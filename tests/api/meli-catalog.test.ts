@@ -1,6 +1,6 @@
 /**
- * @en Mercado Libre catalog API tests with mocked ML client (#184).
- * @es Tests API de catálogo Mercado Libre con cliente ML mockeado (#184).
+ * @en Mercado Libre catalog API tests with mocked ML client (#184/#189).
+ * @es Tests API de catálogo Mercado Libre con cliente ML mockeado (#184/#189).
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -9,6 +9,10 @@ import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
 import { encryptFiscalSecret } from '../../apps/server/fiscal/ar/fiscalSecrets'
 import { clearTenantFeaturesCache } from '../../apps/server/services/tenantConfigCache'
+import {
+  clearEcommerceConnectorRegistry,
+} from '../../apps/server/integrations/ecommerce/connectorRegistry'
+import { resetEcommerceConnectorBootstrap } from '../../apps/server/integrations/ecommerce/bootstrapEcommerceConnectors'
 
 vi.mock('../../apps/server/integrations/meli/meliItemsClient', () => ({
   createMeliItem: vi.fn(),
@@ -23,8 +27,78 @@ import {
   searchMeliCategories,
 } from '../../apps/server/integrations/meli/meliItemsClient'
 
-function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
+function withSyncQueue(base: Record<string, unknown>): PrismaClient {
+  const jobs: Array<Record<string, unknown>> = []
+  let seq = 1
   return {
+    ...base,
+    ecommerceSyncJob: {
+      findUnique: vi.fn(async ({ where }: { where: { id?: number; idempotencyKey?: string } }) => {
+        if (where.id != null) return jobs.find((j) => j.id === where.id) ?? null
+        if (where.idempotencyKey != null) {
+          return jobs.find((j) => j.idempotencyKey === where.idempotencyKey) ?? null
+        }
+        return null
+      }),
+      create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
+        const job = {
+          id: seq++,
+          status: 'pending',
+          attempts: 0,
+          maxAttempts: 3,
+          nextAttemptAt: new Date(0),
+          lastError: null,
+          ...data,
+        }
+        jobs.push(job)
+        return job
+      }),
+      update: vi.fn(async ({ where, data }: { where: { id: number }; data: Record<string, unknown> }) => {
+        const job = jobs.find((j) => j.id === where.id)
+        if (!job) throw new Error('job missing')
+        Object.assign(job, data)
+        return job
+      }),
+      updateMany: vi.fn(
+        async ({
+          where,
+          data,
+        }: {
+          where: { id: number; status?: { in: string[] } }
+          data: Record<string, unknown>
+        }) => {
+          const job = jobs.find((j) => j.id === where.id)
+          if (!job) return { count: 0 }
+          if (where.status?.in && !where.status.in.includes(String(job.status))) {
+            return { count: 0 }
+          }
+          Object.assign(job, data)
+          return { count: 1 }
+        },
+      ),
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn(async () => jobs.filter((j) => j.status === 'pending' || j.status === 'failed')),
+    },
+    syncLog: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+  } as unknown as PrismaClient
+}
+
+function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
+  const pub: Record<string, unknown> = {
+    id: 1,
+    tenantId: 1,
+    articuloId: 10,
+    meliItemId: null as string | null,
+    meliCategoryId: 'MLA1055',
+    estado: 'pending',
+    atributosJson: null,
+    permalink: null as string | null,
+    syncStatus: 'pending',
+    syncError: null as string | null,
+    ultimaSyncAt: null as Date | null,
+  }
+
+  return withSyncQueue({
     deliveryZone: { findMany: vi.fn().mockResolvedValue([]) },
     cliente: { findMany: vi.fn().mockResolvedValue([]), findFirst: vi.fn().mockResolvedValue(null) },
     articulo: {
@@ -78,51 +152,20 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       }),
     },
     meliPublicacion: {
-      findFirst: vi.fn().mockResolvedValue({
-        id: 1,
-        tenantId: 1,
-        articuloId: 10,
-        meliItemId: null,
-        meliCategoryId: 'MLA1055',
-        estado: 'pending',
-        atributosJson: null,
-        permalink: null,
-        syncStatus: 'pending',
-        syncError: null,
-        ultimaSyncAt: null,
+      findFirst: vi.fn().mockImplementation(async () => ({ ...pub })),
+      upsert: vi.fn().mockImplementation(async ({ create, update }: { create: Record<string, unknown>; update: Record<string, unknown> }) => {
+        Object.assign(pub, create, update)
+        return { ...pub }
       }),
-      upsert: vi.fn().mockResolvedValue({
-        id: 1,
-        tenantId: 1,
-        articuloId: 10,
-        meliItemId: null,
-        meliCategoryId: 'MLA1055',
-        estado: 'pending',
-        atributosJson: null,
-        permalink: null,
-        syncStatus: 'pending',
-        syncError: null,
-        ultimaSyncAt: null,
+      update: vi.fn().mockImplementation(async ({ data }: { data: Record<string, unknown> }) => {
+        Object.assign(pub, data)
+        return { ...pub }
       }),
-      update: vi.fn().mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
-        id: 1,
-        tenantId: 1,
-        articuloId: 10,
-        meliCategoryId: 'MLA1055',
-        estado: 'active',
-        atributosJson: null,
-        syncError: null,
-        ...data,
-        meliItemId: data.meliItemId ?? 'MLA111',
-        syncStatus: data.syncStatus ?? 'synced',
-        permalink: data.permalink ?? 'https://articulo.mercadolibre.com.ar/MLA111',
-        ultimaSyncAt: data.ultimaSyncAt ?? new Date(),
-      })),
       delete: vi.fn().mockResolvedValue({}),
       findMany: vi.fn().mockResolvedValue([]),
     },
     ...overrides,
-  } as unknown as PrismaClient
+  })
 }
 
 describe('Mercado Libre catalog API (#184)', () => {
@@ -133,6 +176,8 @@ describe('Mercado Libre catalog API (#184)', () => {
     process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-for-meli-catalog'
     process.env.API_PUBLIC_URL = 'http://localhost:3001'
     clearTenantFeaturesCache()
+    clearEcommerceConnectorRegistry()
+    resetEcommerceConnectorBootstrap()
     vi.mocked(createMeliItem).mockReset()
     vi.mocked(searchMeliCategories).mockReset()
     vi.mocked(fetchMeliCategoryAttributes).mockReset()

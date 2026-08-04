@@ -2350,6 +2350,60 @@ export const meliAPI = {
   },
 }
 
+export type EcommerceConnectorStatus = {
+  connectorType: 'meli' | 'tiendanube' | 'woocommerce'
+  status: 'active' | 'inactive' | 'not_configured'
+  registered: boolean
+}
+
+export type SyncLogRow = {
+  id: number
+  connectorType: string
+  operation: string
+  status: string
+  errorMsg: string | null
+  jobId: number | null
+  createdAt: string
+}
+
+export const ecommerceAPI = {
+  listConnectors: async (): Promise<EcommerceConnectorStatus[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: EcommerceConnectorStatus[] }>(
+        '/ecommerce/connectors',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listSyncLogs: async (params?: {
+    connectorType?: string
+    status?: string
+    limit?: number
+    offset?: number
+  }): Promise<{ data: SyncLogRow[]; total: number; limit: number; offset: number }> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: SyncLogRow[]
+        total: number
+        limit: number
+        offset: number
+      }>('/ecommerce/sync-logs', { params })
+      return {
+        data: response.data.data,
+        total: response.data.total,
+        limit: response.data.limit,
+        offset: response.data.offset,
+      }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 // ============ USERS ============
 
 export const usersAPI = {

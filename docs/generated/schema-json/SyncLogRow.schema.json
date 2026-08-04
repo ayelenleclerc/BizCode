@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "connectorType": {
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "errorMsg": {
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "jobId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "operation": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "success",
+        "error"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "connectorType",
+    "operation",
+    "status",
+    "createdAt"
+  ],
+  "title": "SyncLogRow",
+  "type": "object"
+}

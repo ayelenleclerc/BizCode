@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "connectorType": {
+      "enum": [
+        "meli",
+        "tiendanube",
+        "woocommerce"
+      ],
+      "type": "string"
+    },
+    "registered": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "inactive",
+        "not_configured"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "connectorType",
+    "status",
+    "registered"
+  ],
+  "title": "EcommerceConnectorStatus",
+  "type": "object"
+}

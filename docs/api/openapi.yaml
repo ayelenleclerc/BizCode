@@ -82,6 +82,8 @@ tags:
     description: Mercado Pago online payments integration (#174+)
   - name: meli
     description: Mercado Libre OAuth connection per tenant (#183)
+  - name: ecommerce
+    description: Shared ecommerce sync engine — connectors and SyncLog (#189)
   - name: cobranzas
     description: Overdue invoice reminders (#134)
   - name: cheques
@@ -10303,6 +10305,66 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/ecommerce/connectors:
+    get:
+      tags: [ecommerce]
+      summary: List ecommerce connectors and connection status (#189)
+      description: |
+        Requires `settings.business.manage`. Returns known connector types (`meli`, `tiendanube`, `woocommerce`)
+        with aggregate status. Tiendanube/WooCommerce remain `not_configured` until #187/#188.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Connector statuses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcommerceConnectorsEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/ecommerce/sync-logs:
+    get:
+      tags: [ecommerce]
+      summary: List ecommerce SyncLog rows (#189)
+      description: |
+        Requires `settings.business.manage`. Supports filter by `connectorType` and `status` (`success`|`error`).
+      security:
+        - cookieSession: []
+      parameters:
+        - name: connectorType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [meli, tiendanube, woocommerce]
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [success, error]
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated SyncLog rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcommerceSyncLogListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/articulos/{id}/meli:
     get:
       tags: [meli]
@@ -19585,6 +19647,54 @@ components:
         success: { type: boolean, const: true }
         data:
           $ref: '#/components/schemas/MeliConfigStatus'
+
+    EcommerceConnectorStatus:
+      type: object
+      required: [connectorType, status, registered]
+      properties:
+        connectorType:
+          type: string
+          enum: [meli, tiendanube, woocommerce]
+        status:
+          type: string
+          enum: [active, inactive, not_configured]
+        registered: { type: boolean }
+
+    EcommerceConnectorsEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcommerceConnectorStatus'
+
+    SyncLogRow:
+      type: object
+      required: [id, connectorType, operation, status, createdAt]
+      properties:
+        id: { type: integer }
+        connectorType: { type: string }
+        operation: { type: string }
+        status: { type: string, enum: [success, error] }
+        errorMsg: { type: string, nullable: true }
+        jobId: { type: integer, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    EcommerceSyncLogListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data, total, limit, offset]
+          properties:
+            success: { type: boolean, const: true }
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/SyncLogRow'
+            total: { type: integer }
+            limit: { type: integer }
+            offset: { type: integer }
 
     MeliAuthorizeEnvelope:
       type: object

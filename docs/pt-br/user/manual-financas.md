@@ -93,6 +93,14 @@ Vendas pagas do Mercado Livre viram Pedidos para faturar sem duplo desconto de e
 3. **Faturar** chama `POST /api/meli/ordenes/{meliOrderId}/facturar` — fatura A sem CUIT do cliente retorna `422` `CUIT_REQUIRED_FOR_FACTURA_A`. Completar o CUIT no cliente limpa o pendente.
 4. A fatura de pedidos `origen=meli` usa `skipStockDecrement` porque o estoque já moveu no webhook.
 
+## Motor compartilhado de sync eCommerce (#189)
+
+Pushes de catálogo e estoque dos conectores marketplace passam por uma fila Prisma compartilhada (`EcommerceSyncJob`) com histórico SyncLog:
+
+1. **Configurações → Empresa → Integrações eCommerce** lista os conectores conhecidos (`meli`, `tiendanube`, `woocommerce`) e as últimas linhas SyncLog (filtro por conector/status). Exige `settings.business.manage`.
+2. Catálogo/estoque MeLi enfileiram jobs processados na request e por `npm run ecommerce:sync-worker` a cada minuto (retries 1m/5m/30m; após 3 falhas DLQ e alerta a `super_admin` da plataforma).
+3. APIs: `GET /api/ecommerce/connectors`, `GET /api/ecommerce/sync-logs`. Tiendanube e WooCommerce ficam `not_configured` até #187/#188.
+
 Artigos pai e serviços não são publicados.
 
 ## Links de pagamento Mercado Pago (#175)

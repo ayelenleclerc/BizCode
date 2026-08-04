@@ -133,6 +133,42 @@
       "disconnectFailed": "Não foi possível desconectar o Mercado Livre"
     }
   },
+  "ecommerce": {
+    "title": "Integrações eCommerce",
+    "subtitle": "Status dos conectores e registro compartilhado de sincronização (catálogo, estoque e pedidos).",
+    "loading": "Carregando sincronização eCommerce…",
+    "connectorsLabel": "Conectores disponíveis",
+    "registered": "Adapter registrado",
+    "filterConnector": "Conector",
+    "filterStatus": "Status",
+    "filterAll": "Todos",
+    "emptyLogs": "Nenhuma operação de sincronização registrada.",
+    "logCaption": "Registro de sincronização eCommerce",
+    "connectors": {
+      "meli": "Mercado Livre",
+      "tiendanube": "Tiendanube",
+      "woocommerce": "WooCommerce"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "not_configured": "Não configurado"
+    },
+    "logStatus": {
+      "success": "Sucesso",
+      "error": "Erro"
+    },
+    "columns": {
+      "createdAt": "Data",
+      "connector": "Conector",
+      "operation": "Operação",
+      "status": "Status",
+      "error": "Erro"
+    },
+    "errors": {
+      "loadFailed": "Não foi possível carregar o registro de sincronização eCommerce"
+    }
+  },
   "printDevices": {
     "title": "Dispositivos de impressão",
     "subtitle": "Opcional por cliente: habilite apenas se usar hardware de PDV. PDF e faturação eletrônica funcionam sem impressora.",

@@ -1,13 +1,17 @@
 /**
- * @en Mercado Libre stock push service tests (#185).
- * @es Tests del servicio de push de stock ML (#185).
- * @pt-BR Testes do serviço de push de estoque ML (#185).
+ * @en Mercado Libre stock push service tests (#185/#189).
+ * @es Tests del servicio de push de stock ML (#185/#189).
+ * @pt-BR Testes do serviço de push de estoque ML (#185/#189).
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { MeliStockSyncService } from '../../../apps/server/services/MeliStockSyncService'
 import { encryptFiscalSecret } from '../../../apps/server/fiscal/ar/fiscalSecrets'
+import {
+  clearEcommerceConnectorRegistry,
+} from '../../../apps/server/integrations/ecommerce/connectorRegistry'
+import { resetEcommerceConnectorBootstrap } from '../../../apps/server/integrations/ecommerce/bootstrapEcommerceConnectors'
 
 vi.mock('../../../apps/server/integrations/meli/meliItemsClient', () => ({
   getMeliItem: vi.fn(),
@@ -16,8 +20,64 @@ vi.mock('../../../apps/server/integrations/meli/meliItemsClient', () => ({
 
 import { getMeliItem, updateMeliItem } from '../../../apps/server/integrations/meli/meliItemsClient'
 
-function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
+function withSyncQueue(base: Record<string, unknown>): PrismaClient {
+  const jobs: Array<Record<string, unknown>> = []
+  let seq = 1
   return {
+    ...base,
+    ecommerceSyncJob: {
+      findUnique: vi.fn(async ({ where }: { where: { id?: number; idempotencyKey?: string } }) => {
+        if (where.id != null) return jobs.find((j) => j.id === where.id) ?? null
+        if (where.idempotencyKey != null) {
+          return jobs.find((j) => j.idempotencyKey === where.idempotencyKey) ?? null
+        }
+        return null
+      }),
+      create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
+        const job = {
+          id: seq++,
+          status: 'pending',
+          attempts: 0,
+          maxAttempts: 3,
+          nextAttemptAt: new Date(0),
+          lastError: null,
+          ...data,
+        }
+        jobs.push(job)
+        return job
+      }),
+      update: vi.fn(async ({ where, data }: { where: { id: number }; data: Record<string, unknown> }) => {
+        const job = jobs.find((j) => j.id === where.id)
+        if (!job) throw new Error('job missing')
+        Object.assign(job, data)
+        return job
+      }),
+      updateMany: vi.fn(
+        async ({
+          where,
+          data,
+        }: {
+          where: { id: number; status?: { in: string[] } }
+          data: Record<string, unknown>
+        }) => {
+          const job = jobs.find((j) => j.id === where.id)
+          if (!job) return { count: 0 }
+          if (where.status?.in && !where.status.in.includes(String(job.status))) {
+            return { count: 0 }
+          }
+          Object.assign(job, data)
+          return { count: 1 }
+        },
+      ),
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn(async () => jobs.filter((j) => j.status === 'pending' || j.status === 'failed')),
+    },
+    syncLog: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+  } as unknown as PrismaClient
+}
+
+function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
+  return withSyncQueue({
     meliConfig: {
       findUnique: vi.fn().mockResolvedValue({
         tenantId: 1,
@@ -39,12 +99,14 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
       findMany: vi.fn().mockResolvedValue([]),
     },
     ...overrides,
-  } as unknown as PrismaClient
+  })
 }
 
 describe('MeliStockSyncService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    clearEcommerceConnectorRegistry()
+    resetEcommerceConnectorBootstrap()
   })
 
   it('patches available_quantity only and pauses when stock is 0', async () => {
