@@ -1561,6 +1561,8 @@ model Tenant {
   meliConfig                    MeliConfig?
   meliWebhookEvents             MeliWebhookEvent[]
   meliOrdenes                   MeliOrden[]
+  ecommerceSyncJobs             EcommerceSyncJob[]
+  syncLogs                      SyncLog[]
   shippingCarrierConfigs        ShippingCarrierConfig[]
   configsComision               ConfigComision[]
   liquidacionesComision         LiquidacionComision[]
@@ -1790,6 +1792,53 @@ model MeliOrden {
 
   @@unique([tenantId, meliOrderId])
   @@index([tenantId, status])
+}
+
+/// @en Persistent ecommerce sync queue (Prisma worker; no BullMQ) (#189).
+/// @es Cola persistente de sync eCommerce (worker Prisma; sin BullMQ) (#189).
+/// @pt-BR Fila persistente de sync eCommerce (worker Prisma; sem BullMQ) (#189).
+model EcommerceSyncJob {
+  id              Int       @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  /// meli | tiendanube | woocommerce
+  connectorType   String    @db.VarChar(40)
+  /// publish_product | update_product | pause_product | update_stock | mark_dispatched
+  operation       String    @db.VarChar(40)
+  payload         Json
+  idempotencyKey  String    @unique @db.VarChar(200)
+  /// pending | processing | succeeded | failed | dead
+  status          String    @default("pending") @db.VarChar(20)
+  attempts        Int       @default(0)
+  maxAttempts     Int       @default(3)
+  nextAttemptAt   DateTime  @default(now())
+  lastError       String?   @db.Text
+  articuloId      Int?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status, nextAttemptAt])
+  @@index([tenantId, connectorType])
+  @@index([tenantId, articuloId, operation, status])
+}
+
+/// @en Ecommerce sync operation history for configuration UI (#189).
+/// @es Historial de operaciones de sync eCommerce para UI de configuración (#189).
+/// @pt-BR Histórico de operações de sync eCommerce para UI de configuração (#189).
+model SyncLog {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  connectorType String   @db.VarChar(40)
+  operation     String   @db.VarChar(40)
+  /// success | error
+  status        String   @db.VarChar(20)
+  errorMsg      String?  @db.Text
+  jobId         Int?
+  createdAt     DateTime @default(now())
+
+  @@index([tenantId, connectorType, createdAt])
+  @@index([tenantId, status, createdAt])
 }
 
 /// B2B customer portal branding and feature toggles per tenant (#240).

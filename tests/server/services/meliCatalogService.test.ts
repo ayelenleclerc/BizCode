@@ -8,6 +8,10 @@ import type { PrismaClient } from '@prisma/client'
 import { MeliCatalogService } from '../../../apps/server/services/MeliCatalogService'
 import { MeliApiError } from '../../../apps/server/integrations/meli/meliOAuthClient'
 import { encryptFiscalSecret } from '../../../apps/server/fiscal/ar/fiscalSecrets'
+import {
+  clearEcommerceConnectorRegistry,
+} from '../../../apps/server/integrations/ecommerce/connectorRegistry'
+import { resetEcommerceConnectorBootstrap } from '../../../apps/server/integrations/ecommerce/bootstrapEcommerceConnectors'
 
 vi.mock('../../../apps/server/integrations/meli/meliItemsClient', () => ({
   createMeliItem: vi.fn(),
@@ -39,6 +43,62 @@ function articuloBase(overrides: Record<string, unknown> = {}) {
   }
 }
 
+function withSyncQueue(base: Record<string, unknown>): PrismaClient {
+  const jobs: Array<Record<string, unknown>> = []
+  let seq = 1
+  return {
+    ...base,
+    ecommerceSyncJob: {
+      findUnique: vi.fn(async ({ where }: { where: { id?: number; idempotencyKey?: string } }) => {
+        if (where.id != null) return jobs.find((j) => j.id === where.id) ?? null
+        if (where.idempotencyKey != null) {
+          return jobs.find((j) => j.idempotencyKey === where.idempotencyKey) ?? null
+        }
+        return null
+      }),
+      create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
+        const job = {
+          id: seq++,
+          status: 'pending',
+          attempts: 0,
+          maxAttempts: 3,
+          nextAttemptAt: new Date(0),
+          lastError: null,
+          ...data,
+        }
+        jobs.push(job)
+        return job
+      }),
+      update: vi.fn(async ({ where, data }: { where: { id: number }; data: Record<string, unknown> }) => {
+        const job = jobs.find((j) => j.id === where.id)
+        if (!job) throw new Error('job missing')
+        Object.assign(job, data)
+        return job
+      }),
+      updateMany: vi.fn(
+        async ({
+          where,
+          data,
+        }: {
+          where: { id: number; status?: { in: string[] } }
+          data: Record<string, unknown>
+        }) => {
+          const job = jobs.find((j) => j.id === where.id)
+          if (!job) return { count: 0 }
+          if (where.status?.in && !where.status.in.includes(String(job.status))) {
+            return { count: 0 }
+          }
+          Object.assign(job, data)
+          return { count: 1 }
+        },
+      ),
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn(async () => jobs.filter((j) => j.status === 'pending' || j.status === 'failed')),
+    },
+    syncLog: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+  } as unknown as PrismaClient
+}
+
 function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   const pub = {
     id: 1,
@@ -53,7 +113,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
     syncError: null as string | null,
     ultimaSyncAt: null as Date | null,
   }
-  return {
+  return withSyncQueue({
     meliConfig: {
       findUnique: vi.fn().mockResolvedValue({
         tenantId: 1,
@@ -68,23 +128,24 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
       findFirst: vi.fn().mockResolvedValue(articuloBase()),
     },
     meliPublicacion: {
-      findFirst: vi.fn().mockResolvedValue(pub),
+      findFirst: vi.fn().mockImplementation(async () => ({ ...pub })),
       upsert: vi.fn().mockResolvedValue(pub),
-      update: vi.fn().mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
-        ...pub,
-        ...data,
-        meliItemId: (data.meliItemId as string | undefined) ?? pub.meliItemId,
-      })),
+      update: vi.fn().mockImplementation(async ({ data }: { data: Record<string, unknown> }) => {
+        Object.assign(pub, data)
+        return { ...pub }
+      }),
       delete: vi.fn().mockResolvedValue(pub),
       findMany: vi.fn().mockResolvedValue([]),
     },
     ...overrides,
-  } as unknown as PrismaClient
+  })
 }
 
 describe('MeliCatalogService (#184)', () => {
   beforeEach(() => {
     process.env.API_PUBLIC_URL = 'http://localhost:3001'
+    clearEcommerceConnectorRegistry()
+    resetEcommerceConnectorBootstrap()
     vi.mocked(createMeliItem).mockReset()
     vi.mocked(updateMeliItem).mockReset()
     vi.mocked(fetchMeliCategoryAttributes).mockReset()

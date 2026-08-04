@@ -26,6 +26,7 @@ import { tenantModules } from './middleware/tenantModules'
 import { tenantPlan } from './middleware/tenantPlan'
 import { registerRestDomainRoutes } from './registerRestDomainRoutes'
 import { registerMetricsRoute } from './routes/registerMetricsRoute'
+import { bootstrapEcommerceConnectors } from './integrations/ecommerce/bootstrapEcommerceConnectors'
 
 /**
  * @en Applies Express `trust proxy` from `TRUST_PROXY` hop count when set (#217).
@@ -168,6 +169,7 @@ export function createApp(prisma: PrismaClient): Application {
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getOpenApiDocument()))
 
+  bootstrapEcommerceConnectors()
   registerRestDomainRoutes(app, prisma)
 
   app.use((_req: Request, res: Response) => {

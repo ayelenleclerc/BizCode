@@ -2,7 +2,6 @@ import { Prisma, type Articulo, type ArticuloImagen, type MeliPublicacion, type 
 import { resolveApiPublicBaseUrl } from '../lib/publicUrls'
 import { MeliApiError } from '../integrations/meli/meliOAuthClient'
 import {
-  createMeliItem,
   fetchMeliCategoryAttributes,
   searchMeliCategories,
   updateMeliItem,
@@ -10,6 +9,8 @@ import {
   type MeliCategorySearchHit,
 } from '../integrations/meli/meliItemsClient'
 import { MeliConfigService } from './MeliConfigService'
+import { EcommerceSyncEngine } from './EcommerceSyncEngine'
+import { bootstrapEcommerceConnectors } from '../integrations/ecommerce/bootstrapEcommerceConnectors'
 import type { ServiceResult } from './serviceResults'
 
 export type MeliPublicacionStatus = {
@@ -81,9 +82,12 @@ function mapStatus(row: MeliPublicacion, hasPhotos: boolean): MeliPublicacionSta
  */
 export class MeliCatalogService {
   private readonly meliConfig: MeliConfigService
+  private readonly syncEngine: EcommerceSyncEngine
 
   constructor(private readonly prisma: PrismaClient) {
+    bootstrapEcommerceConnectors()
     this.meliConfig = new MeliConfigService(prisma)
+    this.syncEngine = new EcommerceSyncEngine(prisma)
   }
 
   async getStatus(tenantId: number, articuloId: number): Promise<ServiceResult<MeliPublicacionStatus>> {
@@ -245,42 +249,64 @@ export class MeliCatalogService {
     const qty = Math.max(0, Math.floor(decimalToNumber(articulo.stock)))
     const currency = (articulo.monedaPrecio || 'ARS').toUpperCase()
     const attributes = parseAtributos(row.atributosJson)
+    const isCreate = !row.meliItemId
+    const operation = isCreate ? 'publish_product' : 'update_product'
+    const snapshot = {
+      articuloId: articulo.id,
+      publicacionId: row.id,
+      title: articulo.descripcion.slice(0, 60),
+      price,
+      currencyId: currency,
+      availableQuantity: qty,
+      active: articulo.activo && qty > 0,
+      categoryId: row.meliCategoryId,
+      pictureUrls: pictures.map((p) => p.source),
+      attributes: attributes.length ? attributes : undefined,
+      ...(row.meliItemId ? { externalId: row.meliItemId } : {}),
+    }
 
     try {
-      let item: { id: string; status?: string; permalink?: string }
-      if (!row.meliItemId) {
-        item = await createMeliItem(tokens.data.accessToken, {
-          title: articulo.descripcion.slice(0, 60),
-          category_id: row.meliCategoryId,
-          price,
-          currency_id: currency,
-          available_quantity: Math.max(1, qty || 1),
-          pictures,
-          attributes: attributes.length ? attributes : undefined,
-        })
-      } else {
-        const status = articulo.activo && qty > 0 ? 'active' : 'paused'
-        item = await updateMeliItem(tokens.data.accessToken, row.meliItemId, {
-          title: articulo.descripcion.slice(0, 60),
-          price,
-          status,
-          available_quantity: qty,
-          pictures,
-          attributes: attributes.length ? attributes : undefined,
-        })
-      }
-
-      const updated = await this.prisma.meliPublicacion.update({
+      await this.prisma.meliPublicacion.update({
         where: { id: row.id },
-        data: {
-          meliItemId: item.id,
-          estado: item.status ?? (articulo.activo && qty > 0 ? 'active' : 'paused'),
-          permalink: item.permalink ?? row.permalink,
-          syncStatus: 'synced',
-          syncError: null,
-          ultimaSyncAt: new Date(),
-        },
+        data: { syncStatus: 'pending', syncError: null },
       })
+      const job = await this.syncEngine.enqueue({
+        tenantId,
+        connectorType: 'meli',
+        operation,
+        articuloId: articulo.id,
+        idempotencyKey: `meli:catalog:${tenantId}:${articulo.id}`,
+        payload: snapshot,
+      })
+      const result = await this.syncEngine.processJobById(job.id)
+      const [updated, freshJob] = await Promise.all([
+        this.prisma.meliPublicacion.findFirst({ where: { id: row.id, tenantId } }),
+        this.prisma.ecommerceSyncJob.findUnique({ where: { id: job.id } }),
+      ])
+      if (!updated) {
+        return { ok: false, status: 404, error: 'Mercado Libre listing is not linked' }
+      }
+      if (result === 'succeeded' && (updated.meliItemId || !isCreate)) {
+        return { ok: true, data: mapStatus(updated, true) }
+      }
+      const errMsg =
+        updated.syncError ?? freshJob?.lastError ?? 'Mercado Libre catalog sync failed'
+      if (result === 'failed' || result === 'dead') {
+        await this.markError(row.id, errMsg)
+        if (/quota|limit/i.test(errMsg)) {
+          return {
+            ok: false,
+            status: 403,
+            error: errMsg.includes('quota') || errMsg.toLowerCase().includes('limit')
+              ? 'Mercado Libre listing quota exceeded (403)'
+              : errMsg,
+          }
+        }
+        if (/invalid or expired|unauthorized/i.test(errMsg)) {
+          return { ok: false, status: 401, error: 'Mercado Libre access token is invalid or expired' }
+        }
+        return { ok: false, status: 502, error: errMsg }
+      }
       return { ok: true, data: mapStatus(updated, true) }
     } catch (err: unknown) {
       const mapped = this.mapMeliError(err)

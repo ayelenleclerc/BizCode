@@ -133,6 +133,42 @@
       "disconnectFailed": "No se pudo desconectar MercadoLibre"
     }
   },
+  "ecommerce": {
+    "title": "Integraciones eCommerce",
+    "subtitle": "Estado de conectores y registro de sincronización compartido (catálogo, stock y órdenes).",
+    "loading": "Cargando sincronización eCommerce…",
+    "connectorsLabel": "Conectores disponibles",
+    "registered": "Adapter registrado",
+    "filterConnector": "Conector",
+    "filterStatus": "Estado",
+    "filterAll": "Todos",
+    "emptyLogs": "No hay operaciones de sincronización registradas.",
+    "logCaption": "Registro de sincronización eCommerce",
+    "connectors": {
+      "meli": "Mercado Libre",
+      "tiendanube": "Tiendanube",
+      "woocommerce": "WooCommerce"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "not_configured": "No configurado"
+    },
+    "logStatus": {
+      "success": "Éxito",
+      "error": "Error"
+    },
+    "columns": {
+      "createdAt": "Fecha",
+      "connector": "Conector",
+      "operation": "Operación",
+      "status": "Estado",
+      "error": "Error"
+    },
+    "errors": {
+      "loadFailed": "No se pudo cargar el registro de sincronización eCommerce"
+    }
+  },
   "printDevices": {
     "title": "Dispositivos de impresión",
     "subtitle": "Opcional por cliente: habilitá solo si usás hardware de punto de venta. PDF y facturación electrónica funcionan sin impresora.",

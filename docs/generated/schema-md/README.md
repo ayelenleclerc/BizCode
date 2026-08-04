@@ -348,6 +348,12 @@
 
 * [DocumentoCompraTemplateSummary](./documentocompratemplatesummary.md) – `-`
 
+* [EcommerceConnectorStatus](./ecommerceconnectorstatus.md) – `-`
+
+* [EcommerceConnectorsEnvelope](./ecommerceconnectorsenvelope.md) – `-`
+
+* [EcommerceSyncLogListEnvelope](./ecommercesyncloglistenvelope.md) – `-`
+
 * [EmpresaConfig](./empresaconfig.md) – `-`
 
 * [EmpresaEnvelope](./empresaenvelope.md) – `-`
@@ -1118,6 +1124,8 @@
 
 * [SuperadminTenantStats](./superadmintenantstats.md) – `-`
 
+* [SyncLogRow](./synclogrow.md) – `-`
+
 * [TenantConfig](./tenantconfig.md) – `-`
 
 * [TenantConfigApplyTemplateBody](./tenantconfigapplytemplatebody.md) – `-`
@@ -1277,6 +1285,8 @@
 * [Untitled object in DocumentoCompraPreviewData](./documentocomprapreviewdata-properties-fieldconfidence.md) – `undefined#/properties/fieldConfidence`
 
 * [Untitled object in DocumentoCompraTemplate](./documentocompratemplate-properties-fields.md) – `undefined#/properties/fields`
+
+* [Untitled object in EcommerceSyncLogListEnvelope](./ecommercesyncloglistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in FacturaInput](./facturainput-properties-items-items.md "Catalog line requires articuloId") – `undefined#/properties/items/items`
 
@@ -1619,6 +1629,10 @@
 * [Untitled array in DocumentoCompraTemplateListEnvelope](./documentocompratemplatelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in DocumentoCompraTemplateSummary](./documentocompratemplatesummary-properties-keywords.md) – `undefined#/properties/keywords`
+
+* [Untitled array in EcommerceConnectorsEnvelope](./ecommerceconnectorsenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in EcommerceSyncLogListEnvelope](./ecommercesyncloglistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in Factura](./factura-properties-items.md) – `undefined#/properties/items`
 

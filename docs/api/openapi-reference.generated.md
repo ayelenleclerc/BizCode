@@ -60799,6 +60799,271 @@ Requires module `billing.orders`, permission `sales.create`, and integration `me
 }
 ```
 
+### List ecommerce connectors and connection status (#189)
+
+- **Method:** `GET`
+- **Path:** `/api/ecommerce/connectors`
+- **Tags:** ecommerce
+
+Requires `settings.business.manage`. Returns known connector types (`meli`, `tiendanube`, `woocommerce`) with aggregate status. Tiendanube/WooCommerce remain `not_configured` until #187/#188.
+
+#### Responses
+
+##### Status: 200 Connector statuses
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`connectorType` (required)**
+
+    `string`, possible values: `"meli", "tiendanube", "woocommerce"`
+
+  - **`registered` (required)**
+
+    `boolean`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"active", "inactive", "not_configured"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "connectorType": "meli",
+      "status": "active",
+      "registered": true
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List ecommerce SyncLog rows (#189)
+
+- **Method:** `GET`
+- **Path:** `/api/ecommerce/sync-logs`
+- **Tags:** ecommerce
+
+Requires `settings.business.manage`. Supports filter by `connectorType` and `status` (`success`|`error`).
+
+#### Responses
+
+##### Status: 200 Paginated SyncLog rows
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`connectorType` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`operation` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"success", "error"`
+
+  - **`errorMsg`**
+
+    `string`
+
+  - **`jobId`**
+
+    `integer`
+
+- **`limit` (required)**
+
+  `integer`
+
+- **`offset` (required)**
+
+  `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "connectorType": "",
+      "operation": "",
+      "status": "success",
+      "errorMsg": "",
+      "jobId": 1,
+      "createdAt": ""
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Mercado Libre listing status for an article (#184)
 
 - **Method:** `GET`
@@ -105676,6 +105941,125 @@ Originating invoice header (selected columns)
   }
 }
 ```
+
+### EcommerceConnectorStatus
+
+- **Type:**`object`
+
+* **`connectorType` (required)**
+
+  `string`, possible values: `"meli", "tiendanube", "woocommerce"`
+
+* **`registered` (required)**
+
+  `boolean`
+
+* **`status` (required)**
+
+  `string`, possible values: `"active", "inactive", "not_configured"`
+
+**Example:**
+
+```json
+{
+  "connectorType": "meli",
+  "status": "active",
+  "registered": true
+}
+```
+
+### EcommerceConnectorsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`connectorType` (required)**
+
+    `string`, possible values: `"meli", "tiendanube", "woocommerce"`
+
+  - **`registered` (required)**
+
+    `boolean`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"active", "inactive", "not_configured"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "connectorType": "meli",
+      "status": "active",
+      "registered": true
+    }
+  ]
+}
+```
+
+### SyncLogRow
+
+- **Type:**`object`
+
+* **`connectorType` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`operation` (required)**
+
+  `string`
+
+* **`status` (required)**
+
+  `string`, possible values: `"success", "error"`
+
+* **`errorMsg`**
+
+  `string`
+
+* **`jobId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "connectorType": "",
+  "operation": "",
+  "status": "success",
+  "errorMsg": "",
+  "jobId": 1,
+  "createdAt": ""
+}
+```
+
+### EcommerceSyncLogListEnvelope
+
+- **Type:**
+
+**Example:**
 
 ### MeliAuthorizeEnvelope
 

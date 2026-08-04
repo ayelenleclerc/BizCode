@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "./SyncLogRow.schema.json"
+          },
+          "type": "array"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "success": {
+          "const": true,
+          "type": "boolean"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "success",
+        "data",
+        "total",
+        "limit",
+        "offset"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "EcommerceSyncLogListEnvelope"
+}

@@ -133,6 +133,42 @@
       "disconnectFailed": "Could not disconnect Mercado Libre"
     }
   },
+  "ecommerce": {
+    "title": "eCommerce integrations",
+    "subtitle": "Connector status and shared sync log (catalog, stock and orders).",
+    "loading": "Loading eCommerce sync…",
+    "connectorsLabel": "Available connectors",
+    "registered": "Adapter registered",
+    "filterConnector": "Connector",
+    "filterStatus": "Status",
+    "filterAll": "All",
+    "emptyLogs": "No sync operations recorded yet.",
+    "logCaption": "eCommerce synchronization log",
+    "connectors": {
+      "meli": "Mercado Libre",
+      "tiendanube": "Tiendanube",
+      "woocommerce": "WooCommerce"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "not_configured": "Not configured"
+    },
+    "logStatus": {
+      "success": "Success",
+      "error": "Error"
+    },
+    "columns": {
+      "createdAt": "Date",
+      "connector": "Connector",
+      "operation": "Operation",
+      "status": "Status",
+      "error": "Error"
+    },
+    "errors": {
+      "loadFailed": "Could not load the eCommerce sync log"
+    }
+  },
   "printDevices": {
     "title": "Print devices",
     "subtitle": "Optional per customer: enable only if you use POS hardware. PDF and electronic invoicing work without any printer.",

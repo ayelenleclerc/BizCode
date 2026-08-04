@@ -93,6 +93,14 @@ Paid Mercado Libre sales become Pedidos for invoicing without double stock decre
 3. **Invoice** calls `POST /api/meli/ordenes/{meliOrderId}/facturar` — Factura A without customer CUIT returns `422` `CUIT_REQUIRED_FOR_FACTURA_A`. Completing CUIT on the customer clears the pending flag.
 4. Invoice creation for `origen=meli` uses `skipStockDecrement` because stock already moved on the webhook.
 
+## Shared ecommerce sync engine (#189)
+
+Catalog and stock pushes for marketplace connectors go through a shared Prisma queue (`EcommerceSyncJob`) with SyncLog history:
+
+1. **Settings → Company → eCommerce integrations** lists known connectors (`meli`, `tiendanube`, `woocommerce`) and the latest SyncLog rows (filter by connector/status). Requires `settings.business.manage`.
+2. MeLi catalog/stock operations enqueue jobs processed immediately in-request and by `npm run ecommerce:sync-worker` every minute (retries with 1m/5m/30m backoff; after 3 failures the job is dead-lettered and platform `super_admin` is alerted).
+3. APIs: `GET /api/ecommerce/connectors`, `GET /api/ecommerce/sync-logs`. Tiendanube and WooCommerce remain `not_configured` until their connectors land (#187/#188).
+
 Parent catalog rows and service items cannot be published.
 
 ## Mercado Pago payment links (#175)

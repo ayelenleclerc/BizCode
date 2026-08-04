@@ -74,6 +74,7 @@
     "meli:token-refresh": "tsx scripts/meli-token-refresh-job.ts",
     "meli:catalog-sync": "tsx scripts/meli-catalog-sync-job.ts",
     "meli:stock-reconcile": "tsx scripts/meli-stock-reconcile-job.ts",
+    "ecommerce:sync-worker": "tsx scripts/ecommerce-sync-worker-job.ts",
     "modules:trial-expire": "tsx scripts/module-trial-expire-job.ts",
     "reparto-ubicacion:purge": "tsx scripts/reparto-ubicacion-purge-job.ts",
     "backup:postgres": "tsx scripts/backup-postgres.ts",

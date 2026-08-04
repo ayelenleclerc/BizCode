@@ -17,6 +17,7 @@ import FiscalRetencionesSection from './FiscalRetencionesSection'
 import PortalConfigSection from './PortalConfigSection'
 import MercadoPagoConfigSection from './MercadoPagoConfigSection'
 import MeliConfigSection from './MeliConfigSection'
+import EcommerceSyncSection from './EcommerceSyncSection'
 import IfModule from '@/components/IfModule'
 
 const EMPRESA_TIMEZONE_OPTIONS = [
@@ -565,6 +566,7 @@ export default function EmpresaPage() {
       <ArcaFiscalSection />
       <MercadoPagoConfigSection />
       <MeliConfigSection />
+      <EcommerceSyncSection />
       <PrintDevicesSection />
       <FiscalRetencionesSection />
       <ProveedorAlertasConfigSection />

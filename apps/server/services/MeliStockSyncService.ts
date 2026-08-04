@@ -1,22 +1,22 @@
 /**
- * @en Pushes BizCode article stock to Mercado Libre listings (#185).
- * @es Empuja stock de artículos BizCode a publicaciones Mercado Libre (#185).
- * @pt-BR Empurra estoque de artigos BizCode para anúncios Mercado Livre (#185).
+ * @en Pushes BizCode article stock to Mercado Libre listings (#185) via EcommerceSyncEngine (#189).
+ * @es Empuja stock de artículos BizCode a publicaciones Mercado Libre (#185) vía EcommerceSyncEngine (#189).
+ * @pt-BR Empurra estoque de artigos BizCode para anúncios Mercado Livre (#185) via EcommerceSyncEngine (#189).
  */
 
 import type { PrismaClient } from '@prisma/client'
 import { MeliApiError } from '../integrations/meli/meliOAuthClient'
-import {
-  getMeliItem,
-  updateMeliItem,
-} from '../integrations/meli/meliItemsClient'
+import { getMeliItem } from '../integrations/meli/meliItemsClient'
 import { MeliConfigService } from './MeliConfigService'
+import { EcommerceSyncEngine } from './EcommerceSyncEngine'
+import { bootstrapEcommerceConnectors } from '../integrations/ecommerce/bootstrapEcommerceConnectors'
 import type { ServiceResult } from './serviceResults'
 
 export type MeliStockSyncResult = {
   synced: boolean
   availableQuantity?: number
   status?: string
+  queued?: boolean
 }
 
 export type MeliStockReconcileSummary = {
@@ -26,21 +26,24 @@ export type MeliStockReconcileSummary = {
 }
 
 /**
- * @en Stock-only sync BizCode → Mercado Libre (pause at qty 0) (#185).
- * @es Sync solo de stock BizCode → Mercado Libre (pausa en qty 0) (#185).
- * @pt-BR Sync só de estoque BizCode → Mercado Livre (pausa em qty 0) (#185).
+ * @en Stock-only sync BizCode → Mercado Libre (pause at qty 0) (#185/#189).
+ * @es Sync solo de stock BizCode → Mercado Libre (pausa en qty 0) (#185/#189).
+ * @pt-BR Sync só de estoque BizCode → Mercado Livre (pausa em qty 0) (#185/#189).
  */
 export class MeliStockSyncService {
   private readonly meliConfig: MeliConfigService
+  private readonly syncEngine: EcommerceSyncEngine
 
   constructor(private readonly prisma: PrismaClient) {
+    bootstrapEcommerceConnectors()
     this.meliConfig = new MeliConfigService(prisma)
+    this.syncEngine = new EcommerceSyncEngine(prisma)
   }
 
   /**
-   * @en Patches `available_quantity` (and pause/active) when a MeLi listing exists (#185).
-   * @es Parchea `available_quantity` (y pause/active) si existe publicación MeLi (#185).
-   * @pt-BR Atualiza `available_quantity` (e pause/active) se existir anúncio MeLi (#185).
+   * @en Enqueues stock sync and processes the job immediately (#185/#189).
+   * @es Encola sync de stock y procesa el job de inmediato (#185/#189).
+   * @pt-BR Enfileira sync de estoque e processa o job imediatamente (#185/#189).
    */
   async syncStockToMeli(
     tenantId: number,
@@ -70,26 +73,42 @@ export class MeliStockSyncService {
       qty <= 0 || !articulo.activo ? 'paused' : 'active'
 
     try {
-      const item = await updateMeliItem(tokens.data.accessToken, pub.meliItemId, {
-        available_quantity: qty,
-        status,
-      })
-      await this.prisma.meliPublicacion.update({
-        where: { id: pub.id },
-        data: {
-          estado: item.status ?? status,
-          ultimaSyncAt: new Date(),
-          syncStatus: 'synced',
-          syncError: null,
+      const job = await this.syncEngine.enqueue({
+        tenantId,
+        connectorType: 'meli',
+        operation: 'update_stock',
+        articuloId,
+        idempotencyKey: `meli:stock:${tenantId}:${articuloId}`,
+        payload: {
+          articuloId,
+          publicacionId: pub.id,
+          externalId: pub.meliItemId,
+          quantity: qty,
+          status,
         },
       })
+      const result = await this.syncEngine.processJobById(job.id)
+      if (result === 'succeeded') {
+        return {
+          ok: true,
+          data: {
+            synced: true,
+            availableQuantity: qty,
+            status,
+          },
+        }
+      }
+      if (result === 'deferred') {
+        return {
+          ok: true,
+          data: { synced: false, queued: true, availableQuantity: qty, status },
+        }
+      }
+      const fresh = await this.prisma.ecommerceSyncJob.findUnique({ where: { id: job.id } })
       return {
-        ok: true,
-        data: {
-          synced: true,
-          availableQuantity: qty,
-          status: item.status ?? status,
-        },
+        ok: false,
+        status: 502,
+        error: fresh?.lastError ?? 'Mercado Libre stock sync failed',
       }
     } catch (err: unknown) {
       return this.mapMeliError(err)
@@ -127,20 +146,19 @@ export class MeliStockSyncService {
         }
         const articulo = await this.prisma.articulo.findFirst({
           where: { id: row.articuloId, tenantId: row.tenantId },
-          select: { stock: true },
+          select: { stock: true, activo: true },
         })
         if (!articulo) {
           errors += 1
           continue
         }
-        const bizQty = Math.max(0, Math.floor(Number(articulo.stock)))
+        const localQty = Math.max(0, Math.floor(Number(articulo.stock)))
         const remote = await getMeliItem(tokens.data.accessToken, row.meliItemId)
         const remoteQty = Math.max(0, Math.floor(Number(remote.available_quantity ?? 0)))
-        if (remoteQty === bizQty) continue
-
-        const result = await this.syncStockToMeli(row.tenantId, row.articuloId)
-        if (result.ok && result.data.synced) corrected += 1
-        else errors += 1
+        if (remoteQty === localQty) continue
+        const push = await this.syncStockToMeli(row.tenantId, row.articuloId)
+        if (push.ok && push.data.synced) corrected += 1
+        else if (!push.ok) errors += 1
       } catch {
         errors += 1
       }
@@ -160,7 +178,7 @@ export class MeliStockSyncService {
         error: err.message,
       }
     }
-    const message = err instanceof Error ? err.message : 'Mercado Libre stock sync failed'
+    const message = err instanceof Error ? err.message : 'Mercado Libre request failed'
     return { ok: false, status: 502, error: message }
   }
 }
