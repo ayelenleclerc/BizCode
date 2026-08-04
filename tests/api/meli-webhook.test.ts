@@ -51,6 +51,20 @@ function buildHeaders(dataId: string, secret: string): Record<string, string> {
 
 function buildPrismaMock(): PrismaClient {
   const eventStore = new Set<string>()
+  let meliOrden: {
+    id: number
+    tenantId: number
+    meliOrderId: string
+    status: string
+    shippingId: string | null
+    isFulfillment: boolean
+    buyerNickname: string | null
+    cuitPending: boolean
+    stockAppliedAt: Date | null
+    lastSyncedAt: Date
+    pedidoId: number | null
+  } | null = null
+
   return {
     deliveryZone: { findMany: vi.fn().mockResolvedValue([]) },
     tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, slug: 'demo', active: true }) },
@@ -67,6 +81,7 @@ function buildPrismaMock(): PrismaClient {
         accessTokenEncrypted: encryptFiscalSecret('access-token'),
         refreshTokenEncrypted: encryptFiscalSecret('refresh-token'),
         meliUserId: '468834342',
+        activo: true,
       }),
     },
     meliWebhookEvent: {
@@ -79,6 +94,34 @@ function buildPrismaMock(): PrismaClient {
         return { id: 1 }
       }),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+    },
+    meliOrden: {
+      findUnique: vi.fn().mockImplementation(async () => meliOrden),
+      findUniqueOrThrow: vi.fn().mockImplementation(async () => {
+        if (!meliOrden) throw new Error('missing')
+        return meliOrden
+      }),
+      create: vi.fn().mockImplementation(async ({ data }: { data: Record<string, unknown> }) => {
+        meliOrden = {
+          id: 1,
+          tenantId: data.tenantId as number,
+          meliOrderId: data.meliOrderId as string,
+          status: data.status as string,
+          shippingId: (data.shippingId as string | null) ?? null,
+          isFulfillment: Boolean(data.isFulfillment),
+          buyerNickname: (data.buyerNickname as string | null) ?? null,
+          cuitPending: false,
+          stockAppliedAt: null,
+          lastSyncedAt: new Date(),
+          pedidoId: null,
+        }
+        return meliOrden
+      }),
+      update: vi.fn().mockImplementation(async ({ data }: { data: Record<string, unknown> }) => {
+        if (!meliOrden) throw new Error('missing')
+        meliOrden = { ...meliOrden, ...data } as typeof meliOrden
+        return meliOrden
+      }),
     },
     meliPublicacion: {
       findFirst: vi.fn().mockResolvedValue({ id: 1, articuloId: 10, meliItemId: 'MLA100' }),
@@ -96,7 +139,18 @@ function buildPrismaMock(): PrismaClient {
         unidadBase: 'unidad',
         multiploVenta: null,
         activo: true,
+        esPadre: false,
+        condIva: '1',
+        unidadServicio: null,
       }),
+    },
+    cliente: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      aggregate: vi.fn().mockResolvedValue({ _max: { codigo: 1 } }),
+      create: vi.fn().mockResolvedValue({ id: 20, rsocial: 'Comprador' }),
+    },
+    pedido: {
+      create: vi.fn().mockResolvedValue({ id: 50 }),
     },
     deposito: { findFirst: vi.fn().mockResolvedValue(null) },
     stockAjuste: {
@@ -105,6 +159,7 @@ function buildPrismaMock(): PrismaClient {
         user: { id: 1, username: 'system' },
       }),
     },
+    stockDeposito: { findFirst: vi.fn().mockResolvedValue(null) },
     recuento: { findFirst: vi.fn().mockResolvedValue(null) },
     tenantConfig: { findUnique: vi.fn().mockResolvedValue({ modules: [], integrations: ['meli'] }) },
     $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) => {
@@ -151,7 +206,8 @@ describe('POST /api/webhooks/meli', () => {
     vi.mocked(getMeliOrder).mockResolvedValue({
       id: Number(ORDER_ID),
       status: 'paid',
-      order_items: [{ item: { id: 'MLA100' }, quantity: 1 }],
+      buyer: { nickname: 'BUYER', email: 'buyer@example.com' },
+      order_items: [{ item: { id: 'MLA100', title: 'Demo' }, quantity: 1, unit_price: 100 }],
     })
   })
 

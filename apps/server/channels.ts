@@ -162,6 +162,31 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
           `El precio en Mercado Libre difiere del precio en BizCode para el artículo${code}${desc}. No se auto-corrige (#185).`,
       }
     }
+    case 'meli_order_imported': {
+      const order = payload.resource ? ` ${payload.resource}` : ''
+      return {
+        subject: `[BizCode] Nueva venta en Mercado Libre${order}`,
+        text:
+          payload.detail ??
+          `Se importó una orden de Mercado Libre${order}${payload.pedidoId != null ? ` como pedido #${payload.pedidoId}` : ''}.`,
+      }
+    }
+    case 'meli_cuit_required': {
+      return {
+        subject: `[BizCode] CUIT requerido para facturar orden ML`,
+        text:
+          payload.detail ??
+          `Completar CUIT del cliente antes de emitir factura A${payload.pedidoId != null ? ` (pedido #${payload.pedidoId})` : ''}.`,
+      }
+    }
+    case 'meli_order_cancelled_invoiced': {
+      return {
+        subject: `[BizCode] URGENTE: Orden ML cancelada ya facturada`,
+        text:
+          payload.detail ??
+          `Una orden de Mercado Libre fue cancelada pero el pedido ya está facturado — requiere revisión manual.`,
+      }
+    }
     case 'contract_invoice_generated': {
       const numero = payload.contratoNumero != null ? ` #${payload.contratoNumero}` : ''
       const facturaRef = payload.facturaId != null ? ` (factura #${payload.facturaId})` : ''

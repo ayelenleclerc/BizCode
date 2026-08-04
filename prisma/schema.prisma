@@ -1238,14 +1238,20 @@ model Pedido {
   /// @pt-BR Depósito de despacho previsto quando inventory.warehouses está ativo (#236).
   depositoId  Int?
   deposito    Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
+  /// @en Sales channel origin; `meli` when imported from Mercado Libre (#186).
+  /// @es Origen del canal de venta; `meli` cuando se importa de Mercado Libre (#186).
+  /// @pt-BR Origem do canal de venda; `meli` quando importado do Mercado Livre (#186).
+  origen      String?   @db.VarChar(20)
   remito      Remito?
   items       PedidoItem[]
+  meliOrden   MeliOrden?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([tenantId, estado])
   @@index([tenantId, clienteId])
   @@index([tenantId, depositoId])
+  @@index([tenantId, origen])
 }
 
 /// Delivery note (remito) — non-fiscal transport document (#230).
@@ -1554,6 +1560,7 @@ model Tenant {
   mercadoPagoChargebacks        MercadoPagoChargeback[]
   meliConfig                    MeliConfig?
   meliWebhookEvents             MeliWebhookEvent[]
+  meliOrdenes                   MeliOrden[]
   shippingCarrierConfigs        ShippingCarrierConfig[]
   configsComision               ConfigComision[]
   liquidacionesComision         LiquidacionComision[]
@@ -1758,6 +1765,31 @@ model MeliWebhookEvent {
 
   @@unique([topic, resource])
   @@index([tenantId, processedAt])
+}
+
+/// @en Local Mercado Libre order lifecycle and link to Pedido (#186).
+/// @es Ciclo de vida local de orden Mercado Libre y vínculo a Pedido (#186).
+/// @pt-BR Ciclo de vida local de pedido Mercado Livre e vínculo ao Pedido (#186).
+model MeliOrden {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  meliOrderId    String    @db.VarChar(40)
+  pedidoId       Int?      @unique
+  pedido         Pedido?   @relation(fields: [pedidoId], references: [id], onDelete: SetNull)
+  /// paid | cancelled | payment_required | payment_in_process | ...
+  status         String    @db.VarChar(40)
+  shippingId     String?   @db.VarChar(40)
+  isFulfillment  Boolean   @default(false)
+  buyerNickname  String?   @db.VarChar(120)
+  cuitPending    Boolean   @default(false)
+  stockAppliedAt DateTime?
+  lastSyncedAt   DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([tenantId, meliOrderId])
+  @@index([tenantId, status])
 }
 
 /// B2B customer portal branding and feature toggles per tenant (#240).

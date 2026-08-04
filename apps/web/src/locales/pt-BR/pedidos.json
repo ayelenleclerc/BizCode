@@ -3,6 +3,9 @@
   "subtitle": "Orçamentos e pedidos comerciais",
   "newOrder": "Novo pedido",
   "empty": "Não há pedidos para exibir.",
+  "tabsLabel": "Seções de pedidos",
+  "tabPedidos": "Pedidos",
+  "tabMeli": "Pedidos ML",
   "columns": {
     "id": "N.º",
     "cliente": "Cliente",
@@ -21,5 +24,32 @@
   },
   "filterEstado": "Status",
   "filterAll": "Todos",
-  "loadError": "Não foi possível carregar os pedidos."
+  "loadError": "Não foi possível carregar os pedidos.",
+  "meli": {
+    "filterEstado": "Status",
+    "filter": {
+      "pendiente": "Pendentes",
+      "facturada": "Faturadas",
+      "cancelada": "Canceladas",
+      "all": "Todas"
+    },
+    "refresh": "Atualizar pedidos ML",
+    "empty": "Não há pedidos do Mercado Livre.",
+    "loadError": "Não foi possível carregar os pedidos do Mercado Livre.",
+    "invoiceError": "Não foi possível faturar o pedido.",
+    "cuitPending": "CUIT pendente",
+    "fulfillmentYes": "ML Full (sem envio próprio)",
+    "fulfillmentNo": "Envio próprio",
+    "invoice": "Faturar",
+    "invoicing": "Faturando…",
+    "columns": {
+      "meliOrderId": "Pedido ML",
+      "buyer": "Comprador",
+      "status": "Status ML",
+      "pedido": "Pedido",
+      "total": "Total",
+      "fulfillment": "Logística",
+      "actions": "Ações"
+    }
+  }
 }

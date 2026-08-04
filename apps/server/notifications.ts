@@ -20,6 +20,9 @@ export const NOTIFICATION_TYPES = [
   'mercadopago_payment_failed',
   'mercadopago_chargeback',
   'meli_price_divergence',
+  'meli_order_imported',
+  'meli_cuit_required',
+  'meli_order_cancelled_invoiced',
   'contract_invoice_generated',
   'contract_adjustment_due',
   'ot_presupuestado',
@@ -54,6 +57,7 @@ export type NotificationPayload = {
   descripcion?: string
   stock?: number
   minimo?: number
+  pedidoId?: number
   moduleKey?: string
   expiresAt?: string
   daysRemaining?: number

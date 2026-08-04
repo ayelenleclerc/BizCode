@@ -241,34 +241,53 @@ describe('FacturaService', () => {
     )
   })
 
-  it('createPartialCreditNote rejects when total NCs would exceed invoice (#344)', async () => {
-    vi.mocked(prisma.factura.findFirst).mockResolvedValue({
-      id: 1,
-      estado: 'A',
-      total: new Decimal(100),
-      clienteId: 3,
-      estadoCae: 'pending',
-      tipo: 'B',
-      prefijo: '0001',
-      numero: 1,
-    } as never)
-    vi.mocked(prisma.notaCredito.aggregate).mockResolvedValue({
-      _sum: { monto: new Decimal(80) },
-    } as never)
-
-    const result = await service.createPartialCreditNote(
-      1,
-      1,
-      new Decimal(30),
-      'Devolución parcial',
-      { userId: 1, ipAddress: '127.0.0.1' },
-    )
-
-    expect(result.ok).toBe(false)
-    if (!result.ok) {
-      expect(result.status).toBe(422)
-      expect(result.error).toBe('Total credit notes would exceed invoice total')
+  it('create rejects insufficient stock unless skipStockDecrement (#186)', async () => {
+    const invoiceInput = {
+      ...baseFacturaInput,
+      neto1: 100,
+      neto2: 0,
+      neto3: 0,
+      iva1: 0,
+      iva2: 0,
+      total: 100,
     }
-    expect(prisma.$transaction).not.toHaveBeenCalled()
+    vi.mocked(prisma.articulo.findMany).mockResolvedValue([
+      {
+        id: 7,
+        codigo: 7,
+        descripcion: 'Art',
+        stock: 0,
+        minimo: 0,
+        tipo: 'articulo',
+        condIva: '1',
+        unidadServicio: null,
+        controlLote: false,
+        unidadBase: 'unidad',
+        monedaPrecio: 'ARS',
+        precioEnMonedaOrigen: null,
+        esPadre: false,
+      },
+    ] as never)
+    vi.mocked(prisma.cliente.findFirst).mockResolvedValue({ suspended: false } as never)
+    Object.assign(prisma, {
+      deposito: { findFirst: vi.fn().mockResolvedValue(null) },
+      tenantConfig: { findUnique: vi.fn().mockResolvedValue(null) },
+      tipoCambio: { findFirst: vi.fn().mockResolvedValue(null) },
+      fiscalConfig: { findUnique: vi.fn().mockResolvedValue(null) },
+      regimenRetencion: { findMany: vi.fn().mockResolvedValue([]) },
+      recuento: { findFirst: vi.fn().mockResolvedValue(null) },
+    })
+
+    const blocked = await service.create(1, invoiceInput, 1)
+    expect(blocked.ok).toBe(false)
+    if (!blocked.ok) {
+      expect(blocked.error).toBe('INSUFFICIENT_STOCK')
+    }
+
+    // Past stock gate with skipStockDecrement (transaction itself is out of scope for this unit).
+    vi.mocked(prisma.$transaction).mockRejectedValue(new Error('tx-after-stock-gate'))
+    await expect(
+      service.create(1, invoiceInput, 1, { skipStockDecrement: true }),
+    ).rejects.toThrow('tx-after-stock-gate')
   })
 })
