@@ -44892,6 +44892,82 @@ Public notifications endpoint (no JWT). Validates `x-signature` with platform en
 }
 ```
 
+### Tiendanube notifications webhook (#187)
+
+- **Method:** `POST`
+- **Path:** `/api/webhooks/tiendanube`
+- **Tags:** tiendanube
+
+Public notifications endpoint (no JWT). Validates `x-linkedstore-hmac-sha256` with `TIENDANUBE_WEBHOOK_SECRET` or `TIENDANUBE_CLIENT_SECRET` (HMAC-SHA256 of raw body, hex). Responds `200` immediately and processes asynchronously:
+
+- `order/paid` / `order/cancelled`: re-fetches the TN order into `TiendanubeOrden`, applies paid (stock once via `venta_tiendanube` + Pedido `origen=tiendanube`) or cancelled transitions.
+- `app/uninstalled`: deletes local `TiendanubeConfig`. Rate-limited per IP.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`event` (required)**
+
+  `string`
+
+- **`store_id` (required)**
+
+  `object`
+
+- **`id`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "store_id": "",
+  "event": "",
+  "id": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Notification accepted (processing may continue asynchronously)
+
+###### Content-Type: application/json
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true
+}
+```
+
+##### Status: 400 Invalid signature or payload
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/facturas/{id}/remito
 
 - **Method:** `PARAMETERS`
@@ -60238,6 +60314,843 @@ Requires `settings.business.manage` and tenant integration `meli`. Attempts remo
 }
 ```
 
+### Tiendanube connection status (no tokens) (#187)
+
+- **Method:** `GET`
+- **Path:** `/api/configuracion/tiendanube`
+- **Tags:** tiendanube
+
+Requires `settings.business.manage` and tenant integration `tiendanube`. Never returns access tokens.
+
+#### Responses
+
+##### Status: 200 Tiendanube connection status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`connected` (required)**
+
+    `boolean`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`conectadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`storeId`**
+
+    `string`
+
+  - **`storeName`**
+
+    `string`
+
+  - **`storeUrl`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "connected": true,
+    "storeId": "",
+    "storeName": "",
+    "storeUrl": "",
+    "accessTokenLast4": "",
+    "activo": true,
+    "conectadoAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Build Tiendanube OAuth authorization URL (#187)
+
+- **Method:** `GET`
+- **Path:** `/api/oauth/tiendanube/authorize`
+- **Tags:** tiendanube
+
+Requires `settings.business.manage` and tenant integration `tiendanube`. Returns Partner Portal authorize URL with signed CSRF `state`.
+
+#### Responses
+
+##### Status: 200 Authorization URL
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`authorizationUrl` (required)**
+
+    `string`, format: `uri`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "authorizationUrl": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 503 Platform TIENDANUBE\_CLIENT\_ID / TIENDANUBE\_CLIENT\_SECRET missing
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Tiendanube OAuth callback (#187)
+
+- **Method:** `GET`
+- **Path:** `/api/oauth/tiendanube/callback`
+- **Tags:** tiendanube
+
+Public callback. Validates signed `state`, exchanges `code` for a long-lived token, stores encrypted credentials, then redirects to the web app.
+
+#### Responses
+
+##### Status: 302 Redirect to \`/configuracion?tiendanube=connected\`
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Token exchange failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Disconnect Tiendanube (#187)
+
+- **Method:** `POST`
+- **Path:** `/api/oauth/tiendanube/disconnect`
+- **Tags:** tiendanube
+
+Requires `settings.business.manage` and tenant integration `tiendanube`. Deletes local encrypted token (no public revoke endpoint evidenced).
+
+#### Responses
+
+##### Status: 200 Disconnected
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`disconnected` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "disconnected": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not connected
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List Tiendanube imported orders (#187)
+
+- **Method:** `GET`
+- **Path:** `/api/tiendanube/ordenes`
+- **Tags:** tiendanube
+
+Requires module `billing.orders`, permission `orders.create` or `reports.operational.read`, and integration `tiendanube`.
+
+#### Responses
+
+##### Status: 200 Paginated Tiendanube orders
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cuitPending` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastSyncedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`tnOrderId` (required)**
+
+    `string`
+
+  - **`buyerNickname`**
+
+    `string`
+
+  - **`clienteCuit`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`clienteRsocial`**
+
+    `string`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`pedidoEstado`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`pedidoTotal`**
+
+    `string`
+
+  - **`stockAppliedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tnOrderId": "",
+      "status": "",
+      "buyerNickname": "",
+      "cuitPending": true,
+      "stockAppliedAt": "",
+      "lastSyncedAt": "",
+      "pedidoId": 1,
+      "pedidoEstado": "",
+      "pedidoTotal": "",
+      "facturaId": 1,
+      "clienteId": 1,
+      "clienteRsocial": "",
+      "clienteCuit": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Invoice a Tiendanube imported order (#187)
+
+- **Method:** `POST`
+- **Path:** `/api/tiendanube/ordenes/{tnOrderId}/facturar`
+- **Tags:** tiendanube
+
+Requires module `billing.orders`, permission `sales.create`, and integration `tiendanube`. Invoices the linked Pedido with `skipStockDecrement` (stock already moved via `venta_tiendanube`).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`numero` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"A", "B"`
+
+- **`formaPagoId`**
+
+  `integer`
+
+- **`prefijo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "numero": 1,
+  "prefijo": "",
+  "formaPagoId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Pedido invoiced
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidoId": 1,
+    "facturaId": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Already invoiced or cancelled
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 CUIT required for factura A
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Search Mercado Libre categories (#184)
 
 - **Method:** `GET`
@@ -61515,6 +62428,480 @@ Requires `products.manage`, tenant integration `meli`, and article ownership. Cr
 - **Tags:** meli
 
 Requires `products.manage`, tenant integration `meli`, and article ownership. Pauses remote listing when possible and deletes local mapping.
+
+#### Responses
+
+##### Status: 200 Unlinked
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`unlinked` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "unlinked": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Listing not linked
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Tiendanube listing status for an article (#187)
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/tiendanube`
+- **Tags:** tiendanube
+
+Requires `products.read`, tenant integration `tiendanube`, and article ownership.
+
+#### Responses
+
+##### Status: 200 Listing mapping status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`hasPhotos` (required)**
+
+    `boolean`
+
+  - **`linked` (required)**
+
+    `boolean`
+
+  - **`photoWarning` (required)**
+
+    `boolean`
+
+  - **`estado`**
+
+    `string`
+
+  - **`permalink`**
+
+    `string`
+
+  - **`syncError`**
+
+    `string`
+
+  - **`syncStatus`**
+
+    `string`
+
+  - **`tnProductId`**
+
+    `string`
+
+  - **`tnVariantId`**
+
+    `string`
+
+  - **`ultimaSyncAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "linked": true,
+    "tnProductId": "",
+    "tnVariantId": "",
+    "estado": "",
+    "syncStatus": "",
+    "syncError": "",
+    "permalink": "",
+    "ultimaSyncAt": "",
+    "hasPhotos": true,
+    "photoWarning": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Article not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Opt-in publish or update article on Tiendanube (#187)
+
+- **Method:** `PUT`
+- **Path:** `/api/articulos/{id}/tiendanube`
+- **Tags:** tiendanube
+
+Requires `products.manage`, tenant integration `tiendanube`, and article ownership. Creates or updates `TiendanubePublicacion` and syncs via EcommerceSyncEngine.
+
+#### Responses
+
+##### Status: 200 Listing synced
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`hasPhotos` (required)**
+
+    `boolean`
+
+  - **`linked` (required)**
+
+    `boolean`
+
+  - **`photoWarning` (required)**
+
+    `boolean`
+
+  - **`estado`**
+
+    `string`
+
+  - **`permalink`**
+
+    `string`
+
+  - **`syncError`**
+
+    `string`
+
+  - **`syncStatus`**
+
+    `string`
+
+  - **`tnProductId`**
+
+    `string`
+
+  - **`tnVariantId`**
+
+    `string`
+
+  - **`ultimaSyncAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "linked": true,
+    "tnProductId": "",
+    "tnVariantId": "",
+    "estado": "",
+    "syncStatus": "",
+    "syncError": "",
+    "permalink": "",
+    "ultimaSyncAt": "",
+    "hasPhotos": true,
+    "photoWarning": true
+  }
+}
+```
+
+##### Status: 400 Validation error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Article or Tiendanube connection not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Unlink article from Tiendanube (#187)
+
+- **Method:** `DELETE`
+- **Path:** `/api/articulos/{id}/tiendanube`
+- **Tags:** tiendanube
+
+Requires `products.manage`, tenant integration `tiendanube`, and article ownership. Pauses remote product when possible and deletes local mapping.
 
 #### Responses
 
@@ -105938,6 +107325,484 @@ Originating invoice header (selected columns)
     "accessTokenLast4": "",
     "activo": true,
     "conectadoAt": ""
+  }
+}
+```
+
+### TiendanubeConfigStatus
+
+- **Type:**`object`
+
+* **`connected` (required)**
+
+  `boolean`
+
+* **`accessTokenLast4`**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`conectadoAt`**
+
+  `string`, format: `date-time`
+
+* **`storeId`**
+
+  `string`
+
+* **`storeName`**
+
+  `string`
+
+* **`storeUrl`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "connected": true,
+  "storeId": "",
+  "storeName": "",
+  "storeUrl": "",
+  "accessTokenLast4": "",
+  "activo": true,
+  "conectadoAt": ""
+}
+```
+
+### TiendanubeConfigStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`connected` (required)**
+
+    `boolean`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`conectadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`storeId`**
+
+    `string`
+
+  - **`storeName`**
+
+    `string`
+
+  - **`storeUrl`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "connected": true,
+    "storeId": "",
+    "storeName": "",
+    "storeUrl": "",
+    "accessTokenLast4": "",
+    "activo": true,
+    "conectadoAt": ""
+  }
+}
+```
+
+### TiendanubeAuthorizeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`authorizationUrl` (required)**
+
+    `string`, format: `uri`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "authorizationUrl": ""
+  }
+}
+```
+
+### TiendanubeDisconnectEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`disconnected` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "disconnected": true
+  }
+}
+```
+
+### TiendanubePublicacionStatus
+
+- **Type:**`object`
+
+* **`hasPhotos` (required)**
+
+  `boolean`
+
+* **`linked` (required)**
+
+  `boolean`
+
+* **`photoWarning` (required)**
+
+  `boolean`
+
+* **`estado`**
+
+  `string`
+
+* **`permalink`**
+
+  `string`
+
+* **`syncError`**
+
+  `string`
+
+* **`syncStatus`**
+
+  `string`
+
+* **`tnProductId`**
+
+  `string`
+
+* **`tnVariantId`**
+
+  `string`
+
+* **`ultimaSyncAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "linked": true,
+  "tnProductId": "",
+  "tnVariantId": "",
+  "estado": "",
+  "syncStatus": "",
+  "syncError": "",
+  "permalink": "",
+  "ultimaSyncAt": "",
+  "hasPhotos": true,
+  "photoWarning": true
+}
+```
+
+### TiendanubePublicacionStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`hasPhotos` (required)**
+
+    `boolean`
+
+  - **`linked` (required)**
+
+    `boolean`
+
+  - **`photoWarning` (required)**
+
+    `boolean`
+
+  - **`estado`**
+
+    `string`
+
+  - **`permalink`**
+
+    `string`
+
+  - **`syncError`**
+
+    `string`
+
+  - **`syncStatus`**
+
+    `string`
+
+  - **`tnProductId`**
+
+    `string`
+
+  - **`tnVariantId`**
+
+    `string`
+
+  - **`ultimaSyncAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "linked": true,
+    "tnProductId": "",
+    "tnVariantId": "",
+    "estado": "",
+    "syncStatus": "",
+    "syncError": "",
+    "permalink": "",
+    "ultimaSyncAt": "",
+    "hasPhotos": true,
+    "photoWarning": true
+  }
+}
+```
+
+### TiendanubePublicacionUnlinkEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`unlinked` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "unlinked": true
+  }
+}
+```
+
+### TiendanubeWebhookBody
+
+- **Type:**`object`
+
+* **`event` (required)**
+
+  `string`
+
+* **`store_id` (required)**
+
+  `object`
+
+* **`id`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "store_id": "",
+  "event": "",
+  "id": ""
+}
+```
+
+### TiendanubeWebhookAckEnvelope
+
+- **Type:**`object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true
+}
+```
+
+### TiendanubeOrden
+
+- **Type:**`object`
+
+* **`cuitPending` (required)**
+
+  `boolean`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`lastSyncedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`status` (required)**
+
+  `string`
+
+* **`tnOrderId` (required)**
+
+  `string`
+
+* **`buyerNickname`**
+
+  `string`
+
+* **`clienteCuit`**
+
+  `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`clienteRsocial`**
+
+  `string`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`pedidoEstado`**
+
+  `string`
+
+* **`pedidoId`**
+
+  `integer`
+
+* **`pedidoTotal`**
+
+  `string`
+
+* **`stockAppliedAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tnOrderId": "",
+  "status": "",
+  "buyerNickname": "",
+  "cuitPending": true,
+  "stockAppliedAt": "",
+  "lastSyncedAt": "",
+  "pedidoId": 1,
+  "pedidoEstado": "",
+  "pedidoTotal": "",
+  "facturaId": 1,
+  "clienteId": 1,
+  "clienteRsocial": "",
+  "clienteCuit": ""
+}
+```
+
+### TiendanubeOrdenListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### TiendanubeFacturarEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidoId": 1,
+    "facturaId": 1
   }
 }
 ```

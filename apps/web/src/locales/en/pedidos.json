@@ -51,5 +51,30 @@
       "fulfillment": "Logistics",
       "actions": "Actions"
     }
+  },
+  "tabTiendanube": "TN orders",
+  "tiendanube": {
+    "filterEstado": "Status",
+    "filter": {
+      "pendiente": "Pending",
+      "facturada": "Invoiced",
+      "cancelada": "Cancelled",
+      "all": "All"
+    },
+    "refresh": "Refresh TN orders",
+    "empty": "No Tiendanube orders.",
+    "loadError": "Could not load Tiendanube orders.",
+    "invoiceError": "Could not invoice the order.",
+    "cuitPending": "Tax ID pending",
+    "invoice": "Invoice",
+    "invoicing": "Invoicing…",
+    "columns": {
+      "tnOrderId": "TN order",
+      "buyer": "Buyer",
+      "status": "TN status",
+      "pedido": "Order",
+      "total": "Total",
+      "actions": "Actions"
+    }
   }
 }

@@ -2350,6 +2350,160 @@ export const meliAPI = {
   },
 }
 
+export type TiendanubeConfigStatus = {
+  connected: boolean
+  storeId?: string
+  storeName?: string
+  storeUrl?: string
+  accessTokenLast4?: string
+  activo?: boolean
+  conectadoAt?: string
+}
+
+export type TiendanubePublicacionStatus = {
+  linked: boolean
+  tnProductId?: string
+  tnVariantId?: string
+  estado?: string
+  syncStatus?: string
+  syncError?: string | null
+  permalink?: string | null
+  ultimaSyncAt?: string | null
+  hasPhotos: boolean
+  photoWarning: boolean
+}
+
+export type TiendanubeOrdenRow = {
+  id: number
+  tnOrderId: string
+  status: string
+  buyerNickname: string | null
+  cuitPending: boolean
+  stockAppliedAt: string | null
+  lastSyncedAt: string
+  pedidoId: number | null
+  pedidoEstado: string | null
+  pedidoTotal: string | null
+  facturaId: number | null
+  clienteId: number | null
+  clienteRsocial: string | null
+  clienteCuit: string | null
+}
+
+export const tiendanubeAPI = {
+  getConfig: async (): Promise<TiendanubeConfigStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: TiendanubeConfigStatus }>(
+        '/configuracion/tiendanube',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getAuthorizeUrl: async (): Promise<{ authorizationUrl: string }> => {
+    try {
+      const response = await api.get<{ success: boolean; data: { authorizationUrl: string } }>(
+        '/oauth/tiendanube/authorize',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  disconnect: async (): Promise<{ disconnected: true }> => {
+    try {
+      const response = await api.post<{ success: boolean; data: { disconnected: true } }>(
+        '/oauth/tiendanube/disconnect',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getArticuloListing: async (articuloId: number): Promise<TiendanubePublicacionStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: TiendanubePublicacionStatus }>(
+        `/articulos/${articuloId}/tiendanube`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  upsertArticuloListing: async (articuloId: number): Promise<TiendanubePublicacionStatus> => {
+    try {
+      const response = await api.put<{ success: boolean; data: TiendanubePublicacionStatus }>(
+        `/articulos/${articuloId}/tiendanube`,
+        {},
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  unlinkArticuloListing: async (articuloId: number): Promise<{ unlinked: true }> => {
+    try {
+      const response = await api.delete<{ success: boolean; data: { unlinked: true } }>(
+        `/articulos/${articuloId}/tiendanube`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listOrdenes: async (params?: {
+    estado?: 'pendiente' | 'facturada' | 'cancelada' | 'all'
+    limit?: number
+    offset?: number
+  }): Promise<{ data: TiendanubeOrdenRow[]; total: number; limit: number; offset: number }> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: TiendanubeOrdenRow[]
+        total: number
+        limit: number
+        offset: number
+      }>('/tiendanube/ordenes', { params })
+      return {
+        data: response.data.data,
+        total: response.data.total,
+        limit: response.data.limit,
+        offset: response.data.offset,
+      }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  facturarOrden: async (
+    tnOrderId: string,
+    body: {
+      fecha: string
+      tipo: 'A' | 'B'
+      numero: number
+      prefijo?: string
+      formaPagoId?: number | null
+    },
+  ): Promise<{ pedidoId: number; facturaId: number }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { pedidoId: number; facturaId: number }
+      }>(`/tiendanube/ordenes/${encodeURIComponent(tnOrderId)}/facturar`, body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export type EcommerceConnectorStatus = {
   connectorType: 'meli' | 'tiendanube' | 'woocommerce'
   status: 'active' | 'inactive' | 'not_configured'

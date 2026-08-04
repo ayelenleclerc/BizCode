@@ -60,6 +60,10 @@ import { registerMeliCatalogRoutes } from './routes/registerMeliCatalogRoutes'
 import { registerMeliOrdersRoutes } from './routes/registerMeliOrdersRoutes'
 import { registerEcommerceSyncRoutes } from './routes/registerEcommerceSyncRoutes'
 import { registerMeliWebhookRoutes } from './routes/registerMeliWebhookRoutes'
+import { registerTiendanubeOAuthRoutes } from './routes/registerTiendanubeOAuthRoutes'
+import { registerTiendanubeCatalogRoutes } from './routes/registerTiendanubeCatalogRoutes'
+import { registerTiendanubeOrdersRoutes } from './routes/registerTiendanubeOrdersRoutes'
+import { registerTiendanubeWebhookRoutes } from './routes/registerTiendanubeWebhookRoutes'
 import { registerPrintingRoutes } from './routes/registerPrintingRoutes'
 import { registerContratosRoutes } from './routes/registerContratosRoutes'
 import { registerOrdenTrabajoRoutes } from './routes/registerOrdenTrabajoRoutes'
@@ -109,6 +113,10 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerMeliOrdersRoutes(app, ctx)
   registerEcommerceSyncRoutes(app, ctx)
   registerMeliWebhookRoutes(app, ctx)
+  registerTiendanubeOAuthRoutes(app, ctx)
+  registerTiendanubeCatalogRoutes(app, ctx)
+  registerTiendanubeOrdersRoutes(app, ctx)
+  registerTiendanubeWebhookRoutes(app, ctx)
   registerClientesRoutes(app, ctx)
   registerClienteCuentaCorrienteRoutes(app, ctx)
   registerArticuloVariantesRoutes(app, ctx)

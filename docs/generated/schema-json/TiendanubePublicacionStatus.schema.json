@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "estado": {
+      "type": "string"
+    },
+    "hasPhotos": {
+      "type": "boolean"
+    },
+    "linked": {
+      "type": "boolean"
+    },
+    "permalink": {
+      "nullable": true,
+      "type": "string"
+    },
+    "photoWarning": {
+      "type": "boolean"
+    },
+    "syncError": {
+      "nullable": true,
+      "type": "string"
+    },
+    "syncStatus": {
+      "type": "string"
+    },
+    "tnProductId": {
+      "type": "string"
+    },
+    "tnVariantId": {
+      "type": "string"
+    },
+    "ultimaSyncAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "linked",
+    "hasPhotos",
+    "photoWarning"
+  ],
+  "title": "TiendanubePublicacionStatus",
+  "type": "object"
+}

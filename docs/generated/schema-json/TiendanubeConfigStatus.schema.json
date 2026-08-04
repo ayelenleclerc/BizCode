@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "accessTokenLast4": {
+      "type": "string"
+    },
+    "activo": {
+      "type": "boolean"
+    },
+    "conectadoAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "connected": {
+      "type": "boolean"
+    },
+    "storeId": {
+      "type": "string"
+    },
+    "storeName": {
+      "type": "string"
+    },
+    "storeUrl": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "connected"
+  ],
+  "title": "TiendanubeConfigStatus",
+  "type": "object"
+}

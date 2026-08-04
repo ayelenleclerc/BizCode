@@ -82,6 +82,8 @@ tags:
     description: Mercado Pago online payments integration (#174+)
   - name: meli
     description: Mercado Libre OAuth connection per tenant (#183)
+  - name: tiendanube
+    description: Tiendanube OAuth, catalog, orders and webhooks per tenant (#187)
   - name: ecommerce
     description: Shared ecommerce sync engine — connectors and SyncLog (#189)
   - name: cobranzas
@@ -7442,6 +7444,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
 
+  /api/webhooks/tiendanube:
+    post:
+      tags: [tiendanube]
+      summary: Tiendanube notifications webhook (#187)
+      description: |
+        Public notifications endpoint (no JWT). Validates `x-linkedstore-hmac-sha256` with
+        `TIENDANUBE_WEBHOOK_SECRET` or `TIENDANUBE_CLIENT_SECRET` (HMAC-SHA256 of raw body, hex).
+        Responds `200` immediately and processes asynchronously:
+        - `order/paid` / `order/cancelled`: re-fetches the TN order into `TiendanubeOrden`, applies paid
+          (stock once via `venta_tiendanube` + Pedido `origen=tiendanube`) or cancelled transitions.
+        - `app/uninstalled`: deletes local `TiendanubeConfig`.
+        Rate-limited per IP.
+      security: []
+      parameters:
+        - name: x-linkedstore-hmac-sha256
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Tiendanube HMAC-SHA256 hex of the raw request body.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TiendanubeWebhookBody'
+      responses:
+        '200':
+          description: Notification accepted (processing may continue asynchronously)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TiendanubeWebhookAckEnvelope'
+        '400':
+          description: Invalid signature or payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
   /api/facturas/{id}/remito:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -10177,6 +10219,192 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/configuracion/tiendanube:
+    get:
+      tags: [tiendanube]
+      summary: Tiendanube connection status (no tokens) (#187)
+      description: Requires `settings.business.manage` and tenant integration `tiendanube`. Never returns access tokens.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Tiendanube connection status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TiendanubeConfigStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/oauth/tiendanube/authorize:
+    get:
+      tags: [tiendanube]
+      summary: Build Tiendanube OAuth authorization URL (#187)
+      description: Requires `settings.business.manage` and tenant integration `tiendanube`. Returns Partner Portal authorize URL with signed CSRF `state`.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Authorization URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TiendanubeAuthorizeEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '503':
+          description: Platform TIENDANUBE_CLIENT_ID / TIENDANUBE_CLIENT_SECRET missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/oauth/tiendanube/callback:
+    get:
+      tags: [tiendanube]
+      summary: Tiendanube OAuth callback (#187)
+      description: Public callback. Validates signed `state`, exchanges `code` for a long-lived token, stores encrypted credentials, then redirects to the web app.
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to `/configuracion?tiendanube=connected`
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          description: Token exchange failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/oauth/tiendanube/disconnect:
+    post:
+      tags: [tiendanube]
+      summary: Disconnect Tiendanube (#187)
+      description: Requires `settings.business.manage` and tenant integration `tiendanube`. Deletes local encrypted token (no public revoke endpoint evidenced).
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Disconnected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TiendanubeDisconnectEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/tiendanube/ordenes:
+    get:
+      tags: [tiendanube]
+      summary: List Tiendanube imported orders (#187)
+      description: |
+        Requires module `billing.orders`, permission `orders.create` or `reports.operational.read`, and integration `tiendanube`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pendiente, facturada, cancelada, all]
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated Tiendanube orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TiendanubeOrdenListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/tiendanube/ordenes/{tnOrderId}/facturar:
+    post:
+      tags: [tiendanube]
+      summary: Invoice a Tiendanube imported order (#187)
+      description: |
+        Requires module `billing.orders`, permission `sales.create`, and integration `tiendanube`.
+        Invoices the linked Pedido with `skipStockDecrement` (stock already moved via `venta_tiendanube`).
+      security:
+        - cookieSession: []
+      parameters:
+        - name: tnOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 40
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoInvoiceInput'
+      responses:
+        '200':
+          description: Pedido invoiced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TiendanubeFacturarEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Already invoiced or cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: CUIT required for factura A
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/meli/categories/search:
     get:
       tags: [meli]
@@ -10459,6 +10687,107 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MeliPublicacionUnlinkEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Listing not linked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/articulos/{id}/tiendanube:
+    get:
+      tags: [tiendanube]
+      summary: Tiendanube listing status for an article (#187)
+      description: Requires `products.read`, tenant integration `tiendanube`, and article ownership.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Listing mapping status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TiendanubePublicacionStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [tiendanube]
+      summary: Opt-in publish or update article on Tiendanube (#187)
+      description: Requires `products.manage`, tenant integration `tiendanube`, and article ownership. Creates or updates `TiendanubePublicacion` and syncs via EcommerceSyncEngine.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Listing synced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TiendanubePublicacionStatusEnvelope'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Article or Tiendanube connection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [tiendanube]
+      summary: Unlink article from Tiendanube (#187)
+      description: Requires `products.manage`, tenant integration `tiendanube`, and article ownership. Pauses remote product when possible and deletes local mapping.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Unlinked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TiendanubePublicacionUnlinkEnvelope'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -19647,6 +19976,145 @@ components:
         success: { type: boolean, const: true }
         data:
           $ref: '#/components/schemas/MeliConfigStatus'
+
+    TiendanubeConfigStatus:
+      type: object
+      required: [connected]
+      properties:
+        connected: { type: boolean }
+        storeId: { type: string }
+        storeName: { type: string }
+        storeUrl: { type: string }
+        accessTokenLast4: { type: string }
+        activo: { type: boolean }
+        conectadoAt: { type: string, format: date-time }
+
+    TiendanubeConfigStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/TiendanubeConfigStatus'
+
+    TiendanubeAuthorizeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [authorizationUrl]
+          properties:
+            authorizationUrl: { type: string, format: uri }
+
+    TiendanubeDisconnectEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [disconnected]
+          properties:
+            disconnected: { type: boolean, const: true }
+
+    TiendanubePublicacionStatus:
+      type: object
+      required: [linked, hasPhotos, photoWarning]
+      properties:
+        linked: { type: boolean }
+        tnProductId: { type: string }
+        tnVariantId: { type: string }
+        estado: { type: string }
+        syncStatus: { type: string }
+        syncError: { type: string, nullable: true }
+        permalink: { type: string, nullable: true }
+        ultimaSyncAt: { type: string, format: date-time, nullable: true }
+        hasPhotos: { type: boolean }
+        photoWarning: { type: boolean }
+
+    TiendanubePublicacionStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/TiendanubePublicacionStatus'
+
+    TiendanubePublicacionUnlinkEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [unlinked]
+          properties:
+            unlinked: { type: boolean, const: true }
+
+    TiendanubeWebhookBody:
+      type: object
+      required: [store_id, event]
+      properties:
+        store_id:
+          oneOf:
+            - { type: string }
+            - { type: integer }
+        event: { type: string }
+        id:
+          oneOf:
+            - { type: string }
+            - { type: integer }
+
+    TiendanubeWebhookAckEnvelope:
+      type: object
+      required: [success]
+      properties:
+        success: { type: boolean, const: true }
+
+    TiendanubeOrden:
+      type: object
+      required: [id, tnOrderId, status, cuitPending, lastSyncedAt]
+      properties:
+        id: { type: integer }
+        tnOrderId: { type: string }
+        status: { type: string }
+        buyerNickname: { type: string, nullable: true }
+        cuitPending: { type: boolean }
+        stockAppliedAt: { type: string, format: date-time, nullable: true }
+        lastSyncedAt: { type: string, format: date-time }
+        pedidoId: { type: integer, nullable: true }
+        pedidoEstado: { type: string, nullable: true }
+        pedidoTotal: { type: string, nullable: true }
+        facturaId: { type: integer, nullable: true }
+        clienteId: { type: integer, nullable: true }
+        clienteRsocial: { type: string, nullable: true }
+        clienteCuit: { type: string, nullable: true }
+
+    TiendanubeOrdenListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data, total, limit, offset]
+          properties:
+            success: { type: boolean, const: true }
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/TiendanubeOrden'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    TiendanubeFacturarEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [pedidoId, facturaId]
+          properties:
+            pedidoId: { type: integer }
+            facturaId: { type: integer }
 
     EcommerceConnectorStatus:
       type: object

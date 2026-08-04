@@ -9,6 +9,7 @@ import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import MeliOrdenesPanel from './MeliOrdenesPanel'
+import TiendanubeOrdenesPanel from './TiendanubeOrdenesPanel'
 
 const ESTADOS = ['draft', 'confirmed', 'invoiced', 'cancelled'] as const
 
@@ -20,7 +21,7 @@ function formatMoney(value: number | string): string {
 
 export default function PedidosPage() {
   const { t } = useTranslation('pedidos')
-  const [tab, setTab] = useState<'pedidos' | 'meli'>('pedidos')
+  const [tab, setTab] = useState<'pedidos' | 'meli' | 'tiendanube'>('pedidos')
   const [pedidos, setPedidos] = useState<PedidoRow[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<Error | null>(null)
@@ -107,10 +108,24 @@ export default function PedidosPage() {
               {t('tabMeli')}
             </button>
           </IfIntegration>
+          <IfIntegration id="tiendanube">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === 'tiendanube'}
+              className={`px-3 py-2 text-sm ${tab === 'tiendanube' ? 'border-b-2 border-blue-600 font-semibold' : 'text-slate-500'}`}
+              data-testid="pedidos-tab-tiendanube"
+              onClick={() => setTab('tiendanube')}
+            >
+              {t('tabTiendanube')}
+            </button>
+          </IfIntegration>
         </div>
 
         {tab === 'meli' ? (
           <MeliOrdenesPanel />
+        ) : tab === 'tiendanube' ? (
+          <TiendanubeOrdenesPanel />
         ) : (
           <>
             <div className="mb-4 flex flex-wrap gap-3 items-center">

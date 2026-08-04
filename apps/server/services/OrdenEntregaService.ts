@@ -400,6 +400,10 @@ export class OrdenEntregaService {
       include: ordenInclude,
     })
 
+    if (toEstado === 'in_transit' && fromEstado !== 'in_transit') {
+      void this.enqueueTiendanubeMarkDispatchedIfNeeded(tenantId, orden).catch(() => undefined)
+    }
+
     const auditAction =
       toEstado === 'delivered' && fromEstado !== 'delivered'
         ? 'entrega_confirmed'
@@ -409,5 +413,33 @@ export class OrdenEntregaService {
       ok: true,
       data: { orden: mapOrdenEntregaPublic(orden), auditAction, previousEstado: fromEstado },
     }
+  }
+
+  /**
+   * @en When an OE is dispatched, notify Tiendanube fulfillment for linked Pedido (#187).
+   * @es Al despachar una OE, notifica fulfillment Tiendanube del Pedido vinculado (#187).
+   * @pt-BR Ao despachar uma OE, notifica fulfillment Tiendanube do Pedido vinculado (#187).
+   */
+  private async enqueueTiendanubeMarkDispatchedIfNeeded(
+    tenantId: number,
+    orden: OrdenEntregaRow,
+  ): Promise<void> {
+    let pedidoId: number | null = null
+    const remito = await this.prisma.remito.findFirst({
+      where: { tenantId, ordenEntregaId: orden.id },
+      select: { pedidoId: true, pedido: { select: { origen: true } } },
+    })
+    if (remito?.pedidoId && remito.pedido?.origen === 'tiendanube') {
+      pedidoId = remito.pedidoId
+    } else if (orden.facturaId != null) {
+      const pedido = await this.prisma.pedido.findFirst({
+        where: { tenantId, facturaId: orden.facturaId, origen: 'tiendanube' },
+        select: { id: true },
+      })
+      pedidoId = pedido?.id ?? null
+    }
+    if (pedidoId == null) return
+    const { TiendanubeOrderImportService } = await import('./TiendanubeOrderImportService')
+    await new TiendanubeOrderImportService(this.prisma).enqueueMarkDispatched(tenantId, pedidoId)
   }
 }

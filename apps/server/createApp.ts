@@ -120,7 +120,13 @@ export function createApp(prisma: PrismaClient): Application {
       },
     }),
   )
-  app.use(express.json())
+  app.use(
+    express.json({
+      verify: (req, _res, buf) => {
+        ;(req as Request & { rawBody?: Buffer }).rawBody = Buffer.from(buf)
+      },
+    }),
+  )
   app.use(
     '/uploads/articulos',
     express.static(

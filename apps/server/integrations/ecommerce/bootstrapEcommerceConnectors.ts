@@ -1,11 +1,12 @@
 /**
- * @en Registers built-in ecommerce connector factories (MeLi) (#189).
- * @es Registra factories built-in de conectores eCommerce (MeLi) (#189).
- * @pt-BR Registra factories built-in de conectores eCommerce (MeLi) (#189).
+ * @en Registers built-in ecommerce connector factories (MeLi, Tiendanube) (#189/#187).
+ * @es Registra factories built-in de conectores eCommerce (MeLi, Tiendanube) (#189/#187).
+ * @pt-BR Registra factories built-in de conectores eCommerce (MeLi, Tiendanube) (#189/#187).
  */
 
 import { registerEcommerceConnectorFactory } from './connectorRegistry'
 import { createMeliConnector } from './MeliConnector'
+import { createTiendanubeConnector } from './TiendanubeConnector'
 
 let bootstrapped = false
 
@@ -18,6 +19,9 @@ export function bootstrapEcommerceConnectors(): void {
   if (bootstrapped) return
   registerEcommerceConnectorFactory('meli', (prisma, tenantId) =>
     createMeliConnector(prisma, tenantId),
+  )
+  registerEcommerceConnectorFactory('tiendanube', (prisma, tenantId) =>
+    createTiendanubeConnector(prisma, tenantId),
   )
   bootstrapped = true
 }

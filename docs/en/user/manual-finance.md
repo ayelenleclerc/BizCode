@@ -93,13 +93,22 @@ Paid Mercado Libre sales become Pedidos for invoicing without double stock decre
 3. **Invoice** calls `POST /api/meli/ordenes/{meliOrderId}/facturar` — Factura A without customer CUIT returns `422` `CUIT_REQUIRED_FOR_FACTURA_A`. Completing CUIT on the customer clears the pending flag.
 4. Invoice creation for `origen=meli` uses `skipStockDecrement` because stock already moved on the webhook.
 
+## Tiendanube connector (#187)
+
+Enable tenant integration id **`tiendanube`**, then use **Settings → Company → Tiendanube** for Partner Portal OAuth (long-lived token encrypted in `TiendanubeConfig`).
+
+1. Opt-in per product: **Products → edit article → Tiendanube** (`PUT /api/articulos/{id}/tiendanube`) — syncs via `EcommerceSyncEngine` (`tn:catalog:…`).
+2. Stock pushes after invoices/stock adjustments; quantity 0 pauses the TN product (`published: false`).
+3. Webhook `POST /api/webhooks/tiendanube` verifies `x-linkedstore-hmac-sha256`; `order/paid` imports Pedido `origen=tiendanube` with one-time stock (`venta_tiendanube`).
+4. **Orders → TN orders** lists/import invoices (`GET /api/tiendanube/ordenes`, facturar with `skipStockDecrement`). Dispatching an OE (`in_transit`) enqueues `mark_dispatched` (`PUT` TN order `shipping_status=shipped`).
+
 ## Shared ecommerce sync engine (#189)
 
 Catalog and stock pushes for marketplace connectors go through a shared Prisma queue (`EcommerceSyncJob`) with SyncLog history:
 
 1. **Settings → Company → eCommerce integrations** lists known connectors (`meli`, `tiendanube`, `woocommerce`) and the latest SyncLog rows (filter by connector/status). Requires `settings.business.manage`.
-2. MeLi catalog/stock operations enqueue jobs processed immediately in-request and by `npm run ecommerce:sync-worker` every minute (retries with 1m/5m/30m backoff; after 3 failures the job is dead-lettered and platform `super_admin` is alerted).
-3. APIs: `GET /api/ecommerce/connectors`, `GET /api/ecommerce/sync-logs`. Tiendanube and WooCommerce remain `not_configured` until their connectors land (#187/#188).
+2. MeLi and Tiendanube catalog/stock operations enqueue jobs processed immediately in-request and by `npm run ecommerce:sync-worker` every minute (retries with 1m/5m/30m backoff; after 3 failures the job is dead-lettered and platform `super_admin` is alerted).
+3. APIs: `GET /api/ecommerce/connectors`, `GET /api/ecommerce/sync-logs`. WooCommerce remains `not_configured` until #188.
 
 Parent catalog rows and service items cannot be published.
 
