@@ -80,11 +80,20 @@ Com OAuth conectado, o vendedor pode optar por artigo em **Artigos → editar �
 Sync bidirecional de estoque para artigos com `MeliPublicacion` vinculada (`meliItemId`):
 
 1. **BizCode → ML:** após o decremento de estoque na fatura (`FacturaService`) ou qualquer `StockAjuste` (manual, recebimento de compra, contagem, produção, etc.), `MeliStockSyncService` atualiza apenas `{ available_quantity }` no ML. Estoque ≤ 0 pausa o anúncio (`status: paused`); estoque &gt; 0 e artigo ativo o reativa.
-2. **ML → BizCode:** registrar notificações MeLi em `POST /api/webhooks/meli` (público). O env da plataforma `MELI_WEBHOOK_SECRET` valida `x-signature` (HMAC-SHA256). O topic `orders_v2` busca o pedido e cria `StockAjuste` com motivo `venta_meli` (**não** importa pedidos como Pedido — isso é #186). Topics `items` / `item_price` alertam managers se o preço ML divergir (sem auto-corrigir).
+2. **ML → BizCode:** registrar notificações MeLi em `POST /api/webhooks/meli` (público). O env da plataforma `MELI_WEBHOOK_SECRET` valida `x-signature` (HMAC-SHA256). O topic `orders_v2` reconsulta o pedido em `MeliOrden` (#186): em `paid`, aplica `StockAjuste` `venta_meli` uma vez e cria Pedido `confirmed` com `origen=meli` (preços ML); em `cancelled`, cancela o Pedido se não estiver faturado e restaura estoque (`cancelacion_meli`); se já estiver faturado, alerta managers (sem NC automática). Topics `items` / `item_price` alertam managers se o preço ML divergir (sem auto-corrigir).
 3. **Reconciliação:** agendar `npm run meli:stock-reconcile` a cada hora — o estoque do BizCode é a fonte da verdade; diferenças são corrigidas empurrando ao ML sem duplicar movimentos.
-4. Idempotência: `MeliWebhookEvent` único `(topic, resource)`.
+4. Auditoria: `MeliWebhookEvent` registra notificações; o duplicado `(topic, resource)` **não** bloqueia transições de status do pedido.
 
-A importação de pedidos fica em #186. Artigos pai e serviços não são publicados.
+## Importação de pedidos Mercado Livre (#186)
+
+Vendas pagas do Mercado Livre viram Pedidos para faturar sem duplo desconto de estoque:
+
+1. Abrir **Pedidos → Pedidos ML** (módulo `billing.orders` e integração `meli`).
+2. Filtrar por pendente / faturada / cancelada; ML Full é marcado como sem envio próprio (#193 tracking fora de escopo).
+3. **Faturar** chama `POST /api/meli/ordenes/{meliOrderId}/facturar` — fatura A sem CUIT do cliente retorna `422` `CUIT_REQUIRED_FOR_FACTURA_A`. Completar o CUIT no cliente limpa o pendente.
+4. A fatura de pedidos `origen=meli` usa `skipStockDecrement` porque o estoque já moveu no webhook.
+
+Artigos pai e serviços não são publicados.
 
 ## Links de pagamento Mercado Pago (#175)
 

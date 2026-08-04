@@ -80,11 +80,20 @@ Con OAuth conectado, el vendedor puede optar por artículo desde **Artículos �
 Sync bidireccional de stock para artículos con `MeliPublicacion` vinculada (`meliItemId`):
 
 1. **BizCode → ML:** tras el decremento de stock en factura (`FacturaService`) o cualquier `StockAjuste` (manual, recepción de compra, recuento, producción, etc.), `MeliStockSyncService` parchea solo `{ available_quantity }` en ML. Stock ≤ 0 pausa la publicación (`status: paused`); stock &gt; 0 y artículo activo la reactiva.
-2. **ML → BizCode:** registrar notificaciones MeLi en `POST /api/webhooks/meli` (público). El env de plataforma `MELI_WEBHOOK_SECRET` valida `x-signature` (HMAC-SHA256). El topic `orders_v2` obtiene la orden y crea `StockAjuste` con motivo `venta_meli` (**no** importa órdenes como Pedido — eso es #186). Topics `items` / `item_price` alertan a managers si el precio ML diverge (sin auto-corregir).
+2. **ML → BizCode:** registrar notificaciones MeLi en `POST /api/webhooks/meli` (público). El env de plataforma `MELI_WEBHOOK_SECRET` valida `x-signature` (HMAC-SHA256). El topic `orders_v2` re-consulta la orden en `MeliOrden` (#186): en `paid`, aplica `StockAjuste` `venta_meli` una vez y crea Pedido `confirmed` con `origen=meli` (precios ML); en `cancelled`, cancela el Pedido si no está facturado y restaura stock (`cancelacion_meli`); si ya está facturado, alerta a managers (sin NC automática). Topics `items` / `item_price` alertan a managers si el precio ML diverge (sin auto-corregir).
 3. **Reconciliación:** programar `npm run meli:stock-reconcile` cada hora — el stock de BizCode es fuente de verdad; las diferencias se corrigen empujando a ML sin duplicar movimientos.
-4. Idempotencia: `MeliWebhookEvent` único `(topic, resource)`.
+4. Auditoría: `MeliWebhookEvent` registra notificaciones; el duplicado `(topic, resource)` **no** bloquea transiciones de estado de la orden.
 
-La importación de órdenes queda en #186. Artículos padre y servicios no se publican.
+## Importación de órdenes Mercado Libre (#186)
+
+Las ventas pagadas de Mercado Libre se convierten en Pedidos para facturar sin doble descuento de stock:
+
+1. Abrir **Pedidos → Órdenes ML** (módulo `billing.orders` e integración `meli`).
+2. Filtrar por pendiente / facturada / cancelada; ML Full se marca como sin despacho propio (#193 tracking fuera de alcance).
+3. **Facturar** llama `POST /api/meli/ordenes/{meliOrderId}/facturar` — factura A sin CUIT del cliente responde `422` `CUIT_REQUIRED_FOR_FACTURA_A`. Completar el CUIT en el cliente limpia el pendiente.
+4. La factura de pedidos `origen=meli` usa `skipStockDecrement` porque el stock ya se movió en el webhook.
+
+Artículos padre y servicios no se publican.
 
 ## Links de pago Mercado Pago (#175)
 

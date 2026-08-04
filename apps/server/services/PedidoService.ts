@@ -384,6 +384,9 @@ export class PedidoService {
         items: facturaItems,
       },
       userId,
+      {
+        skipStockDecrement: pedido.origen === 'meli',
+      },
     )
     if (!facturaResult.ok) {
       return facturaResult

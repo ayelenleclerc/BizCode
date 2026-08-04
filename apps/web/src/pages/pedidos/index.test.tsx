@@ -3,8 +3,9 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@/i18n/config'
 import PedidosPage from './index'
-import { pedidosAPI, type PedidoRow } from '@/lib/api'
+import { meliAPI, pedidosAPI, type PedidoRow } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import type { AuthClaims, Permission } from '@/lib/rbac'
 
 const baseClaims: AuthClaims = {
@@ -12,7 +13,7 @@ const baseClaims: AuthClaims = {
   tenantId: 1,
   username: 'pedidos-user',
   role: 'owner',
-  permissions: ['orders.create'] as Permission[],
+  permissions: ['orders.create', 'sales.create'] as Permission[],
   scope: {
     tenantId: 1,
     branchIds: [],
@@ -41,6 +42,10 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: vi.fn(),
 }))
 
+vi.mock('@/contexts/FeatureFlagsContext', () => ({
+  useFeatureFlags: vi.fn(),
+}))
+
 vi.mock('@/lib/api', async () => {
   const actual = await vi.importActual<typeof import('@/lib/api')>('@/lib/api')
   return {
@@ -53,6 +58,13 @@ vi.mock('@/lib/api', async () => {
       confirm: vi.fn(),
       invoice: vi.fn(),
       cancel: vi.fn(),
+    },
+    remitosAPI: {
+      createFromPedido: vi.fn(),
+    },
+    meliAPI: {
+      listOrdenes: vi.fn(),
+      facturarOrden: vi.fn(),
     },
   }
 })
@@ -73,12 +85,45 @@ describe('PedidosPage', () => {
     vi.clearAllMocks()
     localStorage.setItem('lang', 'es')
     mockAuth(baseClaims.permissions)
+    vi.mocked(useFeatureFlags).mockReturnValue({
+      status: 'ready',
+      modules: ['billing.orders'],
+      integrations: ['meli'],
+      hasModule: (key: string) => key === 'billing.orders',
+      hasIntegration: (id: string) => id === 'meli',
+      refreshFeatures: vi.fn(),
+    } as never)
     vi.mocked(pedidosAPI.list).mockResolvedValue({
       success: true,
       data: [samplePedido],
       total: 1,
       take: 100,
       skip: 0,
+    })
+    vi.mocked(meliAPI.listOrdenes).mockResolvedValue({
+      data: [
+        {
+          id: 1,
+          meliOrderId: '2000003509',
+          status: 'paid',
+          shippingId: null,
+          isFulfillment: false,
+          buyerNickname: 'BUYER',
+          cuitPending: true,
+          stockAppliedAt: null,
+          lastSyncedAt: '2026-08-01T12:00:00.000Z',
+          pedidoId: 50,
+          pedidoEstado: 'confirmed',
+          pedidoTotal: '1500',
+          facturaId: null,
+          clienteId: 20,
+          clienteRsocial: 'BUYER',
+          clienteCuit: null,
+        },
+      ],
+      total: 1,
+      limit: 100,
+      offset: 0,
     })
   })
 
@@ -121,5 +166,16 @@ describe('PedidosPage', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('pedidos-table')).not.toBeInTheDocument()
     })
+  })
+
+  it('muestra pestaña Órdenes ML y lista órdenes', async () => {
+    const user = userEvent.setup()
+    render(<PedidosPage />)
+    await screen.findByTestId('pedidos-tab-meli')
+    await user.click(screen.getByTestId('pedidos-tab-meli'))
+    expect(await screen.findByTestId('meli-ordenes-panel')).toBeInTheDocument()
+    expect(await screen.findByTestId('meli-ordenes-table')).toBeInTheDocument()
+    expect(screen.getByTestId('meli-orden-row-2000003509')).toBeInTheDocument()
+    expect(meliAPI.listOrdenes).toHaveBeenCalledWith({ estado: 'pendiente' })
   })
 })

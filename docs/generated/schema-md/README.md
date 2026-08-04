@@ -550,6 +550,12 @@
 
 * [MeliDisconnectEnvelope](./melidisconnectenvelope.md) – `-`
 
+* [MeliOrden](./meliorden.md) – `-`
+
+* [MeliOrdenFacturarEnvelope](./meliordenfacturarenvelope.md) – `-`
+
+* [MeliOrdenListEnvelope](./meliordenlistenvelope.md) – `-`
+
 * [MeliPublicacionStatus](./melipublicacionstatus.md) – `-`
 
 * [MeliPublicacionStatusEnvelope](./melipublicacionstatusenvelope.md) – `-`
@@ -1316,6 +1322,10 @@
 
 * [Untitled object in MeliDisconnectEnvelope](./melidisconnectenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled object in MeliOrdenFacturarEnvelope](./meliordenfacturarenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in MeliOrdenListEnvelope](./meliordenlistenvelope-allof-0.md) – `undefined#/allOf/0`
+
 * [Untitled object in MeliPublicacionUnlinkEnvelope](./melipublicacionunlinkenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in MercadoPagoConfigEnvelope](./mercadopagoconfigenvelope-properties-data.md) – `undefined#/properties/data`
@@ -1675,6 +1685,8 @@
 * [Untitled array in LoteTrazabilidad](./lotetrazabilidad-properties-facturas.md) – `undefined#/properties/facturas`
 
 * [Untitled array in MeliCategorySearchEnvelope](./melicategorysearchenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in MeliOrdenListEnvelope](./meliordenlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in MeliPublicacionStatus](./melipublicacionstatus-properties-atributos.md) – `undefined#/properties/atributos`
 

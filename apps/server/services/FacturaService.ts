@@ -55,6 +55,12 @@ export type FacturaPartialCreditNoteResult = {
 export type FacturaCreateOptions = {
   skipArcaCae?: boolean
   contratoId?: number | null
+  /**
+   * @en Skip stock check/decrement (MeLi orders already adjusted via venta_meli) (#186).
+   * @es Omite chequeo/decremento de stock (órdenes MeLi ya ajustadas vía venta_meli) (#186).
+   * @pt-BR Omite checagem/decremento de estoque (pedidos MeLi já ajustados via venta_meli) (#186).
+   */
+  skipStockDecrement?: boolean
 }
 /**
  * @en Invoice domain operations (list, create, void).
@@ -297,7 +303,9 @@ export class FacturaService {
     }
 
     let stockEval: { insufficient: boolean; alerts: StockBelowMinimumAlert[] }
-    if (depositoId != null && qtyByArticulo.size > 0) {
+    if (options?.skipStockDecrement === true) {
+      stockEval = { insufficient: false, alerts: [] }
+    } else if (depositoId != null && qtyByArticulo.size > 0) {
       const stockRows = await this.prisma.stockDeposito.findMany({
         where: {
           tenantId,
@@ -340,9 +348,11 @@ export class FacturaService {
       }
     }
 
-    const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, depositoId)
-    if (!recuentoBlock.ok) {
-      return recuentoBlock
+    if (options?.skipStockDecrement !== true) {
+      const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, depositoId)
+      if (!recuentoBlock.ok) {
+        return recuentoBlock
+      }
     }
 
     const hasControlledArticles = articulos.some(
@@ -441,7 +451,7 @@ export class FacturaService {
                 }
               : {}),
             items: { create: itemsForCreate },
-          } as Parameters<typeof this.prisma.factura.create>[0]['data'],
+          } as Prisma.FacturaUncheckedCreateInput,
           include: { items: true, cliente: true },
         })
 
@@ -471,6 +481,7 @@ export class FacturaService {
         })
 
         for (const [articuloId, qty] of qtyByArticulo) {
+          if (options?.skipStockDecrement === true) continue
           if (depositoId != null) {
             await applyStockDepositoDelta(tx, {
               tenantId,

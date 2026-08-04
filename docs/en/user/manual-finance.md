@@ -80,11 +80,20 @@ After OAuth is connected, sellers can opt-in per product from **Products → edi
 Bidirectional stock sync for articles with a linked `MeliPublicacion` (`meliItemId`):
 
 1. **BizCode → ML:** after invoice stock decrement (`FacturaService`) or any `StockAjuste` (manual, purchase receipt, count, production, etc.), `MeliStockSyncService` patches only `{ available_quantity }` on ML. Stock ≤ 0 pauses the listing (`status: paused`); stock &gt; 0 and an active article reactivates it.
-2. **ML → BizCode:** register MeLi notifications to `POST /api/webhooks/meli` (public). Platform env `MELI_WEBHOOK_SECRET` validates `x-signature` (HMAC-SHA256). Topic `orders_v2` fetches the order and creates `StockAjuste` with motivo `venta_meli` (does **not** import orders as Pedido — that is #186). Topics `items` / `item_price` notify managers if the ML price diverges (no auto-correct).
+2. **ML → BizCode:** register MeLi notifications to `POST /api/webhooks/meli` (public). Platform env `MELI_WEBHOOK_SECRET` validates `x-signature` (HMAC-SHA256). Topic `orders_v2` re-fetches the order into `MeliOrden` (#186): on `paid`, applies `StockAjuste` `venta_meli` once and creates a Pedido `confirmed` with `origen=meli` (ML prices); on `cancelled`, cancels the Pedido if not invoiced and restores stock (`cancelacion_meli`); if already invoiced, managers get an alert (no automatic credit note). Topics `items` / `item_price` notify managers if the ML price diverges (no auto-correct).
 3. **Reconcile:** schedule `npm run meli:stock-reconcile` hourly — BizCode stock is source of truth; mismatches are corrected by pushing to ML without duplicating stock movements.
-4. Idempotency: `MeliWebhookEvent` unique `(topic, resource)`.
+4. Audit: `MeliWebhookEvent` logs notifications; duplicate `(topic, resource)` does **not** block order status transitions.
 
-Order import remains later (#186). Parent catalog rows and service items cannot be published.
+## Mercado Libre order import (#186)
+
+Paid Mercado Libre sales become Pedidos for invoicing without double stock decrement:
+
+1. Open **Orders → ML orders** (requires module `billing.orders` and integration `meli`).
+2. Filter by pending / invoiced / cancelled; ML Full listings are marked as no own shipping (#193 tracking stays out of scope).
+3. **Invoice** calls `POST /api/meli/ordenes/{meliOrderId}/facturar` — Factura A without customer CUIT returns `422` `CUIT_REQUIRED_FOR_FACTURA_A`. Completing CUIT on the customer clears the pending flag.
+4. Invoice creation for `origen=meli` uses `skipStockDecrement` because stock already moved on the webhook.
+
+Parent catalog rows and service items cannot be published.
 
 ## Mercado Pago payment links (#175)
 

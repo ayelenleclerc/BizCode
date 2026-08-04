@@ -7396,10 +7396,11 @@ paths:
         Public notifications endpoint (no JWT). Validates `x-signature` with platform env `MELI_WEBHOOK_SECRET`
         (HMAC-SHA256 manifest `id:{dataId};request-id:{x-request-id};ts:{ts};`, same family as Mercado Pago docs).
         Responds `200` immediately and processes asynchronously:
-        - topic `orders_v2` / `orders`: fetches the ML order and creates `StockAjuste` with motivo `venta_meli`
-          (does **not** create Pedido/Factura — order import is #186).
+        - topic `orders_v2` / `orders`: re-fetches the ML order into `MeliOrden`, applies paid (stock once + Pedido `origen=meli`)
+          or cancelled transitions (#186). `MeliWebhookEvent` is an audit log; duplicate `(topic, resource)` does **not**
+          block order status updates.
         - topic `items` / `item_price`: alerts managers if remote price diverges from BizCode (no auto-correct).
-        Idempotent per `(topic, resource)` via `MeliWebhookEvent`. Rate-limited per IP.
+        Rate-limited per IP.
       security: []
       parameters:
         - name: data.id
@@ -10201,6 +10202,100 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           description: Mercado Libre not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/meli/ordenes:
+    get:
+      tags: [meli]
+      summary: List Mercado Libre imported orders (#186)
+      description: |
+        Requires module `billing.orders`, permission `orders.create` or `reports.operational.read`, and integration `meli`.
+        Returns `MeliOrden` rows with linked Pedido/cliente summary. Filter by business estado:
+        `pendiente` (pedido confirmed/draft), `facturada`, `cancelada`, or omit/`all`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pendiente, facturada, cancelada, all]
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated MeLi orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliOrdenListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Mercado Libre not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/meli/ordenes/{meliOrderId}/facturar:
+    post:
+      tags: [meli]
+      summary: Invoice a Mercado Libre imported order (#186)
+      description: |
+        Requires module `billing.orders`, permission `sales.create`, and integration `meli`.
+        Invoices the linked Pedido with `skipStockDecrement` (stock already moved via `venta_meli`).
+        Factura A without customer CUIT returns `422` `CUIT_REQUIRED_FOR_FACTURA_A`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: meliOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 40
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoInvoiceInput'
+      responses:
+        '200':
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeliOrdenFacturarEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Order or linked pedido not found / MeLi not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '409':
+          description: Already invoiced or cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Validation / CUIT required for factura A
           content:
             application/json:
               schema:
@@ -19587,6 +19682,51 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MeliCategorySearchHit'
+
+    MeliOrden:
+      type: object
+      required: [id, meliOrderId, status, isFulfillment, cuitPending, lastSyncedAt]
+      properties:
+        id: { type: integer }
+        meliOrderId: { type: string }
+        status: { type: string }
+        shippingId: { type: string, nullable: true }
+        isFulfillment: { type: boolean }
+        buyerNickname: { type: string, nullable: true }
+        cuitPending: { type: boolean }
+        stockAppliedAt: { type: string, format: date-time, nullable: true }
+        lastSyncedAt: { type: string, format: date-time }
+        pedidoId: { type: integer, nullable: true }
+        pedidoEstado: { type: string, nullable: true }
+        pedidoTotal: { type: string, nullable: true }
+        facturaId: { type: integer, nullable: true }
+        clienteId: { type: integer, nullable: true }
+        clienteRsocial: { type: string, nullable: true }
+        clienteCuit: { type: string, nullable: true }
+
+    MeliOrdenListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success: { type: boolean, const: true }
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/MeliOrden'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    MeliOrdenFacturarEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [pedidoId, facturaId]
+          properties:
+            pedidoId: { type: integer }
+            facturaId: { type: integer }
 
     MercadoPagoConfigEnvelope:
       type: object

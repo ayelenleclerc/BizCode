@@ -2047,6 +2047,25 @@ export type MeliCategorySearchHit = {
   domain_name?: string
 }
 
+export type MeliOrdenRow = {
+  id: number
+  meliOrderId: string
+  status: string
+  shippingId: string | null
+  isFulfillment: boolean
+  buyerNickname: string | null
+  cuitPending: boolean
+  stockAppliedAt: string | null
+  lastSyncedAt: string
+  pedidoId: number | null
+  pedidoEstado: string | null
+  pedidoTotal: string | null
+  facturaId: number | null
+  clienteId: number | null
+  clienteRsocial: string | null
+  clienteCuit: string | null
+}
+
 export type MercadoPagoConfigInput = {
   accessToken?: string
   publicKey: string
@@ -2279,6 +2298,51 @@ export const meliAPI = {
         '/meli/categories/search',
         { params: { q } },
       )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listOrdenes: async (params?: {
+    estado?: 'pendiente' | 'facturada' | 'cancelada' | 'all'
+    limit?: number
+    offset?: number
+  }): Promise<{ data: MeliOrdenRow[]; total: number; limit: number; offset: number }> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: MeliOrdenRow[]
+        total: number
+        limit: number
+        offset: number
+      }>('/meli/ordenes', { params })
+      return {
+        data: response.data.data,
+        total: response.data.total,
+        limit: response.data.limit,
+        offset: response.data.offset,
+      }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  facturarOrden: async (
+    meliOrderId: string,
+    body: {
+      fecha: string
+      tipo: 'A' | 'B'
+      numero: number
+      prefijo?: string
+      formaPagoId?: number | null
+    },
+  ): Promise<{ pedidoId: number; facturaId: number }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { pedidoId: number; facturaId: number }
+      }>(`/meli/ordenes/${encodeURIComponent(meliOrderId)}/facturar`, body)
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

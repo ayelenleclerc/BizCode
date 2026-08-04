@@ -140,10 +140,27 @@ export type MeliOrderLineItem = {
   unit_price?: number
 }
 
+export type MeliOrderBuyer = {
+  id?: number | string
+  nickname?: string
+  email?: string
+  first_name?: string
+  last_name?: string
+}
+
+export type MeliOrderShipping = {
+  id?: number | string
+  logistic_type?: string
+  status?: string
+}
+
 export type MeliOrderResponse = {
   id: number | string
   status?: string
   order_items?: MeliOrderLineItem[]
+  buyer?: MeliOrderBuyer
+  shipping?: MeliOrderShipping
+  tags?: string[]
 }
 
 /**

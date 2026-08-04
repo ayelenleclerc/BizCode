@@ -3,6 +3,9 @@
   "subtitle": "Quotes and commercial orders",
   "newOrder": "New order",
   "empty": "No orders to display.",
+  "tabsLabel": "Orders sections",
+  "tabPedidos": "Orders",
+  "tabMeli": "ML orders",
   "columns": {
     "id": "No.",
     "cliente": "Customer",
@@ -21,5 +24,32 @@
   },
   "filterEstado": "Status",
   "filterAll": "All",
-  "loadError": "Could not load orders."
+  "loadError": "Could not load orders.",
+  "meli": {
+    "filterEstado": "Status",
+    "filter": {
+      "pendiente": "Pending",
+      "facturada": "Invoiced",
+      "cancelada": "Cancelled",
+      "all": "All"
+    },
+    "refresh": "Refresh ML orders",
+    "empty": "No Mercado Libre orders.",
+    "loadError": "Could not load Mercado Libre orders.",
+    "invoiceError": "Could not invoice the order.",
+    "cuitPending": "CUIT pending",
+    "fulfillmentYes": "ML Full (no own shipping)",
+    "fulfillmentNo": "Own shipping",
+    "invoice": "Invoice",
+    "invoicing": "Invoicing…",
+    "columns": {
+      "meliOrderId": "ML order",
+      "buyer": "Buyer",
+      "status": "ML status",
+      "pedido": "Order",
+      "total": "Total",
+      "fulfillment": "Logistics",
+      "actions": "Actions"
+    }
+  }
 }

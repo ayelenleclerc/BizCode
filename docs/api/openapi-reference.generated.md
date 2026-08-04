@@ -44804,8 +44804,8 @@ Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSe
 
 Public notifications endpoint (no JWT). Validates `x-signature` with platform env `MELI_WEBHOOK_SECRET` (HMAC-SHA256 manifest `id:{dataId};request-id:{x-request-id};ts:{ts};`, same family as Mercado Pago docs). Responds `200` immediately and processes asynchronously:
 
-- topic `orders_v2` / `orders`: fetches the ML order and creates `StockAjuste` with motivo `venta_meli` (does **not** create Pedido/Factura — order import is #186).
-- topic `items` / `item_price`: alerts managers if remote price diverges from BizCode (no auto-correct). Idempotent per `(topic, resource)` via `MeliWebhookEvent`. Rate-limited per IP.
+- topic `orders_v2` / `orders`: re-fetches the ML order into `MeliOrden`, applies paid (stock once + Pedido `origen=meli`) or cancelled transitions (#186). `MeliWebhookEvent` is an audit log; duplicate `(topic, resource)` does **not** block order status updates.
+- topic `items` / `item_price`: alerts managers if remote price diverges from BizCode (no auto-correct). Rate-limited per IP.
 
 #### Request Body
 
@@ -60337,6 +60337,427 @@ Requires `products.read` and tenant integration `meli`. Proxies ML domain discov
 ```
 
 ##### Status: 404 Mercado Libre not connected
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List Mercado Libre imported orders (#186)
+
+- **Method:** `GET`
+- **Path:** `/api/meli/ordenes`
+- **Tags:** meli
+
+Requires module `billing.orders`, permission `orders.create` or `reports.operational.read`, and integration `meli`. Returns `MeliOrden` rows with linked Pedido/cliente summary. Filter by business estado: `pendiente` (pedido confirmed/draft), `facturada`, `cancelada`, or omit/`all`.
+
+#### Responses
+
+##### Status: 200 Paginated MeLi orders
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cuitPending` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`isFulfillment` (required)**
+
+    `boolean`
+
+  - **`lastSyncedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`meliOrderId` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`buyerNickname`**
+
+    `string`
+
+  - **`clienteCuit`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`clienteRsocial`**
+
+    `string`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`pedidoEstado`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`pedidoTotal`**
+
+    `string`
+
+  - **`shippingId`**
+
+    `string`
+
+  - **`stockAppliedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "meliOrderId": "",
+      "status": "",
+      "shippingId": "",
+      "isFulfillment": true,
+      "buyerNickname": "",
+      "cuitPending": true,
+      "stockAppliedAt": "",
+      "lastSyncedAt": "",
+      "pedidoId": 1,
+      "pedidoEstado": "",
+      "pedidoTotal": "",
+      "facturaId": 1,
+      "clienteId": 1,
+      "clienteRsocial": "",
+      "clienteCuit": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Mercado Libre not connected
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Invoice a Mercado Libre imported order (#186)
+
+- **Method:** `POST`
+- **Path:** `/api/meli/ordenes/{meliOrderId}/facturar`
+- **Tags:** meli
+
+Requires module `billing.orders`, permission `sales.create`, and integration `meli`. Invoices the linked Pedido with `skipStockDecrement` (stock already moved via `venta_meli`). Factura A without customer CUIT returns `422` `CUIT_REQUIRED_FOR_FACTURA_A`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`numero` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"A", "B"`
+
+- **`formaPagoId`**
+
+  `integer`
+
+- **`prefijo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "numero": 1,
+  "prefijo": "",
+  "formaPagoId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Invoice created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidoId": 1,
+    "facturaId": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Order or linked pedido not found / MeLi not connected
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Already invoiced or cancelled
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Validation / CUIT required for factura A
 
 ###### Content-Type: application/json
 
@@ -105661,6 +106082,135 @@ Originating invoice header (selected columns)
       "domain_name": ""
     }
   ]
+}
+```
+
+### MeliOrden
+
+- **Type:**`object`
+
+* **`cuitPending` (required)**
+
+  `boolean`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`isFulfillment` (required)**
+
+  `boolean`
+
+* **`lastSyncedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`meliOrderId` (required)**
+
+  `string`
+
+* **`status` (required)**
+
+  `string`
+
+* **`buyerNickname`**
+
+  `string`
+
+* **`clienteCuit`**
+
+  `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`clienteRsocial`**
+
+  `string`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`pedidoEstado`**
+
+  `string`
+
+* **`pedidoId`**
+
+  `integer`
+
+* **`pedidoTotal`**
+
+  `string`
+
+* **`shippingId`**
+
+  `string`
+
+* **`stockAppliedAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "meliOrderId": "",
+  "status": "",
+  "shippingId": "",
+  "isFulfillment": true,
+  "buyerNickname": "",
+  "cuitPending": true,
+  "stockAppliedAt": "",
+  "lastSyncedAt": "",
+  "pedidoId": 1,
+  "pedidoEstado": "",
+  "pedidoTotal": "",
+  "facturaId": 1,
+  "clienteId": 1,
+  "clienteRsocial": "",
+  "clienteCuit": ""
+}
+```
+
+### MeliOrdenListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### MeliOrdenFacturarEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidoId": 1,
+    "facturaId": 1
+  }
 }
 ```
 
