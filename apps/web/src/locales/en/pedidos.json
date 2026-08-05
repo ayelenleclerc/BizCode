@@ -20,7 +20,11 @@
     "draft": "Draft",
     "confirmed": "Confirmed",
     "invoiced": "Invoiced",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "packed": "Packed",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "collected": "Collected"
   },
   "filterEstado": "Status",
   "filterAll": "All",
@@ -100,6 +104,32 @@
       "pedido": "Order",
       "total": "Total",
       "actions": "Actions"
+    }
+  },
+  "actions": {
+    "confirm": "Confirm",
+    "pack": "Pack",
+    "ship": "Ship",
+    "deliver": "Deliver",
+    "invoice": "Invoice",
+    "collect": "Collect",
+    "cancel": "Cancel"
+  },
+  "create": {
+    "title": "New order",
+    "clienteId": "Customer ID",
+    "descripcion": "Line description",
+    "cantidad": "Quantity",
+    "precio": "Price",
+    "cancel": "Cancel",
+    "submit": "Create",
+    "saving": "Saving…",
+    "errors": {
+      "clienteId": "Invalid customer",
+      "descripcion": "Description required",
+      "cantidad": "Invalid quantity",
+      "precio": "Invalid price",
+      "generic": "Could not create order"
     }
   }
 }

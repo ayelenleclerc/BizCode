@@ -4176,7 +4176,7 @@ paths:
           in: query
           schema:
             type: string
-            enum: [draft, confirmed, invoiced, cancelled]
+            enum: [draft, confirmed, packed, shipped, delivered, invoiced, collected, cancelled]
         - name: clienteId
           in: query
           schema:
@@ -4367,6 +4367,191 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/pedidos/{id}/pack:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [pedidos]
+      summary: Pack pedido (confirmed|invoiced → packed)
+      description: Requires `orders.pick`. Part of BP1-1 logistics (#391).
+      responses:
+        '200':
+          description: Pedido packed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/ship:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [pedidos]
+      summary: Ship pedido (packed|invoiced → shipped)
+      description: Requires `orders.dispatch`. Part of BP1-1 logistics (#391).
+      responses:
+        '200':
+          description: Pedido shipped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/deliver:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [pedidos]
+      summary: Deliver pedido (shipped|invoiced → delivered)
+      description: Requires `orders.deliver.confirm`. Part of BP1-1 logistics (#391).
+      responses:
+        '200':
+          description: Pedido delivered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/collect:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [pedidos]
+      summary: Mark pedido collected when Factura is fully paid
+      description: Requires `sales.create` or `reports.financial.read`. Pedido must be `invoiced` or `delivered` with linked Factura liquidated (#391).
+      responses:
+        '200':
+          description: Pedido collected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '409':
+          description: Invalid state or factura not fully paid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/transitions:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [pedidos]
+      summary: Generic Pedido state transition facade
+      description: >
+        Body with field to (packed, shipped, delivered, invoiced, collected, cancelled, confirmed).
+        When to is invoiced, include PedidoInvoiceInput fields. Server validates adjacency (BP1-1 #391).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoTransitionInput'
+      responses:
+        '200':
+          description: Transition applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/pedidos/{id}/invoice:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -4379,7 +4564,7 @@ paths:
     post:
       tags: [pedidos]
       summary: Invoice pedido (creates Factura)
-      description: Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via FacturaService (no CAE in this release).
+      description: Requires `sales.create`. Allowed from `confirmed|packed|shipped|delivered`. From `confirmed`, estado becomes `invoiced`; from logistics states, keeps fulfillment estado and sets `facturaId` (early/late invoice #391).
       requestBody:
         required: true
         content:
@@ -21197,7 +21382,7 @@ components:
           nullable: true
         estado:
           type: string
-          enum: [draft, confirmed, invoiced, cancelled]
+          enum: [draft, confirmed, packed, shipped, delivered, invoiced, collected, cancelled]
         total:
           type: number
         validUntil:
@@ -21273,6 +21458,28 @@ components:
       properties:
         fecha:
           type: string
+        tipo:
+          type: string
+          enum: [A, B]
+        numero:
+          type: integer
+          minimum: 1
+        prefijo:
+          type: string
+        formaPagoId:
+          type: integer
+          nullable: true
+
+    PedidoTransitionInput:
+      type: object
+      required: [to]
+      properties:
+        to:
+          type: string
+          enum: [confirmed, packed, shipped, delivered, invoiced, collected, cancelled]
+        fecha:
+          type: string
+          description: Required when to=invoiced
         tipo:
           type: string
           enum: [A, B]

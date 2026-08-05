@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { pedidosAPI, remitosAPI, type PedidoRow } from '@/lib/api'
 import { CanAccess } from '@/components/CanAccess'
@@ -12,12 +12,25 @@ import MeliOrdenesPanel from './MeliOrdenesPanel'
 import TiendanubeOrdenesPanel from './TiendanubeOrdenesPanel'
 import WooCommerceOrdenesPanel from './WooCommerceOrdenesPanel'
 
-const ESTADOS = ['draft', 'confirmed', 'invoiced', 'cancelled'] as const
+const ESTADOS = [
+  'draft',
+  'confirmed',
+  'packed',
+  'shipped',
+  'delivered',
+  'invoiced',
+  'collected',
+  'cancelled',
+] as const
 
 function formatMoney(value: number | string): string {
   const n = typeof value === 'number' ? value : Number.parseFloat(String(value))
   if (Number.isNaN(n)) return String(value)
   return n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })
+}
+
+function todayIsoDate(): string {
+  return new Date().toISOString().slice(0, 10)
 }
 
 export default function PedidosPage() {
@@ -28,7 +41,14 @@ export default function PedidosPage() {
   const [loadError, setLoadError] = useState<Error | null>(null)
   const [filterEstado, setFilterEstado] = useState('')
   const [selectedRow, setSelectedRow] = useState(0)
-  const [remitoLoadingId, setRemitoLoadingId] = useState<number | null>(null)
+  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
+  const [showCreate, setShowCreate] = useState(false)
+  const [createClienteId, setCreateClienteId] = useState('')
+  const [createDescripcion, setCreateDescripcion] = useState('')
+  const [createCantidad, setCreateCantidad] = useState('1')
+  const [createPrecio, setCreatePrecio] = useState('0')
+  const [createError, setCreateError] = useState<string | null>(null)
+  const [createSaving, setCreateSaving] = useState(false)
   const listShortcuts = useGlobalListShortcuts()
 
   const loadPedidos = useCallback(async () => {
@@ -64,6 +84,68 @@ export default function PedidosPage() {
     searchInputId: 'search-pedidos-estado',
   })
 
+  const runAction = async (id: number, action: () => Promise<unknown>, e?: MouseEvent) => {
+    e?.stopPropagation()
+    setActionLoadingId(id)
+    try {
+      await action()
+      await loadPedidos()
+    } finally {
+      setActionLoadingId(null)
+    }
+  }
+
+  const handleCreate = async () => {
+    setCreateError(null)
+    const clienteId = Number.parseInt(createClienteId, 10)
+    const cantidad = Number.parseInt(createCantidad, 10)
+    const precio = Number.parseFloat(createPrecio)
+    if (!Number.isInteger(clienteId) || clienteId < 1) {
+      setCreateError(t('create.errors.clienteId'))
+      return
+    }
+    if (!createDescripcion.trim()) {
+      setCreateError(t('create.errors.descripcion'))
+      return
+    }
+    if (!Number.isInteger(cantidad) || cantidad < 1) {
+      setCreateError(t('create.errors.cantidad'))
+      return
+    }
+    if (Number.isNaN(precio) || precio < 0) {
+      setCreateError(t('create.errors.precio'))
+      return
+    }
+    setCreateSaving(true)
+    try {
+      await pedidosAPI.create({
+        clienteId,
+        items: [
+          {
+            descripcion: createDescripcion.trim(),
+            condIva: '1',
+            cantidad,
+            precio,
+            dscto: 0,
+          },
+        ],
+      })
+      setShowCreate(false)
+      setCreateClienteId('')
+      setCreateDescripcion('')
+      setCreateCantidad('1')
+      setCreatePrecio('0')
+      await loadPedidos()
+    } catch (error) {
+      setCreateError(error instanceof Error ? error.message : t('create.errors.generic'))
+    } finally {
+      setCreateSaving(false)
+    }
+  }
+
+  const remitoAllowed = (estado: string) =>
+    estado === 'confirmed' || estado === 'packed' || estado === 'invoiced'
+
   return (
     <ErrorBoundary>
       <div className="p-6" data-testid="pedidos-page">
@@ -78,13 +160,98 @@ export default function PedidosPage() {
                 type="button"
                 className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
                 data-testid="pedidos-new-btn"
-                disabled
+                onClick={() => setShowCreate(true)}
               >
                 {t('newOrder')}
               </button>
             </CanAccess>
           ) : null}
         </header>
+
+        {showCreate ? (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pedidos-create-title"
+            data-testid="pedidos-create-dialog"
+          >
+            <div className="w-full max-w-md rounded bg-white dark:bg-slate-900 p-4 shadow-lg space-y-3">
+              <h2 id="pedidos-create-title" className="text-lg font-semibold">
+                {t('create.title')}
+              </h2>
+              <label className="block text-sm" htmlFor="pedidos-create-cliente">
+                {t('create.clienteId')}
+                <input
+                  id="pedidos-create-cliente"
+                  className="mt-1 w-full border rounded px-2 py-1 dark:bg-slate-800"
+                  value={createClienteId}
+                  onChange={(e) => setCreateClienteId(e.target.value)}
+                  data-testid="pedidos-create-cliente"
+                  inputMode="numeric"
+                />
+              </label>
+              <label className="block text-sm" htmlFor="pedidos-create-desc">
+                {t('create.descripcion')}
+                <input
+                  id="pedidos-create-desc"
+                  className="mt-1 w-full border rounded px-2 py-1 dark:bg-slate-800"
+                  value={createDescripcion}
+                  onChange={(e) => setCreateDescripcion(e.target.value)}
+                  data-testid="pedidos-create-descripcion"
+                />
+              </label>
+              <div className="flex gap-2">
+                <label className="block text-sm flex-1" htmlFor="pedidos-create-qty">
+                  {t('create.cantidad')}
+                  <input
+                    id="pedidos-create-qty"
+                    className="mt-1 w-full border rounded px-2 py-1 dark:bg-slate-800"
+                    value={createCantidad}
+                    onChange={(e) => setCreateCantidad(e.target.value)}
+                    data-testid="pedidos-create-cantidad"
+                    inputMode="numeric"
+                  />
+                </label>
+                <label className="block text-sm flex-1" htmlFor="pedidos-create-precio">
+                  {t('create.precio')}
+                  <input
+                    id="pedidos-create-precio"
+                    className="mt-1 w-full border rounded px-2 py-1 dark:bg-slate-800"
+                    value={createPrecio}
+                    onChange={(e) => setCreatePrecio(e.target.value)}
+                    data-testid="pedidos-create-precio"
+                    inputMode="decimal"
+                  />
+                </label>
+              </div>
+              {createError ? (
+                <p className="text-sm text-red-600" role="alert" data-testid="pedidos-create-error">
+                  {createError}
+                </p>
+              ) : null}
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  className="px-3 py-1 rounded border"
+                  onClick={() => setShowCreate(false)}
+                  data-testid="pedidos-create-cancel"
+                >
+                  {t('create.cancel')}
+                </button>
+                <button
+                  type="button"
+                  className="px-3 py-1 rounded bg-blue-600 text-white disabled:opacity-50"
+                  disabled={createSaving}
+                  onClick={() => void handleCreate()}
+                  data-testid="pedidos-create-submit"
+                >
+                  {createSaving ? t('create.saving') : t('create.submit')}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <div className="mb-4 flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-700" role="tablist" aria-label={t('tabsLabel')}>
           <button
@@ -214,30 +381,128 @@ export default function PedidosPage() {
                           <td className="py-2 pr-4">{formatMoney(p.total)}</td>
                           <td className="py-2 pr-4">{new Date(p.createdAt).toLocaleDateString()}</td>
                           <td className="py-2">
-                            {p.estado === 'confirmed' && (
-                              <IfModule flag="fiscal.remito">
+                            <div className="flex flex-wrap gap-1" role="group" aria-label={t('columns.actions')}>
+                              {p.estado === 'draft' ? (
+                                <CanAccess permission="orders.create">
+                                  <button
+                                    type="button"
+                                    className="px-2 py-1 text-xs rounded bg-indigo-600 text-white disabled:opacity-50"
+                                    data-testid={`pedido-confirm-${p.id}`}
+                                    disabled={actionLoadingId === p.id}
+                                    onClick={(e) => void runAction(p.id, () => pedidosAPI.confirm(p.id), e)}
+                                  >
+                                    {t('actions.confirm')}
+                                  </button>
+                                </CanAccess>
+                              ) : null}
+                              {p.estado === 'confirmed' || p.estado === 'invoiced' ? (
+                                <CanAccess permission="orders.pick">
+                                  <button
+                                    type="button"
+                                    className="px-2 py-1 text-xs rounded bg-amber-600 text-white disabled:opacity-50"
+                                    data-testid={`pedido-pack-${p.id}`}
+                                    disabled={actionLoadingId === p.id}
+                                    onClick={(e) => void runAction(p.id, () => pedidosAPI.pack(p.id), e)}
+                                  >
+                                    {t('actions.pack')}
+                                  </button>
+                                </CanAccess>
+                              ) : null}
+                              {p.estado === 'packed' || p.estado === 'invoiced' ? (
+                                <CanAccess permission="orders.dispatch">
+                                  <button
+                                    type="button"
+                                    className="px-2 py-1 text-xs rounded bg-orange-600 text-white disabled:opacity-50"
+                                    data-testid={`pedido-ship-${p.id}`}
+                                    disabled={actionLoadingId === p.id}
+                                    onClick={(e) => void runAction(p.id, () => pedidosAPI.ship(p.id), e)}
+                                  >
+                                    {t('actions.ship')}
+                                  </button>
+                                </CanAccess>
+                              ) : null}
+                              {p.estado === 'shipped' || p.estado === 'invoiced' ? (
+                                <CanAccess permission="orders.deliver.confirm">
+                                  <button
+                                    type="button"
+                                    className="px-2 py-1 text-xs rounded bg-cyan-600 text-white disabled:opacity-50"
+                                    data-testid={`pedido-deliver-${p.id}`}
+                                    disabled={actionLoadingId === p.id}
+                                    onClick={(e) => void runAction(p.id, () => pedidosAPI.deliver(p.id), e)}
+                                  >
+                                    {t('actions.deliver')}
+                                  </button>
+                                </CanAccess>
+                              ) : null}
+                              {['confirmed', 'packed', 'shipped', 'delivered'].includes(p.estado) &&
+                              p.facturaId == null ? (
                                 <CanAccess permission="sales.create">
                                   <button
                                     type="button"
-                                    className="px-2 py-1 text-xs rounded bg-teal-600 text-white disabled:opacity-50"
-                                    data-testid={`pedido-remito-${p.id}`}
-                                    disabled={remitoLoadingId === p.id}
-                                    onClick={async (e) => {
-                                      e.stopPropagation()
-                                      setRemitoLoadingId(p.id)
-                                      try {
-                                        await remitosAPI.createFromPedido(p.id)
-                                        await loadPedidos()
-                                      } finally {
-                                        setRemitoLoadingId(null)
-                                      }
-                                    }}
+                                    className="px-2 py-1 text-xs rounded bg-emerald-600 text-white disabled:opacity-50"
+                                    data-testid={`pedido-invoice-${p.id}`}
+                                    disabled={actionLoadingId === p.id}
+                                    onClick={(e) =>
+                                      void runAction(
+                                        p.id,
+                                        () =>
+                                          pedidosAPI.invoice(p.id, {
+                                            fecha: todayIsoDate(),
+                                            tipo: 'B',
+                                            numero: Date.now() % 1_000_000,
+                                          }),
+                                        e,
+                                      )
+                                    }
                                   >
-                                    {remitoLoadingId === p.id ? t('remitoCreating') : t('generateRemito')}
+                                    {t('actions.invoice')}
                                   </button>
                                 </CanAccess>
-                              </IfModule>
-                            )}
+                              ) : null}
+                              {p.estado === 'invoiced' || p.estado === 'delivered' ? (
+                                <CanAccess permission="sales.create">
+                                  <button
+                                    type="button"
+                                    className="px-2 py-1 text-xs rounded bg-green-700 text-white disabled:opacity-50"
+                                    data-testid={`pedido-collect-${p.id}`}
+                                    disabled={actionLoadingId === p.id}
+                                    onClick={(e) => void runAction(p.id, () => pedidosAPI.collect(p.id), e)}
+                                  >
+                                    {t('actions.collect')}
+                                  </button>
+                                </CanAccess>
+                              ) : null}
+                              {p.estado === 'draft' || p.estado === 'confirmed' ? (
+                                <CanAccess permission="sales.cancel">
+                                  <button
+                                    type="button"
+                                    className="px-2 py-1 text-xs rounded bg-red-600 text-white disabled:opacity-50"
+                                    data-testid={`pedido-cancel-${p.id}`}
+                                    disabled={actionLoadingId === p.id}
+                                    onClick={(e) => void runAction(p.id, () => pedidosAPI.cancel(p.id), e)}
+                                  >
+                                    {t('actions.cancel')}
+                                  </button>
+                                </CanAccess>
+                              ) : null}
+                              {remitoAllowed(p.estado) ? (
+                                <IfModule flag="fiscal.remito">
+                                  <CanAccess permission="sales.create">
+                                    <button
+                                      type="button"
+                                      className="px-2 py-1 text-xs rounded bg-teal-600 text-white disabled:opacity-50"
+                                      data-testid={`pedido-remito-${p.id}`}
+                                      disabled={actionLoadingId === p.id}
+                                      onClick={(e) =>
+                                        void runAction(p.id, () => remitosAPI.createFromPedido(p.id), e)
+                                      }
+                                    >
+                                      {actionLoadingId === p.id ? t('remitoCreating') : t('generateRemito')}
+                                    </button>
+                                  </CanAccess>
+                                </IfModule>
+                              ) : null}
+                            </div>
                           </td>
                         </tr>
                       ))}

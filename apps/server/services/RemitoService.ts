@@ -8,6 +8,7 @@ import type {
   RemitoUpdateInput,
 } from '@bizcode/types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
+import { PedidoService } from './PedidoService'
 import type { ServiceResult } from './serviceResults'
 
 const remitoInclude = {
@@ -238,6 +239,9 @@ export class RemitoService {
         include: remitoInclude,
       })
     })
+    if (remito.pedidoId != null) {
+      await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, remito.pedidoId, 'shipped')
+    }
     return { ok: true, data: remito }
   }
 
@@ -265,6 +269,9 @@ export class RemitoService {
       data: { estado: 'entregado', firmadoPor, fechaEntrega },
       include: remitoInclude,
     })
+    if (remito.pedidoId != null) {
+      await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, remito.pedidoId, 'delivered')
+    }
     return { ok: true, data: remito }
   }
 
@@ -299,7 +306,8 @@ export class RemitoService {
       },
     })
     if (!pedido) return { ok: false, status: 404, error: 'Pedido not found' }
-    if (pedido.estado !== 'confirmed') {
+    const allowedFrom = new Set(['confirmed', 'packed', 'invoiced'])
+    if (!allowedFrom.has(pedido.estado)) {
       return { ok: false, status: 409, error: 'INVALID_STATE_TRANSITION' }
     }
     if (pedido.remito) return { ok: false, status: 409, error: 'PEDIDO_ALREADY_HAS_REMITO' }
@@ -316,12 +324,16 @@ export class RemitoService {
       return { ok: false, status: 422, error: 'NO_PHYSICAL_ITEMS_FOR_REMITO' }
     }
 
-    return this.create(tenantId, {
+    const created = await this.create(tenantId, {
       tipo: 'remito_x',
       clienteId: pedido.clienteId,
       pedidoId: pedido.id,
       items,
     })
+    if (created.ok) {
+      await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, pedido.id, 'packed')
+    }
+    return created
   }
 
   async createFromFactura(tenantId: number, facturaId: number): Promise<ServiceResult<RemitoRow>> {

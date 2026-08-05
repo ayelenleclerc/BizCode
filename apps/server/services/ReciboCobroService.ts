@@ -8,6 +8,7 @@ import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { RetencionConstanciaService } from './RetencionConstanciaService'
 import { validateCobroRetenciones } from './RetencionCobroValidation'
 import { computeScoreChange } from './CobroService'
+import { PedidoService } from './PedidoService'
 import { TurnoCajaService } from './TurnoCajaService'
 
 function decimalToMoneyString(value: Decimal | number): string {
@@ -532,6 +533,16 @@ export class ReciboCobroService {
       }
     } catch {
       /* Cash drawer posting must not fail recibo create */
+    }
+
+    try {
+      const pedidoSvc = new PedidoService(this.prisma)
+      const facturaIds = [...new Set(created.imputaciones.map((i) => i.facturaId))]
+      for (const facturaId of facturaIds) {
+        await pedidoSvc.tryCollectAfterFacturaPaid(tenantId, facturaId)
+      }
+    } catch {
+      /* Pedido collect sync must not fail recibo create */
     }
 
     return { ok: true, data: mapRecibo(created) }

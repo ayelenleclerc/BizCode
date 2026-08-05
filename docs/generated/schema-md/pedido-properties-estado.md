@@ -22,5 +22,9 @@ undefined#/properties/estado
 | :------------ | :---------- |
 | `"draft"`     |             |
 | `"confirmed"` |             |
+| `"packed"`    |             |
+| `"shipped"`   |             |
+| `"delivered"` |             |
 | `"invoiced"`  |             |
+| `"collected"` |             |
 | `"cancelled"` |             |

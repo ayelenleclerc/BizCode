@@ -1,6 +1,15 @@
 import type { PaginatedResponse } from './api-contracts'
 
-export type PedidoEstado = 'draft' | 'confirmed' | 'invoiced' | 'cancelled'
+/** BP1-1 (#391): commercial + logistics + collection lifecycle keys. */
+export type PedidoEstado =
+  | 'draft'
+  | 'confirmed'
+  | 'packed'
+  | 'shipped'
+  | 'delivered'
+  | 'invoiced'
+  | 'collected'
+  | 'cancelled'
 
 export type PedidoRow = {
   id: number
@@ -17,3 +26,8 @@ export type PedidoRow = {
 }
 
 export type PedidoListResponse = PaginatedResponse<PedidoRow> & { success: boolean }
+
+/** Body for `POST /api/pedidos/:id/transitions`. */
+export type PedidoTransitionInput = {
+  to: Exclude<PedidoEstado, 'draft'>
+}
