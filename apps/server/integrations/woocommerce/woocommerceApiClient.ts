@@ -74,14 +74,31 @@ import {
 } from '../../lib/woocommerceStoreUrl'
 
 /**
+ * @en Builds a validated `URL` for `{origin}/wp-json/wc/v3{path}` from discrete host + relative path (#188).
+ * @es Construye un `URL` validado `{origin}/wp-json/wc/v3{path}` desde host + path relativo (#188).
+ * @pt-BR Constrói um `URL` validado `{origin}/wp-json/wc/v3{path}` a partir de host + path relativo (#188).
+ */
+export function buildValidatedWooCommerceRequestUrl(storeUrl: string, path: string): URL {
+  const origin = normalizeAndValidateWooCommerceStoreUrl(storeUrl)
+  const originUrl = new URL(origin)
+  const relative = normalizeWooCommerceApiPath(path)
+  const pathnameOnly = relative.split('?')[0] ?? relative
+  const search = relative.includes('?') ? relative.slice(relative.indexOf('?')) : ''
+  const url = new URL(`${originUrl.protocol}//${originUrl.host}`)
+  url.pathname = `/wp-json/wc/v3${pathnameOnly}`
+  if (search) {
+    url.search = search.startsWith('?') ? search.slice(1) : search
+  }
+  return url
+}
+
+/**
  * @en Builds the `{storeUrl}/wp-json/wc/v3{path}` URL after HTTPS/public-host validation (#188).
  * @es Construye la URL `{storeUrl}/wp-json/wc/v3{path}` tras validar HTTPS/host público (#188).
  * @pt-BR Constrói a URL `{storeUrl}/wp-json/wc/v3{path}` após validar HTTPS/host público (#188).
  */
 export function woocommerceApiUrl(storeUrl: string, path: string): string {
-  const base = normalizeAndValidateWooCommerceStoreUrl(storeUrl)
-  const normalized = normalizeWooCommerceApiPath(path)
-  return `${base}/wp-json/wc/v3${normalized}`
+  return buildValidatedWooCommerceRequestUrl(storeUrl, path).href
 }
 
 function basicAuthHeader(consumerKey: string, consumerSecret: string): string {
@@ -105,7 +122,8 @@ export async function woocommerceFetch(
   headers.set('Authorization', basicAuthHeader(consumerKey, consumerSecret))
   headers.set('Content-Type', headers.get('Content-Type') ?? 'application/json')
   headers.set('Accept', 'application/json')
-  return fetch(woocommerceApiUrl(storeUrl, path), { ...init, headers })
+  const url = buildValidatedWooCommerceRequestUrl(storeUrl, path)
+  return fetch(url, { ...init, headers })
 }
 
 async function readJsonOrThrow<T>(res: Response, action: string): Promise<T> {
