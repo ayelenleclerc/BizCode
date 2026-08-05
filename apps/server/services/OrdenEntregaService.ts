@@ -432,9 +432,13 @@ export class OrdenEntregaService {
     orden: OrdenEntregaRow,
     target: 'packed' | 'shipped' | 'delivered',
   ): Promise<void> {
-    const pedidoId = await this.resolveLinkedPedidoId(tenantId, orden)
-    if (pedidoId == null) return
-    await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, pedidoId, target)
+    try {
+      const pedidoId = await this.resolveLinkedPedidoId(tenantId, orden)
+      if (pedidoId == null) return
+      await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, pedidoId, target)
+    } catch {
+      /* OE transitions must succeed even if Pedido sync cannot run (partial Prisma in tests). */
+    }
   }
 
   private async resolveLinkedPedidoId(

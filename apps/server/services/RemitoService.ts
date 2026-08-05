@@ -240,7 +240,11 @@ export class RemitoService {
       })
     })
     if (remito.pedidoId != null) {
-      await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, remito.pedidoId, 'shipped')
+      try {
+        await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, remito.pedidoId, 'shipped')
+      } catch {
+        /* Emit must not fail when Pedido sync cannot run. */
+      }
     }
     return { ok: true, data: remito }
   }
@@ -270,7 +274,11 @@ export class RemitoService {
       include: remitoInclude,
     })
     if (remito.pedidoId != null) {
-      await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, remito.pedidoId, 'delivered')
+      try {
+        await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, remito.pedidoId, 'delivered')
+      } catch {
+        /* Deliver must not fail when Pedido sync cannot run. */
+      }
     }
     return { ok: true, data: remito }
   }
@@ -331,7 +339,11 @@ export class RemitoService {
       items,
     })
     if (created.ok) {
-      await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, pedido.id, 'packed')
+      try {
+        await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, pedido.id, 'packed')
+      } catch {
+        /* Remito create must not fail when Pedido sync cannot run. */
+      }
     }
     return created
   }

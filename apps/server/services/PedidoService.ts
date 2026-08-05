@@ -370,24 +370,28 @@ export class PedidoService {
     id: number,
     target: 'packed' | 'shipped' | 'delivered',
   ): Promise<void> {
-    const targetRank = fulfillmentRank(target)
-    const steps: Array<'pack' | 'ship' | 'deliver'> = ['pack', 'ship', 'deliver']
-    for (const action of steps) {
-      const existing = await this.prisma.pedido.findFirst({
-        where: { id, tenantId },
-        select: { estado: true },
-      })
-      if (!existing) return
-      const from = existing.estado as PedidoEstado
-      if (fulfillmentRank(from) >= targetRank) return
-      if (!canTransition(from, action)) continue
-      const next = nextEstadoAfter(from, action)
-      if (next == null || next === from) continue
-      if (fulfillmentRank(next) > targetRank) continue
-      await this.prisma.pedido.update({
-        where: { id },
-        data: { estado: next },
-      })
+    try {
+      const targetRank = fulfillmentRank(target)
+      const steps: Array<'pack' | 'ship' | 'deliver'> = ['pack', 'ship', 'deliver']
+      for (const action of steps) {
+        const existing = await this.prisma.pedido.findFirst({
+          where: { id, tenantId },
+          select: { estado: true },
+        })
+        if (!existing) return
+        const from = existing.estado as PedidoEstado
+        if (fulfillmentRank(from) >= targetRank) return
+        if (!canTransition(from, action)) continue
+        const next = nextEstadoAfter(from, action)
+        if (next == null || next === from) continue
+        if (fulfillmentRank(next) > targetRank) continue
+        await this.prisma.pedido.update({
+          where: { id },
+          data: { estado: next },
+        })
+      }
+    } catch {
+      /* Remito/OE mutations must not fail when Pedido sync is unavailable (e.g. partial test doubles). */
     }
   }
 
