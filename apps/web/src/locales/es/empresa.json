@@ -156,6 +156,37 @@
       "disconnectFailed": "No se pudo desconectar Tiendanube"
     }
   },
+  "woocommerce": {
+    "title": "WooCommerce",
+    "subtitle": "Conectá la tienda con un consumer key/secret de la REST API (Basic Auth). Las credenciales se cifran y nunca se muestran.",
+    "loading": "Cargando estado WooCommerce…",
+    "connectedBadge": "Conectado: {{store}} · key ••••{{last4}}",
+    "notConnectedBadge": "No conectado",
+    "readOnlyHint": "Puede ver el estado; solo roles con permiso de configuración de empresa pueden conectar o desconectar.",
+    "store": "Tienda",
+    "storeUrl": "URL de la tienda",
+    "connectedAt": "Conectado desde",
+    "webhookUrl": "URL del webhook (configurala en WooCommerce → Ajustes → Avanzado → Webhooks)",
+    "webhookSecretWarning": "No hay webhook secret configurado; los webhooks de órdenes entrantes serán rechazados.",
+    "fields": {
+      "storeUrl": "URL de la tienda",
+      "consumerKey": "Consumer Key",
+      "consumerSecret": "Consumer Secret",
+      "webhookSecret": "Webhook secret (opcional)",
+      "webhookSecretHint": "Debe coincidir con el secret configurado para el webhook en WooCommerce."
+    },
+    "connect": "Conectar WooCommerce",
+    "connecting": "Conectando…",
+    "disconnect": "Desconectar",
+    "disconnecting": "Desconectando…",
+    "connectSuccess": "Tienda WooCommerce conectada",
+    "disconnectSuccess": "Tienda WooCommerce desconectada",
+    "errors": {
+      "loadFailed": "No se pudo cargar el estado WooCommerce",
+      "connectFailed": "No se pudo conectar con WooCommerce",
+      "disconnectFailed": "No se pudo desconectar WooCommerce"
+    }
+  },
   "ecommerce": {
     "title": "Integraciones eCommerce",
     "subtitle": "Estado de conectores y registro de sincronización compartido (catálogo, stock y órdenes).",

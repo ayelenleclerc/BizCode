@@ -64,6 +64,10 @@ import { registerTiendanubeOAuthRoutes } from './routes/registerTiendanubeOAuthR
 import { registerTiendanubeCatalogRoutes } from './routes/registerTiendanubeCatalogRoutes'
 import { registerTiendanubeOrdersRoutes } from './routes/registerTiendanubeOrdersRoutes'
 import { registerTiendanubeWebhookRoutes } from './routes/registerTiendanubeWebhookRoutes'
+import { registerWooCommerceConfigRoutes } from './routes/registerWooCommerceConfigRoutes'
+import { registerWooCommerceCatalogRoutes } from './routes/registerWooCommerceCatalogRoutes'
+import { registerWooCommerceOrdersRoutes } from './routes/registerWooCommerceOrdersRoutes'
+import { registerWooCommerceWebhookRoutes } from './routes/registerWooCommerceWebhookRoutes'
 import { registerPrintingRoutes } from './routes/registerPrintingRoutes'
 import { registerContratosRoutes } from './routes/registerContratosRoutes'
 import { registerOrdenTrabajoRoutes } from './routes/registerOrdenTrabajoRoutes'
@@ -117,6 +121,10 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerTiendanubeCatalogRoutes(app, ctx)
   registerTiendanubeOrdersRoutes(app, ctx)
   registerTiendanubeWebhookRoutes(app, ctx)
+  registerWooCommerceConfigRoutes(app, ctx)
+  registerWooCommerceCatalogRoutes(app, ctx)
+  registerWooCommerceOrdersRoutes(app, ctx)
+  registerWooCommerceWebhookRoutes(app, ctx)
   registerClientesRoutes(app, ctx)
   registerClienteCuentaCorrienteRoutes(app, ctx)
   registerArticuloVariantesRoutes(app, ctx)

@@ -10,6 +10,7 @@ import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/Keyboa
 import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import MeliOrdenesPanel from './MeliOrdenesPanel'
 import TiendanubeOrdenesPanel from './TiendanubeOrdenesPanel'
+import WooCommerceOrdenesPanel from './WooCommerceOrdenesPanel'
 
 const ESTADOS = ['draft', 'confirmed', 'invoiced', 'cancelled'] as const
 
@@ -21,7 +22,7 @@ function formatMoney(value: number | string): string {
 
 export default function PedidosPage() {
   const { t } = useTranslation('pedidos')
-  const [tab, setTab] = useState<'pedidos' | 'meli' | 'tiendanube'>('pedidos')
+  const [tab, setTab] = useState<'pedidos' | 'meli' | 'tiendanube' | 'woocommerce'>('pedidos')
   const [pedidos, setPedidos] = useState<PedidoRow[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<Error | null>(null)
@@ -120,12 +121,26 @@ export default function PedidosPage() {
               {t('tabTiendanube')}
             </button>
           </IfIntegration>
+          <IfIntegration id="woocommerce">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === 'woocommerce'}
+              className={`px-3 py-2 text-sm ${tab === 'woocommerce' ? 'border-b-2 border-blue-600 font-semibold' : 'text-slate-500'}`}
+              data-testid="pedidos-tab-woocommerce"
+              onClick={() => setTab('woocommerce')}
+            >
+              {t('tabWooCommerce')}
+            </button>
+          </IfIntegration>
         </div>
 
         {tab === 'meli' ? (
           <MeliOrdenesPanel />
         ) : tab === 'tiendanube' ? (
           <TiendanubeOrdenesPanel />
+        ) : tab === 'woocommerce' ? (
+          <WooCommerceOrdenesPanel />
         ) : (
           <>
             <div className="mb-4 flex flex-wrap gap-3 items-center">

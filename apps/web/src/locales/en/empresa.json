@@ -156,6 +156,37 @@
       "disconnectFailed": "Could not disconnect Tiendanube"
     }
   },
+  "woocommerce": {
+    "title": "WooCommerce",
+    "subtitle": "Connect the store with a REST API consumer key/secret (Basic Auth). Credentials are encrypted and never displayed.",
+    "loading": "Loading WooCommerce status…",
+    "connectedBadge": "Connected: {{store}} · key ••••{{last4}}",
+    "notConnectedBadge": "Not connected",
+    "readOnlyHint": "You can view status; only roles with company settings permission can connect or disconnect.",
+    "store": "Store",
+    "storeUrl": "Store URL",
+    "connectedAt": "Connected since",
+    "webhookUrl": "Webhook URL (configure it in WooCommerce → Settings → Advanced → Webhooks)",
+    "webhookSecretWarning": "No webhook secret is set; incoming order webhooks will be rejected.",
+    "fields": {
+      "storeUrl": "Store URL",
+      "consumerKey": "Consumer Key",
+      "consumerSecret": "Consumer Secret",
+      "webhookSecret": "Webhook secret (optional)",
+      "webhookSecretHint": "Must match the secret configured for the webhook in WooCommerce."
+    },
+    "connect": "Connect WooCommerce",
+    "connecting": "Connecting…",
+    "disconnect": "Disconnect",
+    "disconnecting": "Disconnecting…",
+    "connectSuccess": "WooCommerce store connected",
+    "disconnectSuccess": "WooCommerce store disconnected",
+    "errors": {
+      "loadFailed": "Could not load WooCommerce status",
+      "connectFailed": "Could not connect to WooCommerce",
+      "disconnectFailed": "Could not disconnect WooCommerce"
+    }
+  },
   "ecommerce": {
     "title": "eCommerce integrations",
     "subtitle": "Connector status and shared sync log (catalog, stock and orders).",

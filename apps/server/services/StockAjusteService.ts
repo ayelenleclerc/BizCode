@@ -6,6 +6,7 @@ import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSy
 import { LoteService } from './LoteService'
 import { MeliStockSyncService } from './MeliStockSyncService'
 import { TiendanubeStockSyncService } from './TiendanubeStockSyncService'
+import { WooCommerceStockSyncService } from './WooCommerceStockSyncService'
 import { isUnidadBase, roundQty, validateQuantityForUom } from '../lib/uom'
 
 export type StockAjusteRow = Prisma.StockAjusteGetPayload<{
@@ -168,6 +169,9 @@ export class StockAjusteService {
         .catch(() => undefined)
       void new TiendanubeStockSyncService(this.prisma)
         .syncStockToTiendanube(tenantId, articuloId)
+        .catch(() => undefined)
+      void new WooCommerceStockSyncService(this.prisma)
+        .syncStockToWooCommerce(tenantId, articuloId)
         .catch(() => undefined)
       return { ok: true, data: result }
     } catch (err) {

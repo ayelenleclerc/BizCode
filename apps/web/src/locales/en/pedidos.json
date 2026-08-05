@@ -53,6 +53,7 @@
     }
   },
   "tabTiendanube": "TN orders",
+  "tabWooCommerce": "Woo orders",
   "tiendanube": {
     "filterEstado": "Status",
     "filter": {
@@ -72,6 +73,30 @@
       "tnOrderId": "TN order",
       "buyer": "Buyer",
       "status": "TN status",
+      "pedido": "Order",
+      "total": "Total",
+      "actions": "Actions"
+    }
+  },
+  "woocommerce": {
+    "filterEstado": "Status",
+    "filter": {
+      "pendiente": "Pending",
+      "facturada": "Invoiced",
+      "cancelada": "Cancelled",
+      "all": "All"
+    },
+    "refresh": "Refresh Woo orders",
+    "empty": "No WooCommerce orders.",
+    "loadError": "Could not load WooCommerce orders.",
+    "invoiceError": "Could not invoice the order.",
+    "cuitPending": "Tax ID pending",
+    "invoice": "Invoice",
+    "invoicing": "Invoicing…",
+    "columns": {
+      "wcOrderId": "WC order",
+      "buyer": "Buyer",
+      "status": "WC status",
       "pedido": "Order",
       "total": "Total",
       "actions": "Actions"

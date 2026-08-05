@@ -61151,6 +61151,1054 @@ Requires module `billing.orders`, permission `sales.create`, and integration `ti
 }
 ```
 
+### WooCommerce connection status (no credentials) (#188)
+
+- **Method:** `GET`
+- **Path:** `/api/configuracion/woocommerce`
+- **Tags:** woocommerce
+
+Requires `settings.business.manage` and tenant integration `woocommerce`. Never returns the consumer key/secret.
+
+#### Responses
+
+##### Status: 200 WooCommerce connection status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`connected` (required)**
+
+    `boolean`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`conectadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`consumerKeyLast4`**
+
+    `string`
+
+  - **`hasWebhookSecret`**
+
+    `boolean`
+
+  - **`storeName`**
+
+    `string`
+
+  - **`storeUrl`**
+
+    `string`
+
+  - **`webhookUrl`**
+
+    `string`, format: `uri`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "connected": true,
+    "storeUrl": "",
+    "storeName": "",
+    "consumerKeyLast4": "",
+    "hasWebhookSecret": true,
+    "activo": true,
+    "conectadoAt": "",
+    "webhookUrl": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Verify and save WooCommerce Basic Auth credentials (#188)
+
+- **Method:** `PUT`
+- **Path:** `/api/configuracion/woocommerce`
+- **Tags:** woocommerce
+
+Requires `settings.business.manage` and tenant integration `woocommerce`. Basic Auth (consumer key/secret), not OAuth. Verifies credentials with `GET /products?per_page=1` before persisting them encrypted; only a last-4 hint of the consumer key is ever exposed back.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`consumerKey` (required)**
+
+  `string`
+
+- **`consumerSecret` (required)**
+
+  `string`
+
+- **`storeUrl` (required)**
+
+  `string`, format: `uri`
+
+- **`storeName`**
+
+  `string`
+
+- **`webhookSecret`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "storeUrl": "",
+  "consumerKey": "",
+  "consumerSecret": "",
+  "webhookSecret": "",
+  "storeName": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Credentials verified and saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`connected` (required)**
+
+    `boolean`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`conectadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`consumerKeyLast4`**
+
+    `string`
+
+  - **`hasWebhookSecret`**
+
+    `boolean`
+
+  - **`storeName`**
+
+    `string`
+
+  - **`storeUrl`**
+
+    `string`
+
+  - **`webhookUrl`**
+
+    `string`, format: `uri`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "connected": true,
+    "storeUrl": "",
+    "storeName": "",
+    "consumerKeyLast4": "",
+    "hasWebhookSecret": true,
+    "activo": true,
+    "conectadoAt": "",
+    "webhookUrl": ""
+  }
+}
+```
+
+##### Status: 400 Missing/invalid storeUrl, consumerKey or consumerSecret
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 WooCommerce verification request failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Disconnect WooCommerce (#188)
+
+- **Method:** `DELETE`
+- **Path:** `/api/configuracion/woocommerce`
+- **Tags:** woocommerce
+
+Requires `settings.business.manage` and tenant integration `woocommerce`. Deletes the local encrypted credentials.
+
+#### Responses
+
+##### Status: 200 Disconnected
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`disconnected` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "disconnected": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Re-verify already-saved WooCommerce credentials (#188)
+
+- **Method:** `POST`
+- **Path:** `/api/configuracion/woocommerce/verificar`
+- **Tags:** woocommerce
+
+Requires `settings.business.manage` and tenant integration `woocommerce`. Health check against `GET /products?per_page=1`; no body.
+
+#### Responses
+
+##### Status: 200 Credentials still valid
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`verified` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "verified": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not connected
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 WooCommerce verification request failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Per-tenant WooCommerce order webhook (#188)
+
+- **Method:** `POST`
+- **Path:** `/api/webhooks/woocommerce/{tenantId}`
+- **Tags:** woocommerce
+
+Public per-tenant notifications endpoint (no JWT). WooCommerce posts the order resource directly in the body (not an envelope). Validates `x-wc-webhook-signature` (base64 HMAC-SHA256 of the raw body) against the tenant's `WooCommerceConfig.webhookSecretEncrypted`. Responds `200` immediately and applies the order snapshot asynchronously (stock decrement via `venta_woocommerce` + Pedido `origen=woocommerce` on `processing`/`completed`; cancellation cleanup on `cancelled`/`refunded`/`failed`). Rate-limited per IP.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`id` (required)**
+
+  `object`
+
+- **`status`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": "",
+  "status": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Notification accepted (processing continues asynchronously)
+
+###### Content-Type: application/json
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true
+}
+```
+
+##### Status: 400 Invalid tenantId, missing/invalid signature or payload
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### List WooCommerce imported orders (#188)
+
+- **Method:** `GET`
+- **Path:** `/api/woocommerce/ordenes`
+- **Tags:** woocommerce
+
+Requires module `billing.orders`, permission `orders.create` or `reports.operational.read`, and integration `woocommerce`.
+
+#### Responses
+
+##### Status: 200 Paginated WooCommerce orders
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cuitPending` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lastSyncedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`wcOrderId` (required)**
+
+    `string`
+
+  - **`buyerNickname`**
+
+    `string`
+
+  - **`clienteCuit`**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`clienteRsocial`**
+
+    `string`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`pedidoEstado`**
+
+    `string`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`pedidoTotal`**
+
+    `string`
+
+  - **`stockAppliedAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "wcOrderId": "",
+      "status": "",
+      "buyerNickname": "",
+      "cuitPending": true,
+      "stockAppliedAt": "",
+      "lastSyncedAt": "",
+      "pedidoId": 1,
+      "pedidoEstado": "",
+      "pedidoTotal": "",
+      "facturaId": 1,
+      "clienteId": 1,
+      "clienteRsocial": "",
+      "clienteCuit": ""
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Invoice a WooCommerce imported order (#188)
+
+- **Method:** `POST`
+- **Path:** `/api/woocommerce/ordenes/{wcOrderId}/facturar`
+- **Tags:** woocommerce
+
+Requires module `billing.orders`, permission `sales.create`, and integration `woocommerce`. Invoices the linked Pedido with `skipStockDecrement` (stock already moved via `venta_woocommerce`).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`
+
+- **`numero` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"A", "B"`
+
+- **`formaPagoId`**
+
+  `integer`
+
+- **`prefijo`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "tipo": "A",
+  "numero": 1,
+  "prefijo": "",
+  "formaPagoId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Pedido invoiced
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidoId": 1,
+    "facturaId": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Already invoiced or cancelled
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 CUIT required for factura A
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Search Mercado Libre categories (#184)
 
 - **Method:** `GET`
@@ -61718,7 +62766,7 @@ Requires module `billing.orders`, permission `sales.create`, and integration `me
 - **Path:** `/api/ecommerce/connectors`
 - **Tags:** ecommerce
 
-Requires `settings.business.manage`. Returns known connector types (`meli`, `tiendanube`, `woocommerce`) with aggregate status. Tiendanube/WooCommerce remain `not_configured` until #187/#188.
+Requires `settings.business.manage`. Returns known connector types (`meli`, `tiendanube`, `woocommerce`) with aggregate status. Each connector is `not_configured` until its tenant credentials are saved (`registered` reflects whether the connector adapter factory is bootstrapped, not tenant configuration).
 
 #### Responses
 
@@ -62902,6 +63950,470 @@ Requires `products.manage`, tenant integration `tiendanube`, and article ownersh
 - **Tags:** tiendanube
 
 Requires `products.manage`, tenant integration `tiendanube`, and article ownership. Pauses remote product when possible and deletes local mapping.
+
+#### Responses
+
+##### Status: 200 Unlinked
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`unlinked` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "unlinked": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Listing not linked
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### WooCommerce listing status for an article (#188)
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/woocommerce`
+- **Tags:** woocommerce
+
+Requires `products.read`, tenant integration `woocommerce`, and article ownership.
+
+#### Responses
+
+##### Status: 200 Listing mapping status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`hasPhotos` (required)**
+
+    `boolean`
+
+  - **`linked` (required)**
+
+    `boolean`
+
+  - **`photoWarning` (required)**
+
+    `boolean`
+
+  - **`estado`**
+
+    `string`
+
+  - **`permalink`**
+
+    `string`
+
+  - **`syncError`**
+
+    `string`
+
+  - **`syncStatus`**
+
+    `string`
+
+  - **`ultimaSyncAt`**
+
+    `string`, format: `date-time`
+
+  - **`wcProductId`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "linked": true,
+    "wcProductId": "",
+    "estado": "",
+    "syncStatus": "",
+    "syncError": "",
+    "permalink": "",
+    "ultimaSyncAt": "",
+    "hasPhotos": true,
+    "photoWarning": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Article not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Opt-in publish or update article on WooCommerce (#188)
+
+- **Method:** `PUT`
+- **Path:** `/api/articulos/{id}/woocommerce`
+- **Tags:** woocommerce
+
+Requires `products.manage`, tenant integration `woocommerce`, and article ownership. Creates or updates `WooCommercePublicacion` and syncs via EcommerceSyncEngine.
+
+#### Responses
+
+##### Status: 200 Listing synced
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`hasPhotos` (required)**
+
+    `boolean`
+
+  - **`linked` (required)**
+
+    `boolean`
+
+  - **`photoWarning` (required)**
+
+    `boolean`
+
+  - **`estado`**
+
+    `string`
+
+  - **`permalink`**
+
+    `string`
+
+  - **`syncError`**
+
+    `string`
+
+  - **`syncStatus`**
+
+    `string`
+
+  - **`ultimaSyncAt`**
+
+    `string`, format: `date-time`
+
+  - **`wcProductId`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "linked": true,
+    "wcProductId": "",
+    "estado": "",
+    "syncStatus": "",
+    "syncError": "",
+    "permalink": "",
+    "ultimaSyncAt": "",
+    "hasPhotos": true,
+    "photoWarning": true
+  }
+}
+```
+
+##### Status: 400 Validation error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Article or WooCommerce connection not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Unlink article from WooCommerce (#188)
+
+- **Method:** `DELETE`
+- **Path:** `/api/articulos/{id}/woocommerce`
+- **Tags:** woocommerce
+
+Requires `products.manage`, tenant integration `woocommerce`, and article ownership. Pauses remote product when possible and deletes local mapping.
 
 #### Responses
 
@@ -107776,6 +109288,515 @@ Originating invoice header (selected columns)
 **Example:**
 
 ### TiendanubeFacturarEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidoId": 1,
+    "facturaId": 1
+  }
+}
+```
+
+### WooCommerceConfigStatus
+
+- **Type:**`object`
+
+* **`connected` (required)**
+
+  `boolean`
+
+* **`activo`**
+
+  `boolean`
+
+* **`conectadoAt`**
+
+  `string`, format: `date-time`
+
+* **`consumerKeyLast4`**
+
+  `string`
+
+* **`hasWebhookSecret`**
+
+  `boolean`
+
+* **`storeName`**
+
+  `string`
+
+* **`storeUrl`**
+
+  `string`
+
+* **`webhookUrl`**
+
+  `string`, format: `uri`
+
+**Example:**
+
+```json
+{
+  "connected": true,
+  "storeUrl": "",
+  "storeName": "",
+  "consumerKeyLast4": "",
+  "hasWebhookSecret": true,
+  "activo": true,
+  "conectadoAt": "",
+  "webhookUrl": ""
+}
+```
+
+### WooCommerceConfigStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`connected` (required)**
+
+    `boolean`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`conectadoAt`**
+
+    `string`, format: `date-time`
+
+  - **`consumerKeyLast4`**
+
+    `string`
+
+  - **`hasWebhookSecret`**
+
+    `boolean`
+
+  - **`storeName`**
+
+    `string`
+
+  - **`storeUrl`**
+
+    `string`
+
+  - **`webhookUrl`**
+
+    `string`, format: `uri`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "connected": true,
+    "storeUrl": "",
+    "storeName": "",
+    "consumerKeyLast4": "",
+    "hasWebhookSecret": true,
+    "activo": true,
+    "conectadoAt": "",
+    "webhookUrl": ""
+  }
+}
+```
+
+### WooCommerceCredentialsInput
+
+- **Type:**`object`
+
+* **`consumerKey` (required)**
+
+  `string`
+
+* **`consumerSecret` (required)**
+
+  `string`
+
+* **`storeUrl` (required)**
+
+  `string`, format: `uri`
+
+* **`storeName`**
+
+  `string`
+
+* **`webhookSecret`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "storeUrl": "",
+  "consumerKey": "",
+  "consumerSecret": "",
+  "webhookSecret": "",
+  "storeName": ""
+}
+```
+
+### WooCommerceVerifyEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`verified` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "verified": true
+  }
+}
+```
+
+### WooCommerceDisconnectEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`disconnected` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "disconnected": true
+  }
+}
+```
+
+### WooCommercePublicacionStatus
+
+- **Type:**`object`
+
+* **`hasPhotos` (required)**
+
+  `boolean`
+
+* **`linked` (required)**
+
+  `boolean`
+
+* **`photoWarning` (required)**
+
+  `boolean`
+
+* **`estado`**
+
+  `string`
+
+* **`permalink`**
+
+  `string`
+
+* **`syncError`**
+
+  `string`
+
+* **`syncStatus`**
+
+  `string`
+
+* **`ultimaSyncAt`**
+
+  `string`, format: `date-time`
+
+* **`wcProductId`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "linked": true,
+  "wcProductId": "",
+  "estado": "",
+  "syncStatus": "",
+  "syncError": "",
+  "permalink": "",
+  "ultimaSyncAt": "",
+  "hasPhotos": true,
+  "photoWarning": true
+}
+```
+
+### WooCommercePublicacionStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`hasPhotos` (required)**
+
+    `boolean`
+
+  - **`linked` (required)**
+
+    `boolean`
+
+  - **`photoWarning` (required)**
+
+    `boolean`
+
+  - **`estado`**
+
+    `string`
+
+  - **`permalink`**
+
+    `string`
+
+  - **`syncError`**
+
+    `string`
+
+  - **`syncStatus`**
+
+    `string`
+
+  - **`ultimaSyncAt`**
+
+    `string`, format: `date-time`
+
+  - **`wcProductId`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "linked": true,
+    "wcProductId": "",
+    "estado": "",
+    "syncStatus": "",
+    "syncError": "",
+    "permalink": "",
+    "ultimaSyncAt": "",
+    "hasPhotos": true,
+    "photoWarning": true
+  }
+}
+```
+
+### WooCommercePublicacionUnlinkEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`unlinked` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "unlinked": true
+  }
+}
+```
+
+### WooCommerceWebhookBody
+
+- **Type:**`object`
+
+* **`id` (required)**
+
+  `object`
+
+* **`status`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": "",
+  "status": ""
+}
+```
+
+### WooCommerceWebhookAckEnvelope
+
+- **Type:**`object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true
+}
+```
+
+### WooCommerceOrden
+
+- **Type:**`object`
+
+* **`cuitPending` (required)**
+
+  `boolean`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`lastSyncedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`status` (required)**
+
+  `string`
+
+* **`wcOrderId` (required)**
+
+  `string`
+
+* **`buyerNickname`**
+
+  `string`
+
+* **`clienteCuit`**
+
+  `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`clienteRsocial`**
+
+  `string`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`pedidoEstado`**
+
+  `string`
+
+* **`pedidoId`**
+
+  `integer`
+
+* **`pedidoTotal`**
+
+  `string`
+
+* **`stockAppliedAt`**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "wcOrderId": "",
+  "status": "",
+  "buyerNickname": "",
+  "cuitPending": true,
+  "stockAppliedAt": "",
+  "lastSyncedAt": "",
+  "pedidoId": 1,
+  "pedidoEstado": "",
+  "pedidoTotal": "",
+  "facturaId": 1,
+  "clienteId": 1,
+  "clienteRsocial": "",
+  "clienteCuit": ""
+}
+```
+
+### WooCommerceOrdenListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### WooCommerceFacturarEnvelope
 
 - **Type:**`object`
 

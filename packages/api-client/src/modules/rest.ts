@@ -2504,6 +2504,182 @@ export const tiendanubeAPI = {
   },
 }
 
+export type WooCommerceConfigStatus = {
+  connected: boolean
+  storeUrl?: string
+  storeName?: string
+  consumerKeyLast4?: string
+  hasWebhookSecret?: boolean
+  activo?: boolean
+  conectadoAt?: string
+  webhookUrl?: string
+}
+
+export type WooCommercePublicacionStatus = {
+  linked: boolean
+  wcProductId?: string
+  estado?: string
+  syncStatus?: string
+  syncError?: string | null
+  permalink?: string | null
+  ultimaSyncAt?: string | null
+  hasPhotos: boolean
+  photoWarning: boolean
+}
+
+export type WooCommerceOrdenRow = {
+  id: number
+  wcOrderId: string
+  status: string
+  buyerNickname: string | null
+  cuitPending: boolean
+  stockAppliedAt: string | null
+  lastSyncedAt: string
+  pedidoId: number | null
+  pedidoEstado: string | null
+  pedidoTotal: string | null
+  facturaId: number | null
+  clienteId: number | null
+  clienteRsocial: string | null
+  clienteCuit: string | null
+}
+
+/**
+ * @en WooCommerce config, catalog and orders API client — Basic Auth credentials (#188).
+ * @es Cliente API de configuración, catálogo y órdenes WooCommerce — credenciales Basic Auth (#188).
+ * @pt-BR Cliente API de configuração, catálogo e pedidos WooCommerce — credenciais Basic Auth (#188).
+ */
+export const woocommerceAPI = {
+  getConfig: async (): Promise<WooCommerceConfigStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: WooCommerceConfigStatus }>(
+        '/configuracion/woocommerce',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  verifyAndSave: async (input: {
+    storeUrl: string
+    consumerKey: string
+    consumerSecret: string
+    webhookSecret?: string
+  }): Promise<WooCommerceConfigStatus> => {
+    try {
+      const response = await api.put<{ success: boolean; data: WooCommerceConfigStatus }>(
+        '/configuracion/woocommerce',
+        input,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  verify: async (): Promise<{ verified: true }> => {
+    try {
+      const response = await api.post<{ success: boolean; data: { verified: true } }>(
+        '/configuracion/woocommerce/verificar',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  disconnect: async (): Promise<{ disconnected: true }> => {
+    try {
+      const response = await api.delete<{ success: boolean; data: { disconnected: true } }>(
+        '/configuracion/woocommerce',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getArticuloListing: async (articuloId: number): Promise<WooCommercePublicacionStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: WooCommercePublicacionStatus }>(
+        `/articulos/${articuloId}/woocommerce`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  upsertArticuloListing: async (articuloId: number): Promise<WooCommercePublicacionStatus> => {
+    try {
+      const response = await api.put<{ success: boolean; data: WooCommercePublicacionStatus }>(
+        `/articulos/${articuloId}/woocommerce`,
+        {},
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  unlinkArticuloListing: async (articuloId: number): Promise<{ unlinked: true }> => {
+    try {
+      const response = await api.delete<{ success: boolean; data: { unlinked: true } }>(
+        `/articulos/${articuloId}/woocommerce`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listOrdenes: async (params?: {
+    estado?: 'pendiente' | 'facturada' | 'cancelada' | 'all'
+    limit?: number
+    offset?: number
+  }): Promise<{ data: WooCommerceOrdenRow[]; total: number; limit: number; offset: number }> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: WooCommerceOrdenRow[]
+        total: number
+        limit: number
+        offset: number
+      }>('/woocommerce/ordenes', { params })
+      return {
+        data: response.data.data,
+        total: response.data.total,
+        limit: response.data.limit,
+        offset: response.data.offset,
+      }
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  facturarOrden: async (
+    wcOrderId: string,
+    body: {
+      fecha: string
+      tipo: 'A' | 'B'
+      numero: number
+      prefijo?: string
+      formaPagoId?: number | null
+    },
+  ): Promise<{ pedidoId: number; facturaId: number }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { pedidoId: number; facturaId: number }
+      }>(`/woocommerce/ordenes/${encodeURIComponent(wcOrderId)}/facturar`, body)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export type EcommerceConnectorStatus = {
   connectorType: 'meli' | 'tiendanube' | 'woocommerce'
   status: 'active' | 'inactive' | 'not_configured'

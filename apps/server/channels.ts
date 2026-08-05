@@ -212,6 +212,31 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
           `Una orden de Tiendanube fue cancelada pero el pedido ya está facturado — requiere revisión manual.`,
       }
     }
+    case 'woocommerce_order_imported': {
+      const order = payload.resource ? ` ${payload.resource}` : ''
+      return {
+        subject: `[BizCode] Nueva venta en WooCommerce${order}`,
+        text:
+          payload.detail ??
+          `Se importó una orden de WooCommerce${order}${payload.pedidoId != null ? ` como pedido #${payload.pedidoId}` : ''}.`,
+      }
+    }
+    case 'woocommerce_cuit_required': {
+      return {
+        subject: `[BizCode] CUIT requerido para facturar orden WooCommerce`,
+        text:
+          payload.detail ??
+          `Completar CUIT del cliente antes de emitir factura A${payload.pedidoId != null ? ` (pedido #${payload.pedidoId})` : ''}.`,
+      }
+    }
+    case 'woocommerce_order_cancelled_invoiced': {
+      return {
+        subject: `[BizCode] URGENTE: Orden WooCommerce cancelada ya facturada`,
+        text:
+          payload.detail ??
+          `Una orden de WooCommerce fue cancelada pero el pedido ya está facturado — requiere revisión manual.`,
+      }
+    }
     case 'contract_invoice_generated': {
       const numero = payload.contratoNumero != null ? ` #${payload.contratoNumero}` : ''
       const facturaRef = payload.facturaId != null ? ` (factura #${payload.facturaId})` : ''

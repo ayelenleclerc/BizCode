@@ -18,6 +18,7 @@ import PortalConfigSection from './PortalConfigSection'
 import MercadoPagoConfigSection from './MercadoPagoConfigSection'
 import MeliConfigSection from './MeliConfigSection'
 import TiendanubeConfigSection from './TiendanubeConfigSection'
+import WooCommerceConfigSection from './WooCommerceConfigSection'
 import EcommerceSyncSection from './EcommerceSyncSection'
 import IfModule from '@/components/IfModule'
 
@@ -568,6 +569,7 @@ export default function EmpresaPage() {
       <MercadoPagoConfigSection />
       <MeliConfigSection />
       <TiendanubeConfigSection />
+      <WooCommerceConfigSection />
       <EcommerceSyncSection />
       <PrintDevicesSection />
       <FiscalRetencionesSection />

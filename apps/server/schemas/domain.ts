@@ -1182,6 +1182,35 @@ export const shippingCarrierConfigUpsertBodySchema = z
 
 export const shippingApiCarrierParamSchema = z.enum(SHIPPING_API_CARRIERS)
 
+/**
+ * @en WooCommerce Basic Auth credential save payload: `storeUrl` + consumer key/secret, optional
+ *   webhook secret (#188).
+ * @es Payload para guardar credenciales Basic Auth WooCommerce: `storeUrl` + consumer key/secret,
+ *   webhook secret opcional (#188).
+ * @pt-BR Payload para salvar credenciais Basic Auth WooCommerce: `storeUrl` + consumer key/secret,
+ *   webhook secret opcional (#188).
+ */
+export const woocommerceCredentialsBodySchema = z.object({
+  storeUrl: z
+    .string({ required_error: 'storeUrl is required' })
+    .trim()
+    .min(1, 'storeUrl is required')
+    .max(255)
+    .url('storeUrl must be a valid URL'),
+  consumerKey: z
+    .string({ required_error: 'consumerKey is required' })
+    .trim()
+    .min(1, 'consumerKey is required')
+    .max(200),
+  consumerSecret: z
+    .string({ required_error: 'consumerSecret is required' })
+    .trim()
+    .min(1, 'consumerSecret is required')
+    .max(200),
+  webhookSecret: z.string().trim().max(200).optional().nullable(),
+  storeName: z.string().trim().max(120).optional().nullable(),
+})
+
 export const stockAjusteBodySchema = z
   .object({
     cantidad: z.number({ invalid_type_error: 'cantidad must be a number' }),

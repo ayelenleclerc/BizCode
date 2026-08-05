@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@/i18n/config'
 import PedidosPage from './index'
-import { meliAPI, pedidosAPI, tiendanubeAPI, type PedidoRow } from '@/lib/api'
+import { meliAPI, pedidosAPI, tiendanubeAPI, woocommerceAPI, type PedidoRow } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import type { AuthClaims, Permission } from '@/lib/rbac'
@@ -67,6 +67,10 @@ vi.mock('@/lib/api', async () => {
       facturarOrden: vi.fn(),
     },
     tiendanubeAPI: {
+      listOrdenes: vi.fn(),
+      facturarOrden: vi.fn(),
+    },
+    woocommerceAPI: {
       listOrdenes: vi.fn(),
       facturarOrden: vi.fn(),
     },
@@ -152,6 +156,29 @@ describe('PedidosPage', () => {
       limit: 100,
       offset: 0,
     })
+    vi.mocked(woocommerceAPI.listOrdenes).mockResolvedValue({
+      data: [
+        {
+          id: 3,
+          wcOrderId: 'WC-200',
+          status: 'processing',
+          buyerNickname: 'BUYER_WC',
+          cuitPending: false,
+          stockAppliedAt: null,
+          lastSyncedAt: '2026-08-01T12:00:00.000Z',
+          pedidoId: 52,
+          pedidoEstado: 'confirmed',
+          pedidoTotal: '3000',
+          facturaId: null,
+          clienteId: 22,
+          clienteRsocial: 'BUYER WC',
+          clienteCuit: null,
+        },
+      ],
+      total: 1,
+      limit: 100,
+      offset: 0,
+    })
   })
 
   it('carga listado y muestra tabla', async () => {
@@ -223,5 +250,24 @@ describe('PedidosPage', () => {
     expect(await screen.findByTestId('tiendanube-ordenes-table')).toBeInTheDocument()
     expect(screen.getByTestId('tiendanube-orden-row-TN-100')).toBeInTheDocument()
     expect(tiendanubeAPI.listOrdenes).toHaveBeenCalledWith({ estado: 'pendiente' })
+  })
+
+  it('muestra pestaña Órdenes WooCommerce y lista órdenes', async () => {
+    vi.mocked(useFeatureFlags).mockReturnValue({
+      status: 'ready',
+      modules: ['billing.orders'],
+      integrations: ['woocommerce'],
+      hasModule: (key: string) => key === 'billing.orders',
+      hasIntegration: (id: string) => id === 'woocommerce',
+      refreshFeatures: vi.fn(),
+    } as never)
+    const user = userEvent.setup()
+    render(<PedidosPage />)
+    await screen.findByTestId('pedidos-tab-woocommerce')
+    await user.click(screen.getByTestId('pedidos-tab-woocommerce'))
+    expect(await screen.findByTestId('woocommerce-ordenes-panel')).toBeInTheDocument()
+    expect(await screen.findByTestId('woocommerce-ordenes-table')).toBeInTheDocument()
+    expect(screen.getByTestId('woocommerce-orden-row-WC-200')).toBeInTheDocument()
+    expect(woocommerceAPI.listOrdenes).toHaveBeenCalledWith({ estado: 'pendiente' })
   })
 })

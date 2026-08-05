@@ -355,6 +355,7 @@ model Articulo {
   ofertas              ArticuloOferta[]
   meliPublicacion      MeliPublicacion?
   tiendanubePublicacion TiendanubePublicacion?
+  wooCommercePublicacion WooCommercePublicacion?
   formulasComoProducto FormulaProduccion[] @relation("FormulaProducto")
   formulasComoInsumo   FormulaInsumo[]     @relation("FormulaInsumoArticulo")
   ordenesProduccion    OrdenProduccion[]   @relation("OrdenProduccionProducto")
@@ -1239,14 +1240,15 @@ model Pedido {
   /// @pt-BR Depósito de despacho previsto quando inventory.warehouses está ativo (#236).
   depositoId  Int?
   deposito    Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
-  /// @en Sales channel origin; `meli` / `tiendanube` when imported from marketplace (#186/#187).
-  /// @es Origen del canal de venta; `meli` / `tiendanube` cuando se importa del marketplace (#186/#187).
-  /// @pt-BR Origem do canal de venda; `meli` / `tiendanube` quando importado do marketplace (#186/#187).
+  /// @en Sales channel origin; `meli` / `tiendanube` / `woocommerce` when imported from marketplace (#186/#187/#188).
+  /// @es Origen del canal de venta; `meli` / `tiendanube` / `woocommerce` cuando se importa del marketplace (#186/#187/#188).
+  /// @pt-BR Origem do canal de venda; `meli` / `tiendanube` / `woocommerce` quando importado do marketplace (#186/#187/#188).
   origen      String?   @db.VarChar(20)
   remito      Remito?
   items       PedidoItem[]
   meliOrden   MeliOrden?
   tiendanubeOrden TiendanubeOrden?
+  wooCommerceOrden WooCommerceOrden?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -1566,6 +1568,9 @@ model Tenant {
   tiendanubeConfig              TiendanubeConfig?
   tiendanubeWebhookEvents       TiendanubeWebhookEvent[]
   tiendanubeOrdenes             TiendanubeOrden[]
+  wooCommerceConfig             WooCommerceConfig?
+  wooCommerceWebhookEvents      WooCommerceWebhookEvent[]
+  wooCommerceOrdenes            WooCommerceOrden[]
   ecommerceSyncJobs             EcommerceSyncJob[]
   syncLogs                      SyncLog[]
   shippingCarrierConfigs        ShippingCarrierConfig[]
@@ -1931,6 +1936,95 @@ model TiendanubeOrden {
   updatedAt      DateTime  @updatedAt
 
   @@unique([tenantId, tnOrderId])
+  @@index([tenantId, status])
+}
+
+/// @en WooCommerce REST API credentials per tenant (#188); consumer key/secret and webhook secret encrypted at rest.
+/// @es Credenciales de la API REST de WooCommerce por tenant (#188); consumer key/secret y webhook secret cifrados en reposo.
+/// @pt-BR Credenciais da API REST do WooCommerce por tenant (#188); consumer key/secret e webhook secret criptografados em repouso.
+model WooCommerceConfig {
+  id                      Int      @id @default(autoincrement())
+  tenantId                Int      @unique
+  tenant                  Tenant   @relation(fields: [tenantId], references: [id])
+  storeUrl                String   @db.VarChar(255)
+  consumerKeyEncrypted    String   @db.Text
+  consumerSecretEncrypted String   @db.Text
+  webhookSecretEncrypted  String?  @db.Text
+  consumerKeyLast4        String   @db.VarChar(4)
+  storeName               String?  @db.VarChar(120)
+  activo                  Boolean  @default(true)
+  conectadoAt             DateTime @default(now())
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([activo])
+}
+
+/// @en Opt-in WooCommerce product mapping for a catalog article (#188).
+/// @es Mapping opt-in de producto WooCommerce para un artículo (#188).
+/// @pt-BR Mapeamento opt-in de produto WooCommerce para um artigo (#188).
+model WooCommercePublicacion {
+  id            Int       @id @default(autoincrement())
+  tenantId      Int
+  articuloId    Int       @unique
+  articulo      Articulo  @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  /// Null until the first successful POST /products.
+  wcProductId   String?   @db.VarChar(40)
+  /// Variation id when WooCommerce creates variations.
+  wcVariationId String?   @db.VarChar(40)
+  /// active | paused | pending
+  estado        String    @default("pending") @db.VarChar(20)
+  permalink     String?   @db.VarChar(500)
+  /// synced | pending | error
+  syncStatus    String    @default("pending") @db.VarChar(20)
+  syncError     String?   @db.Text
+  ultimaSyncAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([tenantId, articuloId])
+  @@unique([tenantId, wcProductId])
+  @@index([tenantId, syncStatus])
+  @@index([articuloId])
+}
+
+/// @en Idempotent WooCommerce webhook receipts (#188).
+/// @es Recibos idempotentes de webhooks WooCommerce (#188).
+/// @pt-BR Recibos idempotentes de webhooks WooCommerce (#188).
+model WooCommerceWebhookEvent {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int?
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  topic       String   @db.VarChar(60)
+  resource    String   @db.VarChar(200)
+  /// X-WC-Webhook-Delivery-ID header, when present.
+  deliveryId  String?  @db.VarChar(40)
+  processedAt DateTime @default(now())
+
+  @@unique([topic, resource])
+  @@index([tenantId, processedAt])
+}
+
+/// @en Local WooCommerce order lifecycle and link to Pedido (#188).
+/// @es Ciclo de vida local de orden WooCommerce y vínculo a Pedido (#188).
+/// @pt-BR Ciclo de vida local de pedido WooCommerce e vínculo ao Pedido (#188).
+model WooCommerceOrden {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  wcOrderId      String    @db.VarChar(40)
+  pedidoId       Int?      @unique
+  pedido         Pedido?   @relation(fields: [pedidoId], references: [id], onDelete: SetNull)
+  /// pending | processing | on-hold | completed | cancelled | refunded | failed
+  status         String    @db.VarChar(40)
+  buyerNickname  String?   @db.VarChar(120)
+  cuitPending    Boolean   @default(false)
+  stockAppliedAt DateTime?
+  lastSyncedAt   DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([tenantId, wcOrderId])
   @@index([tenantId, status])
 }
 
