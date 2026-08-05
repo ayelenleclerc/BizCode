@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "buyerNickname": {
+      "nullable": true,
+      "type": "string"
+    },
+    "clienteCuit": {
+      "nullable": true,
+      "type": "string"
+    },
+    "clienteId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "clienteRsocial": {
+      "nullable": true,
+      "type": "string"
+    },
+    "cuitPending": {
+      "type": "boolean"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "lastSyncedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "pedidoEstado": {
+      "nullable": true,
+      "type": "string"
+    },
+    "pedidoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "pedidoTotal": {
+      "nullable": true,
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "stockAppliedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "tnOrderId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tnOrderId",
+    "status",
+    "cuitPending",
+    "lastSyncedAt"
+  ],
+  "title": "TiendanubeOrden",
+  "type": "object"
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "./TiendanubeOrden.schema.json"
+          },
+          "type": "array"
+        },
+        "success": {
+          "const": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "data",
+        "total",
+        "limit",
+        "offset"
+      ],
+      "type": "object"
+    },
+    {
+      "$ref": "./ListPaginationMeta.schema.json"
+    }
+  ],
+  "title": "TiendanubeOrdenListEnvelope"
+}

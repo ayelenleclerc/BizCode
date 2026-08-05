@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "facturaId": {
+          "type": "integer"
+        },
+        "pedidoId": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "pedidoId",
+        "facturaId"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "TiendanubeFacturarEnvelope",
+  "type": "object"
+}

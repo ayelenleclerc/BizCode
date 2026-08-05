@@ -133,6 +133,29 @@
       "disconnectFailed": "No se pudo desconectar MercadoLibre"
     }
   },
+  "tiendanube": {
+    "title": "Tiendanube",
+    "subtitle": "Conectá la tienda del tenant vía OAuth. El access token se cifra y nunca se muestra.",
+    "loading": "Cargando estado Tiendanube…",
+    "connectedBadge": "Conectado: {{store}} · token ••••{{last4}}",
+    "notConnectedBadge": "No conectado",
+    "readOnlyHint": "Puede ver el estado; solo roles con permiso de configuración de empresa pueden conectar o desconectar.",
+    "store": "Tienda",
+    "storeId": "ID de tienda",
+    "storeUrl": "URL de la tienda",
+    "connectedAt": "Conectado desde",
+    "connect": "Conectar con Tiendanube",
+    "connecting": "Redirigiendo…",
+    "disconnect": "Desconectar",
+    "disconnecting": "Desconectando…",
+    "connectSuccess": "Tienda Tiendanube conectada",
+    "disconnectSuccess": "Tienda Tiendanube desconectada",
+    "errors": {
+      "loadFailed": "No se pudo cargar el estado Tiendanube",
+      "connectFailed": "No se pudo iniciar la conexión Tiendanube",
+      "disconnectFailed": "No se pudo desconectar Tiendanube"
+    }
+  },
   "ecommerce": {
     "title": "Integraciones eCommerce",
     "subtitle": "Estado de conectores y registro de sincronización compartido (catálogo, stock y órdenes).",

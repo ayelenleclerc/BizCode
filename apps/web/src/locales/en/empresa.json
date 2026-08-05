@@ -133,6 +133,29 @@
       "disconnectFailed": "Could not disconnect Mercado Libre"
     }
   },
+  "tiendanube": {
+    "title": "Tiendanube",
+    "subtitle": "Connect the tenant store via OAuth. The access token is encrypted and never displayed.",
+    "loading": "Loading Tiendanube status…",
+    "connectedBadge": "Connected: {{store}} · token ••••{{last4}}",
+    "notConnectedBadge": "Not connected",
+    "readOnlyHint": "You can view status; only roles with company settings permission can connect or disconnect.",
+    "store": "Store",
+    "storeId": "Store ID",
+    "storeUrl": "Store URL",
+    "connectedAt": "Connected since",
+    "connect": "Connect with Tiendanube",
+    "connecting": "Redirecting…",
+    "disconnect": "Disconnect",
+    "disconnecting": "Disconnecting…",
+    "connectSuccess": "Tiendanube store connected",
+    "disconnectSuccess": "Tiendanube store disconnected",
+    "errors": {
+      "loadFailed": "Could not load Tiendanube status",
+      "connectFailed": "Could not start Tiendanube connection",
+      "disconnectFailed": "Could not disconnect Tiendanube"
+    }
+  },
   "ecommerce": {
     "title": "eCommerce integrations",
     "subtitle": "Connector status and shared sync log (catalog, stock and orders).",

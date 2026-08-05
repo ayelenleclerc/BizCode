@@ -93,13 +93,22 @@ Vendas pagas do Mercado Livre viram Pedidos para faturar sem duplo desconto de e
 3. **Faturar** chama `POST /api/meli/ordenes/{meliOrderId}/facturar` — fatura A sem CUIT do cliente retorna `422` `CUIT_REQUIRED_FOR_FACTURA_A`. Completar o CUIT no cliente limpa o pendente.
 4. A fatura de pedidos `origen=meli` usa `skipStockDecrement` porque o estoque já moveu no webhook.
 
+## Conector Tiendanube (#187)
+
+Habilite a integração **`tiendanube`**, depois **Configurações → Empresa → Tiendanube** para OAuth Partner Portal (token de longa duração criptografado em `TiendanubeConfig`).
+
+1. Opt-in por produto: **Produtos → editar artigo → Tiendanube** (`PUT /api/articulos/{id}/tiendanube`) — sync via `EcommerceSyncEngine` (`tn:catalog:…`).
+2. Push de estoque após faturas/ajustes; qty 0 pausa o produto TN (`published: false`).
+3. Webhook `POST /api/webhooks/tiendanube` verifica `x-linkedstore-hmac-sha256`; `order/paid` importa Pedido `origen=tiendanube` com estoque uma vez (`venta_tiendanube`).
+4. **Pedidos → Pedidos TN** lista/fatura (`GET /api/tiendanube/ordenes`, faturar com `skipStockDecrement`). Despachar uma OE (`in_transit`) enfileira `mark_dispatched` (`PUT` pedido TN `shipping_status=shipped`).
+
 ## Motor compartilhado de sync eCommerce (#189)
 
 Pushes de catálogo e estoque dos conectores marketplace passam por uma fila Prisma compartilhada (`EcommerceSyncJob`) com histórico SyncLog:
 
 1. **Configurações → Empresa → Integrações eCommerce** lista os conectores conhecidos (`meli`, `tiendanube`, `woocommerce`) e as últimas linhas SyncLog (filtro por conector/status). Exige `settings.business.manage`.
-2. Catálogo/estoque MeLi enfileiram jobs processados na request e por `npm run ecommerce:sync-worker` a cada minuto (retries 1m/5m/30m; após 3 falhas DLQ e alerta a `super_admin` da plataforma).
-3. APIs: `GET /api/ecommerce/connectors`, `GET /api/ecommerce/sync-logs`. Tiendanube e WooCommerce ficam `not_configured` até #187/#188.
+2. Catálogo/estoque MeLi e Tiendanube enfileiram jobs processados na request e por `npm run ecommerce:sync-worker` a cada minuto (retries 1m/5m/30m; após 3 falhas DLQ e alerta a `super_admin` da plataforma).
+3. APIs: `GET /api/ecommerce/connectors`, `GET /api/ecommerce/sync-logs`. WooCommerce fica `not_configured` até #188.
 
 Artigos pai e serviços não são publicados.
 

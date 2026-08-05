@@ -354,6 +354,7 @@ model Articulo {
   imagenes             ArticuloImagen[]
   ofertas              ArticuloOferta[]
   meliPublicacion      MeliPublicacion?
+  tiendanubePublicacion TiendanubePublicacion?
   formulasComoProducto FormulaProduccion[] @relation("FormulaProducto")
   formulasComoInsumo   FormulaInsumo[]     @relation("FormulaInsumoArticulo")
   ordenesProduccion    OrdenProduccion[]   @relation("OrdenProduccionProducto")
@@ -1238,13 +1239,14 @@ model Pedido {
   /// @pt-BR Depósito de despacho previsto quando inventory.warehouses está ativo (#236).
   depositoId  Int?
   deposito    Deposito? @relation(fields: [depositoId], references: [id], onDelete: SetNull)
-  /// @en Sales channel origin; `meli` when imported from Mercado Libre (#186).
-  /// @es Origen del canal de venta; `meli` cuando se importa de Mercado Libre (#186).
-  /// @pt-BR Origem do canal de venda; `meli` quando importado do Mercado Livre (#186).
+  /// @en Sales channel origin; `meli` / `tiendanube` when imported from marketplace (#186/#187).
+  /// @es Origen del canal de venta; `meli` / `tiendanube` cuando se importa del marketplace (#186/#187).
+  /// @pt-BR Origem do canal de venda; `meli` / `tiendanube` quando importado do marketplace (#186/#187).
   origen      String?   @db.VarChar(20)
   remito      Remito?
   items       PedidoItem[]
   meliOrden   MeliOrden?
+  tiendanubeOrden TiendanubeOrden?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -1561,6 +1563,9 @@ model Tenant {
   meliConfig                    MeliConfig?
   meliWebhookEvents             MeliWebhookEvent[]
   meliOrdenes                   MeliOrden[]
+  tiendanubeConfig              TiendanubeConfig?
+  tiendanubeWebhookEvents       TiendanubeWebhookEvent[]
+  tiendanubeOrdenes             TiendanubeOrden[]
   ecommerceSyncJobs             EcommerceSyncJob[]
   syncLogs                      SyncLog[]
   shippingCarrierConfigs        ShippingCarrierConfig[]
@@ -1839,6 +1844,94 @@ model SyncLog {
 
   @@index([tenantId, connectorType, createdAt])
   @@index([tenantId, status, createdAt])
+}
+
+/// @en Tiendanube OAuth tokens per tenant (#187); access token encrypted at rest.
+/// @es Tokens OAuth Tiendanube por tenant (#187); access token cifrado en reposo.
+/// @pt-BR Tokens OAuth Tiendanube por tenant (#187); access token criptografado em repouso.
+model TiendanubeConfig {
+  id                   Int      @id @default(autoincrement())
+  tenantId             Int      @unique
+  tenant               Tenant   @relation(fields: [tenantId], references: [id])
+  /// Tiendanube store / user id from OAuth.
+  storeId              String   @db.VarChar(40)
+  storeName            String?  @db.VarChar(120)
+  storeUrl             String?  @db.VarChar(255)
+  accessTokenEncrypted String   @db.Text
+  accessTokenLast4     String   @db.VarChar(4)
+  conectadoAt          DateTime @default(now())
+  activo               Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([activo])
+}
+
+/// @en Opt-in Tiendanube product mapping for a catalog article (#187).
+/// @es Mapping opt-in de producto Tiendanube para un artículo (#187).
+/// @pt-BR Mapeamento opt-in de produto Tiendanube para um artigo (#187).
+model TiendanubePublicacion {
+  id           Int       @id @default(autoincrement())
+  tenantId     Int
+  articuloId   Int       @unique
+  articulo     Articulo  @relation(fields: [articuloId], references: [id], onDelete: Cascade)
+  /// Null until the first successful POST /products.
+  tnProductId  String?   @db.VarChar(40)
+  /// First / default variant id when TN creates variants.
+  tnVariantId  String?   @db.VarChar(40)
+  /// active | paused | pending
+  estado       String    @default("pending") @db.VarChar(20)
+  permalink    String?   @db.VarChar(500)
+  /// synced | pending | error
+  syncStatus   String    @default("pending") @db.VarChar(20)
+  syncError    String?   @db.Text
+  ultimaSyncAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([tenantId, articuloId])
+  @@unique([tenantId, tnProductId])
+  @@index([tenantId, syncStatus])
+  @@index([articuloId])
+}
+
+/// @en Idempotent Tiendanube webhook receipts (#187).
+/// @es Recibos idempotentes de webhooks Tiendanube (#187).
+/// @pt-BR Recibos idempotentes de webhooks Tiendanube (#187).
+model TiendanubeWebhookEvent {
+  id          Int       @id @default(autoincrement())
+  tenantId    Int?
+  tenant      Tenant?   @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  topic       String    @db.VarChar(60)
+  resource    String    @db.VarChar(200)
+  storeId     String?   @db.VarChar(40)
+  processedAt DateTime  @default(now())
+
+  @@unique([topic, resource])
+  @@index([tenantId, processedAt])
+}
+
+/// @en Local Tiendanube order lifecycle and link to Pedido (#187).
+/// @es Ciclo de vida local de orden Tiendanube y vínculo a Pedido (#187).
+/// @pt-BR Ciclo de vida local de pedido Tiendanube e vínculo ao Pedido (#187).
+model TiendanubeOrden {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  tnOrderId      String    @db.VarChar(40)
+  pedidoId       Int?      @unique
+  pedido         Pedido?   @relation(fields: [pedidoId], references: [id], onDelete: SetNull)
+  /// paid | cancelled | open | closed | ...
+  status         String    @db.VarChar(40)
+  buyerNickname  String?   @db.VarChar(120)
+  cuitPending    Boolean   @default(false)
+  stockAppliedAt DateTime?
+  lastSyncedAt   DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([tenantId, tnOrderId])
+  @@index([tenantId, status])
 }
 
 /// B2B customer portal branding and feature toggles per tenant (#240).

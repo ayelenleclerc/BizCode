@@ -51,5 +51,30 @@
       "fulfillment": "Logística",
       "actions": "Acciones"
     }
+  },
+  "tabTiendanube": "Órdenes TN",
+  "tiendanube": {
+    "filterEstado": "Estado",
+    "filter": {
+      "pendiente": "Pendientes",
+      "facturada": "Facturadas",
+      "cancelada": "Canceladas",
+      "all": "Todas"
+    },
+    "refresh": "Actualizar órdenes TN",
+    "empty": "No hay órdenes de Tiendanube.",
+    "loadError": "No se pudieron cargar las órdenes de Tiendanube.",
+    "invoiceError": "No se pudo facturar la orden.",
+    "cuitPending": "CUIT pendiente",
+    "invoice": "Facturar",
+    "invoicing": "Facturando…",
+    "columns": {
+      "tnOrderId": "Orden TN",
+      "buyer": "Comprador",
+      "status": "Estado TN",
+      "pedido": "Pedido",
+      "total": "Total",
+      "actions": "Acciones"
+    }
   }
 }

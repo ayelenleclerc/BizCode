@@ -1166,6 +1166,30 @@
 
 * [TenantPricingEnvelope](./tenantpricingenvelope.md) – `-`
 
+* [TiendanubeAuthorizeEnvelope](./tiendanubeauthorizeenvelope.md) – `-`
+
+* [TiendanubeConfigStatus](./tiendanubeconfigstatus.md) – `-`
+
+* [TiendanubeConfigStatusEnvelope](./tiendanubeconfigstatusenvelope.md) – `-`
+
+* [TiendanubeDisconnectEnvelope](./tiendanubedisconnectenvelope.md) – `-`
+
+* [TiendanubeFacturarEnvelope](./tiendanubefacturarenvelope.md) – `-`
+
+* [TiendanubeOrden](./tiendanubeorden.md) – `-`
+
+* [TiendanubeOrdenListEnvelope](./tiendanubeordenlistenvelope.md) – `-`
+
+* [TiendanubePublicacionStatus](./tiendanubepublicacionstatus.md) – `-`
+
+* [TiendanubePublicacionStatusEnvelope](./tiendanubepublicacionstatusenvelope.md) – `-`
+
+* [TiendanubePublicacionUnlinkEnvelope](./tiendanubepublicacionunlinkenvelope.md) – `-`
+
+* [TiendanubeWebhookAckEnvelope](./tiendanubewebhookackenvelope.md) – `-`
+
+* [TiendanubeWebhookBody](./tiendanubewebhookbody.md) – `-`
+
 * [TipoCambio](./tipocambio.md) – `-`
 
 * [TipoCambioEnvelope](./tipocambioenvelope.md) – `-`
@@ -1489,6 +1513,16 @@
 * [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-after.md) – `undefined#/properties/after`
 
 * [Untitled object in TenantConfigHistoryEntry](./tenantconfighistoryentry-properties-before.md) – `undefined#/properties/before`
+
+* [Untitled object in TiendanubeAuthorizeEnvelope](./tiendanubeauthorizeenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in TiendanubeDisconnectEnvelope](./tiendanubedisconnectenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in TiendanubeFacturarEnvelope](./tiendanubefacturarenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in TiendanubeOrdenListEnvelope](./tiendanubeordenlistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in TiendanubePublicacionUnlinkEnvelope](./tiendanubepublicacionunlinkenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in TipoCambioListEnvelope](./tipocambiolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
@@ -1897,6 +1931,8 @@
 * [Untitled array in TenantPlanSnapshot](./tenantplansnapshot-properties-features.md) – `undefined#/properties/features`
 
 * [Untitled array in TenantPricingData](./tenantpricingdata-properties-addons.md) – `undefined#/properties/addons`
+
+* [Untitled array in TiendanubeOrdenListEnvelope](./tiendanubeordenlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in TipoCambioListEnvelope](./tipocambiolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

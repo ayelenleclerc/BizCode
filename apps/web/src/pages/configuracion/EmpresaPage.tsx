@@ -17,6 +17,7 @@ import FiscalRetencionesSection from './FiscalRetencionesSection'
 import PortalConfigSection from './PortalConfigSection'
 import MercadoPagoConfigSection from './MercadoPagoConfigSection'
 import MeliConfigSection from './MeliConfigSection'
+import TiendanubeConfigSection from './TiendanubeConfigSection'
 import EcommerceSyncSection from './EcommerceSyncSection'
 import IfModule from '@/components/IfModule'
 
@@ -566,6 +567,7 @@ export default function EmpresaPage() {
       <ArcaFiscalSection />
       <MercadoPagoConfigSection />
       <MeliConfigSection />
+      <TiendanubeConfigSection />
       <EcommerceSyncSection />
       <PrintDevicesSection />
       <FiscalRetencionesSection />

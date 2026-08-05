@@ -207,5 +207,21 @@
     "selectedCategory": "Categoría seleccionada",
     "publish": "Publicar en Mercado Libre",
     "resync": "Sincronizar ahora"
+  },
+  "tiendanube": {
+    "title": "Tiendanube",
+    "subtitle": "Publicá este artículo en Tiendanube (opt-in).",
+    "loading": "Cargando estado de publicación…",
+    "errorLoad": "No se pudo cargar el estado de Tiendanube.",
+    "errorSave": "No se pudo publicar en Tiendanube.",
+    "errorUnlink": "No se pudo desvincular de Tiendanube.",
+    "photoWarning": "Recomendamos agregar al menos una foto antes de publicar.",
+    "status": "Estado",
+    "openListing": "Abrir producto en Tiendanube",
+    "unlink": "Desvincular",
+    "publish": "Publicar en Tiendanube",
+    "resync": "Sincronizar ahora",
+    "productId": "ID producto TN",
+    "publishing": "Publicando…"
   }
 }

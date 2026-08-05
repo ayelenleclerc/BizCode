@@ -23,6 +23,8 @@ const MERCADOPAGO_PREFERENCE_DEFAULT = 20
 const MERCADOPAGO_WEBHOOK_DEFAULT = 120
 const MELI_OAUTH_DEFAULT = 10
 const MELI_WEBHOOK_DEFAULT = 120
+const TIENDANUBE_OAUTH_DEFAULT = 10
+const TIENDANUBE_WEBHOOK_DEFAULT = 120
 
 function parsePositiveInt(raw: string | undefined, defaultValue: number): number {
   if (!raw?.trim()) {
@@ -240,6 +242,30 @@ export const meliWebhookHttpRateLimiter = createRouteLimiter({
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_MELI_WEBHOOK, MELI_WEBHOOK_DEFAULT),
   skipUnless: () => true,
   storePrefix: 'meli-webhook',
+})
+
+/**
+ * @en Per-IP rate limit for Tiendanube OAuth authorize/callback/disconnect (default 10 req/15 min; `HTTP_RATE_LIMIT_TIENDANUBE_OAUTH`).
+ * @es Límite por IP para OAuth Tiendanube authorize/callback/disconnect (10 req/15 min; `HTTP_RATE_LIMIT_TIENDANUBE_OAUTH`).
+ * @pt-BR Limite por IP para OAuth Tiendanube authorize/callback/disconnect (10 req/15 min; `HTTP_RATE_LIMIT_TIENDANUBE_OAUTH`).
+ */
+export const tiendanubeOAuthHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_TIENDANUBE_OAUTH, TIENDANUBE_OAUTH_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'tn-oauth',
+})
+
+/**
+ * @en Per-IP rate limit for Tiendanube webhooks (default 120 req/15 min; `HTTP_RATE_LIMIT_TIENDANUBE_WEBHOOK`).
+ * @es Límite por IP para webhooks Tiendanube (120 req/15 min; `HTTP_RATE_LIMIT_TIENDANUBE_WEBHOOK`).
+ * @pt-BR Limite por IP para webhooks Tiendanube (120 req/15 min; `HTTP_RATE_LIMIT_TIENDANUBE_WEBHOOK`).
+ */
+export const tiendanubeWebhookHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_TIENDANUBE_WEBHOOK, TIENDANUBE_WEBHOOK_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'tn-webhook',
 })
 
 /**

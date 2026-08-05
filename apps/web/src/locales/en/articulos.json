@@ -207,5 +207,21 @@
     "selectedCategory": "Selected category",
     "publish": "Publish to Mercado Libre",
     "resync": "Sync now"
+  },
+  "tiendanube": {
+    "title": "Tiendanube",
+    "subtitle": "Publish this article to Tiendanube (opt-in).",
+    "loading": "Loading listing status…",
+    "errorLoad": "Could not load Tiendanube status.",
+    "errorSave": "Could not publish to Tiendanube.",
+    "errorUnlink": "Could not unlink from Tiendanube.",
+    "photoWarning": "We recommend adding at least one photo before publishing.",
+    "status": "Status",
+    "openListing": "Open product on Tiendanube",
+    "unlink": "Unlink",
+    "publish": "Publish to Tiendanube",
+    "resync": "Sync now",
+    "productId": "TN product ID",
+    "publishing": "Publishing…"
   }
 }

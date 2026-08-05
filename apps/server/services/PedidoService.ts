@@ -385,7 +385,7 @@ export class PedidoService {
       },
       userId,
       {
-        skipStockDecrement: pedido.origen === 'meli',
+        skipStockDecrement: pedido.origen === 'meli' || pedido.origen === 'tiendanube',
       },
     )
     if (!facturaResult.ok) {

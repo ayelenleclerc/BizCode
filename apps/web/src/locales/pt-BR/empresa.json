@@ -133,6 +133,29 @@
       "disconnectFailed": "Não foi possível desconectar o Mercado Livre"
     }
   },
+  "tiendanube": {
+    "title": "Nuvemshop",
+    "subtitle": "Conecte a loja do tenant via OAuth. O access token é criptografado e nunca é exibido.",
+    "loading": "Carregando status Nuvemshop…",
+    "connectedBadge": "Conectado: {{store}} · token ••••{{last4}}",
+    "notConnectedBadge": "Não conectado",
+    "readOnlyHint": "Você pode ver o status; apenas funções com permissão de configuração da empresa podem conectar ou desconectar.",
+    "store": "Loja",
+    "storeId": "ID da loja",
+    "storeUrl": "URL da loja",
+    "connectedAt": "Conectado desde",
+    "connect": "Conectar com Nuvemshop",
+    "connecting": "Redirecionando…",
+    "disconnect": "Desconectar",
+    "disconnecting": "Desconectando…",
+    "connectSuccess": "Loja Nuvemshop conectada",
+    "disconnectSuccess": "Loja Nuvemshop desconectada",
+    "errors": {
+      "loadFailed": "Não foi possível carregar o status Nuvemshop",
+      "connectFailed": "Não foi possível iniciar a conexão Nuvemshop",
+      "disconnectFailed": "Não foi possível desconectar a Nuvemshop"
+    }
+  },
   "ecommerce": {
     "title": "Integrações eCommerce",
     "subtitle": "Status dos conectores e registro compartilhado de sincronização (catálogo, estoque e pedidos).",

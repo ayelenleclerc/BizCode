@@ -41,6 +41,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     meliConfig: {
       findUnique: vi.fn().mockResolvedValue({ activo: true }),
     },
+    tiendanubeConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
+    },
     syncLog: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn().mockResolvedValue([
@@ -83,8 +86,16 @@ describe('ecommerce sync API (#189)', () => {
     expect(res.body.data).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ connectorType: 'meli', status: 'active', registered: true }),
-        expect.objectContaining({ connectorType: 'tiendanube', status: 'not_configured' }),
-        expect.objectContaining({ connectorType: 'woocommerce', status: 'not_configured' }),
+        expect.objectContaining({
+          connectorType: 'tiendanube',
+          status: 'not_configured',
+          registered: true,
+        }),
+        expect.objectContaining({
+          connectorType: 'woocommerce',
+          status: 'not_configured',
+          registered: false,
+        }),
       ]),
     )
   })

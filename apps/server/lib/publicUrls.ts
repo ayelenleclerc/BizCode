@@ -62,3 +62,25 @@ export function resolveMeliOAuthRedirectUri(): string {
   }
   return `${resolveApiPublicBaseUrl()}/api/oauth/meli/callback`
 }
+
+/**
+ * @en Tiendanube notifications webhook URL (#187).
+ * @es URL del webhook de notificaciones Tiendanube (#187).
+ * @pt-BR URL do webhook de notificações Tiendanube (#187).
+ */
+export function resolveTiendanubeNotificationUrl(): string {
+  return `${resolveApiPublicBaseUrl()}/api/webhooks/tiendanube`
+}
+
+/**
+ * @en Tiendanube OAuth redirect URI (#187).
+ * @es URI de redirección OAuth Tiendanube (#187).
+ * @pt-BR URI de redirecionamento OAuth Tiendanube (#187).
+ */
+export function resolveTiendanubeOAuthRedirectUri(): string {
+  const fromEnv = process.env.TIENDANUBE_REDIRECT_URI?.trim()
+  if (fromEnv) {
+    return fromEnv.replace(/\/$/, '')
+  }
+  return `${resolveApiPublicBaseUrl()}/api/oauth/tiendanube/callback`
+}
