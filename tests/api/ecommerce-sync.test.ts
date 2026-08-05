@@ -44,6 +44,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     tiendanubeConfig: {
       findUnique: vi.fn().mockResolvedValue(null),
     },
+    wooCommerceConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
+    },
     syncLog: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn().mockResolvedValue([
@@ -94,7 +97,7 @@ describe('ecommerce sync API (#189)', () => {
         expect.objectContaining({
           connectorType: 'woocommerce',
           status: 'not_configured',
-          registered: false,
+          registered: true,
         }),
       ]),
     )

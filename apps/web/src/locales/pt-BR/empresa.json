@@ -156,6 +156,37 @@
       "disconnectFailed": "Não foi possível desconectar a Nuvemshop"
     }
   },
+  "woocommerce": {
+    "title": "WooCommerce",
+    "subtitle": "Conecte a loja com uma consumer key/secret da REST API (Basic Auth). As credenciais são criptografadas e nunca são exibidas.",
+    "loading": "Carregando status WooCommerce…",
+    "connectedBadge": "Conectado: {{store}} · key ••••{{last4}}",
+    "notConnectedBadge": "Não conectado",
+    "readOnlyHint": "Você pode ver o status; apenas funções com permissão de configuração da empresa podem conectar ou desconectar.",
+    "store": "Loja",
+    "storeUrl": "URL da loja",
+    "connectedAt": "Conectado desde",
+    "webhookUrl": "URL do webhook (configure em WooCommerce → Configurações → Avançado → Webhooks)",
+    "webhookSecretWarning": "Nenhum webhook secret configurado; os webhooks de pedidos recebidos serão rejeitados.",
+    "fields": {
+      "storeUrl": "URL da loja",
+      "consumerKey": "Consumer Key",
+      "consumerSecret": "Consumer Secret",
+      "webhookSecret": "Webhook secret (opcional)",
+      "webhookSecretHint": "Deve corresponder ao secret configurado para o webhook no WooCommerce."
+    },
+    "connect": "Conectar WooCommerce",
+    "connecting": "Conectando…",
+    "disconnect": "Desconectar",
+    "disconnecting": "Desconectando…",
+    "connectSuccess": "Loja WooCommerce conectada",
+    "disconnectSuccess": "Loja WooCommerce desconectada",
+    "errors": {
+      "loadFailed": "Não foi possível carregar o status WooCommerce",
+      "connectFailed": "Não foi possível conectar ao WooCommerce",
+      "disconnectFailed": "Não foi possível desconectar o WooCommerce"
+    }
+  },
   "ecommerce": {
     "title": "Integrações eCommerce",
     "subtitle": "Status dos conectores e registro compartilhado de sincronização (catálogo, estoque e pedidos).",

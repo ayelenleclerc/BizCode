@@ -25,6 +25,8 @@ const MELI_OAUTH_DEFAULT = 10
 const MELI_WEBHOOK_DEFAULT = 120
 const TIENDANUBE_OAUTH_DEFAULT = 10
 const TIENDANUBE_WEBHOOK_DEFAULT = 120
+const WOOCOMMERCE_HTTP_DEFAULT = 10
+const WOOCOMMERCE_WEBHOOK_DEFAULT = 120
 
 function parsePositiveInt(raw: string | undefined, defaultValue: number): number {
   if (!raw?.trim()) {
@@ -266,6 +268,33 @@ export const tiendanubeWebhookHttpRateLimiter = createRouteLimiter({
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_TIENDANUBE_WEBHOOK, TIENDANUBE_WEBHOOK_DEFAULT),
   skipUnless: () => true,
   storePrefix: 'tn-webhook',
+})
+
+/**
+ * @en Per-IP rate limit for WooCommerce config/verify writes (default 10 req/15 min; `HTTP_RATE_LIMIT_WOOCOMMERCE`).
+ * @es Límite por IP para escrituras de config/verificación WooCommerce (10 req/15 min; `HTTP_RATE_LIMIT_WOOCOMMERCE`).
+ * @pt-BR Limite por IP para escritas de config/verificação WooCommerce (10 req/15 min; `HTTP_RATE_LIMIT_WOOCOMMERCE`).
+ */
+export const woocommerceHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_WOOCOMMERCE, WOOCOMMERCE_HTTP_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'wc-http',
+})
+
+/**
+ * @en Per-IP rate limit for WooCommerce webhooks (default 120 req/15 min; `HTTP_RATE_LIMIT_WOOCOMMERCE_WEBHOOK`).
+ * @es Límite por IP para webhooks WooCommerce (120 req/15 min; `HTTP_RATE_LIMIT_WOOCOMMERCE_WEBHOOK`).
+ * @pt-BR Limite por IP para webhooks WooCommerce (120 req/15 min; `HTTP_RATE_LIMIT_WOOCOMMERCE_WEBHOOK`).
+ */
+export const woocommerceWebhookHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(
+    process.env.HTTP_RATE_LIMIT_WOOCOMMERCE_WEBHOOK,
+    WOOCOMMERCE_WEBHOOK_DEFAULT,
+  ),
+  skipUnless: () => true,
+  storePrefix: 'wc-webhook',
 })
 
 /**

@@ -84,3 +84,15 @@ export function resolveTiendanubeOAuthRedirectUri(): string {
   }
   return `${resolveApiPublicBaseUrl()}/api/oauth/tiendanube/callback`
 }
+
+/**
+ * @en WooCommerce per-tenant notifications webhook URL, shown in the config UI so the store owner
+ *   can register it under WooCommerce → Settings → Advanced → Webhooks (#188).
+ * @es URL del webhook de notificaciones WooCommerce por tenant, mostrada en la UI de configuración
+ *   para registrarla en WooCommerce → Ajustes → Avanzado → Webhooks (#188).
+ * @pt-BR URL do webhook de notificações WooCommerce por tenant, exibida na UI de configuração para
+ *   registrar em WooCommerce → Configurações → Avançado → Webhooks (#188).
+ */
+export function resolveWooCommerceWebhookUrl(tenantId: number): string {
+  return `${resolveApiPublicBaseUrl()}/api/webhooks/woocommerce/${tenantId}`
+}

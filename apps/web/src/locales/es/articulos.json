@@ -223,5 +223,21 @@
     "resync": "Sincronizar ahora",
     "productId": "ID producto TN",
     "publishing": "Publicando…"
+  },
+  "woocommerce": {
+    "title": "WooCommerce",
+    "subtitle": "Publicá este artículo en WooCommerce (opt-in).",
+    "loading": "Cargando estado de publicación…",
+    "errorLoad": "No se pudo cargar el estado de WooCommerce.",
+    "errorSave": "No se pudo publicar en WooCommerce.",
+    "errorUnlink": "No se pudo desvincular de WooCommerce.",
+    "photoWarning": "Recomendamos agregar al menos una foto antes de publicar.",
+    "status": "Estado",
+    "openListing": "Abrir producto en WooCommerce",
+    "unlink": "Desvincular",
+    "publish": "Publicar en WooCommerce",
+    "resync": "Sincronizar ahora",
+    "productId": "ID producto WC",
+    "publishing": "Publicando…"
   }
 }

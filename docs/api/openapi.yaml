@@ -84,6 +84,8 @@ tags:
     description: Mercado Libre OAuth connection per tenant (#183)
   - name: tiendanube
     description: Tiendanube OAuth, catalog, orders and webhooks per tenant (#187)
+  - name: woocommerce
+    description: WooCommerce REST API (Basic Auth consumer key/secret), catalog, orders and webhooks per tenant (#188)
   - name: ecommerce
     description: Shared ecommerce sync engine — connectors and SyncLog (#189)
   - name: cobranzas
@@ -10405,6 +10407,255 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/configuracion/woocommerce:
+    get:
+      tags: [woocommerce]
+      summary: WooCommerce connection status (no credentials) (#188)
+      description: Requires `settings.business.manage` and tenant integration `woocommerce`. Never returns the consumer key/secret.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: WooCommerce connection status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommerceConfigStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [woocommerce]
+      summary: Verify and save WooCommerce Basic Auth credentials (#188)
+      description: |
+        Requires `settings.business.manage` and tenant integration `woocommerce`. Basic Auth (consumer
+        key/secret), not OAuth. Verifies credentials with `GET /products?per_page=1` before persisting
+        them encrypted; only a last-4 hint of the consumer key is ever exposed back.
+      security:
+        - cookieSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WooCommerceCredentialsInput'
+      responses:
+        '200':
+          description: Credentials verified and saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommerceConfigStatusEnvelope'
+        '400':
+          description: Missing/invalid storeUrl, consumerKey or consumerSecret
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '502':
+          description: WooCommerce verification request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [woocommerce]
+      summary: Disconnect WooCommerce (#188)
+      description: Requires `settings.business.manage` and tenant integration `woocommerce`. Deletes the local encrypted credentials.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Disconnected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommerceDisconnectEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/configuracion/woocommerce/verificar:
+    post:
+      tags: [woocommerce]
+      summary: Re-verify already-saved WooCommerce credentials (#188)
+      description: Requires `settings.business.manage` and tenant integration `woocommerce`. Health check against `GET /products?per_page=1`; no body.
+      security:
+        - cookieSession: []
+      responses:
+        '200':
+          description: Credentials still valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommerceVerifyEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '502':
+          description: WooCommerce verification request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/webhooks/woocommerce/{tenantId}:
+    post:
+      tags: [woocommerce]
+      summary: Per-tenant WooCommerce order webhook (#188)
+      description: |
+        Public per-tenant notifications endpoint (no JWT). WooCommerce posts the order resource
+        directly in the body (not an envelope). Validates `x-wc-webhook-signature` (base64
+        HMAC-SHA256 of the raw body) against the tenant's `WooCommerceConfig.webhookSecretEncrypted`.
+        Responds `200` immediately and applies the order snapshot asynchronously (stock decrement via
+        `venta_woocommerce` + Pedido `origen=woocommerce` on `processing`/`completed`; cancellation
+        cleanup on `cancelled`/`refunded`/`failed`). Rate-limited per IP.
+      security: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: x-wc-webhook-signature
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Base64 HMAC-SHA256 of the raw request body, keyed with the tenant webhook secret.
+        - name: x-wc-webhook-topic
+          in: header
+          required: false
+          schema:
+            type: string
+          description: WooCommerce webhook topic (e.g. `order.updated`); defaults to `order.updated` when absent.
+        - name: x-wc-webhook-delivery-id
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WooCommerceWebhookBody'
+      responses:
+        '200':
+          description: Notification accepted (processing continues asynchronously)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommerceWebhookAckEnvelope'
+        '400':
+          description: Invalid tenantId, missing/invalid signature or payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/woocommerce/ordenes:
+    get:
+      tags: [woocommerce]
+      summary: List WooCommerce imported orders (#188)
+      description: |
+        Requires module `billing.orders`, permission `orders.create` or `reports.operational.read`, and integration `woocommerce`.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pendiente, facturada, cancelada, all]
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated WooCommerce orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommerceOrdenListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/woocommerce/ordenes/{wcOrderId}/facturar:
+    post:
+      tags: [woocommerce]
+      summary: Invoice a WooCommerce imported order (#188)
+      description: |
+        Requires module `billing.orders`, permission `sales.create`, and integration `woocommerce`.
+        Invoices the linked Pedido with `skipStockDecrement` (stock already moved via `venta_woocommerce`).
+      security:
+        - cookieSession: []
+      parameters:
+        - name: wcOrderId
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 40
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoInvoiceInput'
+      responses:
+        '200':
+          description: Pedido invoiced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommerceFacturarEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Already invoiced or cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: CUIT required for factura A
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/meli/categories/search:
     get:
       tags: [meli]
@@ -10539,7 +10790,8 @@ paths:
       summary: List ecommerce connectors and connection status (#189)
       description: |
         Requires `settings.business.manage`. Returns known connector types (`meli`, `tiendanube`, `woocommerce`)
-        with aggregate status. Tiendanube/WooCommerce remain `not_configured` until #187/#188.
+        with aggregate status. Each connector is `not_configured` until its tenant credentials are saved
+        (`registered` reflects whether the connector adapter factory is bootstrapped, not tenant configuration).
       security:
         - cookieSession: []
       responses:
@@ -10788,6 +11040,107 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TiendanubePublicacionUnlinkEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Listing not linked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/articulos/{id}/woocommerce:
+    get:
+      tags: [woocommerce]
+      summary: WooCommerce listing status for an article (#188)
+      description: Requires `products.read`, tenant integration `woocommerce`, and article ownership.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Listing mapping status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommercePublicacionStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [woocommerce]
+      summary: Opt-in publish or update article on WooCommerce (#188)
+      description: Requires `products.manage`, tenant integration `woocommerce`, and article ownership. Creates or updates `WooCommercePublicacion` and syncs via EcommerceSyncEngine.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Listing synced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommercePublicacionStatusEnvelope'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Article or WooCommerce connection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [woocommerce]
+      summary: Unlink article from WooCommerce (#188)
+      description: Requires `products.manage`, tenant integration `woocommerce`, and article ownership. Pauses remote product when possible and deletes local mapping.
+      security:
+        - cookieSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Unlinked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WooCommercePublicacionUnlinkEnvelope'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -20105,6 +20458,151 @@ components:
         - $ref: '#/components/schemas/ListPaginationMeta'
 
     TiendanubeFacturarEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [pedidoId, facturaId]
+          properties:
+            pedidoId: { type: integer }
+            facturaId: { type: integer }
+
+    WooCommerceConfigStatus:
+      type: object
+      required: [connected]
+      properties:
+        connected: { type: boolean }
+        storeUrl: { type: string }
+        storeName: { type: string }
+        consumerKeyLast4: { type: string }
+        hasWebhookSecret: { type: boolean }
+        activo: { type: boolean }
+        conectadoAt: { type: string, format: date-time }
+        webhookUrl: { type: string, format: uri }
+
+    WooCommerceConfigStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/WooCommerceConfigStatus'
+
+    WooCommerceCredentialsInput:
+      type: object
+      required: [storeUrl, consumerKey, consumerSecret]
+      properties:
+        storeUrl: { type: string, format: uri, maxLength: 255 }
+        consumerKey: { type: string, maxLength: 200 }
+        consumerSecret: { type: string, maxLength: 200 }
+        webhookSecret: { type: string, nullable: true }
+        storeName: { type: string, nullable: true }
+
+    WooCommerceVerifyEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [verified]
+          properties:
+            verified: { type: boolean, const: true }
+
+    WooCommerceDisconnectEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [disconnected]
+          properties:
+            disconnected: { type: boolean, const: true }
+
+    WooCommercePublicacionStatus:
+      type: object
+      required: [linked, hasPhotos, photoWarning]
+      properties:
+        linked: { type: boolean }
+        wcProductId: { type: string }
+        estado: { type: string }
+        syncStatus: { type: string }
+        syncError: { type: string, nullable: true }
+        permalink: { type: string, nullable: true }
+        ultimaSyncAt: { type: string, format: date-time, nullable: true }
+        hasPhotos: { type: boolean }
+        photoWarning: { type: boolean }
+
+    WooCommercePublicacionStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/WooCommercePublicacionStatus'
+
+    WooCommercePublicacionUnlinkEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [unlinked]
+          properties:
+            unlinked: { type: boolean, const: true }
+
+    WooCommerceWebhookBody:
+      type: object
+      required: [id]
+      properties:
+        id:
+          oneOf:
+            - { type: string }
+            - { type: integer }
+        status: { type: string }
+
+    WooCommerceWebhookAckEnvelope:
+      type: object
+      required: [success]
+      properties:
+        success: { type: boolean, const: true }
+
+    WooCommerceOrden:
+      type: object
+      required: [id, wcOrderId, status, cuitPending, lastSyncedAt]
+      properties:
+        id: { type: integer }
+        wcOrderId: { type: string }
+        status: { type: string }
+        buyerNickname: { type: string, nullable: true }
+        cuitPending: { type: boolean }
+        stockAppliedAt: { type: string, format: date-time, nullable: true }
+        lastSyncedAt: { type: string, format: date-time }
+        pedidoId: { type: integer, nullable: true }
+        pedidoEstado: { type: string, nullable: true }
+        pedidoTotal: { type: string, nullable: true }
+        facturaId: { type: integer, nullable: true }
+        clienteId: { type: integer, nullable: true }
+        clienteRsocial: { type: string, nullable: true }
+        clienteCuit: { type: string, nullable: true }
+
+    WooCommerceOrdenListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data, total, limit, offset]
+          properties:
+            success: { type: boolean, const: true }
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/WooCommerceOrden'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    WooCommerceFacturarEnvelope:
       type: object
       required: [success, data]
       properties:

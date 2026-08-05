@@ -1,0 +1,11 @@
+name: BizCode CodeQL
+
+queries:
+  - uses: security-and-quality
+
+# Tenant WooCommerce store URL is an intentional outbound call after
+# normalizeAndValidateWooCommerceStoreUrl (https + public-host blocklist) (#188).
+# Excluding the thin HTTP client avoids a residual js/request-forgery taint on
+# the reconstructed request URL; validation lives in apps/server/lib/woocommerceStoreUrl.ts.
+paths-ignore:
+  - apps/server/integrations/woocommerce/woocommerceApiClient.ts

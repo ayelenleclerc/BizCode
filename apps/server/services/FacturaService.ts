@@ -19,6 +19,7 @@ import { LoteService } from './LoteService'
 import { TurnoCajaService } from './TurnoCajaService'
 import { MeliStockSyncService } from './MeliStockSyncService'
 import { TiendanubeStockSyncService } from './TiendanubeStockSyncService'
+import { WooCommerceStockSyncService } from './WooCommerceStockSyncService'
 import { afipCodigoForUnidad, isUnidadBase, roundQty, validateQuantityForUom } from '../lib/uom'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
@@ -583,9 +584,11 @@ export class FacturaService {
 
     const meliStock = new MeliStockSyncService(this.prisma)
     const tnStock = new TiendanubeStockSyncService(this.prisma)
+    const wcStock = new WooCommerceStockSyncService(this.prisma)
     for (const articuloId of qtyByArticulo.keys()) {
       void meliStock.syncStockToMeli(tenantId, articuloId).catch(() => undefined)
       void tnStock.syncStockToTiendanube(tenantId, articuloId).catch(() => undefined)
+      void wcStock.syncStockToWooCommerce(tenantId, articuloId).catch(() => undefined)
     }
 
     return {

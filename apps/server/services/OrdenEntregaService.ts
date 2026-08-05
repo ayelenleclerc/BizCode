@@ -402,6 +402,7 @@ export class OrdenEntregaService {
 
     if (toEstado === 'in_transit' && fromEstado !== 'in_transit') {
       void this.enqueueTiendanubeMarkDispatchedIfNeeded(tenantId, orden).catch(() => undefined)
+      void this.enqueueWooCommerceMarkDispatchedIfNeeded(tenantId, orden).catch(() => undefined)
     }
 
     const auditAction =
@@ -441,5 +442,33 @@ export class OrdenEntregaService {
     if (pedidoId == null) return
     const { TiendanubeOrderImportService } = await import('./TiendanubeOrderImportService')
     await new TiendanubeOrderImportService(this.prisma).enqueueMarkDispatched(tenantId, pedidoId)
+  }
+
+  /**
+   * @en When an OE is dispatched, notify WooCommerce fulfillment for linked Pedido (#188).
+   * @es Al despachar una OE, notifica fulfillment WooCommerce del Pedido vinculado (#188).
+   * @pt-BR Ao despachar uma OE, notifica fulfillment WooCommerce do Pedido vinculado (#188).
+   */
+  private async enqueueWooCommerceMarkDispatchedIfNeeded(
+    tenantId: number,
+    orden: OrdenEntregaRow,
+  ): Promise<void> {
+    let pedidoId: number | null = null
+    const remito = await this.prisma.remito.findFirst({
+      where: { tenantId, ordenEntregaId: orden.id },
+      select: { pedidoId: true, pedido: { select: { origen: true } } },
+    })
+    if (remito?.pedidoId && remito.pedido?.origen === 'woocommerce') {
+      pedidoId = remito.pedidoId
+    } else if (orden.facturaId != null) {
+      const pedido = await this.prisma.pedido.findFirst({
+        where: { tenantId, facturaId: orden.facturaId, origen: 'woocommerce' },
+        select: { id: true },
+      })
+      pedidoId = pedido?.id ?? null
+    }
+    if (pedidoId == null) return
+    const { WooCommerceOrderImportService } = await import('./WooCommerceOrderImportService')
+    await new WooCommerceOrderImportService(this.prisma).enqueueMarkDispatched(tenantId, pedidoId)
   }
 }

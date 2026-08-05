@@ -102,13 +102,22 @@ Habilitá la integración **`tiendanube`**, luego **Configuración → Empresa �
 3. Webhook `POST /api/webhooks/tiendanube` verifica `x-linkedstore-hmac-sha256`; `order/paid` importa Pedido `origen=tiendanube` con stock una vez (`venta_tiendanube`).
 4. **Pedidos → Órdenes TN** lista/factura (`GET /api/tiendanube/ordenes`, facturar con `skipStockDecrement`). Despachar una OE (`in_transit`) encola `mark_dispatched` (`PUT` orden TN `shipping_status=shipped`).
 
+## Conector WooCommerce (#188)
+
+Habilitá la integración **`woocommerce`**, luego **Configuración → Empresa → WooCommerce** para guardar la URL de la tienda y un consumer key/secret de la REST API (Basic Auth, sin flujo OAuth). Las credenciales se cifran y nunca se muestran de nuevo.
+
+1. Opt-in por producto: **Productos → editar artículo → WooCommerce** (`PUT /api/articulos/{id}/woocommerce`) — sync vía `EcommerceSyncEngine` (`wc:catalog:…`).
+2. Push de stock tras facturas/ajustes (`wc:stock:…`); qty 0 pone el producto WooCommerce en `stock_status=outofstock`.
+3. Webhook `POST /api/webhooks/woocommerce/{tenantId}` verifica `x-wc-webhook-signature` (HMAC-SHA256 con el `webhookSecret` por tenant, configurado en WooCommerce → Ajustes → Avanzado → Webhooks); `order.updated`/processing importa Pedido `origen=woocommerce` con stock una vez (`venta_woocommerce`).
+4. **Pedidos → Órdenes Woo** lista/factura (`GET /api/woocommerce/ordenes`, facturar con `skipStockDecrement`). Despachar una OE (`in_transit`) encola `mark_dispatched`.
+
 ## Motor compartido de sync eCommerce (#189)
 
 Los pushes de catálogo y stock de conectores marketplace pasan por una cola Prisma compartida (`EcommerceSyncJob`) con historial SyncLog:
 
 1. **Configuración → Empresa → Integraciones eCommerce** lista los conectores conocidos (`meli`, `tiendanube`, `woocommerce`) y las últimas filas SyncLog (filtro por conector/estado). Requiere `settings.business.manage`.
-2. Catálogo/stock MeLi y Tiendanube encolan jobs procesados en la request y por `npm run ecommerce:sync-worker` cada minuto (reintentos 1m/5m/30m; tras 3 fallos DLQ y alerta a `super_admin` de plataforma).
-3. APIs: `GET /api/ecommerce/connectors`, `GET /api/ecommerce/sync-logs`. WooCommerce queda `not_configured` hasta #188.
+2. Catálogo/stock MeLi, Tiendanube y WooCommerce encolan jobs procesados en la request y por `npm run ecommerce:sync-worker` cada minuto (reintentos 1m/5m/30m; tras 3 fallos DLQ y alerta a `super_admin` de plataforma).
+3. APIs: `GET /api/ecommerce/connectors`, `GET /api/ecommerce/sync-logs`.
 
 Artículos padre y servicios no se publican.
 

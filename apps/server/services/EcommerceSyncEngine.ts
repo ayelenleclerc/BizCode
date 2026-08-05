@@ -452,12 +452,16 @@ export class EcommerceSyncEngine {
     }>
   > {
     const known: EcommerceConnectorType[] = ['meli', 'tiendanube', 'woocommerce']
-    const [meli, tiendanube] = await Promise.all([
+    const [meli, tiendanube, wooCommerce] = await Promise.all([
       this.prisma.meliConfig.findUnique({
         where: { tenantId },
         select: { activo: true },
       }),
       this.prisma.tiendanubeConfig.findUnique({
+        where: { tenantId },
+        select: { activo: true },
+      }),
+      this.prisma.wooCommerceConfig.findUnique({
         where: { tenantId },
         select: { activo: true },
       }),
@@ -481,6 +485,16 @@ export class EcommerceSyncEngine {
         return {
           connectorType,
           status: tiendanube.activo ? ('active' as const) : ('inactive' as const),
+          registered,
+        }
+      }
+      if (connectorType === 'woocommerce') {
+        if (!wooCommerce) {
+          return { connectorType, status: 'not_configured' as const, registered }
+        }
+        return {
+          connectorType,
+          status: wooCommerce.activo ? ('active' as const) : ('inactive' as const),
           registered,
         }
       }
