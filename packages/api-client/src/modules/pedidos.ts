@@ -1,5 +1,11 @@
 import type { AxiosError, AxiosInstance } from 'axios'
-import type { ApiErrorPayload, JsonRecord, PedidoListResponse, PedidoRow } from '@bizcode/types'
+import type {
+  ApiErrorPayload,
+  JsonRecord,
+  PedidoListResponse,
+  PedidoRow,
+  PedidoTransitionInput,
+} from '@bizcode/types'
 import { api } from '../default-client'
 import { handleError } from '../errors'
 
@@ -44,6 +50,54 @@ export function createPedidosAPI(http: AxiosInstance) {
     confirm: async (id: number): Promise<PedidoRow> => {
       try {
         const response = await http.post<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}/confirm`)
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    pack: async (id: number): Promise<PedidoRow> => {
+      try {
+        const response = await http.post<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}/pack`)
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    ship: async (id: number): Promise<PedidoRow> => {
+      try {
+        const response = await http.post<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}/ship`)
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    deliver: async (id: number): Promise<PedidoRow> => {
+      try {
+        const response = await http.post<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}/deliver`)
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    collect: async (id: number): Promise<PedidoRow> => {
+      try {
+        const response = await http.post<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}/collect`)
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    transition: async (id: number, body: PedidoTransitionInput & JsonRecord): Promise<PedidoRow> => {
+      try {
+        const response = await http.post<{ success: boolean; data: PedidoRow }>(
+          `/pedidos/${id}/transitions`,
+          body,
+        )
         return response.data.data
       } catch (error) {
         return handleError(error as AxiosError<ApiErrorPayload>)

@@ -1,6 +1,6 @@
 # Operational flow — order → delivery → collection (design)
 
-**Design-only document.** It does not assert that UI or REST resources for “orders” exist; the current MVP centers on customers, products, and invoices ([`docs/api/openapi.yaml`](../../api/openapi.yaml)). Align conceptual states with the master plan; map responsibilities to roles that **already exist** in [`src/lib/rbac.ts`](../../../src/lib/rbac.ts).
+**Implementation document (BP1-1 #391).** Order REST lives under `/api/pedidos` ([`docs/api/openapi.yaml`](../../api/openapi.yaml)). Roles map to [`src/lib/rbac.ts`](../../../src/lib/rbac.ts) / `packages/types` RBAC.
 
 ## Proposed lifecycle (target)
 
@@ -75,7 +75,7 @@ Empty cells mean no direct RBAC permission names the step; the role may still pa
 | Logistics | `/logistica`, `/logistica/picking` (#143); `OrdenEntrega`; `GET/POST/PUT /api/ordenes-entrega`, `POST .../iniciar-picking`, `POST .../lista` | OE: `pending` → `picking` → `ready` → `assigned` (route) → `in_transit` → `delivered` \| `failed` \| `cancelled` |
 | GPS tracking | `/logistica/seguimiento` (#144); `RepartoUbicacion`; `GET /api/repartos/activos`, `POST /api/repartos/{id}/ubicacion` | Driver on `on_route` route; planner sees last position; 7-day retention |
 | Logistics KPIs | `/logistica` Reports tab (#145); `dispatchedAt` on `in_transit`; `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas` | Planner/manager; DB aggregates; CSV export |
-| Order entity `pedido` | `Pedido`/`PedidoItem` models, `/api/pedidos`, UI `/pedidos` (#132); `requireModule('billing.orders')` (#223) | States `packed`…`collected` and generic transitions (#65 / full BP1-1) |
+| Order entity `pedido` | Full BP1-1 (#391): `draft`…`collected` + remito/OE/cobro sync; MVP #132 + gating #223 | Early invoice preserved; see ADR-0009 |
 | Permissions `orders.*` | Defined in RBAC; enforced on `/api/ordenes-entrega` | Extend when `pedido` entity ships |
 
 The diagram state **Collected** is partially covered today by **payment registration** (`Cobro`), not by a `pedido` record.

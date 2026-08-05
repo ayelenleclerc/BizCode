@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fecha": {
+      "description": "Required when to=invoiced",
+      "type": "string"
+    },
+    "formaPagoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "numero": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "prefijo": {
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "A",
+        "B"
+      ],
+      "type": "string"
+    },
+    "to": {
+      "enum": [
+        "confirmed",
+        "packed",
+        "shipped",
+        "delivered",
+        "invoiced",
+        "collected",
+        "cancelled"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "to"
+  ],
+  "title": "PedidoTransitionInput",
+  "type": "object"
+}

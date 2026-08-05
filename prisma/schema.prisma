@@ -1229,7 +1229,7 @@ model Pedido {
   cliente     Cliente   @relation(fields: [clienteId], references: [id])
   vendedorId  Int?
   vendedor    AppUser?  @relation(fields: [vendedorId], references: [id])
-  /// draft | confirmed | invoiced | cancelled (ADR-0009)
+  /// draft | confirmed | packed | shipped | delivered | invoiced | collected | cancelled (ADR-0009 / #391)
   estado      String    @db.VarChar(20)
   total       Decimal   @db.Decimal(14, 2) @default(0)
   validUntil  DateTime?

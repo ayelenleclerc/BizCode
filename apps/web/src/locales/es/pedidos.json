@@ -20,7 +20,11 @@
     "draft": "Borrador",
     "confirmed": "Confirmado",
     "invoiced": "Facturado",
-    "cancelled": "Cancelado"
+    "cancelled": "Cancelado",
+    "packed": "Empaquetado",
+    "shipped": "Despachado",
+    "delivered": "Entregado",
+    "collected": "Cobrado"
   },
   "filterEstado": "Estado",
   "filterAll": "Todos",
@@ -100,6 +104,32 @@
       "pedido": "Pedido",
       "total": "Total",
       "actions": "Acciones"
+    }
+  },
+  "actions": {
+    "confirm": "Confirmar",
+    "pack": "Empaquetar",
+    "ship": "Despachar",
+    "deliver": "Entregar",
+    "invoice": "Facturar",
+    "collect": "Cobrar",
+    "cancel": "Cancelar"
+  },
+  "create": {
+    "title": "Nuevo pedido",
+    "clienteId": "ID de cliente",
+    "descripcion": "Descripción línea",
+    "cantidad": "Cantidad",
+    "precio": "Precio",
+    "cancel": "Cancelar",
+    "submit": "Crear",
+    "saving": "Guardando…",
+    "errors": {
+      "clienteId": "Cliente inválido",
+      "descripcion": "Descripción requerida",
+      "cantidad": "Cantidad inválida",
+      "precio": "Precio inválido",
+      "generic": "No se pudo crear el pedido"
     }
   }
 }

@@ -107,6 +107,7 @@ function buildPrisma() {
     },
     pedido: {
       findFirst: vi.fn(),
+      update: vi.fn(async ({ data }: { data: { estado: string } }) => ({ id: 10, estado: data.estado })),
     },
     factura: {
       findFirst: vi.fn(),
@@ -219,20 +220,37 @@ describe('RemitoService', () => {
   })
 
   it('creates remito from confirmed pedido', async () => {
-    vi.mocked(prisma.pedido.findFirst).mockResolvedValue({
-      id: 10,
-      tenantId: 1,
-      clienteId: 2,
-      estado: 'confirmed',
-      remito: null,
-      items: [{ articuloId: 1, cantidad: 3, articulo: { id: 1, descripcion: 'Prod', umedida: 'UN' } }],
-    } as never)
+    vi.mocked(prisma.pedido.findFirst).mockImplementation(async (args?: {
+      select?: { estado?: boolean }
+    }) => {
+      if (args?.select?.estado) {
+        return { estado: 'confirmed' }
+      }
+      return {
+        id: 10,
+        tenantId: 1,
+        clienteId: 2,
+        estado: 'confirmed',
+        remito: null,
+        items: [
+          {
+            articuloId: 1,
+            descripcion: 'Prod',
+            cantidad: 3,
+            articulo: { id: 1, descripcion: 'Prod', umedida: 'UN', tipo: 'producto' },
+          },
+        ],
+      }
+    })
     const result = await service.createFromPedido(1, 10)
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.data.pedidoId).toBe(10)
       expect(result.data.items).toHaveLength(1)
     }
+    expect(prisma.pedido.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { estado: 'packed' } }),
+    )
   })
 })
 

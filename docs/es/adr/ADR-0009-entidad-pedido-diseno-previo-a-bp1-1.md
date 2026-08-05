@@ -1,41 +1,37 @@
-# ADR-0009: Dominio Pedido — diseño y slice MVP comercial
+# ADR-0009: Dominio Pedido — diseño, MVP y ciclo BP1-1 completo
 
-**Estado:** Aceptado (actualizado 2026-05-18: slice MVP #132 en código; gating modular #223)  
+**Estado:** Aceptado (actualizado 2026-08-05: ciclo completo #391; MVP #132 + gating #223)  
 **Fecha:** 2026-05-03  
-**Referencia ISO:** ISO/IEC 12207 (ciclo de vida diseño/implementación); ISO 9001:2015 cláusula 8.3 (diseño y desarrollo)
+**Referencia ISO:** ISO/IEC 12207; ISO 9001:2015 cláusula 8.3
 
 ---
 
 ## Contexto
 
-La documentación de calidad describe el flujo objetivo **pedido → entrega → cobranza** ([`docs/es/quality/flujo-operativo-pedido-entrega-cobranza.md`](../../quality/flujo-operativo-pedido-entrega-cobranza.md)). El RBAC define permisos `orders.*` en [`src/lib/rbac.ts`](../../../../src/lib/rbac.ts).
+Docs de calidad describen el ciclo **pedido → entrega → cobranza**. RBAC expone `orders.*`.
 
-**Evidencia en repositorio (MVP #132):** modelos `Pedido` / `PedidoItem` en [`prisma/schema.prisma`](../../../../prisma/schema.prisma); rutas `GET/POST/PUT/DELETE /api/pedidos` y transiciones `POST .../confirm`, `POST .../invoice` en [`server/routes/registerPedidosRoutes.ts`](../../../../server/routes/registerPedidosRoutes.ts); contrato en [`docs/api/openapi.yaml`](../../api/openapi.yaml). Estados implementados en este slice: `draft`, `confirmed`, `invoiced`, `cancelled` (no el ciclo logístico completo `packed`…`collected` del diagrama — backlog #65).
+**MVP comercial (#132):** modelos y API con estados `draft|confirmed|invoiced|cancelled`.
 
-**Gating modular (#223):** acceso a pedidos exige módulo `billing.orders` vía `requireModule` y configuración por tenant (`TenantConfig`).
+**Gating (#223):** módulo `billing.orders`.
+
+**BP1-1 completo (#391):** `packed|shipped|delivered|collected`; endpoints de transición; sync remito/OE → Pedido; cobro → `collected`. Diseño: #65 (cerrado).
 
 ## Decisión
 
-1. **Slice comercial BP1-1 (#132):** persistir `Pedido` + `PedidoItem` y exponer APIs documentadas en OpenAPI con los estados del slice anterior y auditoría `pedido_*`.
-2. **Pendiente (#65 / BP1-1 completo):** estados y transiciones logísticas (`packed`…`collected`) y vínculo pedido→entrega→cobranza según el documento operativo.
-3. Mantener la narrativa de diseño en el documento operativo y equivalentes EN/PT-BR como referencia del ciclo objetivo.
-4. **Ámbito de canal:** la cabecera opcional `x-bizcode-channel` permanece ortogonal; las APIs de pedidos respetan `claims.scope.channels` como el resto de rutas autenticadas.
+1. `estado` como string validado (máquina en `pedidoStateMachine`); sin enum Prisma.
+2. **Facturación temprana:** desde `confirmed` → `invoiced`; desde logística solo se setea `facturaId` sin perder progreso.
+3. `collect` exige Factura liquidada; desde `invoiced` o `delivered`.
+4. Cancel solo `draft|confirmed`.
+5. Canal ortogonal.
 
 ## Consecuencias
 
-- **Pros:** Contrato, pruebas y docs alineados al código del MVP comercial; gating por tenant sin Redis (caché en proceso, #223).
-- **Contras:** El flujo operativo completo del diagrama sigue parcial hasta #65.
+Máquina Pedido unificada; OE/remito/cobros siguen siendo especialistas que sincronizan hacia Pedido.
 
-## Alternativas consideradas (#69)
+## Moneda
 
-Tabla resumida en la versión EN del ADR: [ADR-0009-order-entity-design-only.md](../../en/adr/ADR-0009-order-entity-design-only.md) (sección *Alternatives considered*). Decisión: modelo relacional `Pedido` + `PedidoItem` con enum de estados (`draft` … `collected`).
-
-## Moneda y claves de estado
-
-**Moneda por tenant** en el primer slice; multi-moneda en ADR aparte si producto lo exige. Mapeo diagrama → claves de implementación: sección *Estados canónicos de implementación* en [flujo-operativo-pedido-entrega-cobranza.md](../../quality/flujo-operativo-pedido-entrega-cobranza.md). Boceto Prisma/OpenAPI: [boceto-implementacion-dominio-pedido.md](../../quality/boceto-implementacion-dominio-pedido.md).
+Moneda por defecto del tenant. Multi-moneda → ADR aparte.
 
 ## Referencias
 
-- [`docs/es/quality/flujo-operativo-pedido-entrega-cobranza.md`](../../quality/flujo-operativo-pedido-entrega-cobranza.md)
-- [`docs/es/quality/boceto-implementacion-dominio-pedido.md`](../../quality/boceto-implementacion-dominio-pedido.md)
-- [`docs/api/openapi.yaml`](../../api/openapi.yaml)
+Versión EN canónica de detalle de paths: [ADR-0009-order-entity-design-only.md](../../en/adr/ADR-0009-order-entity-design-only.md). Issues #65, #132, #223, #391.

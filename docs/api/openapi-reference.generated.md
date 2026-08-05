@@ -25436,7 +25436,7 @@ Requires `orders.create` or `reports.operational.read`.
 
   - **`estado`**
 
-    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
 
   - **`facturaId`**
 
@@ -25711,7 +25711,7 @@ Requires `orders.create`. Initial estado is `draft`.
 
   - **`estado`**
 
-    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
 
   - **`facturaId`**
 
@@ -25945,7 +25945,7 @@ Requires `orders.create` or `reports.operational.read`.
 
   - **`estado`**
 
-    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
 
   - **`facturaId`**
 
@@ -26224,7 +26224,7 @@ Requires `orders.create`.
 
   - **`estado`**
 
-    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
 
   - **`facturaId`**
 
@@ -26474,7 +26474,7 @@ Requires `sales.cancel`. Sets estado to `cancelled` (not allowed when invoiced).
 
   - **`estado`**
 
-    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
 
   - **`facturaId`**
 
@@ -26708,7 +26708,7 @@ Requires `orders.create`.
 
   - **`estado`**
 
-    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
 
   - **`facturaId`**
 
@@ -26909,6 +26909,1238 @@ Requires `orders.create`.
 }
 ```
 
+### PARAMETERS /api/pedidos/{id}/pack
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/pack`
+
+### Pack pedido (confirmed|invoiced → packed)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/pack`
+- **Tags:** pedidos
+
+Requires `orders.pick`. Part of BP1-1 logistics (#391).
+
+#### Responses
+
+##### Status: 200 Pedido packed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/ship
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/ship`
+
+### Ship pedido (packed|invoiced → shipped)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/ship`
+- **Tags:** pedidos
+
+Requires `orders.dispatch`. Part of BP1-1 logistics (#391).
+
+#### Responses
+
+##### Status: 200 Pedido shipped
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/deliver
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/deliver`
+
+### Deliver pedido (shipped|invoiced → delivered)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/deliver`
+- **Tags:** pedidos
+
+Requires `orders.deliver.confirm`. Part of BP1-1 logistics (#391).
+
+#### Responses
+
+##### Status: 200 Pedido delivered
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/collect
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/collect`
+
+### Mark pedido collected when Factura is fully paid
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/collect`
+- **Tags:** pedidos
+
+Requires `sales.create` or `reports.financial.read`. Pedido must be `invoiced` or `delivered` with linked Factura liquidated (#391).
+
+#### Responses
+
+##### Status: 200 Pedido collected
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state or factura not fully paid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/transitions
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/transitions`
+
+### Generic Pedido state transition facade
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/transitions`
+- **Tags:** pedidos
+
+Body with field to (packed, shipped, delivered, invoiced, collected, cancelled, confirmed). When to is invoiced, include PedidoInvoiceInput fields. Server validates adjacency (BP1-1 #391).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`to` (required)**
+
+  `string`, possible values: `"confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
+
+- **`fecha`**
+
+  `string` — Required when to=invoiced
+
+- **`formaPagoId`**
+
+  `integer`
+
+- **`numero`**
+
+  `integer`
+
+- **`prefijo`**
+
+  `string`
+
+- **`tipo`**
+
+  `string`, possible values: `"A", "B"`
+
+**Example:**
+
+```json
+{
+  "to": "confirmed",
+  "fecha": "",
+  "tipo": "A",
+  "numero": 1,
+  "prefijo": "",
+  "formaPagoId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Transition applied
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`estado`**
+
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
+
+  - **`facturaId`**
+
+    `integer`
+
+  - **`id`**
+
+    `integer`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId`**
+
+      `integer`
+
+    - **`cantidad`**
+
+      `integer`
+
+    - **`dscto`**
+
+      `number`
+
+    - **`id`**
+
+      `integer`
+
+    - **`precio`**
+
+      `number`
+
+    - **`subtotal`**
+
+      `number`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`total`**
+
+    `number`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`validUntil`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "estado": "draft",
+    "total": 1,
+    "validUntil": "",
+    "facturaId": 1,
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "precio": 1,
+        "dscto": 1,
+        "subtotal": 1,
+        "additionalProperty": "anything"
+      }
+    ],
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Invalid state transition
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/pedidos/{id}/invoice
 
 - **Method:** `PARAMETERS`
@@ -26920,7 +28152,7 @@ Requires `orders.create`.
 - **Path:** `/api/pedidos/{id}/invoice`
 - **Tags:** pedidos
 
-Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via FacturaService (no CAE in this release).
+Requires `sales.create`. Allowed from `confirmed|packed|shipped|delivered`. From `confirmed`, estado becomes `invoiced`; from logistics states, keeps fulfillment estado and sets `facturaId` (early/late invoice
 
 #### Request Body
 
@@ -26978,7 +28210,7 @@ Requires `sales.create`. Pedido must be `confirmed`. Creates invoice via Factura
 
   - **`estado`**
 
-    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
 
   - **`facturaId`**
 
@@ -111979,7 +113211,7 @@ Originating invoice header (selected columns)
 
 * **`estado`**
 
-  `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+  `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
 
 * **`facturaId`**
 
@@ -112175,6 +113407,47 @@ Originating invoice header (selected columns)
 }
 ```
 
+### PedidoTransitionInput
+
+- **Type:**`object`
+
+* **`to` (required)**
+
+  `string`, possible values: `"confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
+
+* **`fecha`**
+
+  `string` — Required when to=invoiced
+
+* **`formaPagoId`**
+
+  `integer`
+
+* **`numero`**
+
+  `integer`
+
+* **`prefijo`**
+
+  `string`
+
+* **`tipo`**
+
+  `string`, possible values: `"A", "B"`
+
+**Example:**
+
+```json
+{
+  "to": "confirmed",
+  "fecha": "",
+  "tipo": "A",
+  "numero": 1,
+  "prefijo": "",
+  "formaPagoId": 1
+}
+```
+
 ### PedidoEnvelope
 
 - **Type:**`object`
@@ -112193,7 +113466,7 @@ Originating invoice header (selected columns)
 
   - **`estado`**
 
-    `string`, possible values: `"draft", "confirmed", "invoiced", "cancelled"`
+    `string`, possible values: `"draft", "confirmed", "packed", "shipped", "delivered", "invoiced", "collected", "cancelled"`
 
   - **`facturaId`**
 

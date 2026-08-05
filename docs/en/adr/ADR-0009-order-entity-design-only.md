@@ -1,6 +1,6 @@
-# ADR-0009: Order / “Pedido” domain — design and commercial MVP slice
+# ADR-0009: Order / “Pedido” domain — design, MVP, and full BP1-1 lifecycle
 
-**Status:** Accepted (updated 2026-05-18: MVP slice #132 in code; modular gating #223)  
+**Status:** Accepted (updated 2026-08-05: full lifecycle #391; prior MVP #132 + gating #223)  
 **Date:** 2026-05-03  
 **ISO reference:** ISO/IEC 12207 (design vs implementation lifecycle); ISO 9001:2015 clause 8.3 (design and development)
 
@@ -8,44 +8,34 @@
 
 ## Context
 
-Quality docs describe a target lifecycle for **pedido → delivery → collection** (`docs/en/quality/operational-flow-order-delivery-collection.md`). RBAC exposes `orders.*` in [`src/lib/rbac.ts`](../../../../src/lib/rbac.ts).
+Quality docs describe the lifecycle **pedido → delivery → collection** (`docs/en/quality/operational-flow-order-delivery-collection.md`). RBAC exposes `orders.*`.
 
-**Repository evidence (MVP #132):** `Pedido` / `PedidoItem` in [`prisma/schema.prisma`](../../../../prisma/schema.prisma); `GET/POST/PUT/DELETE /api/pedidos` plus `POST .../confirm` and `POST .../invoice` in [`server/routes/registerPedidosRoutes.ts`](../../../../server/routes/registerPedidosRoutes.ts); contract in [`docs/api/openapi.yaml`](../../api/openapi.yaml). States in this slice: `draft`, `confirmed`, `invoiced`, `cancelled` (not the full logistics cycle `packed`…`collected` — backlog #65).
+**Commercial MVP (#132):** `Pedido` / `PedidoItem`; `GET/POST/PUT/DELETE /api/pedidos` plus `confirm` / `invoice`; states `draft`, `confirmed`, `invoiced`, `cancelled`. Paths live under [`apps/server/routes/registerPedidosRoutes.ts`](../../../../apps/server/routes/registerPedidosRoutes.ts).
 
-**Modular gating (#223):** orders require `billing.orders` via `requireModule` and per-tenant `TenantConfig`.
+**Modular gating (#223):** module `billing.orders`.
+
+**Full BP1-1 (#391):** logistics states `packed`, `shipped`, `delivered`, financial close `collected`; endpoints `pack` / `ship` / `deliver` / `collect` / `transitions`; remito/OE → Pedido sync; cobro → `collected` when Factura is fully paid. Design history: GitHub #65 (design-only, closed).
 
 ## Decision
 
-1. **Commercial BP1-1 slice (#132):** persist `Pedido` + `PedidoItem` and expose documented OpenAPI routes with audit actions `pedido_*`.
-2. **Pending (#65 / full BP1-1):** logistics states and pedido→delivery→collection links per the operational-flow doc.
-3. Keep the operational-flow narrative in EN/ES/PT-BR as the target lifecycle reference.
-4. **Channel scope:** optional `x-bizcode-channel` remains orthogonal; order APIs respect `claims.scope.channels` like other authenticated routes.
+1. Persist `Pedido` + `PedidoItem` with `estado` as validated string keys (`draft` … `collected` | `cancelled`) — not a Prisma enum — to avoid migration churn (TS/`pedidoStateMachine` enforce adjacency).
+2. **Early invoice:** `confirmed → invoiced` may run before logistics. Invoicing from `packed|shipped|delivered` sets `facturaId` and **keeps** the logistics `estado`.
+3. `collect` requires linked `facturaId` and Factura fully imputed via recibo de cobro; allowed from `invoiced` or `delivered`.
+4. Cancel only from `draft` | `confirmed`.
+5. Channel scope (`x-bizcode-channel`) remains orthogonal.
 
 ## Consequences
 
-- **Positive:** Contract, tests, and docs match the commercial MVP; per-tenant module gating without Redis (in-process cache, #223).
-- **Negative:** Full diagram lifecycle remains partial until #65.
-
-## Alternatives considered (GitHub #69)
-
-| Option | Rationale | Why not now |
-|--------|-----------|-------------|
-| Flat `estado` string without enum | Faster spike | Harder to enforce transitions and i18n labels consistently. |
-| Event-sourced order log | Full audit of transitions | Heavier operations and read models; defer until product requires replay. |
-| Single wide `Pedido` row with JSON `items` | Fewer tables | Weak relational integrity vs `Articulo`/`Cliente`; Prisma relations preferred when implemented. |
-
-**Chosen path for BP1-1:** relational `Pedido` + `PedidoItem` (sketched, not migrated) with an explicit `PedidoEstado` enum keyed as in the operational-flow doc (`draft` … `collected`).
+- **Positive:** Single Pedido estado spans commercial + logistics + collection; OE/remito/cobros machines stay specialized and sync into Pedido.
+- **Negative:** Dual machines (Pedido vs OE) need careful sync tests; ecommerce origins must keep skip-stock / mark-dispatched behavior.
 
 ## Currency strategy
 
-**Tenant-default currency** for the first implementation slice (see [order-domain-implementation-sketch.md](../quality/order-domain-implementation-sketch.md)). Multi-currency requires a separate ADR if product mandates FX rules.
-
-## State machine (implementation keys)
-
-Authoritative mapping from the UX-facing diagram to persisted/API keys lives in the **Canonical implementation states** section of [`operational-flow-order-delivery-collection.md`](../quality/operational-flow-order-delivery-collection.md) (EN; ES/PT in locale map).
+**Tenant-default currency** for this slice. Multi-currency requires a separate ADR.
 
 ## References
 
-- [`docs/en/quality/operational-flow-order-delivery-collection.md`](../../quality/operational-flow-order-delivery-collection.md)
-- [`docs/en/quality/order-domain-implementation-sketch.md`](../quality/order-domain-implementation-sketch.md)
+- [`docs/en/quality/operational-flow-order-delivery-collection.md`](../quality/operational-flow-order-delivery-collection.md)
+- GitHub #65 (design), #132 (MVP), #223 (gating), #391 (full lifecycle)
 - [`docs/api/openapi.yaml`](../../api/openapi.yaml)
+- [`apps/server/lib/pedidoStateMachine.ts`](../../../../apps/server/lib/pedidoStateMachine.ts)

@@ -58,6 +58,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}) {
         remito: null,
         items: [{ articuloId: 1, cantidad: 2, articulo: { id: 1, descripcion: 'Articulo', umedida: 'UN' } }],
       }),
+      update: vi.fn().mockResolvedValue({ id: 1, estado: 'packed' }),
     },
     factura: {
       findFirst: vi.fn().mockResolvedValue({

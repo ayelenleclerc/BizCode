@@ -67,4 +67,48 @@ describe('PedidoService', () => {
       expect(result.error).toBe('INVOICED_PEDIDO_CANNOT_CANCEL')
     }
   })
+
+  it('packs from confirmed', async () => {
+    vi.mocked(prisma.pedido.findFirst).mockResolvedValue({ id: 1, estado: 'confirmed' } as never)
+    vi.mocked(prisma.pedido.update).mockResolvedValue({ id: 1, estado: 'packed' } as never)
+
+    const result = await service.pack(1, 1)
+
+    expect(result.ok).toBe(true)
+    expect(prisma.pedido.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { estado: 'packed' } }),
+    )
+  })
+
+  it('rejects collect when factura is not fully paid', async () => {
+    const prismaExtended = {
+      ...prisma,
+      factura: {
+        findFirst: vi.fn().mockResolvedValue({
+          id: 9,
+          clienteId: 3,
+          total: { minus: () => ({ lessThanOrEqualTo: () => false }) },
+        }),
+      },
+      reciboCobroImputacion: {
+        aggregate: vi.fn().mockResolvedValue({ _sum: { importe: null } }),
+      },
+      pedido: {
+        ...prisma.pedido,
+        findFirst: vi.fn().mockResolvedValue({
+          id: 1,
+          estado: 'invoiced',
+          facturaId: 9,
+        }),
+      },
+    } as unknown as PrismaClient
+    const svc = new PedidoService(prismaExtended)
+
+    const result = await svc.collect(1, 1)
+
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.error).toBe('FACTURA_NOT_FULLY_PAID')
+    }
+  })
 })

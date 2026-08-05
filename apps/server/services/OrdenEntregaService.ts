@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 import type { OrdenEntregaCreateInput, OrdenEntregaEstado, OrdenEntregaUpdateBody } from '@bizcode/types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
+import { PedidoService } from './PedidoService'
 import type { ServiceResult } from './serviceResults'
 
 export const ORDEN_ENTREGA_ESTADOS: OrdenEntregaEstado[] = [
@@ -308,6 +309,7 @@ export class OrdenEntregaService {
       },
       include: ordenInclude,
     })
+    await this.syncLinkedPedidoFulfillment(tenantId, orden, 'packed')
     return { ok: true, data: mapOrdenEntregaPublic(orden) }
   }
 
@@ -403,6 +405,10 @@ export class OrdenEntregaService {
     if (toEstado === 'in_transit' && fromEstado !== 'in_transit') {
       void this.enqueueTiendanubeMarkDispatchedIfNeeded(tenantId, orden).catch(() => undefined)
       void this.enqueueWooCommerceMarkDispatchedIfNeeded(tenantId, orden).catch(() => undefined)
+      await this.syncLinkedPedidoFulfillment(tenantId, orden, 'shipped')
+    }
+    if (toEstado === 'delivered' && fromEstado !== 'delivered') {
+      await this.syncLinkedPedidoFulfillment(tenantId, orden, 'delivered')
     }
 
     const auditAction =
@@ -414,6 +420,44 @@ export class OrdenEntregaService {
       ok: true,
       data: { orden: mapOrdenEntregaPublic(orden), auditAction, previousEstado: fromEstado },
     }
+  }
+
+  /**
+   * @en Sync Pedido.estado from linked remito/factura when OE advances (#391).
+   * @es Sincroniza Pedido.estado desde remito/factura al avanzar la OE (#391).
+   * @pt-BR Sincroniza Pedido.estado a partir de remito/factura ao avançar a OE (#391).
+   */
+  private async syncLinkedPedidoFulfillment(
+    tenantId: number,
+    orden: OrdenEntregaRow,
+    target: 'packed' | 'shipped' | 'delivered',
+  ): Promise<void> {
+    try {
+      const pedidoId = await this.resolveLinkedPedidoId(tenantId, orden)
+      if (pedidoId == null) return
+      await new PedidoService(this.prisma).syncFulfillmentEstado(tenantId, pedidoId, target)
+    } catch {
+      /* OE transitions must succeed even if Pedido sync cannot run (partial Prisma in tests). */
+    }
+  }
+
+  private async resolveLinkedPedidoId(
+    tenantId: number,
+    orden: OrdenEntregaRow,
+  ): Promise<number | null> {
+    const remito = await this.prisma.remito.findFirst({
+      where: { tenantId, ordenEntregaId: orden.id },
+      select: { pedidoId: true },
+    })
+    if (remito?.pedidoId != null) return remito.pedidoId
+    if (orden.facturaId != null) {
+      const pedido = await this.prisma.pedido.findFirst({
+        where: { tenantId, facturaId: orden.facturaId },
+        select: { id: true },
+      })
+      return pedido?.id ?? null
+    }
+    return null
   }
 
   /**

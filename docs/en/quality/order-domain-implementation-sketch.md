@@ -1,68 +1,34 @@
 # Order (`Pedido`) domain — implementation sketch (BP1-1)
 
-**Design only.** No migration or route in this repository slice is implied by this file. Supersedes nothing; when BP1-1 is executed, replace sketches with real `schema.prisma` and `openapi.yaml` fragments.
+**Superseded for implementation by #391.** Historical Prisma/OpenAPI sketch retained for traceability. Live contract: [`docs/api/openapi.yaml`](../../api/openapi.yaml); machine: [`apps/server/lib/pedidoStateMachine.ts`](../../../apps/server/lib/pedidoStateMachine.ts); ADR-0009.
 
-## Prisma sketch (indicative)
+## Prisma sketch (indicative — historical)
 
 ```prisma
-// SKETCH — not applied. Align field names and enums with operational-flow-order-delivery-collection.md
-// model Pedido {
-//   id          Int      @id @default(autoincrement())
-//   tenantId    Int
-//   estado      PedidoEstado
-//   clienteId   Int
-//   channel     String?  // optional snapshot; authority remains AuthScope + header rules
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-//   items       PedidoItem[]
-//   tenant      Tenant   @relation(fields: [tenantId], references: [id])
-//   cliente     Cliente  @relation(fields: [clienteId], references: [id])
-// }
-//
-// model PedidoItem {
-//   id         Int @id @default(autoincrement())
-//   pedidoId   Int
-//   articuloId Int
-//   cantidad   Decimal
-//   precioUnit Decimal
-//   pedido     Pedido   @relation(fields: [pedidoId], references: [id])
-//   articulo   Articulo @relation(fields: [articuloId], references: [id])
-// }
-//
+// SKETCH — applied as String estado + app validation (#391), not Prisma enum
 // enum PedidoEstado {
-//   draft
-//   confirmed
-//   packed
-//   shipped
-//   delivered
-//   invoiced
-//   collected
+//   draft, confirmed, packed, shipped, delivered, invoiced, collected, cancelled
 // }
 ```
 
-## OpenAPI path sketch (indicative)
+## OpenAPI path sketch → implemented
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| `POST` | `/api/pedidos` | Create in `draft` |
-| `GET` | `/api/pedidos` | List (tenant-scoped, paginated) |
-| `GET` | `/api/pedidos/:id` | Detail + items |
-| `PUT` | `/api/pedidos/:id` | Update while allowed by `estado` |
-| `POST` | `/api/pedidos/:id/transitions` | Body: `{ "to": "confirmed" \| "packed" \| ... }` with server-side validation |
-| `POST` | `/api/pedidos/:id/invoice` | Optional shortcut to create/link `Factura` and set `invoiced` |
+| Method | Path | Status |
+|--------|------|--------|
+| `POST` | `/api/pedidos` | Implemented |
+| `GET` | `/api/pedidos` | Implemented |
+| `GET` | `/api/pedidos/:id` | Implemented |
+| `PUT` | `/api/pedidos/:id` | Implemented |
+| `POST` | `/api/pedidos/:id/transitions` | Implemented (#391) |
+| `POST` | `/api/pedidos/:id/pack\|ship\|deliver\|collect` | Implemented (#391) |
+| `POST` | `/api/pedidos/:id/invoice` | Implemented (early invoice) |
 
-All routes: `requirePermission` with `orders.*` as per [rbac-matrix-roles-permissions-scopes.md](rbac-matrix-roles-permissions-scopes.md); respect `x-bizcode-channel` per [ADR-0009](../adr/ADR-0009-order-entity-design-only.md).
+## Currency strategy
 
-## Currency strategy (decision placeholder)
-
-**Default for MVP:** single **tenant-default currency** on `Tenant` (or reuse existing monetary fields on `Factura`); no multi-currency conversion in the first BP1-1 slice unless product signs off. If multi-currency is required later, add `currency` on `Pedido` + conversion policy ADR.
-
-## Legacy `PEDIDO*.DBF` (optional mapping)
-
-When source files are available under an agreed path, map legacy columns to `Pedido` / `PedidoItem` fields in `scripts/` documentation (see `scripts/MIGRACION_PROGRAMA_VIEJO.md` pattern). Do not hard-code host-specific absolute paths in controlled docs.
+**Tenant-default currency** (ADR-0009).
 
 ## References
 
 - [operational-flow-order-delivery-collection.md](operational-flow-order-delivery-collection.md)
 - [ADR-0009](../adr/ADR-0009-order-entity-design-only.md)
-- [master-plan-bizcode-execution.md](master-plan-bizcode-execution.md)
+- GitHub #391

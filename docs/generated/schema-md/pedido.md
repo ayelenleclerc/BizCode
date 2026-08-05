@@ -97,7 +97,11 @@ undefined#/allOf/0/properties/data/items
 | :------------ | :---------- |
 | `"draft"`     |             |
 | `"confirmed"` |             |
+| `"packed"`    |             |
+| `"shipped"`   |             |
+| `"delivered"` |             |
 | `"invoiced"`  |             |
+| `"collected"` |             |
 | `"cancelled"` |             |
 
 ## facturaId

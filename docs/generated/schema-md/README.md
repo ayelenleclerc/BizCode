@@ -790,6 +790,8 @@
 
 * [PedidoListEnvelope](./pedidolistenvelope.md) – `-`
 
+* [PedidoTransitionInput](./pedidotransitioninput.md) – `-`
+
 * [PeriodoLockEnvelope](./periodolockenvelope.md) – `-`
 
 * [PeriodoLockResult](./periodolockresult.md) – `-`

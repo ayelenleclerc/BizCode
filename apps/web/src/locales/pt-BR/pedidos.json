@@ -20,7 +20,11 @@
     "draft": "Rascunho",
     "confirmed": "Confirmado",
     "invoiced": "Faturado",
-    "cancelled": "Cancelado"
+    "cancelled": "Cancelado",
+    "packed": "Embalado",
+    "shipped": "Despachado",
+    "delivered": "Entregue",
+    "collected": "Cobrado"
   },
   "filterEstado": "Status",
   "filterAll": "Todos",
@@ -100,6 +104,32 @@
       "pedido": "Pedido",
       "total": "Total",
       "actions": "Ações"
+    }
+  },
+  "actions": {
+    "confirm": "Confirmar",
+    "pack": "Embalar",
+    "ship": "Despachar",
+    "deliver": "Entregar",
+    "invoice": "Faturar",
+    "collect": "Cobrar",
+    "cancel": "Cancelar"
+  },
+  "create": {
+    "title": "Novo pedido",
+    "clienteId": "ID do cliente",
+    "descripcion": "Descrição da linha",
+    "cantidad": "Quantidade",
+    "precio": "Preço",
+    "cancel": "Cancelar",
+    "submit": "Criar",
+    "saving": "Salvando…",
+    "errors": {
+      "clienteId": "Cliente inválido",
+      "descripcion": "Descrição obrigatória",
+      "cantidad": "Quantidade inválida",
+      "precio": "Preço inválido",
+      "generic": "Não foi possível criar o pedido"
     }
   }
 }
