@@ -74,6 +74,25 @@ describe('WooCommerceConfigService', () => {
     expect(verifyWooCommerceConnection).not.toHaveBeenCalled()
   })
 
+  it('verifyAndSave rejects private or non-https storeUrl before calling WooCommerce', async () => {
+    const upsert = vi.fn()
+    const prisma = {
+      wooCommerceConfig: { upsert },
+    } as unknown as PrismaClient
+    const result = await new WooCommerceConfigService(prisma).verifyAndSave(1, {
+      storeUrl: 'https://127.0.0.1',
+      consumerKey: 'ck',
+      consumerSecret: 'cs',
+    })
+    expect(result).toEqual({
+      ok: false,
+      status: 400,
+      error: 'storeUrl host is not allowed',
+    })
+    expect(verifyWooCommerceConnection).not.toHaveBeenCalled()
+    expect(upsert).not.toHaveBeenCalled()
+  })
+
   it('verifyAndSave surfaces connection failures without persisting', async () => {
     vi.mocked(verifyWooCommerceConnection).mockRejectedValue(
       Object.assign(new Error('Invalid WooCommerce consumer key/secret'), { status: 401 }),

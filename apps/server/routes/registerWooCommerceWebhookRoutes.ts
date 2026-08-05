@@ -9,7 +9,6 @@ import {
 } from '../services/WooCommerceWebhookService'
 import { WooCommerceConfigService } from '../services/WooCommerceConfigService'
 import { verifyWooCommerceWebhookSignature } from '../lib/woocommerceWebhookSignature'
-import { sanitizeLogField } from '../lib/sanitizeLogField'
 import type { RestRouteContext } from './restRouteTypes'
 
 function headerString(value: string | string[] | undefined): string | null {
@@ -63,13 +62,8 @@ export function registerWooCommerceWebhookRoutes(app: Application, ctx: RestRout
         signatureHeader,
       })
       if (!valid) {
-        console.warn(
-          '[woocommerce-webhook] invalid_signature',
-          'tenant',
-          tenantId,
-          'topic',
-          sanitizeLogField(topic),
-        )
+        // Do not log raw topic/headers (CodeQL js/log-injection); tenantId is numeric.
+        console.warn('[woocommerce-webhook] invalid_signature tenant', tenantId)
         res.status(400).json({ success: false, error: 'Invalid webhook signature' })
         return
       }

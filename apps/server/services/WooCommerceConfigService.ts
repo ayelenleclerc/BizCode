@@ -1,6 +1,10 @@
 import type { PrismaClient } from '@prisma/client'
 import { decryptFiscalSecret, encryptFiscalSecret } from '../fiscal/ar/fiscalSecrets'
 import { verifyWooCommerceConnection } from '../integrations/woocommerce/woocommerceApiClient'
+import {
+  normalizeAndValidateWooCommerceStoreUrl,
+  WooCommerceStoreUrlError,
+} from '../lib/woocommerceStoreUrl'
 import type { ServiceResult } from './serviceResults'
 
 export type WooCommerceConfigStatus = {
@@ -28,7 +32,7 @@ function last4(value: string): string {
 }
 
 function normalizeStoreUrl(raw: string): string {
-  return raw.trim().replace(/\/+$/, '')
+  return normalizeAndValidateWooCommerceStoreUrl(raw)
 }
 
 /**
@@ -78,11 +82,21 @@ export class WooCommerceConfigService {
     tenantId: number,
     input: WooCommerceCredentialsInput,
   ): Promise<ServiceResult<WooCommerceConfigStatus>> {
-    const storeUrl = normalizeStoreUrl(input.storeUrl)
     const consumerKey = input.consumerKey.trim()
     const consumerSecret = input.consumerSecret.trim()
-    if (!storeUrl || !consumerKey || !consumerSecret) {
+    if (!input.storeUrl?.trim() || !consumerKey || !consumerSecret) {
       return { ok: false, status: 400, error: 'storeUrl, consumerKey and consumerSecret are required' }
+    }
+
+    let storeUrl: string
+    try {
+      storeUrl = normalizeStoreUrl(input.storeUrl)
+    } catch (err: unknown) {
+      const message =
+        err instanceof WooCommerceStoreUrlError
+          ? err.message
+          : 'storeUrl must be a valid public https URL'
+      return { ok: false, status: 400, error: message }
     }
 
     try {

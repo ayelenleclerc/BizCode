@@ -68,14 +68,19 @@ export type WooCommerceOrderResponse = {
   line_items?: WooCommerceOrderLineItem[]
 }
 
+import {
+  normalizeAndValidateWooCommerceStoreUrl,
+  normalizeWooCommerceApiPath,
+} from '../../lib/woocommerceStoreUrl'
+
 /**
- * @en Builds the `{storeUrl}/wp-json/wc/v3{path}` URL (#188).
- * @es Construye la URL `{storeUrl}/wp-json/wc/v3{path}` (#188).
- * @pt-BR Constrói a URL `{storeUrl}/wp-json/wc/v3{path}` (#188).
+ * @en Builds the `{storeUrl}/wp-json/wc/v3{path}` URL after HTTPS/public-host validation (#188).
+ * @es Construye la URL `{storeUrl}/wp-json/wc/v3{path}` tras validar HTTPS/host público (#188).
+ * @pt-BR Constrói a URL `{storeUrl}/wp-json/wc/v3{path}` após validar HTTPS/host público (#188).
  */
 export function woocommerceApiUrl(storeUrl: string, path: string): string {
-  const base = storeUrl.trim().replace(/\/+$/, '')
-  const normalized = path.startsWith('/') ? path : `/${path}`
+  const base = normalizeAndValidateWooCommerceStoreUrl(storeUrl)
+  const normalized = normalizeWooCommerceApiPath(path)
   return `${base}/wp-json/wc/v3${normalized}`
 }
 

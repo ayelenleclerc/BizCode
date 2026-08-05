@@ -1196,7 +1196,15 @@ export const woocommerceCredentialsBodySchema = z.object({
     .trim()
     .min(1, 'storeUrl is required')
     .max(255)
-    .url('storeUrl must be a valid URL'),
+    .url('storeUrl must be a valid URL')
+    .refine((value) => {
+      try {
+        const parsed = new URL(value)
+        return parsed.protocol === 'https:'
+      } catch {
+        return false
+      }
+    }, 'storeUrl must use https'),
   consumerKey: z
     .string({ required_error: 'consumerKey is required' })
     .trim()

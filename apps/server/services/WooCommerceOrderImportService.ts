@@ -10,7 +10,6 @@ import {
   getWooCommerceOrder,
   type WooCommerceOrderResponse,
 } from '../integrations/woocommerce/woocommerceApiClient'
-import { sanitizeLogField } from '../lib/sanitizeLogField'
 import { resolveSystemUserId } from '../lib/systemUserId'
 import { notifyManagers } from '../notifications'
 import { bootstrapEcommerceConnectors } from '../integrations/ecommerce/bootstrapEcommerceConnectors'
@@ -97,16 +96,8 @@ export class WooCommerceOrderImportService {
         creds.data.consumerSecret,
         orderId,
       )
-    } catch (err: unknown) {
-      console.warn(
-        '[woocommerce-order-import] order_fetch_error',
-        'tenant',
-        tenantId,
-        'order',
-        sanitizeLogField(orderId),
-        'detail',
-        err instanceof Error ? err.message : err,
-      )
+    } catch {
+      console.warn('[woocommerce-order-import] order_fetch_error tenant', tenantId)
       return
     }
 
@@ -170,15 +161,8 @@ export class WooCommerceOrderImportService {
 
     const created = await this.createPedidoFromOrder(tenantId, order)
     if (!created.ok) {
-      console.warn(
-        '[woocommerce-order-import] pedido_create_failed',
-        'tenant',
-        tenantId,
-        'order',
-        sanitizeLogField(wcOrderId),
-        'error',
-        sanitizeLogField(created.error),
-      )
+      // Numeric tenant only — skip order id / error text (CodeQL js/log-injection).
+      console.warn('[woocommerce-order-import] pedido_create_failed tenant', tenantId)
       return
     }
 
@@ -230,13 +214,10 @@ export class WooCommerceOrderImportService {
       })
       if (!result.ok) {
         console.warn(
-          '[woocommerce-order-import] stock_adjust_failed',
-          'tenant',
+          '[woocommerce-order-import] stock_adjust_failed tenant',
           tenantId,
           'articulo',
           pub.articuloId,
-          'error',
-          sanitizeLogField(result.error),
         )
       } else {
         void this.stockSync.syncStockToWooCommerce(tenantId, pub.articuloId).catch(() => undefined)
@@ -415,10 +396,10 @@ export class WooCommerceOrderImportService {
       const cancelled = await this.pedidos.cancel(tenantId, row.pedidoId)
       if (!cancelled.ok) {
         console.warn(
-          '[woocommerce-order-import] pedido_cancel_failed',
+          '[woocommerce-order-import] pedido_cancel_failed tenant',
+          tenantId,
           'pedido',
           row.pedidoId,
-          sanitizeLogField(cancelled.error),
         )
       }
     }

@@ -5,7 +5,6 @@
  */
 
 import type { PrismaClient } from '@prisma/client'
-import { sanitizeLogField } from '../lib/sanitizeLogField'
 import { WooCommerceOrderImportService } from './WooCommerceOrderImportService'
 import type { WooCommerceOrderResponse } from '../integrations/woocommerce/woocommerceApiClient'
 
@@ -51,13 +50,8 @@ export class WooCommerceWebhookService {
         },
       })
     } catch {
-      console.warn(
-        '[woocommerce-webhook] duplicate_delivery',
-        'tenant',
-        tenantId,
-        'order',
-        sanitizeLogField(orderId),
-      )
+      // Avoid logging untrusted order ids (CodeQL js/log-injection).
+      console.warn('[woocommerce-webhook] duplicate_delivery tenant', tenantId)
       return
     }
 
