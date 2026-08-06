@@ -4,19 +4,24 @@ import { requireMercadoPagoIntegration } from '../middleware/requireMercadoPagoI
 import { mercadopagoTestHttpRateLimiter } from '../middleware/routeRateLimit'
 import { validateBody } from '../middleware/validateBody'
 import { mercadoPagoConfigUpsertBodySchema } from '../schemas/mercadopago'
+import { PaymentProviderConfigService } from '../payments/PaymentProviderConfigService'
 import { MercadoPagoConfigService } from '../services/MercadoPagoConfigService'
 import { MercadoPagoQrService } from '../services/MercadoPagoQrService'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
 
 /**
- * @en Mercado Pago tenant credentials API (#174).
- * @es API de credenciales Mercado Pago por tenant (#174).
- * @pt-BR API de credenciais Mercado Pago por tenant (#174).
+ * @en Mercado Pago tenant credentials API (#174). Compat facade; dual-writes via
+ *   PaymentProviderConfigService (#377).
+ * @es API de credenciales Mercado Pago por tenant (#174). Fachada de compatibilidad;
+ *   dual-write vía PaymentProviderConfigService (#377).
+ * @pt-BR API de credenciais Mercado Pago por tenant (#174). Fachada de compatibilidade;
+ *   dual-write via PaymentProviderConfigService (#377).
  */
 export function registerMercadoPagoRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma, writeAudit } = ctx
-  const mpConfig = new MercadoPagoConfigService(prisma)
+  const mpConfig = new PaymentProviderConfigService(prisma)
+  const mpLegacyConfig = new MercadoPagoConfigService(prisma)
   const mpQr = new MercadoPagoQrService(prisma)
   const requireMp = requireMercadoPagoIntegration(prisma)
 
@@ -26,7 +31,7 @@ export function registerMercadoPagoRoutes(app: Application, ctx: RestRouteContex
     requireMp,
     async (req: Request, res: Response) => {
       try {
-        const data = await mpConfig.getStatus(getTenantId(req))
+        const data = await mpConfig.getMercadoPagoConfigStatus(getTenantId(req))
         res.json({ success: true, data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
@@ -51,7 +56,7 @@ export function registerMercadoPagoRoutes(app: Application, ctx: RestRouteContex
           externalPosId?: string
           staticQrData?: string
         }
-        const result = await mpConfig.upsert(getTenantId(req), body)
+        const result = await mpConfig.upsertMercadoPagoConfig(getTenantId(req), body)
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return
@@ -81,7 +86,7 @@ export function registerMercadoPagoRoutes(app: Application, ctx: RestRouteContex
     mercadopagoTestHttpRateLimiter,
     async (req: Request, res: Response) => {
       try {
-        const result = await mpConfig.testCredentials(getTenantId(req))
+        const result = await mpLegacyConfig.testCredentials(getTenantId(req))
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })
           return

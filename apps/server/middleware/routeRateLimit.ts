@@ -468,6 +468,18 @@ export const fiscalMutationHttpRateLimiter = createRouteLimiter({
   storePrefix: 'mut-fiscal',
 })
 
+/**
+ * @en Per-IP rate limit for payment provider config/checkout mutations (#377); visible to CodeQL.
+ * @es Límite por IP para mutaciones de config/checkout de pagos (#377); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações de config/checkout de pagamentos (#377); visível ao CodeQL.
+ */
+export const paymentsMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'mut-payments',
+})
+
 function runLimiterChain(
   req: Request,
   res: Response,

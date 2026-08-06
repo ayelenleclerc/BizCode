@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "checkoutUrl": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "preferenceId": {
+          "type": "string"
+        },
+        "provider": {
+          "$ref": "./PaymentProviderCode.schema.json"
+        },
+        "providerStatus": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "provider"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "PaymentCheckoutEnvelope",
+  "type": "object"
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "accessTokenLast4": {
+      "type": "string"
+    },
+    "capabilities": {
+      "$ref": "./PaymentProviderCapabilities.schema.json"
+    },
+    "configured": {
+      "type": "boolean"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "environment": {
+      "enum": [
+        "sandbox",
+        "production"
+      ],
+      "type": "string"
+    },
+    "isDefault": {
+      "type": "boolean"
+    },
+    "lastValidationAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "provider": {
+      "$ref": "./PaymentProviderCode.schema.json"
+    },
+    "publicKey": {
+      "type": "string"
+    },
+    "validationStatus": {
+      "nullable": true,
+      "type": "string"
+    },
+    "webhookSecretSet": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "provider",
+    "capabilities",
+    "configured",
+    "enabled",
+    "isDefault"
+  ],
+  "title": "PaymentProviderStatusEntry",
+  "type": "object"
+}

@@ -15,7 +15,7 @@ import PrintDevicesSection from './PrintDevicesSection'
 import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
 import FiscalRetencionesSection from './FiscalRetencionesSection'
 import PortalConfigSection from './PortalConfigSection'
-import MercadoPagoConfigSection from './MercadoPagoConfigSection'
+import PaymentProviderSection from './PaymentProviderSection'
 import MeliConfigSection from './MeliConfigSection'
 import TiendanubeConfigSection from './TiendanubeConfigSection'
 import WooCommerceConfigSection from './WooCommerceConfigSection'
@@ -566,7 +566,7 @@ export default function EmpresaPage() {
       </form>
 
       <FiscalProviderSection />
-      <MercadoPagoConfigSection />
+      <PaymentProviderSection />
       <MeliConfigSection />
       <TiendanubeConfigSection />
       <WooCommerceConfigSection />

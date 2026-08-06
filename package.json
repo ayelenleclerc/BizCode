@@ -84,6 +84,8 @@
     "arca:retry-pending-job": "tsx scripts/arca-retry-pending-job.ts",
     "fiscal:migrate-provider-config": "tsx scripts/migrate-fiscal-provider-config-378.ts",
     "fiscal:verify-provider-migration": "tsx scripts/verify-fiscal-provider-migration.ts",
+    "payments:migrate-provider-config": "tsx scripts/migrate-payment-provider-config-377.ts",
+    "payments:verify-provider-migration": "tsx scripts/verify-payment-provider-migration.ts",
     "shipping:tracking-refresh": "tsx scripts/shipping-tracking-refresh-job.ts",
     "backfill:cliente-cc": "tsx scripts/backfill-cliente-cc.ts",
     "inspect:dbf-all": "tsx scripts/inspect-dbf-all.ts",

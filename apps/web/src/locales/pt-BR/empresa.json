@@ -59,6 +59,18 @@
       "loadFailed": "Não foi possível carregar os provedores fiscais"
     }
   },
+  "paymentProviders": {
+    "title": "Cobranças (multi-provedor)",
+    "subtitle": "Mercado Pago é o único provedor live hoje; Payway e Stripe são stubs de capacidades até existir um adapter real.",
+    "loading": "Carregando provedores de pagamento…",
+    "defaultBadge": "Padrão",
+    "configuredBadge": "Configurado",
+    "notConfiguredBadge": "Não configurado",
+    "notImplementedBadge": "Não disponível nesta versão",
+    "errors": {
+      "loadFailed": "Não foi possível carregar os provedores de pagamento"
+    }
+  },
   "arca": {
     "title": "Faturamento eletrônico ARCA (CAE)",
     "subtitle": "Homologação mock — credenciais criptografadas; certificado e chave não são exibidos após salvar.",

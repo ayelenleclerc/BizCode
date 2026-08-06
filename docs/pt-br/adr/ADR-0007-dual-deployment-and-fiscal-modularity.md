@@ -34,3 +34,5 @@ Opções consideradas:
 - [visao-produto-e-implantacao.md](../quality/visao-produto-e-implantacao.md) (PROD-VISION-001)
 - [arquitetura.md](../arquitetura.md)
 - [CONTRIBUTING.md](../../../CONTRIBUTING.md)
+- [ADR-0018: Nota fiscal eletrônica multi-organismo](ADR-0018-fiscal-multi-organism-e-invoicing.md)
+- [ADR-0019: Cobranças multi-provedor](ADR-0019-payments-multi-provider.md)

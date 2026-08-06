@@ -1653,6 +1653,7 @@ model Tenant {
   portalMagicLinks                 PortalMagicLink[]
   portalSessions                   PortalSession[]
   mercadoPagoConfig                MercadoPagoConfig?
+  paymentProviderConfigs           PaymentProviderConfig[]
   mercadoPagoProcessedPayments     MercadoPagoProcessedPayment[]
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds               MercadoPagoRefund[]
@@ -1802,6 +1803,39 @@ model MercadoPagoConfig {
   staticQrData           String?  @db.Text
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+}
+
+/// @en Multi-provider payment configuration per tenant (#377, ADR-0019). Legacy `MercadoPagoConfig`
+///   is kept for dual-read/write during the transition; `mercadopago` rows are backfilled from it.
+/// @es Configuraci\u00f3n de proveedor de pagos multi-proveedor por tenant (#377, ADR-0019).
+///   `MercadoPagoConfig` se conserva para lectura/escritura dual; las filas `mercadopago` se migran desde ah\u00ed.
+/// @pt-BR Configura\u00e7\u00e3o de provedor de pagamentos multi-provedor por tenant (#377, ADR-0019).
+///   `MercadoPagoConfig` \u00e9 mantido para leitura/escrita dupla; as linhas `mercadopago` s\u00e3o migradas dele.
+model PaymentProviderConfig {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  /// mercadopago | payway | stripe (PaymentProviderCode)
+  providerCode     String    @db.VarChar(30)
+  /// sandbox | production
+  environment      String    @default("sandbox") @db.VarChar(20)
+  enabled          Boolean   @default(true)
+  isDefault        Boolean   @default(false)
+  /// @en AES-256-GCM ciphertext of provider-specific JSON secrets (encryptFiscalSecret).
+  encryptedConfig  String    @db.Text
+  accessTokenLast4 String?   @db.VarChar(4)
+  publicKey        String?   @db.VarChar(120)
+  webhookSecretSet Boolean   @default(false)
+  configVersion    Int       @default(1)
+  lastValidationAt DateTime?
+  validationStatus String?   @db.VarChar(20)
+  validationError  String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([tenantId, providerCode])
+  @@index([tenantId])
+  @@index([providerCode])
 }
 
 /// MercadoLibre OAuth tokens per tenant (#183); access/refresh encrypted at rest.

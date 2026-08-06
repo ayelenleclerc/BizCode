@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "accessToken": {
+      "type": "string"
+    },
+    "activo": {
+      "type": "boolean"
+    },
+    "collectorId": {
+      "type": "string"
+    },
+    "externalPosId": {
+      "type": "string"
+    },
+    "provider": {
+      "$ref": "./PaymentProviderCode.schema.json"
+    },
+    "publicKey": {
+      "type": "string"
+    },
+    "sandboxMode": {
+      "type": "boolean"
+    },
+    "staticQrData": {
+      "type": "string"
+    },
+    "webhookSecret": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "provider"
+  ],
+  "title": "PaymentProviderConfigInput",
+  "type": "object"
+}

@@ -59,6 +59,18 @@
       "loadFailed": "Could not load fiscal providers"
     }
   },
+  "paymentProviders": {
+    "title": "Payments (multi-provider)",
+    "subtitle": "Mercado Pago is the only live provider today; Payway and Stripe are capability-only stubs until a live adapter is implemented.",
+    "loading": "Loading payment providers…",
+    "defaultBadge": "Default",
+    "configuredBadge": "Configured",
+    "notConfiguredBadge": "Not configured",
+    "notImplementedBadge": "Not available in this build",
+    "errors": {
+      "loadFailed": "Could not load payment providers"
+    }
+  },
   "arca": {
     "title": "ARCA electronic invoicing (CAE)",
     "subtitle": "Homologación mock — credentials encrypted at rest; certificate and key are never shown after save.",

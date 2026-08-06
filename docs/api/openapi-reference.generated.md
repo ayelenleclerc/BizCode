@@ -23973,6 +23973,954 @@ Requires `sales.create`. Resolves the tenant's default fiscal provider (`arca_ws
 }
 ```
 
+### Multi-provider payment provider status per tenant (#377)
+
+- **Method:** `GET`
+- **Path:** `/api/payments/providers/config`
+- **Tags:** payments
+
+Requires `settings.business.manage`. Lists every registered provider (`mercadopago`, `payway`, `stripe`) with capabilities and configuration status. Never returns access tokens or webhook secrets.
+
+#### Responses
+
+##### Status: 200 Provider status list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`capabilities` (required)**
+
+    `object`
+
+    - **`displayName` (required)**
+
+      `string`
+
+    - **`implemented` (required)**
+
+      `boolean`
+
+    - **`provider` (required)**
+
+      `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+    - **`supportsCancellation` (required)**
+
+      `boolean`
+
+    - **`supportsCheckoutUrl` (required)**
+
+      `boolean`
+
+    - **`supportsEmbeddedCheckout` (required)**
+
+      `boolean`
+
+    - **`supportsOAuth` (required)**
+
+      `boolean`
+
+    - **`supportsPartialRefunds` (required)**
+
+      `boolean`
+
+    - **`supportsQr` (required)**
+
+      `boolean`
+
+    - **`supportsRecurringPayments` (required)**
+
+      `boolean`
+
+    - **`supportsRefunds` (required)**
+
+      `boolean`
+
+    - **`supportsSandbox` (required)**
+
+      `boolean`
+
+    - **`notes`**
+
+      `string`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`isDefault` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`environment`**
+
+    `string`, possible values: `"sandbox", "production"`
+
+  - **`lastValidationAt`**
+
+    `string`, format: `date-time`
+
+  - **`publicKey`**
+
+    `string`
+
+  - **`validationStatus`**
+
+    `string`
+
+  - **`webhookSecretSet`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "provider": "mercadopago",
+      "capabilities": {
+        "provider": "mercadopago",
+        "displayName": "",
+        "implemented": true,
+        "supportsCheckoutUrl": true,
+        "supportsEmbeddedCheckout": true,
+        "supportsQr": true,
+        "supportsRefunds": true,
+        "supportsPartialRefunds": true,
+        "supportsCancellation": true,
+        "supportsRecurringPayments": true,
+        "supportsOAuth": true,
+        "supportsSandbox": true,
+        "notes": ""
+      },
+      "configured": true,
+      "enabled": true,
+      "isDefault": true,
+      "environment": "sandbox",
+      "accessTokenLast4": "",
+      "publicKey": "",
+      "webhookSecretSet": true,
+      "lastValidationAt": "",
+      "validationStatus": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upsert payment provider configuration (#377)
+
+- **Method:** `PUT`
+- **Path:** `/api/payments/providers/config`
+- **Tags:** payments
+
+Requires `settings.business.manage`. Only `provider: mercadopago` is implemented today (dual-writes the legacy `/api/configuracion/mercadopago` table); other providers return 501.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`provider` (required)**
+
+  `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+- **`accessToken`**
+
+  `string`
+
+- **`activo`**
+
+  `boolean`
+
+- **`collectorId`**
+
+  `string`
+
+- **`externalPosId`**
+
+  `string`
+
+- **`publicKey`**
+
+  `string`
+
+- **`sandboxMode`**
+
+  `boolean`
+
+- **`staticQrData`**
+
+  `string`
+
+- **`webhookSecret`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "provider": "mercadopago",
+  "accessToken": "",
+  "publicKey": "",
+  "webhookSecret": "",
+  "sandboxMode": true,
+  "activo": true,
+  "collectorId": "",
+  "externalPosId": "",
+  "staticQrData": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 501 Provider not implemented (capability stub)
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Validate stored credentials for a payment provider (#377)
+
+- **Method:** `POST`
+- **Path:** `/api/payments/providers/validate`
+- **Tags:** payments
+
+Requires `settings.business.manage`. Never returns secrets.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`provider` (required)**
+
+  `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+**Example:**
+
+```json
+{
+  "provider": "mercadopago"
+}
+```
+
+#### Responses
+
+##### Status: 200 Validation outcome
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`accountName`**
+
+    `string`
+
+  - **`healthy`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "healthy": true,
+    "accountName": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Provider not registered
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Static capability declaration for every registered payment provider (#377)
+
+- **Method:** `GET`
+- **Path:** `/api/payments/providers/capabilities`
+- **Tags:** payments
+
+Requires `settings.business.manage`. No tenant context; `mercadopago` is the only provider with `implemented: true` today — `payway` and `stripe` are capability-only stubs (Not evidenced in current codebase — no live PSP client).
+
+#### Responses
+
+##### Status: 200 Capability list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`displayName` (required)**
+
+    `string`
+
+  - **`implemented` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+  - **`supportsCancellation` (required)**
+
+    `boolean`
+
+  - **`supportsCheckoutUrl` (required)**
+
+    `boolean`
+
+  - **`supportsEmbeddedCheckout` (required)**
+
+    `boolean`
+
+  - **`supportsOAuth` (required)**
+
+    `boolean`
+
+  - **`supportsPartialRefunds` (required)**
+
+    `boolean`
+
+  - **`supportsQr` (required)**
+
+    `boolean`
+
+  - **`supportsRecurringPayments` (required)**
+
+    `boolean`
+
+  - **`supportsRefunds` (required)**
+
+    `boolean`
+
+  - **`supportsSandbox` (required)**
+
+    `boolean`
+
+  - **`notes`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "provider": "mercadopago",
+      "displayName": "",
+      "implemented": true,
+      "supportsCheckoutUrl": true,
+      "supportsEmbeddedCheckout": true,
+      "supportsQr": true,
+      "supportsRefunds": true,
+      "supportsPartialRefunds": true,
+      "supportsCancellation": true,
+      "supportsRecurringPayments": true,
+      "supportsOAuth": true,
+      "supportsSandbox": true,
+      "notes": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create checkout preference for an invoice (#377)
+
+- **Method:** `POST`
+- **Path:** `/api/payments/invoices/{facturaId}/checkout`
+- **Tags:** payments
+
+Requires `sales.create`. Resolves the tenant's default payment provider (`mercadopago` today) and delegates to its adapter. Generalizes `POST /api/facturas/{id}/mp/preference`.
+
+#### Responses
+
+##### Status: 200 Checkout outcome
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`amount`**
+
+    `number`
+
+  - **`checkoutUrl`**
+
+    `string`
+
+  - **`currency`**
+
+    `string`
+
+  - **`expiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`preferenceId`**
+
+    `string`
+
+  - **`providerStatus`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "",
+    "provider": "mercadopago",
+    "preferenceId": "",
+    "checkoutUrl": "",
+    "expiresAt": "",
+    "providerStatus": "",
+    "amount": 1,
+    "currency": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice or payment provider not configured
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 501 Provider not implemented
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/fiscal/regimenes
 
 - **Method:** `PARAMETERS`
@@ -114531,6 +115479,656 @@ Originating invoice header (selected columns)
   "success": true,
   "data": {
     "configured": true
+  }
+}
+```
+
+### PaymentProviderCode
+
+- **Type:**`string`
+
+**Example:**
+
+### PaymentProviderCapabilities
+
+- **Type:**`object`
+
+* **`displayName` (required)**
+
+  `string`
+
+* **`implemented` (required)**
+
+  `boolean`
+
+* **`provider` (required)**
+
+  `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+* **`supportsCancellation` (required)**
+
+  `boolean`
+
+* **`supportsCheckoutUrl` (required)**
+
+  `boolean`
+
+* **`supportsEmbeddedCheckout` (required)**
+
+  `boolean`
+
+* **`supportsOAuth` (required)**
+
+  `boolean`
+
+* **`supportsPartialRefunds` (required)**
+
+  `boolean`
+
+* **`supportsQr` (required)**
+
+  `boolean`
+
+* **`supportsRecurringPayments` (required)**
+
+  `boolean`
+
+* **`supportsRefunds` (required)**
+
+  `boolean`
+
+* **`supportsSandbox` (required)**
+
+  `boolean`
+
+* **`notes`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "provider": "mercadopago",
+  "displayName": "",
+  "implemented": true,
+  "supportsCheckoutUrl": true,
+  "supportsEmbeddedCheckout": true,
+  "supportsQr": true,
+  "supportsRefunds": true,
+  "supportsPartialRefunds": true,
+  "supportsCancellation": true,
+  "supportsRecurringPayments": true,
+  "supportsOAuth": true,
+  "supportsSandbox": true,
+  "notes": ""
+}
+```
+
+### PaymentProviderCapabilitiesListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`displayName` (required)**
+
+    `string`
+
+  - **`implemented` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+  - **`supportsCancellation` (required)**
+
+    `boolean`
+
+  - **`supportsCheckoutUrl` (required)**
+
+    `boolean`
+
+  - **`supportsEmbeddedCheckout` (required)**
+
+    `boolean`
+
+  - **`supportsOAuth` (required)**
+
+    `boolean`
+
+  - **`supportsPartialRefunds` (required)**
+
+    `boolean`
+
+  - **`supportsQr` (required)**
+
+    `boolean`
+
+  - **`supportsRecurringPayments` (required)**
+
+    `boolean`
+
+  - **`supportsRefunds` (required)**
+
+    `boolean`
+
+  - **`supportsSandbox` (required)**
+
+    `boolean`
+
+  - **`notes`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "provider": "mercadopago",
+      "displayName": "",
+      "implemented": true,
+      "supportsCheckoutUrl": true,
+      "supportsEmbeddedCheckout": true,
+      "supportsQr": true,
+      "supportsRefunds": true,
+      "supportsPartialRefunds": true,
+      "supportsCancellation": true,
+      "supportsRecurringPayments": true,
+      "supportsOAuth": true,
+      "supportsSandbox": true,
+      "notes": ""
+    }
+  ]
+}
+```
+
+### PaymentProviderStatusEntry
+
+- **Type:**`object`
+
+* **`capabilities` (required)**
+
+  `object`
+
+  - **`displayName` (required)**
+
+    `string`
+
+  - **`implemented` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+  - **`supportsCancellation` (required)**
+
+    `boolean`
+
+  - **`supportsCheckoutUrl` (required)**
+
+    `boolean`
+
+  - **`supportsEmbeddedCheckout` (required)**
+
+    `boolean`
+
+  - **`supportsOAuth` (required)**
+
+    `boolean`
+
+  - **`supportsPartialRefunds` (required)**
+
+    `boolean`
+
+  - **`supportsQr` (required)**
+
+    `boolean`
+
+  - **`supportsRecurringPayments` (required)**
+
+    `boolean`
+
+  - **`supportsRefunds` (required)**
+
+    `boolean`
+
+  - **`supportsSandbox` (required)**
+
+    `boolean`
+
+  - **`notes`**
+
+    `string`
+
+* **`configured` (required)**
+
+  `boolean`
+
+* **`enabled` (required)**
+
+  `boolean`
+
+* **`isDefault` (required)**
+
+  `boolean`
+
+* **`provider` (required)**
+
+  `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+* **`accessTokenLast4`**
+
+  `string`
+
+* **`environment`**
+
+  `string`, possible values: `"sandbox", "production"`
+
+* **`lastValidationAt`**
+
+  `string`, format: `date-time`
+
+* **`publicKey`**
+
+  `string`
+
+* **`validationStatus`**
+
+  `string`
+
+* **`webhookSecretSet`**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "provider": "mercadopago",
+  "capabilities": {
+    "provider": "mercadopago",
+    "displayName": "",
+    "implemented": true,
+    "supportsCheckoutUrl": true,
+    "supportsEmbeddedCheckout": true,
+    "supportsQr": true,
+    "supportsRefunds": true,
+    "supportsPartialRefunds": true,
+    "supportsCancellation": true,
+    "supportsRecurringPayments": true,
+    "supportsOAuth": true,
+    "supportsSandbox": true,
+    "notes": ""
+  },
+  "configured": true,
+  "enabled": true,
+  "isDefault": true,
+  "environment": "sandbox",
+  "accessTokenLast4": "",
+  "publicKey": "",
+  "webhookSecretSet": true,
+  "lastValidationAt": "",
+  "validationStatus": ""
+}
+```
+
+### PaymentProviderStatusListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`capabilities` (required)**
+
+    `object`
+
+    - **`displayName` (required)**
+
+      `string`
+
+    - **`implemented` (required)**
+
+      `boolean`
+
+    - **`provider` (required)**
+
+      `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+    - **`supportsCancellation` (required)**
+
+      `boolean`
+
+    - **`supportsCheckoutUrl` (required)**
+
+      `boolean`
+
+    - **`supportsEmbeddedCheckout` (required)**
+
+      `boolean`
+
+    - **`supportsOAuth` (required)**
+
+      `boolean`
+
+    - **`supportsPartialRefunds` (required)**
+
+      `boolean`
+
+    - **`supportsQr` (required)**
+
+      `boolean`
+
+    - **`supportsRecurringPayments` (required)**
+
+      `boolean`
+
+    - **`supportsRefunds` (required)**
+
+      `boolean`
+
+    - **`supportsSandbox` (required)**
+
+      `boolean`
+
+    - **`notes`**
+
+      `string`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`isDefault` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+  - **`accessTokenLast4`**
+
+    `string`
+
+  - **`environment`**
+
+    `string`, possible values: `"sandbox", "production"`
+
+  - **`lastValidationAt`**
+
+    `string`, format: `date-time`
+
+  - **`publicKey`**
+
+    `string`
+
+  - **`validationStatus`**
+
+    `string`
+
+  - **`webhookSecretSet`**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "provider": "mercadopago",
+      "capabilities": {
+        "provider": "mercadopago",
+        "displayName": "",
+        "implemented": true,
+        "supportsCheckoutUrl": true,
+        "supportsEmbeddedCheckout": true,
+        "supportsQr": true,
+        "supportsRefunds": true,
+        "supportsPartialRefunds": true,
+        "supportsCancellation": true,
+        "supportsRecurringPayments": true,
+        "supportsOAuth": true,
+        "supportsSandbox": true,
+        "notes": ""
+      },
+      "configured": true,
+      "enabled": true,
+      "isDefault": true,
+      "environment": "sandbox",
+      "accessTokenLast4": "",
+      "publicKey": "",
+      "webhookSecretSet": true,
+      "lastValidationAt": "",
+      "validationStatus": ""
+    }
+  ]
+}
+```
+
+### PaymentProviderConfigInput
+
+- **Type:**`object`
+
+* **`provider` (required)**
+
+  `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+* **`accessToken`**
+
+  `string`
+
+* **`activo`**
+
+  `boolean`
+
+* **`collectorId`**
+
+  `string`
+
+* **`externalPosId`**
+
+  `string`
+
+* **`publicKey`**
+
+  `string`
+
+* **`sandboxMode`**
+
+  `boolean`
+
+* **`staticQrData`**
+
+  `string`
+
+* **`webhookSecret`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "provider": "mercadopago",
+  "accessToken": "",
+  "publicKey": "",
+  "webhookSecret": "",
+  "sandboxMode": true,
+  "activo": true,
+  "collectorId": "",
+  "externalPosId": "",
+  "staticQrData": ""
+}
+```
+
+### PaymentProviderValidateInput
+
+- **Type:**`object`
+
+* **`provider` (required)**
+
+  `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+**Example:**
+
+```json
+{
+  "provider": "mercadopago"
+}
+```
+
+### PaymentProviderValidateEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`accountName`**
+
+    `string`
+
+  - **`healthy`**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true,
+    "healthy": true,
+    "accountName": ""
+  }
+}
+```
+
+### ApiSuccessConfiguredEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+### PaymentCheckoutEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`amount`**
+
+    `number`
+
+  - **`checkoutUrl`**
+
+    `string`
+
+  - **`currency`**
+
+    `string`
+
+  - **`expiresAt`**
+
+    `string`, format: `date-time`
+
+  - **`preferenceId`**
+
+    `string`
+
+  - **`providerStatus`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "",
+    "provider": "mercadopago",
+    "preferenceId": "",
+    "checkoutUrl": "",
+    "expiresAt": "",
+    "providerStatus": "",
+    "amount": 1,
+    "currency": ""
   }
 }
 ```
