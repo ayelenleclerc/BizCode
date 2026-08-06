@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "capabilities": {
+      "$ref": "./FiscalProviderCapabilities.schema.json"
+    },
+    "configured": {
+      "type": "boolean"
+    },
+    "countryCode": {
+      "type": "string"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "environment": {
+      "enum": [
+        "homologacion",
+        "produccion"
+      ],
+      "type": "string"
+    },
+    "isDefault": {
+      "type": "boolean"
+    },
+    "lastValidationAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "legalName": {
+      "type": "string"
+    },
+    "pointOfSale": {
+      "type": "string"
+    },
+    "provider": {
+      "$ref": "./FiscalProviderCode.schema.json"
+    },
+    "taxIdentifier": {
+      "type": "string"
+    },
+    "validationStatus": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "provider",
+    "countryCode",
+    "capabilities",
+    "configured",
+    "enabled",
+    "isDefault"
+  ],
+  "title": "FiscalProviderStatusEntry",
+  "type": "object"
+}

@@ -44,6 +44,8 @@ tags:
     description: Credit notes (invoice void flow, module billing.credit_notes, #146)
   - name: afip
     description: Argentina AFIP electronic invoicing (CAE; homologación mock in dev)
+  - name: fiscal
+    description: Multi-organism fiscal e-invoicing — provider config, capabilities and document authorization (#378, ADR-0018)
   - name: pedidos
     description: Commercial orders and quotes (ADR-0009)
   - name: contratos
@@ -3705,6 +3707,165 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/providers/config:
+    get:
+      tags: [fiscal]
+      summary: Multi-organism fiscal provider status per tenant (#378)
+      description: |
+        Requires `settings.fiscal.manage`. Lists every registered provider (`arca_wsfe`,
+        `uruguay_dgi`, `mexico_sat_pac`) with capabilities and configuration status.
+        Never returns certificate/private key material.
+      responses:
+        '200':
+          description: Provider status list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalProviderStatusListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [fiscal]
+      summary: Upsert fiscal provider configuration (#378)
+      description: |
+        Requires `settings.fiscal.manage`. Only `provider: arca_wsfe` is implemented today
+        (dual-writes the legacy `/api/arca/config` table); other providers return 501.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FiscalProviderConfigInput'
+      responses:
+        '200':
+          description: Config saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArcaConfigEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '501':
+          description: Provider not implemented (capability stub)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/providers/validate:
+    post:
+      tags: [fiscal]
+      summary: Validate stored credentials for a fiscal provider (#378)
+      description: Requires `settings.fiscal.manage`. Records `lastValidationAt`/`validationStatus`; never returns secrets.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FiscalProviderValidateInput'
+      responses:
+        '200':
+          description: Validation outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalProviderValidateEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Provider not registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/providers/capabilities:
+    get:
+      tags: [fiscal]
+      summary: Static capability declaration for every registered fiscal provider (#378)
+      description: |
+        Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe` is the only
+        provider with `implemented: true` today — `uruguay_dgi` and `mexico_sat_pac` are
+        capability-only stubs (Not evidenced in current codebase — no live SOAP/REST client).
+      responses:
+        '200':
+          description: Capability list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalProviderCapabilitiesListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/documents/{facturaId}/authorize:
+    post:
+      tags: [fiscal]
+      summary: Authorize a fiscal document for an invoice (#378)
+      description: |
+        Requires `sales.create`. Resolves the tenant's default fiscal provider
+        (`arca_wsfe` today) and delegates to its adapter; idempotent by
+        `{provider}:factura:{facturaId}`. Generalizes `POST /api/arca/cae`.
+      parameters:
+        - name: facturaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Authorization outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalDocumentAuthorizeEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Factura or fiscal config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Fiscal provider not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '502':
+          description: Provider authorization request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -21349,6 +21510,121 @@ components:
           properties:
             cae: { type: string }
             caeVto: { type: string, format: date-time }
+
+    FiscalProviderCode:
+      type: string
+      enum: [arca_wsfe, uruguay_dgi, mexico_sat_pac]
+
+    FiscalProviderCapabilities:
+      type: object
+      required:
+        - provider
+        - countryCode
+        - displayName
+        - implemented
+        - supportsInvoice
+        - supportsCreditNote
+        - supportsCancel
+        - supportsHealthCheck
+        - supportsLastAuthorizedNumber
+      properties:
+        provider:
+          $ref: '#/components/schemas/FiscalProviderCode'
+        countryCode: { type: string }
+        displayName: { type: string }
+        implemented: { type: boolean }
+        supportsInvoice: { type: boolean }
+        supportsCreditNote: { type: boolean }
+        supportsCancel: { type: boolean }
+        supportsHealthCheck: { type: boolean }
+        supportsLastAuthorizedNumber: { type: boolean }
+        notes: { type: string }
+
+    FiscalProviderCapabilitiesListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalProviderCapabilities'
+
+    FiscalProviderStatusEntry:
+      type: object
+      required: [provider, countryCode, capabilities, configured, enabled, isDefault]
+      properties:
+        provider:
+          $ref: '#/components/schemas/FiscalProviderCode'
+        countryCode: { type: string }
+        capabilities:
+          $ref: '#/components/schemas/FiscalProviderCapabilities'
+        configured: { type: boolean }
+        enabled: { type: boolean }
+        isDefault: { type: boolean }
+        environment: { type: string, enum: [homologacion, produccion] }
+        taxIdentifier: { type: string }
+        legalName: { type: string }
+        pointOfSale: { type: string }
+        lastValidationAt: { type: string, format: date-time, nullable: true }
+        validationStatus: { type: string, nullable: true }
+
+    FiscalProviderStatusListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalProviderStatusEntry'
+
+    FiscalProviderConfigInput:
+      type: object
+      required: [provider]
+      properties:
+        provider:
+          $ref: '#/components/schemas/FiscalProviderCode'
+        cuit: { type: string }
+        certificate: { type: string }
+        privateKey: { type: string }
+        ambiente:
+          type: string
+          enum: [homologacion, produccion]
+
+    FiscalProviderValidateInput:
+      type: object
+      required: [provider]
+      properties:
+        provider:
+          $ref: '#/components/schemas/FiscalProviderCode'
+
+    FiscalProviderValidateEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [configured]
+          properties:
+            configured: { type: boolean }
+
+    FiscalDocumentAuthorizeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [fiscalDocumentId, status, provider]
+          properties:
+            fiscalDocumentId: { type: integer }
+            status: { type: string, enum: [pending, authorized, rejected, failed] }
+            authorizationCode: { type: string }
+            authorizationExpiresAt: { type: string, format: date-time }
+            provider:
+              $ref: '#/components/schemas/FiscalProviderCode'
 
     PedidoItem:
       type: object

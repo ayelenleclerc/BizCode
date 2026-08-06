@@ -38,6 +38,18 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       }),
       upsert: vi.fn().mockResolvedValue({ id: 1 }),
     },
+    fiscalProviderConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      findFirst: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      upsert: vi.fn().mockResolvedValue({ id: 1, isDefault: true, configVersion: 1 }),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+    },
+    fiscalDocument: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 1, ...data })),
+      update: vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 1, ...data })),
+    },
     padronA4Cache: {
       findUnique: vi.fn(async ({ where }: { where: { tenantId_cuit: { tenantId: number; cuit: string } } }) => {
         const key = `${where.tenantId_cuit.tenantId}:${where.tenantId_cuit.cuit}`

@@ -404,6 +404,24 @@
 
 * [FidelizacionDashboardEnvelope](./fidelizaciondashboardenvelope.md) – `-`
 
+* [FiscalDocumentAuthorizeEnvelope](./fiscaldocumentauthorizeenvelope.md) – `-`
+
+* [FiscalProviderCapabilities](./fiscalprovidercapabilities.md) – `-`
+
+* [FiscalProviderCapabilitiesListEnvelope](./fiscalprovidercapabilitieslistenvelope.md) – `-`
+
+* [FiscalProviderCode](./fiscalprovidercode.md) – `-`
+
+* [FiscalProviderConfigInput](./fiscalproviderconfiginput.md) – `-`
+
+* [FiscalProviderStatusEntry](./fiscalproviderstatusentry.md) – `-`
+
+* [FiscalProviderStatusListEnvelope](./fiscalproviderstatuslistenvelope.md) – `-`
+
+* [FiscalProviderValidateEnvelope](./fiscalprovidervalidateenvelope.md) – `-`
+
+* [FiscalProviderValidateInput](./fiscalprovidervalidateinput.md) – `-`
+
 * [FiscalRetencionesConfig](./fiscalretencionesconfig.md) – `-`
 
 * [FiscalRetencionesConfigEnvelope](./fiscalretencionesconfigenvelope.md) – `-`
@@ -1346,6 +1364,10 @@
 
 * [Untitled object in FidelizacionDashboard](./fidelizaciondashboard-properties-ranking-items.md) – `undefined#/properties/ranking/items`
 
+* [Untitled object in FiscalDocumentAuthorizeEnvelope](./fiscaldocumentauthorizeenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in FiscalProviderValidateEnvelope](./fiscalprovidervalidateenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in FormulaCostoEnvelope](./formulacostoenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in FormulaCostoEnvelope](./formulacostoenvelope-properties-data-properties-lineas-items.md) – `undefined#/properties/data/properties/lineas/items`
@@ -1721,6 +1743,10 @@
 * [Untitled array in FefoAllocationListEnvelope](./fefoallocationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FidelizacionDashboard](./fidelizaciondashboard-properties-ranking.md) – `undefined#/properties/ranking`
+
+* [Untitled array in FiscalProviderCapabilitiesListEnvelope](./fiscalprovidercapabilitieslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in FiscalProviderStatusListEnvelope](./fiscalproviderstatuslistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FormaPagoListEnvelope](./formapagolistenvelope-properties-data.md) – `undefined#/properties/data`
 

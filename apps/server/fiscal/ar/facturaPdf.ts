@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
 import type { ServiceResult } from '../../services/serviceResults'
 import type { ArcaFacturaPdfInput, CondicionIvaCode } from './arcaFiscalPdfTypes'
-import { buildFacturaPdfImages } from './facturaPdfImages'
+import { ArcaFiscalDocumentRenderer } from '../arca/ArcaFiscalDocumentRenderer'
 import { renderFacturaPdfA4, renderFacturaTicket80mm } from './facturaPdfLayout'
 import { FidelizacionService } from '../../services/FidelizacionService'
 
@@ -184,7 +184,7 @@ export async function buildFacturaPdfBuffer(
     factura,
     mapFacturaToPdfInput(empresaRow, factura, options.preview),
   )
-  const images = await buildFacturaPdfImages(pdfInput)
+  const images = await new ArcaFiscalDocumentRenderer().renderAuthorizationArtifacts(pdfInput)
   const buffer = await renderFacturaPdfA4(pdfInput, images)
 
   return { ok: true, data: buffer }

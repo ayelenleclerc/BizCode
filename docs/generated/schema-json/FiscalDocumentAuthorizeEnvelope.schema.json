@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "authorizationCode": {
+          "type": "string"
+        },
+        "authorizationExpiresAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "fiscalDocumentId": {
+          "type": "integer"
+        },
+        "provider": {
+          "$ref": "./FiscalProviderCode.schema.json"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "authorized",
+            "rejected",
+            "failed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "fiscalDocumentId",
+        "status",
+        "provider"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "FiscalDocumentAuthorizeEnvelope",
+  "type": "object"
+}

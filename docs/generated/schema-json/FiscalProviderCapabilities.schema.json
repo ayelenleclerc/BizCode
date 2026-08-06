@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "countryCode": {
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "implemented": {
+      "type": "boolean"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "provider": {
+      "$ref": "./FiscalProviderCode.schema.json"
+    },
+    "supportsCancel": {
+      "type": "boolean"
+    },
+    "supportsCreditNote": {
+      "type": "boolean"
+    },
+    "supportsHealthCheck": {
+      "type": "boolean"
+    },
+    "supportsInvoice": {
+      "type": "boolean"
+    },
+    "supportsLastAuthorizedNumber": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "provider",
+    "countryCode",
+    "displayName",
+    "implemented",
+    "supportsInvoice",
+    "supportsCreditNote",
+    "supportsCancel",
+    "supportsHealthCheck",
+    "supportsLastAuthorizedNumber"
+  ],
+  "title": "FiscalProviderCapabilities",
+  "type": "object"
+}

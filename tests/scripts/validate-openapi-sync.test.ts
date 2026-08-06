@@ -64,12 +64,19 @@ describe('openapi sync compareRoutes', () => {
     )
   })
 
-  it('discovers Express /api routes from server source', () => {
-    const routes = scanExpressApiRoutes('apps/server')
-    expect(
-      routes.some(
-        (route) => route.method === 'get' && route.openApiPath === '/api/dashboard/summary',
-      ),
-    ).toBe(true)
-  })
+  it(
+    'discovers Express /api routes from server source',
+    () => {
+      // @en Repo-wide filesystem scan; grows with each new route module (e.g. #378 fiscal adapters), so it needs more than the 5s default.
+      // @es Escaneo del filesystem completo del repo; crece con cada módulo de rutas nuevo (p. ej. adapters fiscales #378), por eso necesita más de los 5s por defecto.
+      // @pt-BR Varredura do filesystem completo do repositório; cresce com cada novo módulo de rotas (ex.: adapters fiscais #378), por isso precisa de mais que os 5s padrão.
+      const routes = scanExpressApiRoutes('apps/server')
+      expect(
+        routes.some(
+          (route) => route.method === 'get' && route.openApiPath === '/api/dashboard/summary',
+        ),
+      ).toBe(true)
+    },
+    15000,
+  )
 })
