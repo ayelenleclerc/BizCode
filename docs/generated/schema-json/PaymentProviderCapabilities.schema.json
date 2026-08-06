@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "displayName": {
+      "type": "string"
+    },
+    "implemented": {
+      "type": "boolean"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "provider": {
+      "$ref": "./PaymentProviderCode.schema.json"
+    },
+    "supportsCancellation": {
+      "type": "boolean"
+    },
+    "supportsCheckoutUrl": {
+      "type": "boolean"
+    },
+    "supportsEmbeddedCheckout": {
+      "type": "boolean"
+    },
+    "supportsOAuth": {
+      "type": "boolean"
+    },
+    "supportsPartialRefunds": {
+      "type": "boolean"
+    },
+    "supportsQr": {
+      "type": "boolean"
+    },
+    "supportsRecurringPayments": {
+      "type": "boolean"
+    },
+    "supportsRefunds": {
+      "type": "boolean"
+    },
+    "supportsSandbox": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "provider",
+    "displayName",
+    "implemented",
+    "supportsCheckoutUrl",
+    "supportsEmbeddedCheckout",
+    "supportsQr",
+    "supportsRefunds",
+    "supportsPartialRefunds",
+    "supportsCancellation",
+    "supportsRecurringPayments",
+    "supportsOAuth",
+    "supportsSandbox"
+  ],
+  "title": "PaymentProviderCapabilities",
+  "type": "object"
+}

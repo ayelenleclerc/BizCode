@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "provider": {
+      "$ref": "./PaymentProviderCode.schema.json"
+    }
+  },
+  "required": [
+    "provider"
+  ],
+  "title": "PaymentProviderValidateInput",
+  "type": "object"
+}

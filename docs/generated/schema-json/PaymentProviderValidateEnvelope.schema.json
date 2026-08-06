@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "accountName": {
+          "type": "string"
+        },
+        "configured": {
+          "type": "boolean"
+        },
+        "healthy": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "configured"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "PaymentProviderValidateEnvelope",
+  "type": "object"
+}

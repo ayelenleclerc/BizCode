@@ -18,6 +18,8 @@
 
 * [ApiErrorEnvelope](./apierrorenvelope.md) – `-`
 
+* [ApiSuccessConfiguredEnvelope](./apisuccessconfiguredenvelope.md) – `-`
+
 * [AppUser](./appuser.md) – `-`
 
 * [AppUserEnvelope](./appuserenvelope.md) – `-`
@@ -796,6 +798,24 @@
 
 * [PadronA4Envelope](./padrona4envelope.md) – `-`
 
+* [PaymentCheckoutEnvelope](./paymentcheckoutenvelope.md) – `-`
+
+* [PaymentProviderCapabilities](./paymentprovidercapabilities.md) – `-`
+
+* [PaymentProviderCapabilitiesListEnvelope](./paymentprovidercapabilitieslistenvelope.md) – `-`
+
+* [PaymentProviderCode](./paymentprovidercode.md) – `-`
+
+* [PaymentProviderConfigInput](./paymentproviderconfiginput.md) – `-`
+
+* [PaymentProviderStatusEntry](./paymentproviderstatusentry.md) – `-`
+
+* [PaymentProviderStatusListEnvelope](./paymentproviderstatuslistenvelope.md) – `-`
+
+* [PaymentProviderValidateEnvelope](./paymentprovidervalidateenvelope.md) – `-`
+
+* [PaymentProviderValidateInput](./paymentprovidervalidateinput.md) – `-`
+
 * [Pedido](./pedido.md) – `-`
 
 * [PedidoEnvelope](./pedidoenvelope.md) – `-`
@@ -1278,6 +1298,8 @@
 
 ### Objects
 
+* [Untitled object in ApiSuccessConfiguredEnvelope](./apisuccessconfiguredenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in ArcaCaeEnvelope](./arcacaeenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in ArcaConfigEnvelope](./arcaconfigenvelope-properties-data.md) – `undefined#/properties/data`
@@ -1487,6 +1509,10 @@
 * [Untitled object in OrdenTrabajoListEnvelope](./ordentrabajolistenvelope-allof-0-properties-counts.md) – `undefined#/allOf/0/properties/counts`
 
 * [Untitled object in OrdenTrabajoUpdateInput](./ordentrabajoupdateinput-allof-1.md) – `undefined#/allOf/1`
+
+* [Untitled object in PaymentCheckoutEnvelope](./paymentcheckoutenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PaymentProviderValidateEnvelope](./paymentprovidervalidateenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in PedidoInput](./pedidoinput-properties-items-items.md "Catalog line requires articuloId") – `undefined#/properties/items/items`
 
@@ -1863,6 +1889,10 @@
 * [Untitled array in OrdenTrabajoListEnvelope](./ordentrabajolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in OrdenTrabajoTransitionInput](./ordentrabajotransitioninput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in PaymentProviderCapabilitiesListEnvelope](./paymentprovidercapabilitieslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in PaymentProviderStatusListEnvelope](./paymentproviderstatuslistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in Pedido](./pedido-properties-items.md) – `undefined#/properties/items`
 

@@ -34,3 +34,5 @@ Opciones consideradas:
 - [vision-producto-y-despliegue.md](../quality/vision-producto-y-despliegue.md) (PROD-VISION-001)
 - [arquitectura.md](../arquitectura.md)
 - [CONTRIBUTING.md](../../../CONTRIBUTING.md)
+- [ADR-0018: Facturación electrónica multi-organismo](ADR-0018-fiscal-multi-organism-e-invoicing.md)
+- [ADR-0019: Cobros multi-proveedor](ADR-0019-payments-multi-provider.md)

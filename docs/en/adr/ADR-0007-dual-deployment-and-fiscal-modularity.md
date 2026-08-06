@@ -34,3 +34,5 @@ Options considered:
 - [product-vision-and-deployment.md](../quality/product-vision-and-deployment.md) (PROD-VISION-001)
 - [architecture.md](../architecture.md)
 - [CONTRIBUTING.md](../../../CONTRIBUTING.md)
+- [ADR-0018: Multi-organism fiscal e-invoicing](ADR-0018-fiscal-multi-organism-e-invoicing.md)
+- [ADR-0019: Multi-provider payments](ADR-0019-payments-multi-provider.md)

@@ -7,9 +7,9 @@ import {
   extractDataIdFromQuery,
   extractPaymentIdFromPayload,
   isChargebackWebhook,
-  MercadoPagoWebhookService,
   type MercadoPagoWebhookPayload,
 } from '../services/MercadoPagoWebhookService'
+import { PaymentWebhookService } from '../payments/PaymentWebhookService'
 import { sanitizeLogField } from '../lib/sanitizeLogField'
 import type { RestRouteContext } from './restRouteTypes'
 
@@ -22,13 +22,16 @@ function headerString(value: string | string[] | undefined): string | null {
 }
 
 /**
- * @en Public Mercado Pago webhook route (#176).
- * @es Ruta pública de webhook Mercado Pago (#176).
- * @pt-BR Rota pública de webhook Mercado Pago (#176).
+ * @en Public Mercado Pago webhook route (#176). Compat facade via `PaymentWebhookService` (#377);
+ *   business effects (ReciboCobro) remain in `MercadoPagoWebhookService`.
+ * @es Ruta pública de webhook Mercado Pago (#176). Fachada vía `PaymentWebhookService` (#377);
+ *   los efectos de negocio siguen en `MercadoPagoWebhookService`.
+ * @pt-BR Rota pública de webhook Mercado Pago (#176). Fachada via `PaymentWebhookService` (#377);
+ *   efeitos de negócio permanecem em `MercadoPagoWebhookService`.
  */
 export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma } = ctx
-  const webhookService = new MercadoPagoWebhookService(prisma)
+  const webhookService = new PaymentWebhookService(prisma)
 
   app.post(
     '/api/webhooks/mercadopago',
@@ -51,7 +54,7 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
       }
 
       void webhookService
-        .resolveTenantIdBySignature({
+        .resolveMercadoPagoTenantBySignature({
           xSignature,
           xRequestId,
           dataId,
@@ -84,13 +87,17 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
 
           setImmediate(() => {
             const processPromise = isChargeback
-              ? webhookService.processChargebackNotification(
+              ? webhookService.processMercadoPagoChargebackNotification(
                   tenantId,
                   resourceId,
                   body,
                   req.ip ?? null,
                 )
-              : webhookService.processPaymentNotification(tenantId, resourceId, req.ip ?? null)
+              : webhookService.processMercadoPagoPaymentNotification(
+                  tenantId,
+                  resourceId,
+                  req.ip ?? null,
+                )
 
             void processPromise.catch((err: unknown) => {
               console.warn(

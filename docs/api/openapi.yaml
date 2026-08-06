@@ -46,6 +46,8 @@ tags:
     description: Argentina AFIP electronic invoicing (CAE; homologación mock in dev)
   - name: fiscal
     description: Multi-organism fiscal e-invoicing — provider config, capabilities and document authorization (#378, ADR-0018)
+  - name: payments
+    description: Multi-provider online payments — provider config, capabilities and checkout (#377, ADR-0019); Mercado Pago is the only live adapter today
   - name: pedidos
     description: Commercial orders and quotes (ADR-0009)
   - name: contratos
@@ -3862,6 +3864,159 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
         '502':
           description: Provider authorization request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/payments/providers/config:
+    get:
+      tags: [payments]
+      summary: Multi-provider payment provider status per tenant (#377)
+      description: |
+        Requires `settings.business.manage`. Lists every registered provider (`mercadopago`,
+        `payway`, `stripe`) with capabilities and configuration status.
+        Never returns access tokens or webhook secrets.
+      responses:
+        '200':
+          description: Provider status list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProviderStatusListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [payments]
+      summary: Upsert payment provider configuration (#377)
+      description: |
+        Requires `settings.business.manage`. Only `provider: mercadopago` is implemented today
+        (dual-writes the legacy `/api/configuracion/mercadopago` table); other providers return 501.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentProviderConfigInput'
+      responses:
+        '200':
+          description: Config saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessConfiguredEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '501':
+          description: Provider not implemented (capability stub)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/payments/providers/validate:
+    post:
+      tags: [payments]
+      summary: Validate stored credentials for a payment provider (#377)
+      description: Requires `settings.business.manage`. Never returns secrets.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentProviderValidateInput'
+      responses:
+        '200':
+          description: Validation outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProviderValidateEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Provider not registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/payments/providers/capabilities:
+    get:
+      tags: [payments]
+      summary: Static capability declaration for every registered payment provider (#377)
+      description: |
+        Requires `settings.business.manage`. No tenant context; `mercadopago` is the only
+        provider with `implemented: true` today — `payway` and `stripe` are
+        capability-only stubs (Not evidenced in current codebase — no live PSP client).
+      responses:
+        '200':
+          description: Capability list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProviderCapabilitiesListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/payments/invoices/{facturaId}/checkout:
+    post:
+      tags: [payments]
+      summary: Create checkout preference for an invoice (#377)
+      description: |
+        Requires `sales.create`. Resolves the tenant's default payment provider
+        (`mercadopago` today) and delegates to its adapter. Generalizes
+        `POST /api/facturas/{id}/mp/preference`.
+      parameters:
+        - name: facturaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Checkout outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentCheckoutEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Invoice or payment provider not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '501':
+          description: Provider not implemented
           content:
             application/json:
               schema:
@@ -21609,6 +21764,144 @@ components:
           required: [configured]
           properties:
             configured: { type: boolean }
+
+    PaymentProviderCode:
+      type: string
+      enum: [mercadopago, payway, stripe]
+
+    PaymentProviderCapabilities:
+      type: object
+      required:
+        - provider
+        - displayName
+        - implemented
+        - supportsCheckoutUrl
+        - supportsEmbeddedCheckout
+        - supportsQr
+        - supportsRefunds
+        - supportsPartialRefunds
+        - supportsCancellation
+        - supportsRecurringPayments
+        - supportsOAuth
+        - supportsSandbox
+      properties:
+        provider:
+          $ref: '#/components/schemas/PaymentProviderCode'
+        displayName: { type: string }
+        implemented: { type: boolean }
+        supportsCheckoutUrl: { type: boolean }
+        supportsEmbeddedCheckout: { type: boolean }
+        supportsQr: { type: boolean }
+        supportsRefunds: { type: boolean }
+        supportsPartialRefunds: { type: boolean }
+        supportsCancellation: { type: boolean }
+        supportsRecurringPayments: { type: boolean }
+        supportsOAuth: { type: boolean }
+        supportsSandbox: { type: boolean }
+        notes: { type: string }
+
+    PaymentProviderCapabilitiesListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentProviderCapabilities'
+
+    PaymentProviderStatusEntry:
+      type: object
+      required: [provider, capabilities, configured, enabled, isDefault]
+      properties:
+        provider:
+          $ref: '#/components/schemas/PaymentProviderCode'
+        capabilities:
+          $ref: '#/components/schemas/PaymentProviderCapabilities'
+        configured: { type: boolean }
+        enabled: { type: boolean }
+        isDefault: { type: boolean }
+        environment: { type: string, enum: [sandbox, production] }
+        accessTokenLast4: { type: string }
+        publicKey: { type: string }
+        webhookSecretSet: { type: boolean }
+        lastValidationAt: { type: string, format: date-time, nullable: true }
+        validationStatus: { type: string, nullable: true }
+
+    PaymentProviderStatusListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentProviderStatusEntry'
+
+    PaymentProviderConfigInput:
+      type: object
+      required: [provider]
+      properties:
+        provider:
+          $ref: '#/components/schemas/PaymentProviderCode'
+        accessToken: { type: string }
+        publicKey: { type: string }
+        webhookSecret: { type: string }
+        sandboxMode: { type: boolean }
+        activo: { type: boolean }
+        collectorId: { type: string }
+        externalPosId: { type: string }
+        staticQrData: { type: string }
+
+    PaymentProviderValidateInput:
+      type: object
+      required: [provider]
+      properties:
+        provider:
+          $ref: '#/components/schemas/PaymentProviderCode'
+
+    PaymentProviderValidateEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [configured]
+          properties:
+            configured: { type: boolean }
+            healthy: { type: boolean }
+            accountName: { type: string }
+
+    ApiSuccessConfiguredEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [configured]
+          properties:
+            configured: { type: boolean }
+
+    PaymentCheckoutEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [status, provider]
+          properties:
+            status: { type: string }
+            provider:
+              $ref: '#/components/schemas/PaymentProviderCode'
+            preferenceId: { type: string }
+            checkoutUrl: { type: string }
+            expiresAt: { type: string, format: date-time }
+            providerStatus: { type: string }
+            amount: { type: number }
+            currency: { type: string }
 
     FiscalDocumentAuthorizeEnvelope:
       type: object

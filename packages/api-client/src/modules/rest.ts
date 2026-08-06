@@ -2091,6 +2091,99 @@ export const fiscalAPI = {
   },
 }
 
+export type PaymentProviderCode = 'mercadopago' | 'payway' | 'stripe'
+
+export type PaymentProviderCapabilities = {
+  provider: PaymentProviderCode
+  displayName: string
+  implemented: boolean
+  supportsCheckoutUrl: boolean
+  supportsEmbeddedCheckout: boolean
+  supportsQr: boolean
+  supportsRefunds: boolean
+  supportsPartialRefunds: boolean
+  supportsCancellation: boolean
+  supportsRecurringPayments: boolean
+  supportsOAuth: boolean
+  supportsSandbox: boolean
+  notes?: string
+}
+
+export type PaymentProviderStatusEntry = {
+  provider: PaymentProviderCode
+  capabilities: PaymentProviderCapabilities
+  configured: boolean
+  enabled: boolean
+  isDefault: boolean
+  environment?: 'sandbox' | 'production'
+  accessTokenLast4?: string
+  publicKey?: string
+  webhookSecretSet?: boolean
+  lastValidationAt?: string | null
+  validationStatus?: string | null
+}
+
+export type PaymentCheckoutResult = {
+  status: string
+  provider: PaymentProviderCode
+  preferenceId?: string
+  checkoutUrl?: string
+  expiresAt?: string
+  providerStatus?: string
+  amount?: number
+  currency?: string
+}
+
+/** @en Multi-provider payments client (#377). @es Cliente de cobros multi-proveedor (#377). @pt-BR Cliente de cobranças multi-provedor (#377). */
+export const paymentsAPI = {
+  getProvidersConfig: async (): Promise<PaymentProviderStatusEntry[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: PaymentProviderStatusEntry[] }>(
+        '/payments/providers/config',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getCapabilities: async (): Promise<PaymentProviderCapabilities[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: PaymentProviderCapabilities[] }>(
+        '/payments/providers/capabilities',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  validateProvider: async (
+    provider: PaymentProviderCode,
+  ): Promise<{ configured: boolean; healthy?: boolean; accountName?: string }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { configured: boolean; healthy?: boolean; accountName?: string }
+      }>('/payments/providers/validate', { provider })
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  createCheckout: async (facturaId: number): Promise<PaymentCheckoutResult> => {
+    try {
+      const response = await api.post<{ success: boolean; data: PaymentCheckoutResult }>(
+        `/payments/invoices/${facturaId}/checkout`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export type PadronA4ConsultaDto = {
   cuit: string
   verificado: boolean
