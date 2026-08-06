@@ -1,6 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { z } from 'zod'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
+import { fiscalMutationHttpRateLimiter } from '../middleware/routeRateLimit'
 import { validateBody } from '../middleware/validateBody'
 import type { FiscalConfigInput } from '../fiscal/ar/ArcaService'
 import { ArcaFiscalAdapter } from '../fiscal/arca/ArcaFiscalAdapter'
@@ -80,28 +81,34 @@ export function registerArcaRoutes(app: Application, ctx: RestRouteContext): voi
     },
   )
 
-  app.post('/api/arca/auth', requirePermission('settings.fiscal.manage'), async (req: Request, res: Response) => {
-    try {
-      const result = await arcaAdapter.authenticate(getTenantId(req))
-      if (!result.ok) {
-        res.status(result.status).json({ success: false, error: result.error })
-        return
+  app.post(
+    '/api/arca/auth',
+    fiscalMutationHttpRateLimiter,
+    requirePermission('settings.fiscal.manage'),
+    async (req: Request, res: Response) => {
+      try {
+        const result = await arcaAdapter.authenticate(getTenantId(req))
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json({
+          success: true,
+          data: {
+            token: result.data.token,
+            sign: result.data.sign,
+            expiration: result.data.expiration.toISOString(),
+          },
+        })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
       }
-      res.json({
-        success: true,
-        data: {
-          token: result.data.token,
-          sign: result.data.sign,
-          expiration: result.data.expiration.toISOString(),
-        },
-      })
-    } catch (err: unknown) {
-      res.status(500).json({ success: false, error: errorMessage(err) })
-    }
-  })
+    },
+  )
 
   app.post(
     '/api/arca/cae',
+    fiscalMutationHttpRateLimiter,
     requirePermission('sales.create'),
     validateBody(caeBodySchema),
     async (req: Request, res: Response) => {

@@ -172,7 +172,7 @@ export default function OrdenesTrabajoPage() {
   async function handleFacturar(row: OrdenTrabajoRow): Promise<void> {
     setActionId(row.id)
     try {
-      await ordenesTrabajoAPI.facturar(row.id, { skipArcaCae: true })
+      await ordenesTrabajoAPI.facturar(row.id, {})
       await load()
     } finally {
       setActionId(null)

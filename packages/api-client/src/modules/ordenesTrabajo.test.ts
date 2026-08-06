@@ -36,7 +36,7 @@ describe('createOrdenesTrabajoAPI', () => {
     http.post.mockResolvedValue({
       data: { success: true, data: { orden: { id: 2 }, facturaId: 99 } },
     })
-    await api.facturar(2, { skipArcaCae: true })
-    expect(http.post).toHaveBeenCalledWith('/ordenes-trabajo/2/facturar', { skipArcaCae: true })
+    await api.facturar(2, {})
+    expect(http.post).toHaveBeenCalledWith('/ordenes-trabajo/2/facturar', {})
   })
 })

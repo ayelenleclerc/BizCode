@@ -477,9 +477,15 @@ describe('OrdenTrabajoService', () => {
       },
     })
     const service = new OrdenTrabajoService(prisma)
-    const result = await service.facturar(1, 1, 9, { skipArcaCae: true })
+    const result = await service.facturar(1, 1, 9, {})
     expect(result.ok).toBe(true)
     expect(facturaCreate).toHaveBeenCalled()
+    expect(facturaCreate).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({ skipArcaCae: true }),
+    )
     if (result.ok) expect(result.data.facturaId).toBe(99)
   })
 

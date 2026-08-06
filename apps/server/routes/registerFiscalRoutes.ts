@@ -15,6 +15,7 @@
 import type { Application, Request, Response } from 'express'
 import { z } from 'zod'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
+import { fiscalMutationHttpRateLimiter } from '../middleware/routeRateLimit'
 import { validateBody } from '../middleware/validateBody'
 import { FiscalProviderConfigService } from '../fiscal/FiscalProviderConfigService'
 import { FiscalDocumentService } from '../fiscal/FiscalDocumentService'
@@ -126,6 +127,7 @@ export function registerFiscalRoutes(app: Application, ctx: RestRouteContext): v
 
   app.post(
     '/api/fiscal/documents/:facturaId/authorize',
+    fiscalMutationHttpRateLimiter,
     requirePermission('sales.create'),
     async (req: Request, res: Response) => {
       try {

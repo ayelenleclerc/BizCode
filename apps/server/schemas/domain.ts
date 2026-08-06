@@ -1959,13 +1959,11 @@ export const ordenTrabajoFacturarBodySchema = z
   .object({
     tipo: z.enum(['A', 'B']).optional(),
     prefijo: z.string().optional(),
-    skipArcaCae: z.boolean().optional(),
   })
   .transform(
     (data): OrdenTrabajoFacturarInput => ({
       tipo: data.tipo,
       prefijo: data.prefijo?.trim(),
-      skipArcaCae: data.skipArcaCae,
     }),
   )
 
