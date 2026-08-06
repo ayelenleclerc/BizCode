@@ -47,6 +47,18 @@
   "success": {
     "saved": "Company settings saved"
   },
+  "fiscalProviders": {
+    "title": "Fiscal e-invoicing (multi-organism)",
+    "subtitle": "ARCA (Argentina) is the only provider with a working integration today; DGI (Uruguay) and SAT (Mexico) are capability-only stubs, with no live issuance.",
+    "loading": "Loading fiscal providers…",
+    "defaultBadge": "Default",
+    "configuredBadge": "Configured",
+    "notConfiguredBadge": "Not configured",
+    "notImplementedBadge": "Not available in this build",
+    "errors": {
+      "loadFailed": "Could not load fiscal providers"
+    }
+  },
   "arca": {
     "title": "ARCA electronic invoicing (CAE)",
     "subtitle": "Homologación mock — credentials encrypted at rest; certificate and key are never shown after save.",

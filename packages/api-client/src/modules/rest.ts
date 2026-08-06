@@ -1978,6 +1978,119 @@ export const arcaAPI = {
   },
 }
 
+/**
+ * @en Multi-organism fiscal e-invoicing types (#378, ADR-0018). `arca_wsfe` is the only
+ *   provider with a working adapter; `uruguay_dgi`/`mexico_sat_pac` are capability-only stubs.
+ * @es Tipos de facturación electrónica multi-organismo (#378, ADR-0018). `arca_wsfe` es el
+ *   único proveedor con adapter funcional; `uruguay_dgi`/`mexico_sat_pac` son stubs de capacidades.
+ * @pt-BR Tipos de nota fiscal eletrônica multi-organismo (#378, ADR-0018). `arca_wsfe` é o
+ *   único provedor com adapter funcional; `uruguay_dgi`/`mexico_sat_pac` são stubs de capacidades.
+ */
+export type FiscalProviderCode = 'arca_wsfe' | 'uruguay_dgi' | 'mexico_sat_pac'
+
+export type FiscalProviderCapabilities = {
+  provider: FiscalProviderCode
+  countryCode: string
+  displayName: string
+  implemented: boolean
+  supportsInvoice: boolean
+  supportsCreditNote: boolean
+  supportsCancel: boolean
+  supportsHealthCheck: boolean
+  supportsLastAuthorizedNumber: boolean
+  notes?: string
+}
+
+export type FiscalProviderStatusEntry = {
+  provider: FiscalProviderCode
+  countryCode: string
+  capabilities: FiscalProviderCapabilities
+  configured: boolean
+  enabled: boolean
+  isDefault: boolean
+  environment?: 'homologacion' | 'produccion'
+  taxIdentifier?: string
+  legalName?: string
+  pointOfSale?: string
+  lastValidationAt?: string | null
+  validationStatus?: string | null
+}
+
+export type FiscalProviderConfigInput = {
+  provider: FiscalProviderCode
+  cuit?: string
+  certificate?: string
+  privateKey?: string
+  ambiente?: 'homologacion' | 'produccion'
+}
+
+export type FiscalDocumentAuthorizeResult = {
+  fiscalDocumentId: number
+  status: 'pending' | 'authorized' | 'rejected' | 'failed'
+  authorizationCode?: string
+  authorizationExpiresAt?: string
+  provider: FiscalProviderCode
+}
+
+export const fiscalAPI = {
+  getProvidersConfig: async (): Promise<FiscalProviderStatusEntry[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: FiscalProviderStatusEntry[] }>(
+        '/fiscal/providers/config',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  putProvidersConfig: async (body: FiscalProviderConfigInput): Promise<{ configured: boolean }> => {
+    try {
+      const response = await api.put<{ success: boolean; data: { configured: boolean } }>(
+        '/fiscal/providers/config',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  validateProvider: async (provider: FiscalProviderCode): Promise<{ configured: boolean }> => {
+    try {
+      const response = await api.post<{ success: boolean; data: { configured: boolean } }>(
+        '/fiscal/providers/validate',
+        { provider },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getCapabilities: async (): Promise<FiscalProviderCapabilities[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: FiscalProviderCapabilities[] }>(
+        '/fiscal/providers/capabilities',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  authorizeDocument: async (facturaId: number): Promise<FiscalDocumentAuthorizeResult> => {
+    try {
+      const response = await api.post<{ success: boolean; data: FiscalDocumentAuthorizeResult }>(
+        `/fiscal/documents/${facturaId}/authorize`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export type PadronA4ConsultaDto = {
   cuit: string
   verificado: boolean

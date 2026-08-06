@@ -456,6 +456,18 @@ export const fefoMutationHttpRateLimiter = createRouteLimiter({
   storePrefix: 'mut-fefo',
 })
 
+/**
+ * @en Per-IP rate limit for fiscal/ARCA authorize & auth mutations (#378); visible to CodeQL.
+ * @es Límite por IP para mutaciones de autorización fiscal/ARCA (#378); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações de autorização fiscal/ARCA (#378); visível ao CodeQL.
+ */
+export const fiscalMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'mut-fiscal',
+})
+
 function runLimiterChain(
   req: Request,
   res: Response,

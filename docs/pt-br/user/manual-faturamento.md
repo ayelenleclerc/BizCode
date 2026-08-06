@@ -24,6 +24,8 @@ No detalhe da nota: pré-visualização, imprimir (modal com download alternativ
 
 Validação no portal AFIP pode permanecer manual em homologação.
 
+A emissão do CAE é delegada internamente ao adapter fiscal da ARCA, parte do módulo fiscal multi-organismo ([ADR-0018](../adr/ADR-0018-fiscal-multi-organism-e-invoicing.md)); o comportamento visível, os endpoints e os PDFs não mudam. Apenas ARCA/AFIP (Argentina) está implementado hoje.
+
 ## Cancelamento com nota de crédito (módulo)
 
 Com o módulo do tenant **`billing.credit_notes`** ativo e permissão **`sales.cancel`**, abra o detalhe de uma nota **ativa** e use **Cancelar nota fiscal**. É obrigatório informar um **motivo** com pelo menos **10** caracteres (validação no servidor). A operação chama `PUT /api/facturas/{id}/void`; o sistema registra uma **nota de crédito** ligada à nota original (veja [ADR-0012](../adr/ADR-0012-anulacao-fatura-nota-credito.md)). Listagem no app: página **Finanças**, mesmo módulo (API `GET /api/notas-credito`).

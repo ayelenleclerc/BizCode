@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { hasPermission } from '@/lib/rbac'
 import { validateCUIT } from '@/lib/validators'
 import type { EmpresaConfig } from '@bizcode/types'
-import ArcaFiscalSection from './ArcaFiscalSection'
+import FiscalProviderSection from './FiscalProviderSection'
 import PrintDevicesSection from './PrintDevicesSection'
 import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
 import FiscalRetencionesSection from './FiscalRetencionesSection'
@@ -565,7 +565,7 @@ export default function EmpresaPage() {
         )}
       </form>
 
-      <ArcaFiscalSection />
+      <FiscalProviderSection />
       <MercadoPagoConfigSection />
       <MeliConfigSection />
       <TiendanubeConfigSection />

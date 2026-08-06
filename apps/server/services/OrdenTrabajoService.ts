@@ -543,7 +543,8 @@ export class OrdenTrabajoService {
         items,
       },
       userId,
-      { skipArcaCae: input.skipArcaCae !== false },
+      // Server-side policy for OT MVP: defer CAE (retry via arca:retry-pending). Not client-controlled (#378 CodeQL).
+      { skipArcaCae: true },
     )
     if (!result.ok) return result
 

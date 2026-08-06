@@ -67,8 +67,6 @@ export type OrdenTrabajoTransitionInput = {
 export type OrdenTrabajoFacturarInput = {
   tipo?: 'A' | 'B'
   prefijo?: string
-  /** When true, create invoice without ARCA CAE request. Default true for workshop MVP. */
-  skipArcaCae?: boolean
 }
 
 export type OrdenTrabajoItemRow = {

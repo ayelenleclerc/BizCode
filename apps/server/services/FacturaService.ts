@@ -10,7 +10,7 @@ import {
   type StockBelowMinimumAlert,
 } from './facturaStock'
 import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
-import { ArcaService } from '../fiscal/ar/ArcaService'
+import { FiscalDocumentService } from '../fiscal/FiscalDocumentService'
 import { validateFacturaPercepciones } from './RetencionFacturaValidation'
 import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { GarantiaService } from './GarantiaService'
@@ -70,14 +70,15 @@ export type FacturaCreateOptions = {
  * @pt-BR Opera??es de dom?nio de faturas (listagem, cria??o, anula??o).
  */
 export class FacturaService {
-  private readonly arca: ArcaService
+  /** @en Delegates CAE/fiscal authorization to the multi-organism module (#378); ARCA remains the only live adapter. */
+  private readonly fiscalDocumentService: FiscalDocumentService
   private readonly garantiaService: GarantiaService
   private readonly fidelizacionService: FidelizacionService
   private readonly loteService: LoteService
   private readonly turnoCajaService: TurnoCajaService
 
   constructor(private readonly prisma: PrismaClient) {
-    this.arca = new ArcaService(prisma)
+    this.fiscalDocumentService = new FiscalDocumentService(prisma)
     this.garantiaService = new GarantiaService(prisma)
     this.fidelizacionService = new FidelizacionService(prisma)
     this.loteService = new LoteService(prisma)
@@ -517,8 +518,8 @@ export class FacturaService {
     }
 
     if (options?.skipArcaCae !== true) {
-      void this.arca.requestCaeForFactura(tenantId, newFactura.id).catch(() => {
-        /* retry: npm run arca:retry-pending */
+      void this.fiscalDocumentService.authorizeInvoice(tenantId, newFactura.id).catch(() => {
+        /* retry: npm run arca:retry-pending (delegates to FiscalDocumentRetryService, #378) */
       })
     }
 
@@ -698,7 +699,7 @@ export class FacturaService {
     })
 
     if (factura.estadoCae === 'issued') {
-      void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
+      void this.fiscalDocumentService.authorizeCreditNote(tenantId, result.notaCredito.id).catch(() => {
         /* homologación mock; retry job may be added later */
       })
     }
@@ -808,7 +809,7 @@ export class FacturaService {
     })
 
     if (factura.estadoCae === 'issued') {
-      void this.arca.requestCaeForNotaCredito(tenantId, result.notaCredito.id).catch(() => {
+      void this.fiscalDocumentService.authorizeCreditNote(tenantId, result.notaCredito.id).catch(() => {
         /* homologaci?n mock; retry job may be added later */
       })
     }

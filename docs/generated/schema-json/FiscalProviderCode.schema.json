@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "arca_wsfe",
+    "uruguay_dgi",
+    "mexico_sat_pac"
+  ],
+  "title": "FiscalProviderCode",
+  "type": "string"
+}

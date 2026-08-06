@@ -24,6 +24,8 @@ In invoice detail: **Preview PDF**, **Print / preview** (modal with download fal
 
 Official AFIP portal validation of QR/barcode may still be required in homologación.
 
+CAE issuance is delegated internally to the ARCA fiscal adapter, part of the multi-organism fiscal e-invoicing module ([ADR-0018](../adr/ADR-0018-fiscal-multi-organism-e-invoicing.md)); user-facing behavior, endpoints and PDFs are unchanged. Only ARCA/AFIP (Argentina) is implemented today.
+
 ## Voiding an invoice (credit notes module)
 
 When tenant module **`billing.credit_notes`** is enabled and your role has **`sales.cancel`**, open an **active** invoice detail and use **Void invoice**. You must enter a **reason** with at least **10** characters (server validation). The operation calls `PUT /api/facturas/{id}/void`; the system records a **credit note** linked to the original invoice (see [ADR-0012](../adr/ADR-0012-invoice-void-credit-note.md)). Listing credit notes in the app: **Finance** page, same module (API `GET /api/notas-credito`).

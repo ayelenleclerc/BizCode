@@ -47,6 +47,18 @@
   "success": {
     "saved": "Configuración de empresa guardada"
   },
+  "fiscalProviders": {
+    "title": "Facturación electrónica fiscal (multi-organismo)",
+    "subtitle": "ARCA (Argentina) es el único proveedor con integración funcional hoy; DGI (Uruguay) y SAT (México) son stubs de capacidades, sin emisión real.",
+    "loading": "Cargando proveedores fiscales…",
+    "defaultBadge": "Predeterminado",
+    "configuredBadge": "Configurado",
+    "notConfiguredBadge": "Sin configurar",
+    "notImplementedBadge": "No disponible en esta versión",
+    "errors": {
+      "loadFailed": "No se pudieron cargar los proveedores fiscales"
+    }
+  },
   "arca": {
     "title": "Facturación electrónica ARCA (CAE)",
     "subtitle": "Homologación mock — credenciales cifradas; certificado y clave no se muestran tras guardar.",

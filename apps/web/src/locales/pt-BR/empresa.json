@@ -47,6 +47,18 @@
   "success": {
     "saved": "Configuração da empresa salva"
   },
+  "fiscalProviders": {
+    "title": "Nota fiscal eletrônica (multi-organismo)",
+    "subtitle": "ARCA (Argentina) é o único provedor com integração funcional hoje; DGI (Uruguai) e SAT (México) são stubs de capacidades, sem emissão real.",
+    "loading": "Carregando provedores fiscais…",
+    "defaultBadge": "Padrão",
+    "configuredBadge": "Configurado",
+    "notConfiguredBadge": "Não configurado",
+    "notImplementedBadge": "Não disponível nesta versão",
+    "errors": {
+      "loadFailed": "Não foi possível carregar os provedores fiscais"
+    }
+  },
   "arca": {
     "title": "Faturamento eletrônico ARCA (CAE)",
     "subtitle": "Homologação mock — credenciais criptografadas; certificado e chave não são exibidos após salvar.",

@@ -23074,6 +23074,905 @@ Requires `sales.create`.
 }
 ```
 
+### Multi-organism fiscal provider status per tenant (#378)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/providers/config`
+- **Tags:** fiscal
+
+Requires `settings.fiscal.manage`. Lists every registered provider (`arca_wsfe`, `uruguay_dgi`, `mexico_sat_pac`) with capabilities and configuration status. Never returns certificate/private key material.
+
+#### Responses
+
+##### Status: 200 Provider status list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`capabilities` (required)**
+
+    `object`
+
+    - **`countryCode` (required)**
+
+      `string`
+
+    - **`displayName` (required)**
+
+      `string`
+
+    - **`implemented` (required)**
+
+      `boolean`
+
+    - **`provider` (required)**
+
+      `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+    - **`supportsCancel` (required)**
+
+      `boolean`
+
+    - **`supportsCreditNote` (required)**
+
+      `boolean`
+
+    - **`supportsHealthCheck` (required)**
+
+      `boolean`
+
+    - **`supportsInvoice` (required)**
+
+      `boolean`
+
+    - **`supportsLastAuthorizedNumber` (required)**
+
+      `boolean`
+
+    - **`notes`**
+
+      `string`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`countryCode` (required)**
+
+    `string`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`isDefault` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+  - **`environment`**
+
+    `string`, possible values: `"homologacion", "produccion"`
+
+  - **`lastValidationAt`**
+
+    `string`, format: `date-time`
+
+  - **`legalName`**
+
+    `string`
+
+  - **`pointOfSale`**
+
+    `string`
+
+  - **`taxIdentifier`**
+
+    `string`
+
+  - **`validationStatus`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "provider": "arca_wsfe",
+      "countryCode": "",
+      "capabilities": {
+        "provider": "arca_wsfe",
+        "countryCode": "",
+        "displayName": "",
+        "implemented": true,
+        "supportsInvoice": true,
+        "supportsCreditNote": true,
+        "supportsCancel": true,
+        "supportsHealthCheck": true,
+        "supportsLastAuthorizedNumber": true,
+        "notes": ""
+      },
+      "configured": true,
+      "enabled": true,
+      "isDefault": true,
+      "environment": "homologacion",
+      "taxIdentifier": "",
+      "legalName": "",
+      "pointOfSale": "",
+      "lastValidationAt": "",
+      "validationStatus": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Upsert fiscal provider configuration (#378)
+
+- **Method:** `PUT`
+- **Path:** `/api/fiscal/providers/config`
+- **Tags:** fiscal
+
+Requires `settings.fiscal.manage`. Only `provider: arca_wsfe` is implemented today (dual-writes the legacy `/api/arca/config` table); other providers return 501.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`provider` (required)**
+
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+- **`ambiente`**
+
+  `string`, possible values: `"homologacion", "produccion"`
+
+- **`certificate`**
+
+  `string`
+
+- **`cuit`**
+
+  `string`
+
+- **`privateKey`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "provider": "arca_wsfe",
+  "cuit": "",
+  "certificate": "",
+  "privateKey": "",
+  "ambiente": "homologacion"
+}
+```
+
+#### Responses
+
+##### Status: 200 Config saved
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured`**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 501 Provider not implemented (capability stub)
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Validate stored credentials for a fiscal provider (#378)
+
+- **Method:** `POST`
+- **Path:** `/api/fiscal/providers/validate`
+- **Tags:** fiscal
+
+Requires `settings.fiscal.manage`. Records `lastValidationAt`/`validationStatus`; never returns secrets.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`provider` (required)**
+
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+**Example:**
+
+```json
+{
+  "provider": "arca_wsfe"
+}
+```
+
+#### Responses
+
+##### Status: 200 Validation outcome
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Provider not registered
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Static capability declaration for every registered fiscal provider (#378)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/providers/capabilities`
+- **Tags:** fiscal
+
+Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe` is the only provider with `implemented: true` today — `uruguay_dgi` and `mexico_sat_pac` are capability-only stubs (Not evidenced in current codebase — no live SOAP/REST client).
+
+#### Responses
+
+##### Status: 200 Capability list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`countryCode` (required)**
+
+    `string`
+
+  - **`displayName` (required)**
+
+    `string`
+
+  - **`implemented` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+  - **`supportsCancel` (required)**
+
+    `boolean`
+
+  - **`supportsCreditNote` (required)**
+
+    `boolean`
+
+  - **`supportsHealthCheck` (required)**
+
+    `boolean`
+
+  - **`supportsInvoice` (required)**
+
+    `boolean`
+
+  - **`supportsLastAuthorizedNumber` (required)**
+
+    `boolean`
+
+  - **`notes`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "provider": "arca_wsfe",
+      "countryCode": "",
+      "displayName": "",
+      "implemented": true,
+      "supportsInvoice": true,
+      "supportsCreditNote": true,
+      "supportsCancel": true,
+      "supportsHealthCheck": true,
+      "supportsLastAuthorizedNumber": true,
+      "notes": ""
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Authorize a fiscal document for an invoice (#378)
+
+- **Method:** `POST`
+- **Path:** `/api/fiscal/documents/{facturaId}/authorize`
+- **Tags:** fiscal
+
+Requires `sales.create`. Resolves the tenant's default fiscal provider (`arca_wsfe` today) and delegates to its adapter; idempotent by `{provider}:factura:{facturaId}`. Generalizes `POST /api/arca/cae`.
+
+#### Responses
+
+##### Status: 200 Authorization outcome
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fiscalDocumentId` (required)**
+
+    `integer`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"pending", "authorized", "rejected", "failed"`
+
+  - **`authorizationCode`**
+
+    `string`
+
+  - **`authorizationExpiresAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "fiscalDocumentId": 1,
+    "status": "pending",
+    "authorizationCode": "",
+    "authorizationExpiresAt": "",
+    "provider": "arca_wsfe"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Factura or fiscal config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Fiscal provider not configured
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 Provider authorization request failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/fiscal/regimenes
 
 - **Method:** `PARAMETERS`
@@ -113151,6 +114050,534 @@ Originating invoice header (selected columns)
   "data": {
     "cae": "",
     "caeVto": ""
+  }
+}
+```
+
+### FiscalProviderCode
+
+- **Type:**`string`
+
+**Example:**
+
+### FiscalProviderCapabilities
+
+- **Type:**`object`
+
+* **`countryCode` (required)**
+
+  `string`
+
+* **`displayName` (required)**
+
+  `string`
+
+* **`implemented` (required)**
+
+  `boolean`
+
+* **`provider` (required)**
+
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+* **`supportsCancel` (required)**
+
+  `boolean`
+
+* **`supportsCreditNote` (required)**
+
+  `boolean`
+
+* **`supportsHealthCheck` (required)**
+
+  `boolean`
+
+* **`supportsInvoice` (required)**
+
+  `boolean`
+
+* **`supportsLastAuthorizedNumber` (required)**
+
+  `boolean`
+
+* **`notes`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "provider": "arca_wsfe",
+  "countryCode": "",
+  "displayName": "",
+  "implemented": true,
+  "supportsInvoice": true,
+  "supportsCreditNote": true,
+  "supportsCancel": true,
+  "supportsHealthCheck": true,
+  "supportsLastAuthorizedNumber": true,
+  "notes": ""
+}
+```
+
+### FiscalProviderCapabilitiesListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`countryCode` (required)**
+
+    `string`
+
+  - **`displayName` (required)**
+
+    `string`
+
+  - **`implemented` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+  - **`supportsCancel` (required)**
+
+    `boolean`
+
+  - **`supportsCreditNote` (required)**
+
+    `boolean`
+
+  - **`supportsHealthCheck` (required)**
+
+    `boolean`
+
+  - **`supportsInvoice` (required)**
+
+    `boolean`
+
+  - **`supportsLastAuthorizedNumber` (required)**
+
+    `boolean`
+
+  - **`notes`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "provider": "arca_wsfe",
+      "countryCode": "",
+      "displayName": "",
+      "implemented": true,
+      "supportsInvoice": true,
+      "supportsCreditNote": true,
+      "supportsCancel": true,
+      "supportsHealthCheck": true,
+      "supportsLastAuthorizedNumber": true,
+      "notes": ""
+    }
+  ]
+}
+```
+
+### FiscalProviderStatusEntry
+
+- **Type:**`object`
+
+* **`capabilities` (required)**
+
+  `object`
+
+  - **`countryCode` (required)**
+
+    `string`
+
+  - **`displayName` (required)**
+
+    `string`
+
+  - **`implemented` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+  - **`supportsCancel` (required)**
+
+    `boolean`
+
+  - **`supportsCreditNote` (required)**
+
+    `boolean`
+
+  - **`supportsHealthCheck` (required)**
+
+    `boolean`
+
+  - **`supportsInvoice` (required)**
+
+    `boolean`
+
+  - **`supportsLastAuthorizedNumber` (required)**
+
+    `boolean`
+
+  - **`notes`**
+
+    `string`
+
+* **`configured` (required)**
+
+  `boolean`
+
+* **`countryCode` (required)**
+
+  `string`
+
+* **`enabled` (required)**
+
+  `boolean`
+
+* **`isDefault` (required)**
+
+  `boolean`
+
+* **`provider` (required)**
+
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+* **`environment`**
+
+  `string`, possible values: `"homologacion", "produccion"`
+
+* **`lastValidationAt`**
+
+  `string`, format: `date-time`
+
+* **`legalName`**
+
+  `string`
+
+* **`pointOfSale`**
+
+  `string`
+
+* **`taxIdentifier`**
+
+  `string`
+
+* **`validationStatus`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "provider": "arca_wsfe",
+  "countryCode": "",
+  "capabilities": {
+    "provider": "arca_wsfe",
+    "countryCode": "",
+    "displayName": "",
+    "implemented": true,
+    "supportsInvoice": true,
+    "supportsCreditNote": true,
+    "supportsCancel": true,
+    "supportsHealthCheck": true,
+    "supportsLastAuthorizedNumber": true,
+    "notes": ""
+  },
+  "configured": true,
+  "enabled": true,
+  "isDefault": true,
+  "environment": "homologacion",
+  "taxIdentifier": "",
+  "legalName": "",
+  "pointOfSale": "",
+  "lastValidationAt": "",
+  "validationStatus": ""
+}
+```
+
+### FiscalProviderStatusListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`capabilities` (required)**
+
+    `object`
+
+    - **`countryCode` (required)**
+
+      `string`
+
+    - **`displayName` (required)**
+
+      `string`
+
+    - **`implemented` (required)**
+
+      `boolean`
+
+    - **`provider` (required)**
+
+      `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+    - **`supportsCancel` (required)**
+
+      `boolean`
+
+    - **`supportsCreditNote` (required)**
+
+      `boolean`
+
+    - **`supportsHealthCheck` (required)**
+
+      `boolean`
+
+    - **`supportsInvoice` (required)**
+
+      `boolean`
+
+    - **`supportsLastAuthorizedNumber` (required)**
+
+      `boolean`
+
+    - **`notes`**
+
+      `string`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+  - **`countryCode` (required)**
+
+    `string`
+
+  - **`enabled` (required)**
+
+    `boolean`
+
+  - **`isDefault` (required)**
+
+    `boolean`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+  - **`environment`**
+
+    `string`, possible values: `"homologacion", "produccion"`
+
+  - **`lastValidationAt`**
+
+    `string`, format: `date-time`
+
+  - **`legalName`**
+
+    `string`
+
+  - **`pointOfSale`**
+
+    `string`
+
+  - **`taxIdentifier`**
+
+    `string`
+
+  - **`validationStatus`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "provider": "arca_wsfe",
+      "countryCode": "",
+      "capabilities": {
+        "provider": "arca_wsfe",
+        "countryCode": "",
+        "displayName": "",
+        "implemented": true,
+        "supportsInvoice": true,
+        "supportsCreditNote": true,
+        "supportsCancel": true,
+        "supportsHealthCheck": true,
+        "supportsLastAuthorizedNumber": true,
+        "notes": ""
+      },
+      "configured": true,
+      "enabled": true,
+      "isDefault": true,
+      "environment": "homologacion",
+      "taxIdentifier": "",
+      "legalName": "",
+      "pointOfSale": "",
+      "lastValidationAt": "",
+      "validationStatus": ""
+    }
+  ]
+}
+```
+
+### FiscalProviderConfigInput
+
+- **Type:**`object`
+
+* **`provider` (required)**
+
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+* **`ambiente`**
+
+  `string`, possible values: `"homologacion", "produccion"`
+
+* **`certificate`**
+
+  `string`
+
+* **`cuit`**
+
+  `string`
+
+* **`privateKey`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "provider": "arca_wsfe",
+  "cuit": "",
+  "certificate": "",
+  "privateKey": "",
+  "ambiente": "homologacion"
+}
+```
+
+### FiscalProviderValidateInput
+
+- **Type:**`object`
+
+* **`provider` (required)**
+
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+**Example:**
+
+```json
+{
+  "provider": "arca_wsfe"
+}
+```
+
+### FiscalProviderValidateEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`configured` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "configured": true
+  }
+}
+```
+
+### FiscalDocumentAuthorizeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`fiscalDocumentId` (required)**
+
+    `integer`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "mexico_sat_pac"`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"pending", "authorized", "rejected", "failed"`
+
+  - **`authorizationCode`**
+
+    `string`
+
+  - **`authorizationExpiresAt`**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "fiscalDocumentId": 1,
+    "status": "pending",
+    "authorizationCode": "",
+    "authorizationExpiresAt": "",
+    "provider": "arca_wsfe"
   }
 }
 ```
