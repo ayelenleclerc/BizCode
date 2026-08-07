@@ -1,13 +1,29 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
+    "accessToken": {
+      "description": "New opaque access token (also set as bizcode_session cookie)",
+      "type": "string"
+    },
+    "expiresIn": {
+      "description": "Access token lifetime in seconds (900 = 15 minutes)",
+      "example": 900,
+      "type": "integer"
+    },
+    "refreshToken": {
+      "description": "New opaque refresh token (also set as bizcode_refresh cookie)",
+      "type": "string"
+    },
     "refreshed": {
       "const": true,
       "type": "boolean"
     }
   },
   "required": [
-    "refreshed"
+    "refreshed",
+    "accessToken",
+    "refreshToken",
+    "expiresIn"
   ],
   "title": "RefreshResult",
   "type": "object"

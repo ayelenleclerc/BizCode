@@ -50,6 +50,17 @@ export function getCookieValue(rawCookieHeader: string | undefined, key: string)
   return null
 }
 
+/**
+ * @en Extracts an opaque Bearer token from an Authorization header (#167).
+ * @es Extrae un token opaco Bearer del header Authorization (#167).
+ * @pt-BR Extrai um token opaco Bearer do header Authorization (#167).
+ */
+export function getBearerToken(authorizationHeader: string | undefined): string | null {
+  if (!authorizationHeader) return null
+  const match = /^Bearer\s+(\S+)$/i.exec(authorizationHeader.trim())
+  return match?.[1] ?? null
+}
+
 function appendSetCookie(res: Response, cookie: string): void {
   const prev = res.getHeader('Set-Cookie')
   if (!prev) {
@@ -89,6 +100,23 @@ export type IssuedTokenPair = {
   accessSessionId: number
   refreshTokenId: number
   refreshTtlMs: number
+}
+
+/**
+ * @en Session token fields returned alongside cookies for RN/Expo clients (#167).
+ * @es Campos de token de sesión devueltos junto a cookies para clientes RN/Expo (#167).
+ * @pt-BR Campos de token de sessão retornados junto com cookies para clientes RN/Expo (#167).
+ */
+export function buildBearerTokenPayload(pair: Pick<IssuedTokenPair, 'accessToken' | 'refreshToken'>): {
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
+} {
+  return {
+    accessToken: pair.accessToken,
+    refreshToken: pair.refreshToken,
+    expiresIn: ACCESS_TOKEN_TTL_MS / 1000,
+  }
 }
 
 /**

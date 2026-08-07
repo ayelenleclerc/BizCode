@@ -196,7 +196,7 @@ describe('authAPI', () => {
     it('retorna loggedOut', async () => {
       mockPost.mockResolvedValueOnce({ data: { data: { loggedOut: true } } })
       expect(await authAPI.logout()).toEqual({ loggedOut: true })
-      expect(mockPost).toHaveBeenCalledWith('/auth/logout')
+      expect(mockPost).toHaveBeenCalledWith('/auth/logout', undefined)
     })
 
     it('lanza error del servidor', async () => {

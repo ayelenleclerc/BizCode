@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "refreshToken": {
+      "description": "Opaque refresh token when cookies are unavailable (mobile/RN,",
+      "type": "string"
+    }
+  },
+  "title": "RefreshInput",
+  "type": "object"
+}

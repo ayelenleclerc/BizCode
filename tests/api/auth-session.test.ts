@@ -173,6 +173,9 @@ describe('Auth session endpoints', () => {
     expect(login.status).toBe(200)
     expect(login.body.success).toBe(true)
     expect(login.body.data.username).toBe(loginName)
+    expect(typeof login.body.data.accessToken).toBe('string')
+    expect(typeof login.body.data.refreshToken).toBe('string')
+    expect(login.body.data.expiresIn).toBe(900)
     const cookiesRaw = login.headers['set-cookie']
     const cookies = !cookiesRaw ? [] : Array.isArray(cookiesRaw) ? cookiesRaw : [cookiesRaw]
     const sessionCookie = cookies.find((c) => c.startsWith('bizcode_session='))
@@ -181,8 +184,7 @@ describe('Auth session endpoints', () => {
     expect(refreshCookie).toBeTruthy()
 
     const token = decodeURIComponent(sessionCookie!.split(';')[0].split('=')[1])
-    expect(typeof token).toBe('string')
-    expect(token.length).toBeGreaterThan(20)
+    expect(token).toBe(login.body.data.accessToken)
 
     const me = await request(app)
       .get('/api/auth/me')

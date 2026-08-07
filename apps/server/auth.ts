@@ -25,8 +25,10 @@ import {
   REFRESH_COOKIE_NAME,
   SESSION_EXPIRED_ERROR,
   blacklistRefreshHash,
+  buildBearerTokenPayload,
   clearAuthCookies,
   createOpaqueToken,
+  getBearerToken,
   getCookieValue,
   hashOpaqueToken,
   opaqueTokenHashCandidates,
@@ -159,7 +161,11 @@ export function resolveSession(prisma: PrismaClient) {
       return
     }
 
-    const token = getCookieValue(req.headers.cookie, ACCESS_COOKIE_NAME)
+    const token =
+      getCookieValue(req.headers.cookie, ACCESS_COOKIE_NAME) ??
+      getBearerToken(
+        typeof req.headers.authorization === 'string' ? req.headers.authorization : undefined,
+      )
     if (!token) {
       next()
       return
@@ -575,6 +581,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
         tenantId: user.tenantId,
         username: user.username,
         role,
+        ...buildBearerTokenPayload(pair),
       },
     })
   })
@@ -682,6 +689,7 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
         tenantId: user.tenantId,
         username: user.username,
         role,
+        ...buildBearerTokenPayload(pair),
       },
     })
   })
@@ -878,8 +886,16 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
   })
 
   authRouter.post('/refresh', async (req: Request, res: Response) => {
-    const rawRefresh = getCookieValue(req.headers.cookie, REFRESH_COOKIE_NAME)
-    // Missing cookie: reject without mutating cookies (CodeQL js/user-controlled-bypass).
+    const body = (req.body ?? {}) as { refreshToken?: string }
+    const rawRefresh =
+      getCookieValue(req.headers.cookie, REFRESH_COOKIE_NAME) ??
+      (typeof body.refreshToken === 'string' && body.refreshToken.length > 0
+        ? body.refreshToken
+        : null) ??
+      getBearerToken(
+        typeof req.headers.authorization === 'string' ? req.headers.authorization : undefined,
+      )
+    // Missing refresh: reject without mutating cookies (CodeQL js/user-controlled-bypass).
     if (typeof rawRefresh !== 'string' || rawRefresh.length === 0) {
       res.status(401).json({ success: false, error: SESSION_EXPIRED_ERROR })
       return
@@ -980,12 +996,27 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
       ipAddress: req.ip,
       metadata: { tokenFamily: pair.tokenFamily },
     })
-    res.json({ success: true, data: { refreshed: true } })
+    res.json({
+      success: true,
+      data: {
+        refreshed: true as const,
+        ...buildBearerTokenPayload(pair),
+      },
+    })
   })
 
   authRouter.post('/logout', async (req: AuthenticatedRequest, res: Response) => {
-    const accessToken = getCookieValue(req.headers.cookie, ACCESS_COOKIE_NAME)
-    const refreshToken = getCookieValue(req.headers.cookie, REFRESH_COOKIE_NAME)
+    const body = (req.body ?? {}) as { refreshToken?: string }
+    const accessToken =
+      getCookieValue(req.headers.cookie, ACCESS_COOKIE_NAME) ??
+      getBearerToken(
+        typeof req.headers.authorization === 'string' ? req.headers.authorization : undefined,
+      )
+    const refreshToken =
+      getCookieValue(req.headers.cookie, REFRESH_COOKIE_NAME) ??
+      (typeof body.refreshToken === 'string' && body.refreshToken.length > 0
+        ? body.refreshToken
+        : null)
     const now = new Date()
 
     if (refreshToken) {

@@ -15,6 +15,9 @@ export type LoginSuccessData = {
   tenantId: number
   username: string
   role: string
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
 }
 
 export type LoginMfaChallengeData = {
@@ -107,18 +110,34 @@ export function createAuthAPI(http: AxiosInstance) {
       }
     },
 
-    refresh: async (): Promise<{ refreshed: boolean }> => {
+    refresh: async (body?: { refreshToken?: string }): Promise<{
+      refreshed: boolean
+      accessToken: string
+      refreshToken: string
+      expiresIn: number
+    }> => {
       try {
-        const response = await http.post<{ success: boolean; data: { refreshed: boolean } }>('/auth/refresh')
+        const response = await http.post<{
+          success: boolean
+          data: {
+            refreshed: boolean
+            accessToken: string
+            refreshToken: string
+            expiresIn: number
+          }
+        }>('/auth/refresh', body)
         return response.data.data
       } catch (error) {
         return handleError(error as AxiosError<ApiErrorPayload>)
       }
     },
 
-    logout: async (): Promise<{ loggedOut: boolean }> => {
+    logout: async (body?: { refreshToken?: string }): Promise<{ loggedOut: boolean }> => {
       try {
-        const response = await http.post<{ success: boolean; data: { loggedOut: boolean } }>('/auth/logout')
+        const response = await http.post<{ success: boolean; data: { loggedOut: boolean } }>(
+          '/auth/logout',
+          body,
+        )
         return response.data.data
       } catch (error) {
         return handleError(error as AxiosError<ApiErrorPayload>)

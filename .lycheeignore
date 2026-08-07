@@ -6,7 +6,9 @@ https://www\.npmjs\.com/package/@adobe/jsonschema2md
 https://www\.npmjs\.com/package/@scalar/openapi-to-markdown
 # regexr.com: enlaces "try pattern" generados por jsonschema2md en docs/generated/schema-md/; 520 en CI.
 https://regexr\.com/
+# argentina.gob.ar (AAIP): timeouts intermitentes desde runners de GitHub Actions.
+https://www\.argentina\.gob\.ar/aaip
 http://localhost
-http://127.0.0.1
+http://127\.0\.0\.1
 https://localhost
-https://127.0.0.1
+https://127\.0\.0\.1

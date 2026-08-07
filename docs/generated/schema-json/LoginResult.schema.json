@@ -1,6 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
+    "accessToken": {
+      "description": "Opaque access token for Authorization Bearer (also HttpOnly cookie)",
+      "type": "string"
+    },
+    "expiresIn": {
+      "description": "Access token lifetime in seconds",
+      "example": 900,
+      "type": "integer"
+    },
+    "refreshToken": {
+      "description": "Opaque refresh token for rotation (also HttpOnly cookie)",
+      "type": "string"
+    },
     "role": {
       "type": "string"
     },
@@ -18,7 +31,10 @@
     "userId",
     "tenantId",
     "username",
-    "role"
+    "role",
+    "accessToken",
+    "refreshToken",
+    "expiresIn"
   ],
   "title": "LoginResult",
   "type": "object"
