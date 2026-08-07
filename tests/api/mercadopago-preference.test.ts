@@ -64,6 +64,20 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     reciboCobroImputacion: {
       groupBy: vi.fn().mockResolvedValue([]),
     },
+    paymentTransaction: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({ id: 1 }),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      update: vi.fn().mockResolvedValue({ id: 1 }),
+    },
+    paymentProviderConfig: {
+      findMany: vi.fn().mockResolvedValue([]),
+      findUnique: vi.fn().mockResolvedValue(null),
+      findFirst: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({ id: 1 }),
+      update: vi.fn().mockResolvedValue({ id: 1 }),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+    },
     factura: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue({
@@ -128,7 +142,7 @@ describe('Mercado Pago invoice payment link API', () => {
     expect(createMercadoPagoPreference).toHaveBeenCalledOnce()
   })
 
-  it('POST /api/facturas/:id/mp/preference returns 409 when active preference exists', async () => {
+  it('POST /api/facturas/:id/mp/preference returns existing active preference (idempotent)', async () => {
     const app = createApp(
       buildPrismaMock({
         factura: {
@@ -151,10 +165,24 @@ describe('Mercado Pago invoice payment link API', () => {
           }),
           update: vi.fn(),
         },
+        paymentTransaction: {
+          findUnique: vi.fn().mockResolvedValue(null),
+          upsert: vi.fn().mockResolvedValue({
+            id: 1,
+            status: 'pending',
+            providerCode: 'mercadopago',
+            preferenceId: 'old-pref',
+            checkoutUrl: 'https://mp.test/old',
+            amount: new Decimal('2500.00'),
+            currency: 'ARS',
+          }),
+        },
       }),
     )
-    const res = await request(app).post('/api/facturas/7/mp/preference').expect(409)
-    expect(res.body.error).toBe('MP_PREFERENCE_ALREADY_ACTIVE')
+    const res = await request(app).post('/api/facturas/7/mp/preference').expect(201)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.preferenceId).toBe('old-pref')
+    expect(res.body.data.paymentLink).toBe('https://mp.test/old')
   })
 
   it('returns 403 when mercadopago integration disabled', async () => {

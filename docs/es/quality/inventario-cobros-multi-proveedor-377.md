@@ -18,7 +18,15 @@ Mapea componentes Mercado Pago existentes hacia el módulo multi-proveedor.
 | `/api/webhooks/mercadopago` | Alias compat | `PaymentWebhookService` |
 | `MercadoPagoConfigSection` | Montar dentro de sección genérica | `PaymentProviderSection` |
 | Flag de integración `mercadopago` | Conservar | `IfIntegration` / `requireMercadoPagoIntegration` |
-| Campos `Factura.mp*` | Reutilizar | DTO / resultados del adapter |
-| `MercadoPagoProcessedPayment` | Reutilizar | Idempotencia de webhooks |
+| Campos `Factura.mp*` | Dual-write con ledger (hasta ADR de corte) | Preferencia/QR MP; espejo de `PaymentTransaction` |
+| `PaymentTransaction` (Prisma) | Ledger nuevo (DoD #377) | `PaymentTransactionService` + `PaymentService` / webhook / refund |
+| `MercadoPagoProcessedPayment` | Reutilizar | Idempotencia de webhooks (+ sync del ledger) |
+
+## Entregado (#377)
+
+- Contrato + registry; adapter MP live; stubs Payway/Stripe.
+- `PaymentProviderConfig` + migrate/verify; ledger `PaymentTransaction` con create idempotente.
+- Servicios genéricos + rutas `/api/payments/*` (checkout/status/refund/flags) y alias MP `deprecated`.
+- UI default/enable + checkout vía `paymentsAPI.createCheckout`.
 
 Ver [ADR-0019](../adr/ADR-0019-payments-multi-provider.md).

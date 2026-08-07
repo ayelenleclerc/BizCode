@@ -18,8 +18,10 @@ Maps existing Mercado Pago components to the multi-provider module destinations.
 | `/api/webhooks/mercadopago` | Compat alias | `PaymentWebhookService` |
 | `MercadoPagoConfigSection` | Mount inside generic section | `PaymentProviderSection` |
 | Integration flag `mercadopago` | Keep | Unchanged `IfIntegration` / `requireMercadoPagoIntegration` |
-| Factura `mp*` fields | Reuse (no dual Factura table) | Normalized via DTO / adapter results |
-| `MercadoPagoProcessedPayment` | Reuse | Idempotency store for webhooks |
+| Factura `mp*` fields | Dual-write with ledger (keep until cut-over ADR) | Written by MP preference/QR path; mirrored from `PaymentTransaction` /
+  adapter results |
+| `PaymentTransaction` (Prisma) | New ledger (#377 DoD) | `PaymentTransactionService` + `PaymentService` / webhook / refund |
+| `MercadoPagoProcessedPayment` | Reuse | Idempotency store for webhooks (+ ledger sync after process) |
 
 ## Delivered (#377)
 
@@ -27,13 +29,15 @@ Maps existing Mercado Pago components to the multi-provider module destinations.
 - Live adapter: `MercadoPagoPaymentAdapter` (wraps existing MP services; single HTTP client).
 - Stubs: Payway / Stripe (`implemented: false`).
 - Prisma `PaymentProviderConfig` + dual-read/write + migrate/verify scripts.
-- Services: `PaymentProviderConfigService`, `PaymentService`, `PaymentWebhookService`.
-- Routes: `/api/payments/*` + legacy MP aliases.
-- UI: `PaymentProviderSection` + `MercadoPagoConfigSection`.
+- Prisma `PaymentTransaction` ledger (`idempotencyKey`, dual-write `Factura.mp*`).
+- Services: `PaymentProviderConfigService` (default/enabled), `PaymentTransactionService`, `PaymentService`, `PaymentWebhookService`.
+- Routes: `/api/payments/*` (checkout, status, refund, flags) + legacy MP aliases (`deprecated` in OpenAPI).
+- UI: `PaymentProviderSection` (default/enable) + `MercadoPagoConfigSection`; checkout via `paymentsAPI.createCheckout`.
+- Idempotent preference create (reuse active checkout; no empty 409).
 
 ## Consumers confirmed
 
-- Facturación: preference / QR / refund modals
+- Facturación: preference / QR / refund modals (`paymentsAPI` for checkout)
 - Webhook + reconciliation + chargebacks
 - Portal: opens existing `mpPaymentLink` only
-- OpenAPI tag `mercadopago` (+ new `payments`)
+- OpenAPI tag `mercadopago` (deprecated paths) + `payments`

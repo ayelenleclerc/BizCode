@@ -1,49 +1,45 @@
+/**
+ * @vitest-environment jsdom
+ */
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import MercadoPagoPaymentLinkModal from './MercadoPagoPaymentLinkModal'
-import { facturasAPI } from '@/lib/api'
 import type { Factura } from '@bizcode/types'
+
+const { getMpStatus, createCheckout, tStable } = vi.hoisted(() => ({
+  getMpStatus: vi.fn(),
+  createCheckout: vi.fn(),
+  tStable: (key: string) => key,
+}))
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: Record<string, string>) => {
-      const map: Record<string, string> = {
-        'mercadopago.modalTitle': 'Link de pago',
-        'mercadopago.modalSubtitle': `Factura ${opts?.ref ?? ''}`,
-        'mercadopago.loading': 'Cargando…',
-        'mercadopago.createLink': 'Generar link',
-        'mercadopago.creating': 'Generando…',
-        'mercadopago.estado.none': 'Sin link',
-        'mercadopago.estado.pending': 'Pendiente',
-        'mercadopago.linkLabel': 'Link',
-        'mercadopago.copy': 'Copiar',
-        'mercadopago.whatsapp': 'WhatsApp',
-        'mercadopago.email': 'Email',
-        'mercadopago.shareGroup': 'Compartir',
-        'mercadopago.whatsappDisabled': 'Sin teléfono',
-        'mercadopago.emailDisabled': 'Sin email',
-        'detail.close': 'Cerrar',
-      }
-      return map[key] ?? key
-    },
+    t: tStable,
+    i18n: { language: 'es' },
   }),
 }))
 
 vi.mock('@/lib/api', () => ({
   facturasAPI: {
-    getMpStatus: vi.fn(),
+    getMpStatus,
     createMpPreference: vi.fn(),
+    getMpQr: vi.fn(),
+    refundMp: vi.fn(),
+  },
+  paymentsAPI: {
+    createCheckout,
   },
 }))
 
+import MercadoPagoPaymentLinkModal from './MercadoPagoPaymentLinkModal'
+
 const factura: Factura = {
-  id: 7,
-  fecha: '2026-06-01',
-  tipo: 'B',
+  id: 1,
+  fecha: '2026-08-01',
+  tipo: 'A',
   prefijo: '0001',
-  numero: 99,
-  clienteId: 2,
+  numero: 1,
+  clienteId: 10,
   neto1: 100,
   neto2: 0,
   neto3: 0,
@@ -55,40 +51,73 @@ const factura: Factura = {
 
 describe('MercadoPagoPaymentLinkModal', () => {
   beforeEach(() => {
-    vi.mocked(facturasAPI.getMpStatus).mockResolvedValue({
-      estado: 'none',
-      amount: '121.00',
-    })
-    vi.mocked(facturasAPI.createMpPreference).mockResolvedValue({
-      estado: 'pending',
-      paymentLink: 'https://mp.test/pay',
-      amount: '121.00',
-    })
-    Object.assign(navigator, {
-      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    getMpStatus.mockReset()
+    createCheckout.mockReset()
+    getMpStatus.mockResolvedValue({ estado: 'none' })
+    createCheckout.mockResolvedValue({
+      provider: 'mercadopago',
+      preferenceId: 'pref-1',
+      initPoint: 'https://mp.test/pay',
+      sandboxInitPoint: null,
+      externalReference: '1',
+      invoiceId: 1,
     })
   })
 
-  it('loads status and creates preference', async () => {
+  it('creates checkout via paymentsAPI and shows link', async () => {
     const user = userEvent.setup()
+    let checkoutCreated = false
+    createCheckout.mockImplementation(async () => {
+      checkoutCreated = true
+      return {
+        provider: 'mercadopago',
+        preferenceId: 'pref-1',
+        initPoint: 'https://mp.test/pay',
+        sandboxInitPoint: null,
+        externalReference: '1',
+        invoiceId: 1,
+      }
+    })
+    getMpStatus.mockImplementation(async () =>
+      checkoutCreated
+        ? {
+            estado: 'pending',
+            preferenceId: 'pref-1',
+            paymentLink: 'https://mp.test/pay',
+          }
+        : { estado: 'none' },
+    )
+
     render(
       <MercadoPagoPaymentLinkModal
         factura={factura}
-        cliente={{ id: 2, codigo: 1, rsocial: 'ACME', condIva: 'RI', activo: true, telef: '5491112345678', email: 'a@b.com' } as never}
+        cliente={undefined}
         onClose={vi.fn()}
       />,
     )
 
     await waitFor(() => {
-      expect(screen.getByTestId('btn-mp-create-preference')).toBeInTheDocument()
+      expect(getMpStatus).toHaveBeenCalledWith(1)
     })
+    expect(await screen.findByTestId('btn-mp-create-preference')).toBeInTheDocument()
 
-    vi.mocked(facturasAPI.createMpPreference).mockClear()
     await user.click(screen.getByTestId('btn-mp-create-preference'))
 
     await waitFor(() => {
-      expect(facturasAPI.createMpPreference).toHaveBeenCalledTimes(1)
-      expect(facturasAPI.createMpPreference).toHaveBeenCalledWith(7)
+      expect(createCheckout).toHaveBeenCalledWith(1)
     })
+    expect(await screen.findByTestId('mp-payment-link-input')).toHaveValue('https://mp.test/pay')
+  })
+
+  it('calls onClose from close button', async () => {
+    const user = userEvent.setup()
+    const onClose = vi.fn()
+    render(
+      <MercadoPagoPaymentLinkModal factura={factura} cliente={undefined} onClose={onClose} />,
+    )
+
+    await screen.findByTestId('btn-mp-modal-close')
+    await user.click(screen.getByTestId('btn-mp-modal-close'))
+    expect(onClose).toHaveBeenCalledTimes(1)
   })
 })

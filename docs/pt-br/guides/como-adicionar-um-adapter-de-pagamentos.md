@@ -20,11 +20,11 @@ Em `bootstrapPaymentProviders.ts` e no `switch` fechado de `getPaymentProviderAd
 
 ## 5. Prisma / segredos
 
-Reutilizar `PaymentProviderConfig` com `encryptFiscalSecret`.
+Reutilizar `PaymentProviderConfig` com `encryptFiscalSecret`. Os checkouts são persistidos em `PaymentTransaction` (`idempotencyKey = '{provider}:factura:{invoiceId}'`) via `PaymentService` / `PaymentTransactionService`; o adapter não deve inventar outra tabela ledger.
 
 ## 6. Rotas / UI / OpenAPI
 
-As rotas genéricas e `PaymentProviderSection` já são agnósticas. Atualizar o enum OpenAPI `PaymentProviderCode` se houver código novo.
+As rotas genéricas (checkout/status/refund/flags) e `PaymentProviderSection` já são agnósticas. Atualizar o enum OpenAPI `PaymentProviderCode` se houver código novo.
 
 ## 7. Testes
 

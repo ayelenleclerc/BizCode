@@ -45,7 +45,18 @@ describe('PaymentWebhookService', () => {
 
   it('processMercadoPagoPaymentNotification delegates idempotent processing', async () => {
     processPaymentNotification.mockResolvedValue(undefined)
-    const svc = new PaymentWebhookService({} as PrismaClient)
+    const prisma = {
+      mercadoPagoProcessedPayment: {
+        findUnique: vi.fn().mockResolvedValue(null),
+      },
+      paymentTransaction: {
+        findUnique: vi.fn().mockResolvedValue(null),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      factura: { findFirst: vi.fn() },
+    } as unknown as PrismaClient
+    const svc = new PaymentWebhookService(prisma)
     await svc.processMercadoPagoPaymentNotification(1, 'pay-1', '127.0.0.1')
     expect(processPaymentNotification).toHaveBeenCalledWith(1, 'pay-1', '127.0.0.1')
   })

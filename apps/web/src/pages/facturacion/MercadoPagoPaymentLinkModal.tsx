@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { facturasAPI, type MercadoPagoFacturaPaymentDto } from '@/lib/api'
+import { facturasAPI, paymentsAPI, type MercadoPagoFacturaPaymentDto } from '@/lib/api'
 import type { Cliente, Factura } from '@bizcode/types'
 
 type Props = {
@@ -61,7 +61,8 @@ export default function MercadoPagoPaymentLinkModal({
     setCreating(true)
     setError(null)
     try {
-      const data = await facturasAPI.createMpPreference(factura.id)
+      await paymentsAPI.createCheckout(factura.id)
+      const data = await facturasAPI.getMpStatus(factura.id)
       setStatus(data)
       onStatusChange?.(data)
     } catch (err: unknown) {

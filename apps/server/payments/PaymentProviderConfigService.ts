@@ -219,4 +219,82 @@ export class PaymentProviderConfigService {
     }
     return configured
   }
+
+  /**
+   * @en Sets the default payment provider for a tenant (clears other defaults).
+   * @es Define el proveedor de pagos predeterminado del tenant (limpia otros defaults).
+   * @pt-BR Define o provedor de pagamento padrão do tenant (limpa outros defaults).
+   */
+  async setDefaultProvider(
+    tenantId: number,
+    provider: PaymentProviderCode,
+  ): Promise<ServiceResult<{ provider: PaymentProviderCode; isDefault: boolean }>> {
+    const row = await this.prisma.paymentProviderConfig.findUnique({
+      where: { tenantId_providerCode: { tenantId, providerCode: provider } },
+    })
+    if (!row) {
+      return { ok: false, status: 404, error: 'PAYMENT_PROVIDER_CONFIG_NOT_FOUND' }
+    }
+    if (!row.enabled) {
+      return { ok: false, status: 422, error: 'PAYMENT_PROVIDER_DISABLED' }
+    }
+    await this.prisma.$transaction([
+      this.prisma.paymentProviderConfig.updateMany({
+        where: { tenantId, NOT: { providerCode: provider } },
+        data: { isDefault: false },
+      }),
+      this.prisma.paymentProviderConfig.update({
+        where: { id: row.id },
+        data: { isDefault: true },
+      }),
+    ])
+    return { ok: true, data: { provider, isDefault: true } }
+  }
+
+  /**
+   * @en Enables or disables a configured payment provider.
+   * @es Activa o desactiva un proveedor de pagos configurado.
+   * @pt-BR Ativa ou desativa um provedor de pagamento configurado.
+   */
+  async setProviderEnabled(
+    tenantId: number,
+    provider: PaymentProviderCode,
+    enabled: boolean,
+  ): Promise<ServiceResult<{ provider: PaymentProviderCode; enabled: boolean; isDefault: boolean }>> {
+    const row = await this.prisma.paymentProviderConfig.findUnique({
+      where: { tenantId_providerCode: { tenantId, providerCode: provider } },
+    })
+    if (!row) {
+      return { ok: false, status: 404, error: 'PAYMENT_PROVIDER_CONFIG_NOT_FOUND' }
+    }
+    const updated = await this.prisma.paymentProviderConfig.update({
+      where: { id: row.id },
+      data: {
+        enabled,
+        isDefault: enabled ? row.isDefault : false,
+      },
+    })
+    if (!enabled && row.isDefault) {
+      const fallback = await this.prisma.paymentProviderConfig.findFirst({
+        where: { tenantId, enabled: true },
+        orderBy: { id: 'asc' },
+      })
+      if (fallback) {
+        await this.prisma.paymentProviderConfig.update({
+          where: { id: fallback.id },
+          data: { isDefault: true },
+        })
+      }
+    }
+    if (provider === 'mercadopago') {
+      await this.prisma.mercadoPagoConfig.updateMany({
+        where: { tenantId },
+        data: { activo: enabled },
+      })
+    }
+    return {
+      ok: true,
+      data: { provider, enabled: updated.enabled, isDefault: enabled ? updated.isDefault : false },
+    }
+  }
 }

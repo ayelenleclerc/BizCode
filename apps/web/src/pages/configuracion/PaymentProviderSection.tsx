@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { paymentsAPI, type PaymentProviderStatusEntry } from '@/lib/api'
+import { paymentsAPI, type PaymentProviderCode, type PaymentProviderStatusEntry } from '@/lib/api'
 import IfIntegration from '@/components/IfIntegration'
 import MercadoPagoConfigSection from './MercadoPagoConfigSection'
 
@@ -17,6 +17,8 @@ export default function PaymentProviderSection() {
   const [loading, setLoading] = useState(true)
   const [providers, setProviders] = useState<PaymentProviderStatusEntry[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [busyProvider, setBusyProvider] = useState<PaymentProviderCode | null>(null)
 
   const loadProviders = useCallback(async () => {
     setLoading(true)
@@ -34,6 +36,22 @@ export default function PaymentProviderSection() {
   useEffect(() => {
     void loadProviders()
   }, [loadProviders])
+
+  const runFlagsUpdate = async (
+    provider: PaymentProviderCode,
+    flags: { enabled?: boolean; isDefault?: boolean },
+  ) => {
+    setBusyProvider(provider)
+    setActionError(null)
+    try {
+      await paymentsAPI.updateProviderFlags({ provider, ...flags })
+      await loadProviders()
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : t('paymentProviders.errors.updateFailed'))
+    } finally {
+      setBusyProvider(null)
+    }
+  }
 
   return (
     <IfIntegration id="mercadopago">
@@ -61,6 +79,17 @@ export default function PaymentProviderSection() {
           </p>
         )}
 
+        {actionError && (
+          <p
+            className="text-red-600 dark:text-red-400 text-sm"
+            role="alert"
+            aria-live="polite"
+            data-testid="payment-providers-action-error"
+          >
+            {actionError}
+          </p>
+        )}
+
         {!loading && !loadError && (
           <ul data-testid="list-payment-providers" className="divide-y divide-slate-200 dark:divide-slate-700">
             {providers.map((provider) => (
@@ -75,7 +104,7 @@ export default function PaymentProviderSection() {
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">{provider.provider}</p>
                 </div>
-                <div className="flex flex-wrap gap-2 text-xs">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
                   {provider.isDefault && (
                     <span className="rounded bg-sky-100 px-2 py-0.5 text-sky-800 dark:bg-sky-900 dark:text-sky-100">
                       {t('paymentProviders.defaultBadge')}
@@ -95,6 +124,34 @@ export default function PaymentProviderSection() {
                       {t('paymentProviders.notImplementedBadge')}
                     </span>
                   )}
+                  {provider.configured && provider.capabilities.implemented ? (
+                    <div className="flex flex-wrap gap-1">
+                      {!provider.isDefault ? (
+                        <button
+                          type="button"
+                          className="rounded border border-sky-600 px-2 py-1 text-sky-700 dark:text-sky-300 disabled:opacity-50"
+                          data-testid={`payment-provider-set-default-${provider.provider}`}
+                          disabled={busyProvider === provider.provider || !provider.enabled}
+                          onClick={() => void runFlagsUpdate(provider.provider, { isDefault: true })}
+                        >
+                          {t('paymentProviders.actions.setDefault')}
+                        </button>
+                      ) : null}
+                      <button
+                        type="button"
+                        className="rounded border border-slate-400 px-2 py-1 text-slate-700 dark:text-slate-200 disabled:opacity-50"
+                        data-testid={`payment-provider-toggle-${provider.provider}`}
+                        disabled={busyProvider === provider.provider}
+                        onClick={() =>
+                          void runFlagsUpdate(provider.provider, { enabled: !provider.enabled })
+                        }
+                      >
+                        {provider.enabled
+                          ? t('paymentProviders.actions.disable')
+                          : t('paymentProviders.actions.enable')}
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
               </li>
             ))}

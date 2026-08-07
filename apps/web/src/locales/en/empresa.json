@@ -67,8 +67,14 @@
     "configuredBadge": "Configured",
     "notConfiguredBadge": "Not configured",
     "notImplementedBadge": "Not available in this build",
+    "actions": {
+      "setDefault": "Set as default",
+      "enable": "Enable",
+      "disable": "Disable"
+    },
     "errors": {
-      "loadFailed": "Could not load payment providers"
+      "loadFailed": "Could not load payment providers",
+      "updateFailed": "Could not update the payment provider"
     }
   },
   "arca": {

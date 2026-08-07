@@ -1,13 +1,20 @@
 /**
  * @en Orchestrates checkout/refund/status via the payment provider registry (#377).
+ *   Persists PaymentTransaction and dual-writes Factura.mp* through adapters.
  * @es Orquesta checkout/reembolso/estado vía el registry de proveedores de pago (#377).
+ *   Persiste PaymentTransaction y dual-write Factura.mp* vía adapters.
  * @pt-BR Orquestra checkout/reembolso/status via o registry de provedores de pagamento (#377).
+ *   Persiste PaymentTransaction e dual-write Factura.mp* via adapters.
  */
 
 import type { PrismaClient } from '@prisma/client'
 import type { ServiceResult } from '../services/serviceResults'
 import { bootstrapPaymentProviders } from './bootstrapPaymentProviders'
 import { PaymentProviderConfigService } from './PaymentProviderConfigService'
+import {
+  invoiceIdempotencyKey,
+  PaymentTransactionService,
+} from './PaymentTransactionService'
 import { getPaymentProviderAdapter } from './paymentProviderRegistry'
 import type {
   CreatePaymentResult,
@@ -18,10 +25,12 @@ import type {
 
 export class PaymentService {
   private readonly configService: PaymentProviderConfigService
+  private readonly transactions: PaymentTransactionService
 
   constructor(private readonly prisma: PrismaClient) {
     bootstrapPaymentProviders()
     this.configService = new PaymentProviderConfigService(prisma)
+    this.transactions = new PaymentTransactionService(prisma)
   }
 
   async resolveDefaultProvider(tenantId: number): Promise<PaymentProviderCode | null> {
@@ -46,11 +55,29 @@ export class PaymentService {
     if (!adapter?.getCapabilities().implemented) {
       return { ok: false, status: 501, error: 'PAYMENT_PROVIDER_NOT_IMPLEMENTED' }
     }
-    return adapter.createPayment({
+
+    const idempotencyKey = invoiceIdempotencyKey(resolved, invoiceId)
+    const existing = await this.transactions.findByIdempotencyKey(tenantId, idempotencyKey)
+    if (existing && this.transactions.isReusableCheckout(existing)) {
+      return { ok: true, data: this.transactions.toCreatePaymentResult(existing) }
+    }
+
+    const result = await adapter.createPayment({
       tenantId,
       invoiceId,
-      idempotencyKey: `${resolved}:factura:${invoiceId}`,
+      idempotencyKey,
     })
+    if (!result.ok) return result
+
+    await this.transactions.upsertCheckout({
+      tenantId,
+      provider: resolved,
+      invoiceId,
+      idempotencyKey,
+      result: result.data,
+      paymentType: 'preference',
+    })
+    return result
   }
 
   async getPaymentStatus(
@@ -63,7 +90,18 @@ export class PaymentService {
     if (!adapter) {
       return { ok: false, status: 404, error: 'PAYMENT_PROVIDER_NOT_REGISTERED' }
     }
-    return adapter.getPaymentStatus(tenantId, invoiceId)
+    const result = await adapter.getPaymentStatus(tenantId, invoiceId)
+    if (result.ok) {
+      await this.transactions.syncInvoiceCheckoutStatus({
+        tenantId,
+        invoiceId,
+        provider: resolved,
+        status: result.data.status,
+        providerStatus: result.data.providerStatus,
+        externalPaymentId: result.data.externalPaymentId,
+      })
+    }
+    return result
   }
 
   async refundPayment(
@@ -78,13 +116,31 @@ export class PaymentService {
     }
     const adapter = getPaymentProviderAdapter(resolved, this.prisma)
     if (!adapter?.refundPayment) {
-      return { ok: false, status: 501, error: 'PAYMENT_REFUND_NOT_SUPPORTED' }
+      return { ok: false, status: 501, error: 'PAYMENT_PROVIDER_NOT_IMPLEMENTED' }
     }
-    return adapter.refundPayment({
+    const result = await adapter.refundPayment({
       tenantId,
       invoiceId,
       amount: input.amount,
       reason: input.reason,
     })
+    if (!result.ok) return result
+
+    await this.transactions.recordRefund({
+      tenantId,
+      provider: resolved,
+      invoiceId,
+      amount: result.data.amount ?? input.amount ?? 0,
+      status: result.data.status,
+      refundId: result.data.refundId,
+    })
+    await this.transactions.syncInvoiceCheckoutStatus({
+      tenantId,
+      invoiceId,
+      provider: resolved,
+      status: result.data.status,
+      providerStatus: result.data.status,
+    })
+    return result
   }
 }

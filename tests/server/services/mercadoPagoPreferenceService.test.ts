@@ -116,13 +116,14 @@ describe('MercadoPagoPreferenceService', () => {
     }
   })
 
-  it('createPreference rejects active pending preference', async () => {
+  it('createPreference returns existing active pending preference (idempotent)', async () => {
     const prisma = buildPrismaMock({
       factura: {
         findFirst: vi.fn().mockResolvedValue({
           ...baseFactura,
           mpEstado: 'pending',
           mpPreferenceId: 'pref-active',
+          mpPaymentLink: 'https://mp.test/active',
           mpPreferenceExpiresAt: new Date(Date.now() + 60_000),
         }),
         update: vi.fn(),
@@ -130,7 +131,12 @@ describe('MercadoPagoPreferenceService', () => {
     })
     const service = new MercadoPagoPreferenceService(prisma)
     const result = await service.createPreference(1, 7)
-    expect(result).toEqual({ ok: false, status: 409, error: 'MP_PREFERENCE_ALREADY_ACTIVE' })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.preferenceId).toBe('pref-active')
+      expect(result.data.paymentLink).toBe('https://mp.test/active')
+      expect(result.data.estado).toBe('pending')
+    }
     expect(createMercadoPagoPreference).not.toHaveBeenCalled()
   })
 

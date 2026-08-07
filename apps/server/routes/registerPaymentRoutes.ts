@@ -34,6 +34,18 @@ const validateProviderBodySchema = z.object({
   provider: z.enum(PAYMENT_PROVIDER_CODES),
 })
 
+const providerFlagsBodySchema = z.object({
+  provider: z.enum(PAYMENT_PROVIDER_CODES),
+  enabled: z.boolean().optional(),
+  isDefault: z.boolean().optional(),
+})
+
+const refundBodySchema = z.object({
+  amount: z.number().positive().optional(),
+  reason: z.string().min(1).max(500).optional(),
+  provider: z.enum(PAYMENT_PROVIDER_CODES).optional(),
+})
+
 const facturaIdParamSchema = z.coerce.number().int().min(1)
 
 export function registerPaymentRoutes(app: Application, ctx: RestRouteContext): void {
@@ -98,6 +110,49 @@ export function registerPaymentRoutes(app: Application, ctx: RestRouteContext): 
     },
   )
 
+  app.patch(
+    '/api/payments/providers/config',
+    paymentsMutationHttpRateLimiter,
+    requirePermission('settings.business.manage'),
+    validateBody(providerFlagsBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const body = req.body as z.infer<typeof providerFlagsBodySchema>
+        const tenantId = getTenantId(req)
+        if (body.enabled !== undefined) {
+          const enabledResult = await providerConfigService.setProviderEnabled(
+            tenantId,
+            body.provider,
+            body.enabled,
+          )
+          if (!enabledResult.ok) {
+            res.status(enabledResult.status).json({ success: false, error: enabledResult.error })
+            return
+          }
+        }
+        if (body.isDefault === true) {
+          const defaultResult = await providerConfigService.setDefaultProvider(tenantId, body.provider)
+          if (!defaultResult.ok) {
+            res.status(defaultResult.status).json({ success: false, error: defaultResult.error })
+            return
+          }
+        }
+        const status = await providerConfigService.getStatus(tenantId)
+        const entry = status.ok ? status.data.find((e) => e.provider === body.provider) : undefined
+        await writeAudit(
+          req as AuthenticatedRequest,
+          'payment_provider_flags_update',
+          'payment_provider_config',
+          String(tenantId),
+          { provider: body.provider, enabled: body.enabled, isDefault: body.isDefault },
+        )
+        res.json({ success: true, data: entry ?? null })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
   app.post(
     '/api/payments/providers/validate',
     paymentsMutationHttpRateLimiter,
@@ -152,6 +207,65 @@ export function registerPaymentRoutes(app: Application, ctx: RestRouteContext): 
           'factura',
           String(parsedId.data),
           { provider: result.data.provider, status: result.data.status },
+        )
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/payments/invoices/:facturaId/status',
+    requirePermission('reports.financial.read'),
+    async (req: Request, res: Response) => {
+      try {
+        const parsedId = facturaIdParamSchema.safeParse(req.params.facturaId)
+        if (!parsedId.success) {
+          res.status(400).json({ success: false, error: 'INVALID_FACTURA_ID' })
+          return
+        }
+        const result = await paymentService.getPaymentStatus(getTenantId(req), parsedId.data)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/payments/invoices/:facturaId/refund',
+    paymentsMutationHttpRateLimiter,
+    requirePermission('sales.cancel'),
+    validateBody(refundBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const parsedId = facturaIdParamSchema.safeParse(req.params.facturaId)
+        if (!parsedId.success) {
+          res.status(400).json({ success: false, error: 'INVALID_FACTURA_ID' })
+          return
+        }
+        const body = req.body as z.infer<typeof refundBodySchema>
+        const result = await paymentService.refundPayment(
+          getTenantId(req),
+          parsedId.data,
+          { amount: body.amount, reason: body.reason },
+          body.provider,
+        )
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(
+          req as AuthenticatedRequest,
+          'payment_refund_create',
+          'factura',
+          String(parsedId.data),
+          { refundId: result.data.refundId, status: result.data.status },
         )
         res.json({ success: true, data: result.data })
       } catch (err: unknown) {
