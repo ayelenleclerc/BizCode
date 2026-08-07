@@ -31,9 +31,11 @@ In [`bootstrapPaymentProviders.ts`](../../../apps/server/payments/bootstrapPayme
 
 Reuse `PaymentProviderConfig`: store under `providerCode = '<provider>'`, `encryptedConfig` via `encryptFiscalSecret` / `decryptFiscalSecret`. Do not add provider-specific plaintext secret columns.
 
+Checkout attempts are persisted in `PaymentTransaction` by `PaymentService` / `PaymentTransactionService` using `idempotencyKey = '{provider}:factura:{invoiceId}'`. Adapters should not invent a second ledger table; map provider ids into the existing ledger fields (`externalPaymentId`, `preferenceId`, `checkoutUrl`, normalized `status`).
+
 ## 6. Routes / UI / OpenAPI
 
-No new routes are required for basic status/validate/checkout: `registerPaymentRoutes.ts` and `PaymentProviderSection.tsx` read from `getCapabilities()` / `PaymentProviderConfigService.getStatus()`. Update `docs/api/openapi.yaml` `PaymentProviderCode` enum if you added a new code.
+No new routes are required for basic status/validate/checkout/refund/flags: `registerPaymentRoutes.ts` and `PaymentProviderSection.tsx` read from `getCapabilities()` / `PaymentProviderConfigService`. Update `docs/api/openapi.yaml` `PaymentProviderCode` enum if you added a new code.
 
 ## 7. Tests
 

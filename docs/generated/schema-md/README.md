@@ -808,6 +808,8 @@
 
 * [PaymentProviderConfigInput](./paymentproviderconfiginput.md) – `-`
 
+* [PaymentProviderFlagsEnvelope](./paymentproviderflagsenvelope.md) – `-`
+
 * [PaymentProviderStatusEntry](./paymentproviderstatusentry.md) – `-`
 
 * [PaymentProviderStatusListEnvelope](./paymentproviderstatuslistenvelope.md) – `-`
@@ -815,6 +817,10 @@
 * [PaymentProviderValidateEnvelope](./paymentprovidervalidateenvelope.md) – `-`
 
 * [PaymentProviderValidateInput](./paymentprovidervalidateinput.md) – `-`
+
+* [PaymentRefundEnvelope](./paymentrefundenvelope.md) – `-`
+
+* [PaymentStatusEnvelope](./paymentstatusenvelope.md) – `-`
 
 * [Pedido](./pedido.md) – `-`
 
@@ -1513,6 +1519,10 @@
 * [Untitled object in PaymentCheckoutEnvelope](./paymentcheckoutenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in PaymentProviderValidateEnvelope](./paymentprovidervalidateenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PaymentRefundEnvelope](./paymentrefundenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PaymentStatusEnvelope](./paymentstatusenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in PedidoInput](./pedidoinput-properties-items-items.md "Catalog line requires articuloId") – `undefined#/properties/items/items`
 

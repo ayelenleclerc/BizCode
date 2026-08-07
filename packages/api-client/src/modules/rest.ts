@@ -2172,11 +2172,70 @@ export const paymentsAPI = {
     }
   },
 
+  updateProviderFlags: async (input: {
+    provider: PaymentProviderCode
+    enabled?: boolean
+    isDefault?: boolean
+  }): Promise<PaymentProviderStatusEntry | null> => {
+    try {
+      const response = await api.patch<{ success: boolean; data: PaymentProviderStatusEntry | null }>(
+        '/payments/providers/config',
+        input,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
   createCheckout: async (facturaId: number): Promise<PaymentCheckoutResult> => {
     try {
       const response = await api.post<{ success: boolean; data: PaymentCheckoutResult }>(
         `/payments/invoices/${facturaId}/checkout`,
       )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  getStatus: async (
+    facturaId: number,
+  ): Promise<{
+    status: string
+    providerStatus?: string
+    externalPaymentId?: string
+    amount?: number
+    currency?: string
+    approvedAt?: string | null
+  }> => {
+    try {
+      const response = await api.get<{
+        success: boolean
+        data: {
+          status: string
+          providerStatus?: string
+          externalPaymentId?: string
+          amount?: number
+          currency?: string
+          approvedAt?: string | null
+        }
+      }>(`/payments/invoices/${facturaId}/status`)
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  refund: async (
+    facturaId: number,
+    input?: { amount?: number; reason?: string; provider?: PaymentProviderCode },
+  ): Promise<{ status: string; refundId?: string; amount?: number }> => {
+    try {
+      const response = await api.post<{
+        success: boolean
+        data: { status: string; refundId?: string; amount?: number }
+      }>(`/payments/invoices/${facturaId}/refund`, input ?? {})
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

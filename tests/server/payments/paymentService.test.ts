@@ -24,10 +24,23 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findUnique: vi.fn().mockResolvedValue(null),
       findFirst: vi.fn().mockResolvedValue(null),
       upsert: vi.fn().mockResolvedValue({ id: 1 }),
+      update: vi.fn().mockResolvedValue({ id: 1 }),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+    },
+    paymentTransaction: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockImplementation(async ({ create }: { create: Record<string, unknown> }) => ({
+        id: 1,
+        ...create,
+        amount: create.amount ?? new Decimal(0),
+      })),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      update: vi.fn().mockResolvedValue({ id: 1 }),
     },
     mercadoPagoConfig: {
       findUnique: vi.fn().mockResolvedValue(null),
       upsert: vi.fn().mockResolvedValue({ id: 1 }),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
     reciboCobroImputacion: {
       groupBy: vi.fn().mockResolvedValue([]),
@@ -57,6 +70,12 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       }),
       update: vi.fn().mockResolvedValue({}),
     },
+    $transaction: vi.fn(async (ops: unknown) => {
+      if (Array.isArray(ops)) {
+        return Promise.all(ops)
+      }
+      return ops
+    }),
     ...overrides,
   } as unknown as PrismaClient
 }
@@ -271,5 +290,82 @@ describe('PaymentService', () => {
       expect(result.data.preferenceId).toBe('pref-svc')
       expect(result.data.provider).toBe('mercadopago')
     }
+    expect(prisma.paymentTransaction.upsert).toHaveBeenCalled()
+  })
+
+  it('createPaymentForInvoice reuses PaymentTransaction when checkout is still active', async () => {
+    const prisma = buildPrismaMock({
+      paymentProviderConfig: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            providerCode: 'mercadopago',
+            enabled: true,
+            isDefault: true,
+            environment: 'sandbox',
+            accessTokenLast4: 'TOKEN',
+            publicKey: 'PK',
+            webhookSecretSet: true,
+            lastValidationAt: null,
+            validationStatus: null,
+          },
+        ]),
+        findUnique: vi.fn(),
+        findFirst: vi.fn(),
+        upsert: vi.fn(),
+      },
+      paymentTransaction: {
+        findUnique: vi.fn().mockResolvedValue({
+          id: 9,
+          tenantId: 1,
+          providerCode: 'mercadopago',
+          status: 'pending',
+          preferenceId: 'pref-existing',
+          checkoutUrl: 'https://mp.example/existing',
+          amount: new Decimal(1500),
+          currency: 'ARS',
+          expiredAt: new Date(Date.now() + 60_000),
+          providerStatus: 'pending',
+          externalPaymentId: null,
+        }),
+        upsert: vi.fn(),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const service = new PaymentService(prisma)
+    const result = await service.createPaymentForInvoice(1, 7)
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.preferenceId).toBe('pref-existing')
+      expect(result.data.checkoutUrl).toBe('https://mp.example/existing')
+    }
+    expect(prisma.paymentTransaction.upsert).not.toHaveBeenCalled()
+  })
+
+  it('setDefaultProvider clears other defaults', async () => {
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 })
+    const update = vi.fn().mockResolvedValue({ id: 2, isDefault: true })
+    const prisma = buildPrismaMock({
+      paymentProviderConfig: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findUnique: vi.fn().mockResolvedValue({
+          id: 2,
+          tenantId: 1,
+          providerCode: 'mercadopago',
+          enabled: true,
+          isDefault: false,
+        }),
+        findFirst: vi.fn(),
+        upsert: vi.fn(),
+        update,
+        updateMany,
+      },
+      $transaction: vi.fn(async (ops: Promise<unknown>[]) => Promise.all(ops)),
+    })
+    const config = new PaymentProviderConfigService(prisma)
+    const result = await config.setDefaultProvider(1, 'mercadopago')
+    expect(result.ok).toBe(true)
+    expect(updateMany).toHaveBeenCalled()
+    expect(update).toHaveBeenCalled()
   })
 })

@@ -1,6 +1,6 @@
 # ADR-0019: Módulo de cobranças multi-provedor (Mercado Pago como primeiro adapter)
 
-**Status:** Aceito  
+**Status:** Aceito (emenda 2026-08-07: ledger `PaymentTransaction` + fechamento DoD #377)  
 **Data:** 2026-08-06  
 **Referência ISO:** ISO/IEC 12207:2017 §6.3.2; ISO 9001:2015 §8.3.3
 
@@ -22,16 +22,17 @@ Opções consideradas:
 3. `MercadoPagoPaymentAdapter` envolve os serviços MP existentes — **sem segundo cliente HTTP**.
 4. Stubs `payway` / `stripe` com `implemented: false` e `PaymentAdapterNotImplementedError`.
 5. Prisma `PaymentProviderConfig` com dual-read/write de `MercadoPagoConfig`; reutiliza `Factura.mp*` e `MercadoPagoProcessedPayment`.
-6. `PaymentProviderConfigService`, `PaymentService`, `PaymentWebhookService` (fachada; efeitos ReciboCobro em `MercadoPagoWebhookService`).
-7. Rotas genéricas `/api/payments/*` + alias legado MP.
-8. UI `PaymentProviderSection` + formulário `MercadoPagoConfigSection`.
+6. Ledger Prisma `PaymentTransaction` (`@@unique([tenantId, idempotencyKey])`, chave `{provider}:factura:{id}`): upsert no checkout, create idempotente (reutiliza preferência/link ativo), sync em webhook/refund; dual-write com `Factura.mp*` até ADR de corte.
+7. `PaymentProviderConfigService` (`enabled` / um só `isDefault`), `PaymentTransactionService`, `PaymentService`, `PaymentWebhookService` (fachada; efeitos ReciboCobro em `MercadoPagoWebhookService`).
+8. Rotas genéricas `/api/payments/*` (checkout, status, refund, flags) + alias legado MP (`deprecated: true` no OpenAPI) que delegam create via `PaymentService`.
+9. UI `PaymentProviderSection` (default/enable) + `MercadoPagoConfigSection`; modal de link cria checkout com `paymentsAPI.createCheckout`.
 
 ## Consequências
 
-- Positivo: MP intercambiável; stubs degradam com 501.
-- Negativo: duas fontes de config até deprecar `MercadoPagoConfig`.
+- Positivo: MP intercambiável; ledger + idempotência; stubs degradam com 501.
+- Negativo: dual-write (`PaymentTransaction` ↔ `Factura.mp*` ↔ MP legado) até scripts de verify e ADR de corte.
 - **Não evidenciado no código atual:** clientes live Payway/Fiserv/Getnet/Stripe.
-- Seguimento: ADR futuro antes de remover dual-read ou implementar adapter não-MP real.
+- Seguimento: ADR futuro antes de remover `MercadoPagoConfig` / colunas `Factura.mp*` ou implementar adapter não-MP real.
 
 ## Referências
 

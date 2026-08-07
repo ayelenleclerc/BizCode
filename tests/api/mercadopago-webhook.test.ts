@@ -101,6 +101,12 @@ function buildPrismaMock(): PrismaClient {
       findUnique: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue({ id: 1 }),
     },
+    paymentTransaction: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      update: vi.fn().mockResolvedValue({ id: 1 }),
+      upsert: vi.fn().mockResolvedValue({ id: 1 }),
+    },
     factura: {
       findFirst: vi.fn().mockResolvedValue({
         id: 7,

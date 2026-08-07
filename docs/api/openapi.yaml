@@ -3925,6 +3925,54 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
         '500':
           $ref: '#/components/responses/ServerError'
+    patch:
+      tags: [payments]
+      summary: Update provider enabled / default flags (#377)
+      description: |
+        Requires `settings.business.manage`. Sets `enabled` and/or `isDefault` for a configured
+        provider. Only one default is allowed per tenant.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [provider]
+              properties:
+                provider:
+                  $ref: '#/components/schemas/PaymentProviderCode'
+                enabled:
+                  type: boolean
+                isDefault:
+                  type: boolean
+                  description: When true, clears other defaults for the tenant
+      responses:
+        '200':
+          description: Updated provider status entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProviderFlagsEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Provider config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Provider disabled or invalid flag combination
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/payments/providers/validate:
     post:
@@ -4017,6 +4065,91 @@ paths:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
         '501':
           description: Provider not implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/payments/invoices/{facturaId}/status:
+    get:
+      tags: [payments]
+      summary: Normalized payment status for an invoice (#377)
+      description: Requires `reports.financial.read`. Syncs `PaymentTransaction` when present.
+      parameters:
+        - name: facturaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Normalized payment status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentStatusEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Invoice or provider not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/payments/invoices/{facturaId}/refund:
+    post:
+      tags: [payments]
+      summary: Refund invoice payment via default or specified provider (#377)
+      description: Requires `sales.cancel`. Records a `PaymentTransaction` with paymentType `refund`.
+      parameters:
+        - name: facturaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  exclusiveMinimum: 0
+                reason:
+                  type: string
+                  maxLength: 500
+                provider:
+                  $ref: '#/components/schemas/PaymentProviderCode'
+      responses:
+        '200':
+          description: Refund outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRefundEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Provider not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '501':
+          description: Provider refunds not implemented
           content:
             application/json:
               schema:
@@ -7706,9 +7839,12 @@ paths:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
+      deprecated: true
       tags: [facturas, mercadopago]
       summary: Mercado Pago payment status for invoice (#175, #177)
-      description: Requires `reports.financial.read` and tenant integration `mercadopago`. Returns derived estado including `expired` when preference or QR TTL elapsed; includes active link or QR channel.
+      description: |
+        Deprecated — prefer `GET /api/payments/invoices/{facturaId}/status`.
+        Requires `reports.financial.read` and tenant integration `mercadopago`. Returns derived estado including `expired` when preference or QR TTL elapsed; includes active link or QR channel.
       security:
         - cookieSession: []
       parameters:
@@ -7743,10 +7879,13 @@ paths:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
     post:
+      deprecated: true
       tags: [facturas, mercadopago]
       summary: Create Mercado Pago checkout preference for invoice (#175)
       description: |
+        Deprecated — prefer `POST /api/payments/invoices/{facturaId}/checkout` (idempotent; returns existing active preference).
         Creates a Mercado Pago Checkout preference for the invoice outstanding balance (ARS), stores `mpPreferenceId` and `mpPaymentLink` on `Factura`.
+        Also upserts `PaymentTransaction` (#377).
         Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 409 when an active non-expired preference or QR already exists.
       security:
         - cookieSession: []
@@ -10538,9 +10677,12 @@ paths:
 
   /api/configuracion/mercadopago:
     get:
+      deprecated: true
       tags: [mercadopago]
       summary: Mercado Pago config status (metadata only) (#174)
-      description: Requires `settings.business.manage` and tenant integration `mercadopago`. Does not return access token or webhook secret.
+      description: |
+        Deprecated — prefer `GET /api/payments/providers/config`.
+        Requires `settings.business.manage` and tenant integration `mercadopago`. Does not return access token or webhook secret.
       security:
         - cookieSession: []
       responses:
@@ -10557,9 +10699,12 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
     put:
+      deprecated: true
       tags: [mercadopago]
       summary: Upsert tenant Mercado Pago credentials (#174)
-      description: Requires `settings.business.manage` and tenant integration `mercadopago`. Access token and webhook secret encrypted at rest.
+      description: |
+        Deprecated — prefer `PUT /api/payments/providers/config`.
+        Requires `settings.business.manage` and tenant integration `mercadopago`. Access token and webhook secret encrypted at rest.
       security:
         - cookieSession: []
       requestBody:
@@ -21902,6 +22047,48 @@ components:
             providerStatus: { type: string }
             amount: { type: number }
             currency: { type: string }
+
+    PaymentStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [status]
+          properties:
+            status: { type: string }
+            providerStatus: { type: string }
+            externalPaymentId: { type: string }
+            amount: { type: number }
+            currency: { type: string }
+            approvedAt:
+              type: string
+              format: date-time
+              nullable: true
+
+    PaymentRefundEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: object
+          required: [status]
+          properties:
+            status: { type: string }
+            refundId: { type: string }
+            amount: { type: number }
+
+    PaymentProviderFlagsEnvelope:
+      type: object
+      required: [success]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/PaymentProviderStatusEntry'
+            - type: 'null'
 
     FiscalDocumentAuthorizeEnvelope:
       type: object

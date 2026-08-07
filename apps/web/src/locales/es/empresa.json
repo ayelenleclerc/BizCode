@@ -67,8 +67,14 @@
     "configuredBadge": "Configurado",
     "notConfiguredBadge": "Sin configurar",
     "notImplementedBadge": "No disponible en esta versión",
+    "actions": {
+      "setDefault": "Usar como predeterminado",
+      "enable": "Activar",
+      "disable": "Desactivar"
+    },
     "errors": {
-      "loadFailed": "No se pudieron cargar los proveedores de cobro"
+      "loadFailed": "No se pudieron cargar los proveedores de cobro",
+      "updateFailed": "No se pudo actualizar el proveedor"
     }
   },
   "arca": {

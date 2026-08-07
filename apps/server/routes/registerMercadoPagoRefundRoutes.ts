@@ -79,6 +79,15 @@ export function registerMercadoPagoRefundRoutes(app: Application, ctx: RestRoute
           res.status(result.status).json({ success: false, error: result.error })
           return
         }
+        const { PaymentTransactionService } = await import('../payments/PaymentTransactionService')
+        await new PaymentTransactionService(prisma).recordRefund({
+          tenantId,
+          provider: 'mercadopago',
+          invoiceId: facturaId,
+          amount: Number(result.data.monto),
+          status: result.data.estado === 'completado' ? 'refunded' : 'in_process',
+          refundId: result.data.mpRefundId ?? String(result.data.id),
+        })
         await writeAudit(authReq, 'mercadopago_refund', 'mercadopago_refund', String(result.data.id), {
           facturaId,
           mpPaymentId: result.data.mpPaymentId,

@@ -1,6 +1,6 @@
 # ADR-0019: Módulo de cobros multi-proveedor (Mercado Pago como primer adapter)
 
-**Estado:** Aceptado  
+**Estado:** Aceptado (enmienda 2026-08-07: ledger `PaymentTransaction` + cierre DoD #377)  
 **Fecha:** 2026-08-06  
 **Referencia ISO:** ISO/IEC 12207:2017 §6.3.2; ISO 9001:2015 §8.3.3
 
@@ -21,17 +21,18 @@ Opciones consideradas:
 2. Registry + bootstrap (`paymentProviderRegistry.ts`, `bootstrapPaymentProviders.ts`).
 3. `MercadoPagoPaymentAdapter` envuelve los servicios MP existentes — **sin segundo cliente HTTP**.
 4. Stubs `payway` / `stripe` con `implemented: false` y `PaymentAdapterNotImplementedError`.
-5. Prisma `PaymentProviderConfig` con dual-read/write de `MercadoPagoConfig`; se reutilizan `Factura.mp*` y `MercadoPagoProcessedPayment` (sin `PaymentTransaction` dual).
-6. `PaymentProviderConfigService`, `PaymentService`, `PaymentWebhookService` (fachada; efectos ReciboCobro en `MercadoPagoWebhookService`).
-7. Rutas genéricas `/api/payments/*` + alias legacy MP.
-8. UI `PaymentProviderSection` + formulario `MercadoPagoConfigSection`.
+5. Prisma `PaymentProviderConfig` con dual-read/write de `MercadoPagoConfig`; se reutilizan `Factura.mp*` y `MercadoPagoProcessedPayment`.
+6. Ledger Prisma `PaymentTransaction` (`@@unique([tenantId, idempotencyKey])`, clave `{provider}:factura:{id}`): upsert en checkout, create idempotente (reutiliza preferencia/link activo), sync en webhook/refund; dual-write con `Factura.mp*` hasta ADR de corte.
+7. `PaymentProviderConfigService` (`enabled` / un solo `isDefault`), `PaymentTransactionService`, `PaymentService`, `PaymentWebhookService` (fachada; efectos ReciboCobro en `MercadoPagoWebhookService`).
+8. Rutas genéricas `/api/payments/*` (checkout, status, refund, flags) + alias legacy MP (`deprecated: true` en OpenAPI) que delegan create vía `PaymentService`.
+9. UI `PaymentProviderSection` (default/enable) + `MercadoPagoConfigSection`; modal de link crea checkout con `paymentsAPI.createCheckout`.
 
 ## Consecuencias
 
-- Positivo: MP intercambiable; stubs degradan con 501.
-- Negativo: doble fuente de config hasta deprecar `MercadoPagoConfig`.
+- Positivo: MP intercambiable; ledger + idempotencia; stubs degradan con 501.
+- Negativo: dual-write (`PaymentTransaction` ↔ `Factura.mp*` ↔ MP legacy) hasta scripts de verify y ADR de corte.
 - **No evidenciado en el código actual:** clientes live Payway/Fiserv/Getnet/Stripe.
-- Seguimiento: ADR futuro antes de quitar dual-read o implementar un adapter no-MP real.
+- Seguimiento: ADR futuro antes de quitar `MercadoPagoConfig` / columnas `Factura.mp*` o implementar un adapter no-MP real.
 
 ## Referencias
 

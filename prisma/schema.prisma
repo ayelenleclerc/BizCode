@@ -897,6 +897,7 @@ model Factura {
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds               MercadoPagoRefund[]
   mercadoPagoChargebacks           MercadoPagoChargeback[]
+  paymentTransactions              PaymentTransaction[]
   liquidacionComisionDetalles      LiquidacionComisionDetalle[]
   movimientosPuntos                MovimientoPuntos[]
   /// @en Fiscal e-invoicing authorization attempts across providers (#378).
@@ -1654,6 +1655,7 @@ model Tenant {
   portalSessions                   PortalSession[]
   mercadoPagoConfig                MercadoPagoConfig?
   paymentProviderConfigs           PaymentProviderConfig[]
+  paymentTransactions              PaymentTransaction[]
   mercadoPagoProcessedPayments     MercadoPagoProcessedPayment[]
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds               MercadoPagoRefund[]
@@ -1836,6 +1838,49 @@ model PaymentProviderConfig {
   @@unique([tenantId, providerCode])
   @@index([tenantId])
   @@index([providerCode])
+}
+
+/// @en Generic payment operation ledger multi-provider (#377 DoD). Dual-writes Factura.mp* until a future cutover ADR.
+/// @es Libro de operaciones de cobro multi-proveedor (#377 DoD). Dual-write con Factura.mp* hasta ADR de corte.
+/// @pt-BR Livro de opera\u00e7\u00f5es de cobran\u00e7a multi-provedor (#377 DoD). Dual-write com Factura.mp* at\u00e9 ADR de corte.
+model PaymentTransaction {
+  id                Int          @id @default(autoincrement())
+  tenantId          Int
+  tenant            Tenant       @relation(fields: [tenantId], references: [id])
+  /// mercadopago | payway | stripe (PaymentProviderCode)
+  providerCode      String       @db.VarChar(30)
+  externalPaymentId String?      @db.VarChar(80)
+  externalReference String?      @db.VarChar(120)
+  /// e.g. factura:{id}
+  internalReference String       @db.VarChar(120)
+  /// preference | qr | refund | webhook | checkout
+  paymentType       String       @db.VarChar(30)
+  /// Normalized PaymentStatus (#377)
+  status            String       @db.VarChar(30)
+  providerStatus    String?      @db.VarChar(40)
+  amount            Decimal      @db.Decimal(14, 2)
+  currency          String       @default("ARS") @db.VarChar(3)
+  checkoutUrl       String?      @db.VarChar(500)
+  preferenceId      String?      @db.VarChar(80)
+  idempotencyKey    String       @db.VarChar(120)
+  facturaId         Int?
+  factura           Factura?     @relation(fields: [facturaId], references: [id], onDelete: SetNull)
+  reciboCobroId     Int?
+  reciboCobro       ReciboCobro? @relation(fields: [reciboCobroId], references: [id], onDelete: SetNull)
+  rawMetadata       Json?
+  approvedAt        DateTime?
+  rejectedAt        DateTime?
+  cancelledAt       DateTime?
+  expiredAt         DateTime?
+  refundedAt        DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@unique([tenantId, idempotencyKey])
+  @@index([tenantId, providerCode])
+  @@index([tenantId, facturaId])
+  @@index([externalPaymentId])
+  @@index([internalReference])
 }
 
 /// MercadoLibre OAuth tokens per tenant (#183); access/refresh encrypted at rest.
@@ -2653,6 +2698,7 @@ model ReciboCobro {
   mercadoPagoProcessedPayments     MercadoPagoProcessedPayment[]
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds               MercadoPagoRefund[]
+  paymentTransactions              PaymentTransaction[]
   liquidacionComisionDetalles      LiquidacionComisionDetalle[]
 
   @@unique([tenantId, numero])

@@ -178,7 +178,8 @@ export class MercadoPagoPreferenceService {
 
     const now = new Date()
     if (isActivePreference(factura, now)) {
-      return { ok: false, status: 409, error: 'MP_PREFERENCE_ALREADY_ACTIVE' }
+      const pendiente = await this.computePendiente(tenantId, factura.clienteId, factura)
+      return { ok: true, data: await this.mapToDto(factura, pendiente, now) }
     }
 
     if (isActiveQr(factura, now)) {

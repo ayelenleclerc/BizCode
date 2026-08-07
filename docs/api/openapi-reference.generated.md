@@ -24391,6 +24391,215 @@ Requires `settings.business.manage`. Only `provider: mercadopago` is implemented
 }
 ```
 
+### Update provider enabled / default flags (#377)
+
+- **Method:** `PATCH`
+- **Path:** `/api/payments/providers/config`
+- **Tags:** payments
+
+Requires `settings.business.manage`. Sets `enabled` and/or `isDefault` for a configured provider. Only one default is allowed per tenant.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`provider` (required)**
+
+  `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+- **`enabled`**
+
+  `boolean`
+
+- **`isDefault`**
+
+  `boolean` — When true, clears other defaults for the tenant
+
+**Example:**
+
+```json
+{
+  "provider": "mercadopago",
+  "enabled": true,
+  "isDefault": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated provider status entry
+
+###### Content-Type: application/json
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`data`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "provider": "mercadopago",
+    "capabilities": {
+      "provider": "mercadopago",
+      "displayName": "",
+      "implemented": true,
+      "supportsCheckoutUrl": true,
+      "supportsEmbeddedCheckout": true,
+      "supportsQr": true,
+      "supportsRefunds": true,
+      "supportsPartialRefunds": true,
+      "supportsCancellation": true,
+      "supportsRecurringPayments": true,
+      "supportsOAuth": true,
+      "supportsSandbox": true,
+      "notes": ""
+    },
+    "configured": true,
+    "enabled": true,
+    "isDefault": true,
+    "environment": "sandbox",
+    "accessTokenLast4": "",
+    "publicKey": "",
+    "webhookSecretSet": true,
+    "lastValidationAt": "",
+    "validationStatus": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Provider config not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Provider disabled or invalid flag combination
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Validate stored credentials for a payment provider (#377)
 
 - **Method:** `POST`
@@ -24901,6 +25110,330 @@ Requires `sales.create`. Resolves the tenant's default payment provider (`mercad
 ```
 
 ##### Status: 501 Provider not implemented
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Normalized payment status for an invoice (#377)
+
+- **Method:** `GET`
+- **Path:** `/api/payments/invoices/{facturaId}/status`
+- **Tags:** payments
+
+Requires `reports.financial.read`. Syncs `PaymentTransaction` when present.
+
+#### Responses
+
+##### Status: 200 Normalized payment status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`amount`**
+
+    `number`
+
+  - **`approvedAt`**
+
+    `string`, format: `date-time`
+
+  - **`currency`**
+
+    `string`
+
+  - **`externalPaymentId`**
+
+    `string`
+
+  - **`providerStatus`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "",
+    "providerStatus": "",
+    "externalPaymentId": "",
+    "amount": 1,
+    "currency": "",
+    "approvedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Invoice or provider not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Refund invoice payment via default or specified provider (#377)
+
+- **Method:** `POST`
+- **Path:** `/api/payments/invoices/{facturaId}/refund`
+- **Tags:** payments
+
+Requires `sales.cancel`. Records a `PaymentTransaction` with paymentType `refund`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`amount`**
+
+  `number`
+
+- **`provider`**
+
+  `string`, possible values: `"mercadopago", "payway", "stripe"`
+
+- **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "amount": 1,
+  "reason": "",
+  "provider": "mercadopago"
+}
+```
+
+#### Responses
+
+##### Status: 200 Refund outcome
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`amount`**
+
+    `number`
+
+  - **`refundId`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "",
+    "refundId": "",
+    "amount": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Provider not configured
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 501 Provider refunds not implemented
 
 ###### Content-Type: application/json
 
@@ -47096,13 +47629,13 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 - **Method:** `PARAMETERS`
 - **Path:** `/api/facturas/{id}/mp`
 
-### Mercado Pago payment status for invoice (#175,
+### Mercado Pago payment status for invoice (#175, ⚠️ Deprecated
 
 - **Method:** `GET`
 - **Path:** `/api/facturas/{id}/mp`
 - **Tags:** facturas, mercadopago
 
-Requires `reports.financial.read` and tenant integration `mercadopago`. Returns derived estado including `expired` when preference or QR TTL elapsed; includes active link or QR channel.
+Deprecated — prefer `GET /api/payments/invoices/{facturaId}/status`. Requires `reports.financial.read` and tenant integration `mercadopago`. Returns derived estado including `expired` when preference or QR TTL elapsed; includes active link or QR channel.
 
 #### Responses
 
@@ -47298,13 +47831,13 @@ Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 
 - **Method:** `PARAMETERS`
 - **Path:** `/api/facturas/{id}/mp/preference`
 
-### Create Mercado Pago checkout preference for invoice (#175)
+### Create Mercado Pago checkout preference for invoice (#175) ⚠️ Deprecated
 
 - **Method:** `POST`
 - **Path:** `/api/facturas/{id}/mp/preference`
 - **Tags:** facturas, mercadopago
 
-Creates a Mercado Pago Checkout preference for the invoice outstanding balance (ARS), stores `mpPreferenceId` and `mpPaymentLink` on `Factura`. Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 409 when an active non-expired preference or QR already exists.
+Deprecated — prefer `POST /api/payments/invoices/{facturaId}/checkout` (idempotent; returns existing active preference). Creates a Mercado Pago Checkout preference for the invoice outstanding balance (ARS), stores `mpPreferenceId` and `mpPaymentLink` on `Factura`. Also upserts `PaymentTransaction` (#377). Requires `reports.financial.read` and tenant integration `mercadopago`. Returns 409 when an active non-expired preference or QR already exists.
 
 #### Responses
 
@@ -62477,13 +63010,13 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 }
 ```
 
-### Mercado Pago config status (metadata only) (#174)
+### Mercado Pago config status (metadata only) (#174) ⚠️ Deprecated
 
 - **Method:** `GET`
 - **Path:** `/api/configuracion/mercadopago`
 - **Tags:** mercadopago
 
-Requires `settings.business.manage` and tenant integration `mercadopago`. Does not return access token or webhook secret.
+Deprecated — prefer `GET /api/payments/providers/config`. Requires `settings.business.manage` and tenant integration `mercadopago`. Does not return access token or webhook secret.
 
 #### Responses
 
@@ -62617,13 +63150,13 @@ Requires `settings.business.manage` and tenant integration `mercadopago`. Does n
 }
 ```
 
-### Upsert tenant Mercado Pago credentials (#174)
+### Upsert tenant Mercado Pago credentials (#174) ⚠️ Deprecated
 
 - **Method:** `PUT`
 - **Path:** `/api/configuracion/mercadopago`
 - **Tags:** mercadopago
 
-Requires `settings.business.manage` and tenant integration `mercadopago`. Access token and webhook secret encrypted at rest.
+Deprecated — prefer `PUT /api/payments/providers/config`. Requires `settings.business.manage` and tenant integration `mercadopago`. Access token and webhook secret encrypted at rest.
 
 #### Request Body
 
@@ -116129,6 +116662,142 @@ Originating invoice header (selected columns)
     "providerStatus": "",
     "amount": 1,
     "currency": ""
+  }
+}
+```
+
+### PaymentStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`amount`**
+
+    `number`
+
+  - **`approvedAt`**
+
+    `string`, format: `date-time`
+
+  - **`currency`**
+
+    `string`
+
+  - **`externalPaymentId`**
+
+    `string`
+
+  - **`providerStatus`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "",
+    "providerStatus": "",
+    "externalPaymentId": "",
+    "amount": 1,
+    "currency": "",
+    "approvedAt": ""
+  }
+}
+```
+
+### PaymentRefundEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`status` (required)**
+
+    `string`
+
+  - **`amount`**
+
+    `number`
+
+  - **`refundId`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "",
+    "refundId": "",
+    "amount": 1
+  }
+}
+```
+
+### PaymentProviderFlagsEnvelope
+
+- **Type:**`object`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`data`**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "provider": "mercadopago",
+    "capabilities": {
+      "provider": "mercadopago",
+      "displayName": "",
+      "implemented": true,
+      "supportsCheckoutUrl": true,
+      "supportsEmbeddedCheckout": true,
+      "supportsQr": true,
+      "supportsRefunds": true,
+      "supportsPartialRefunds": true,
+      "supportsCancellation": true,
+      "supportsRecurringPayments": true,
+      "supportsOAuth": true,
+      "supportsSandbox": true,
+      "notes": ""
+    },
+    "configured": true,
+    "enabled": true,
+    "isDefault": true,
+    "environment": "sandbox",
+    "accessTokenLast4": "",
+    "publicKey": "",
+    "webhookSecretSet": true,
+    "lastValidationAt": "",
+    "validationStatus": ""
   }
 }
 ```
