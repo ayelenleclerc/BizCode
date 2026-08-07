@@ -10,6 +10,7 @@ BizCode usa **pnpm workspaces** y **Turborepo** (#154):
 |------|-----|
 | `apps/web/` | Frontend React + Vite |
 | `apps/server/` | API Express |
+| `apps/seller/` | Expo (React Native) App Vendedor — ventas en campo (#167) |
 | `packages/types/` | Tipos TypeScript y contratos RBAC compartidos |
 | `packages/api-client/` | Cliente HTTP de la API |
 | `prisma/` | Esquema y migraciones (raíz del repo) |
@@ -24,6 +25,36 @@ El cliente HTTP compartido está en `packages/api-client/`. Ya no lee variables 
 Opcional en `.env` para la app web:
 
 - `VITE_API_URL` — base completa de la API incluyendo `/api` (p. ej. `http://localhost:3001/api`)
+
+### App Vendedor (`apps/seller`, #167)
+
+App Expo SDK con Expo Router. La UI usa React Native Paper (`@bizcode/ui` queda diferido a #157). Auth en modo **Bearer dual**: la API sigue seteando cookies HttpOnly para web y además devuelve `accessToken` / `refreshToken` / `expiresIn` en el body de login y refresh. La app seller guarda esos tokens en **expo-secure-store** (nunca AsyncStorage) y envía `Authorization: Bearer` más `x-bizcode-channel: field`.
+
+Roles permitidos: `seller`, `manager`, `owner`. Otros roles ven una pantalla accesible de denegación “solo vendedor”.
+
+```bash
+# Terminal 1 — API
+pnpm run server
+
+# Terminal 2 — Expo
+pnpm --filter @bizcode/seller start
+```
+
+Env opcional (Expo public):
+
+- `EXPO_PUBLIC_API_BASE_URL` — por defecto `http://localhost:3001/api`
+
+Type-check:
+
+```bash
+pnpm --filter @bizcode/seller type-check
+```
+
+**CORS / Expo web:** los orígenes por defecto incluyen Vite (`5173`/`4173`) y Expo web (`8081`, `19006`). Para un dispositivo u origen custom, seteá `CORS_ORIGINS` (separado por comas) en `.env`. Expo Go nativo / development builds normalmente no envían header `Origin` de navegador.
+
+**Dispositivo físico:** apuntá `EXPO_PUBLIC_API_BASE_URL` a la IP LAN de la máquina (p. ej. `http://192.168.x.x:3001/api`), no a `localhost`.
+
+**Nota:** `@bizcode/ui` (#157) está fuera de alcance de #167; no bloquear type-check ni login por ese paquete.
 
 ## Requisitos
 
@@ -90,6 +121,7 @@ npx prisma db seed
 | `pnpm run dev:full` | API sidecar + Vite |
 | `pnpm run server` | Solo API (`http://localhost:3001`) |
 | `pnpm run dev:vite` | Solo Vite (`http://localhost:5173`) |
+| `pnpm --filter @bizcode/seller start` | Expo App Vendedor (Expo Go / simulador) |
 | `pnpm run dev` | Tauri (requiere Rust) |
 
 Swagger UI con API en marcha: `http://localhost:3001/api-docs/`.

@@ -146,7 +146,11 @@ paths:
   /api/auth/login:
     post:
       tags: [auth]
-      summary: Create authenticated session (access 15m + refresh 7d/30d cookies) or MFA challenge (#213)
+      summary: Create authenticated session (cookies + Bearer tokens for RN) or MFA challenge (#213, #167)
+      description: >
+        Issues HttpOnly cookies (`bizcode_session`, `bizcode_refresh`) for browser clients and
+        returns the same opaque tokens in the JSON body (`accessToken`, `refreshToken`, `expiresIn`)
+        for mobile/RN clients that persist them in secure storage (#167). Cookies alone remain sufficient for web.
       requestBody:
         required: true
         content:
@@ -156,7 +160,7 @@ paths:
       responses:
         '200':
           description: >
-            Session created (Set-Cookie) when MFA is off; or MFA challenge payload without cookies when mfaEnabled.
+            Session created (Set-Cookie + token fields in body) when MFA is off; or MFA challenge payload without cookies when mfaRequired.
           headers:
             Set-Cookie:
               schema:
@@ -303,12 +307,20 @@ paths:
   /api/auth/refresh:
     post:
       tags: [auth]
-      summary: Rotate refresh token and issue a new access+refresh cookie pair (#212)
+      summary: Rotate refresh token and issue a new access+refresh pair (#212, #167)
       description: >
-        Requires bizcode_refresh cookie. Reuse of a revoked refresh token invalidates the whole token family.
+        Accepts refresh via `bizcode_refresh` cookie, JSON body `refreshToken`, or `Authorization: Bearer <refreshToken>`.
+        Reuse of a revoked refresh token invalidates the whole token family.
+        Response includes new cookies and Bearer token fields for RN clients.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshInput'
       responses:
         '200':
-          description: New access and refresh cookies issued
+          description: New access and refresh cookies/tokens issued
           content:
             application/json:
               schema:
@@ -324,6 +336,14 @@ paths:
     post:
       tags: [auth]
       summary: Revoke current session
+      description: >
+        Revokes using refresh cookie, body `refreshToken`, and/or access cookie / `Authorization: Bearer <accessToken>` (#167).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshInput'
       responses:
         '200':
           description: Session revoked (or already missing)
@@ -336,6 +356,9 @@ paths:
     get:
       tags: [auth]
       summary: Get authenticated claims
+      security:
+        - cookieSession: []
+        - bearerAuth: []
       responses:
         '200':
           description: Current authenticated claims
@@ -14935,6 +14958,13 @@ components:
       type: apiKey
       in: cookie
       name: bizcode_session
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: >
+        Opaque access token from login/refresh JSON body (`accessToken`). Same validation as `bizcode_session` cookie (#167).
+        For `/api/auth/refresh`, the Bearer value may be the refresh token when no cookie/body is sent.
 
   parameters:
     BizcodeChannelHeader:
@@ -15145,13 +15175,30 @@ components:
           type: boolean
           description: When true, refresh cookie TTL is 30 days; otherwise 7 days (#212).
 
+    RefreshInput:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+          description: Opaque refresh token when cookies are unavailable (mobile/RN, #167).
+
     RefreshResult:
       type: object
-      required: [refreshed]
+      required: [refreshed, accessToken, refreshToken, expiresIn]
       properties:
         refreshed:
           type: boolean
           const: true
+        accessToken:
+          type: string
+          description: New opaque access token (also set as bizcode_session cookie)
+        refreshToken:
+          type: string
+          description: New opaque refresh token (also set as bizcode_refresh cookie)
+        expiresIn:
+          type: integer
+          description: Access token lifetime in seconds (900 = 15 minutes)
+          example: 900
 
     RefreshEnvelope:
       type: object
@@ -15165,7 +15212,7 @@ components:
 
     LoginResult:
       type: object
-      required: [userId, tenantId, username, role]
+      required: [userId, tenantId, username, role, accessToken, refreshToken, expiresIn]
       properties:
         userId:
           type: integer
@@ -15175,6 +15222,16 @@ components:
           type: string
         role:
           type: string
+        accessToken:
+          type: string
+          description: Opaque access token for Authorization Bearer (also HttpOnly cookie)
+        refreshToken:
+          type: string
+          description: Opaque refresh token for rotation (also HttpOnly cookie)
+        expiresIn:
+          type: integer
+          description: Access token lifetime in seconds
+          example: 900
 
     LoginMfaChallenge:
       type: object

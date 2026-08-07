@@ -1016,6 +1016,8 @@
 
 * [RefreshEnvelope](./refreshenvelope.md) – `-`
 
+* [RefreshInput](./refreshinput.md) – `-`
+
 * [RefreshResult](./refreshresult.md) – `-`
 
 * [RegimenRetencion](./regimenretencion.md) – `-`

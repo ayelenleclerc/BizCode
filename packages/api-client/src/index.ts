@@ -1,5 +1,5 @@
 export * from './api'
-export type { ApiClientConfig } from './config'
+export type { ApiClientConfig, TokenStorage } from './config'
 export {
   DEFAULT_API_BASE_URL,
   DEFAULT_API_ROOT_URL,

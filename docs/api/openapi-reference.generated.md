@@ -134,11 +134,13 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
-### Create authenticated session (access 15m + refresh 7d/30d cookies) or MFA challenge (#213)
+### Create authenticated session (cookies + Bearer tokens for RN) or MFA challenge (#213,
 
 - **Method:** `POST`
 - **Path:** `/api/auth/login`
 - **Tags:** auth
+
+Issues HttpOnly cookies (`bizcode_session`, `bizcode_refresh`) for browser clients and returns the same opaque tokens in the JSON body (`accessToken`, `refreshToken`, `expiresIn`) for mobile/RN clients that persist them in secure storage (#167). Cookies alone remain sufficient for web.
 
 #### Request Body
 
@@ -173,7 +175,7 @@ One-time endpoint to create initial tenant and owner user.
 
 #### Responses
 
-##### Status: 200 Session created (Set-Cookie) when MFA is off; or MFA challenge payload without cookies when mfaEnabled.
+##### Status: 200 Session created (Set-Cookie + token fields in body) when MFA is off; or MFA challenge payload without cookies when mfaRequired.
 
 ###### Content-Type: application/json
 
@@ -194,7 +196,10 @@ One-time endpoint to create initial tenant and owner user.
     "userId": 1,
     "tenantId": 1,
     "username": "",
-    "role": ""
+    "role": "",
+    "accessToken": "",
+    "refreshToken": "",
+    "expiresIn": 900
   }
 }
 ```
@@ -299,6 +304,18 @@ One-time endpoint to create initial tenant and owner user.
 
   `object`
 
+  - **`accessToken` (required)**
+
+    `string` — Opaque access token for Authorization Bearer (also HttpOnly cookie)
+
+  - **`expiresIn` (required)**
+
+    `integer` — Access token lifetime in seconds
+
+  - **`refreshToken` (required)**
+
+    `string` — Opaque refresh token for rotation (also HttpOnly cookie)
+
   - **`role` (required)**
 
     `string`
@@ -328,7 +345,10 @@ One-time endpoint to create initial tenant and owner user.
     "userId": 1,
     "tenantId": 1,
     "username": "",
-    "role": ""
+    "role": "",
+    "accessToken": "",
+    "refreshToken": "",
+    "expiresIn": 900
   }
 }
 ```
@@ -680,17 +700,33 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
-### Rotate refresh token and issue a new access+refresh cookie pair (#212)
+### Rotate refresh token and issue a new access+refresh pair (#212,
 
 - **Method:** `POST`
 - **Path:** `/api/auth/refresh`
 - **Tags:** auth
 
-Requires bizcode\_refresh cookie. Reuse of a revoked refresh token invalidates the whole token family.
+Accepts refresh via `bizcode_refresh` cookie, JSON body `refreshToken`, or `Authorization: Bearer <refreshToken>`. Reuse of a revoked refresh token invalidates the whole token family. Response includes new cookies and Bearer token fields for RN clients.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`refreshToken`**
+
+  `string` — Opaque refresh token when cookies are unavailable (mobile/RN,
+
+**Example:**
+
+```json
+{
+  "refreshToken": ""
+}
+```
 
 #### Responses
 
-##### Status: 200 New access and refresh cookies issued
+##### Status: 200 New access and refresh cookies/tokens issued
 
 ###### Content-Type: application/json
 
@@ -698,9 +734,21 @@ Requires bizcode\_refresh cookie. Reuse of a revoked refresh token invalidates t
 
   `object`
 
+  - **`accessToken` (required)**
+
+    `string` — New opaque access token (also set as bizcode\_session cookie)
+
+  - **`expiresIn` (required)**
+
+    `integer` — Access token lifetime in seconds (900 = 15 minutes)
+
   - **`refreshed` (required)**
 
     `boolean`
+
+  - **`refreshToken` (required)**
+
+    `string` — New opaque refresh token (also set as bizcode\_refresh cookie)
 
 - **`success` (required)**
 
@@ -712,7 +760,10 @@ Requires bizcode\_refresh cookie. Reuse of a revoked refresh token invalidates t
 {
   "success": true,
   "data": {
-    "refreshed": true
+    "refreshed": true,
+    "accessToken": "",
+    "refreshToken": "",
+    "expiresIn": 900
   }
 }
 ```
@@ -743,6 +794,24 @@ Requires bizcode\_refresh cookie. Reuse of a revoked refresh token invalidates t
 - **Method:** `POST`
 - **Path:** `/api/auth/logout`
 - **Tags:** auth
+
+Revokes using refresh cookie, body `refreshToken`, and/or access cookie / `Authorization: Bearer <accessToken>` (#167).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`refreshToken`**
+
+  `string` — Opaque refresh token when cookies are unavailable (mobile/RN,
+
+**Example:**
+
+```json
+{
+  "refreshToken": ""
+}
+```
 
 #### Responses
 
@@ -89836,19 +89905,50 @@ Rate-limited mutation; requires products.manage. USD only.
 }
 ```
 
-### RefreshResult
+### RefreshInput
 
 - **Type:**`object`
 
-* **`refreshed` (required)**
+* **`refreshToken`**
 
-  `boolean`
+  `string` — Opaque refresh token when cookies are unavailable (mobile/RN,
 
 **Example:**
 
 ```json
 {
-  "refreshed": true
+  "refreshToken": ""
+}
+```
+
+### RefreshResult
+
+- **Type:**`object`
+
+* **`accessToken` (required)**
+
+  `string` — New opaque access token (also set as bizcode\_session cookie)
+
+* **`expiresIn` (required)**
+
+  `integer` — Access token lifetime in seconds (900 = 15 minutes)
+
+* **`refreshed` (required)**
+
+  `boolean`
+
+* **`refreshToken` (required)**
+
+  `string` — New opaque refresh token (also set as bizcode\_refresh cookie)
+
+**Example:**
+
+```json
+{
+  "refreshed": true,
+  "accessToken": "",
+  "refreshToken": "",
+  "expiresIn": 900
 }
 ```
 
@@ -89860,9 +89960,21 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `object`
 
+  - **`accessToken` (required)**
+
+    `string` — New opaque access token (also set as bizcode\_session cookie)
+
+  - **`expiresIn` (required)**
+
+    `integer` — Access token lifetime in seconds (900 = 15 minutes)
+
   - **`refreshed` (required)**
 
     `boolean`
+
+  - **`refreshToken` (required)**
+
+    `string` — New opaque refresh token (also set as bizcode\_refresh cookie)
 
 * **`success` (required)**
 
@@ -89874,7 +89986,10 @@ Rate-limited mutation; requires products.manage. USD only.
 {
   "success": true,
   "data": {
-    "refreshed": true
+    "refreshed": true,
+    "accessToken": "",
+    "refreshToken": "",
+    "expiresIn": 900
   }
 }
 ```
@@ -89882,6 +89997,18 @@ Rate-limited mutation; requires products.manage. USD only.
 ### LoginResult
 
 - **Type:**`object`
+
+* **`accessToken` (required)**
+
+  `string` — Opaque access token for Authorization Bearer (also HttpOnly cookie)
+
+* **`expiresIn` (required)**
+
+  `integer` — Access token lifetime in seconds
+
+* **`refreshToken` (required)**
+
+  `string` — Opaque refresh token for rotation (also HttpOnly cookie)
 
 * **`role` (required)**
 
@@ -89906,7 +90033,10 @@ Rate-limited mutation; requires products.manage. USD only.
   "userId": 1,
   "tenantId": 1,
   "username": "",
-  "role": ""
+  "role": "",
+  "accessToken": "",
+  "refreshToken": "",
+  "expiresIn": 900
 }
 ```
 
@@ -89952,7 +90082,10 @@ Rate-limited mutation; requires products.manage. USD only.
     "userId": 1,
     "tenantId": 1,
     "username": "",
-    "role": ""
+    "role": "",
+    "accessToken": "",
+    "refreshToken": "",
+    "expiresIn": 900
   }
 }
 ```
@@ -89964,6 +90097,18 @@ Rate-limited mutation; requires products.manage. USD only.
 * **`data` (required)**
 
   `object`
+
+  - **`accessToken` (required)**
+
+    `string` — Opaque access token for Authorization Bearer (also HttpOnly cookie)
+
+  - **`expiresIn` (required)**
+
+    `integer` — Access token lifetime in seconds
+
+  - **`refreshToken` (required)**
+
+    `string` — Opaque refresh token for rotation (also HttpOnly cookie)
 
   - **`role` (required)**
 
@@ -89994,7 +90139,10 @@ Rate-limited mutation; requires products.manage. USD only.
     "userId": 1,
     "tenantId": 1,
     "username": "",
-    "role": ""
+    "role": "",
+    "accessToken": "",
+    "refreshToken": "",
+    "expiresIn": 900
   }
 }
 ```
