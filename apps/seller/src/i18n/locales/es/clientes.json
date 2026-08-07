@@ -1,0 +1,56 @@
+{
+  "searchPlaceholder": "Buscar por nombre, CUIT o código",
+  "listTitle": "Clientes",
+  "empty": "Ningún cliente coincide con la búsqueda.",
+  "emptyHint": "Escribí al menos un carácter para buscar.",
+  "statusActive": "Activo",
+  "statusSuspended": "Suspendido",
+  "saldo": "Saldo",
+  "localidadUnknown": "Sin localidad",
+  "detailTitle": "Cliente",
+  "tabs": {
+    "cuenta": "Cuenta",
+    "pedidos": "Pedidos",
+    "datos": "Datos"
+  },
+  "cuenta": {
+    "saldoActual": "Saldo actual",
+    "limiteCredito": "Límite de crédito",
+    "sinLimite": "Sin límite de crédito",
+    "usoCredito": "{{pct}}% utilizado",
+    "facturasVencidas": "Facturas vencidas",
+    "sinVencidas": "Sin facturas vencidas",
+    "diasMora": "{{days}} días de mora",
+    "ledgerUnavailable": "Módulo de cuenta corriente no disponible; se muestra el saldo del maestro.",
+    "receiptsUnavailable": "No se pudieron cargar las facturas pendientes."
+  },
+  "pedidos": {
+    "title": "Últimos pedidos",
+    "empty": "Sin pedidos recientes.",
+    "estado": "Estado",
+    "total": "Importe",
+    "detailTitle": "Pedido #{{id}}",
+    "items": "Renglones",
+    "noItems": "Sin renglones en la respuesta.",
+    "createdAt": "Creado"
+  },
+  "datos": {
+    "telefono": "Teléfono",
+    "email": "Email",
+    "domicilio": "Domicilio",
+    "zona": "Zona de entrega",
+    "zonaUnknown": "Sin zona asignada",
+    "score": "Score de pago",
+    "call": "Llamar a {{phone}}",
+    "sinTelefono": "Sin teléfono",
+    "sinEmail": "Sin email",
+    "sinDomicilio": "Sin domicilio"
+  },
+  "nuevoPedido": "Nuevo pedido",
+  "suspendedBanner": "Cliente suspendido. No se pueden generar pedidos nuevos.",
+  "score": {
+    "low": "Alto riesgo",
+    "mid": "Neutral",
+    "high": "Buen pagador"
+  }
+}

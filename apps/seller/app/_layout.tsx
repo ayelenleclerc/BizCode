@@ -1,3 +1,4 @@
+import '../src/i18n'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { PaperProvider } from 'react-native-paper'
@@ -5,9 +6,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AuthProvider } from '../src/auth/AuthContext'
 
 /**
- * @en Root layout: Paper + auth session bootstrap for App Seller (#167).
- * @es Layout raíz: Paper + bootstrap de sesión auth para App Seller (#167).
- * @pt-BR Layout raiz: Paper + bootstrap de sessão auth para App Seller (#167).
+ * @en Root layout: i18n + Paper + auth session for App Seller (#167/#168).
+ * @es Layout raíz: i18n + Paper + sesión auth para App Seller (#167/#168).
+ * @pt-BR Layout raiz: i18n + Paper + sessão auth para App Seller (#167/#168).
  */
 export default function RootLayout() {
   return (

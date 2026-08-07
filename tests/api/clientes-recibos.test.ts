@@ -224,6 +224,9 @@ describe('Recibo cobro cliente API (#233)', () => {
   let prisma: PrismaClient
 
   beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'owner'
     prisma = buildPrisma()
   })
 
@@ -234,6 +237,24 @@ describe('Recibo cobro cliente API (#233)', () => {
     expect(res.body.data).toHaveLength(1)
     expect(res.body.data[0].facturaRef).toBe('B-0001-50')
     expect(res.body.data[0].pendiente).toBe('242.00')
+  })
+
+  it('GET facturas-pendientes allows seller with customers.read (#168)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'seller'
+    const app = createApp(prisma)
+    await request(app).get('/api/clientes/1/facturas-pendientes').expect(200)
+  })
+
+  it('GET facturas-pendientes forbids driver without customers.read (#168)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    const app = createApp(prisma)
+    await request(app).get('/api/clientes/1/facturas-pendientes').expect(403)
+  })
+
+  it('GET recibos still requires reports.financial.read (#168)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'seller'
+    const app = createApp(prisma)
+    await request(app).get('/api/clientes/1/recibos').expect(403)
   })
 
   it('GET recibos returns history', async () => {

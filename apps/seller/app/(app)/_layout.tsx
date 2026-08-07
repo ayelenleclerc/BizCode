@@ -1,16 +1,21 @@
 import { Redirect, Tabs, useRouter } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, View } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthContext'
 
 export default function AppLayout() {
+  const { t } = useTranslation('common')
   const { status, logout } = useAuth()
   const router = useRouter()
 
   if (status === 'loading') {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator accessibilityLabel="Cargando" />
+      <View
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        accessibilityLabel={t('loading')}
+      >
+        <ActivityIndicator />
       </View>
     )
   }
@@ -24,7 +29,7 @@ export default function AppLayout() {
   const logoutButton = () => (
     <IconButton
       icon="logout"
-      accessibilityLabel="Cerrar sesión"
+      accessibilityLabel={t('logout')}
       testID="seller-logout"
       onPress={() => {
         void (async () => {
@@ -41,10 +46,10 @@ export default function AppLayout() {
         headerRight: logoutButton,
       }}
     >
-      <Tabs.Screen name="clientes" options={{ title: 'Clientes' }} />
-      <Tabs.Screen name="pedidos" options={{ title: 'Pedidos' }} />
-      <Tabs.Screen name="catalogo" options={{ title: 'Catálogo' }} />
-      <Tabs.Screen name="agenda" options={{ title: 'Agenda' }} />
+      <Tabs.Screen name="clientes" options={{ title: t('tabs.clientes') }} />
+      <Tabs.Screen name="pedidos" options={{ title: t('tabs.pedidos') }} />
+      <Tabs.Screen name="catalogo" options={{ title: t('tabs.catalogo') }} />
+      <Tabs.Screen name="agenda" options={{ title: t('tabs.agenda') }} />
     </Tabs>
   )
 }

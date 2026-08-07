@@ -10,7 +10,7 @@ BizCode usa **pnpm workspaces** e **Turborepo** (#154):
 |---------|-------|
 | `apps/web/` | Frontend React + Vite |
 | `apps/server/` | API Express |
-| `apps/seller/` | Expo (React Native) App Vendedor — vendas em campo (#167) |
+| `apps/seller/` | Expo (React Native) App Vendedor — vendas em campo (#167, #168) |
 | `packages/types/` | Tipos TypeScript e contratos RBAC compartilhados |
 | `packages/api-client/` | Cliente HTTP da API |
 | `prisma/` | Esquema e migrações (raiz do repositório) |
@@ -26,11 +26,15 @@ Opcional em `.env` para o app web:
 
 - `VITE_API_URL` — base completa da API incluindo `/api` (ex.: `http://localhost:3001/api`)
 
-### App Vendedor (`apps/seller`, #167)
+### App Vendedor (`apps/seller`, #167 / #168)
 
 App Expo SDK com Expo Router. A UI usa React Native Paper (`@bizcode/ui` fica diferido para #157). Auth em modo **Bearer dual**: a API continua definindo cookies HttpOnly para a web e também devolve `accessToken` / `refreshToken` / `expiresIn` no body de login e refresh. O app seller guarda esses tokens no **expo-secure-store** (nunca AsyncStorage) e envia `Authorization: Bearer` mais `x-bizcode-channel: field`.
 
 Papéis permitidos: `seller`, `manager`, `owner`. Outros papéis veem uma tela acessível de negação “somente vendedor”.
+
+**Clientes (#168):** busca online (`GET /api/clientes?q=`) e ficha com abas Conta / Pedidos / Dados (saldo via `GET …/cuenta-corriente/saldo` se `finance.ledger` estiver habilitado, faturas vencidas via `GET …/facturas-pendientes` se `finance.receipts` estiver habilitado, últimos pedidos, contato + discador nativo, score e zona). Papéis com `customers.read` podem chamar esses dois GET (ledger completo / escrita de recibos ainda exige `reports.financial.read`). Cache offline → **#171**.
+
+Strings de UI com **i18next** (EN / ES / pt-BR) e `expo-localization` para o idioma do dispositivo.
 
 ```bash
 # Terminal 1 — API
@@ -54,7 +58,7 @@ pnpm --filter @bizcode/seller type-check
 
 **Dispositivo físico:** aponte `EXPO_PUBLIC_API_BASE_URL` para o IP LAN da máquina (ex.: `http://192.168.x.x:3001/api`), não `localhost`.
 
-**Nota:** `@bizcode/ui` (#157) está fora do escopo de #167; não bloquear type-check nem login por esse pacote.
+**Nota:** `@bizcode/ui` (#157) está fora do escopo de #167/#168; não bloquear type-check nem login por esse pacote.
 
 ## Requisitos
 

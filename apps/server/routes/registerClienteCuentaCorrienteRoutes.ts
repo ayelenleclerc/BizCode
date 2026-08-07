@@ -1,6 +1,6 @@
 import type { Application, Request, Response } from 'express'
 import type { AuthenticatedRequest } from '../auth'
-import { requirePermission } from '../auth'
+import { requireAnyPermission, requirePermission } from '../auth'
 import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
 import {
@@ -103,7 +103,8 @@ export function registerClienteCuentaCorrienteRoutes(
   app.get(
     '/api/clientes/:id/cuenta-corriente/saldo',
     ledgerModule,
-    requirePermission('reports.financial.read'),
+    // App Seller (#168): field roles with customers.read need AR balance snapshot (not full ledger).
+    requireAnyPermission('customers.read', 'reports.financial.read'),
     async (req: Request, res: Response) => {
       const clienteId = parsePositiveIntParam(String(req.params.id))
       if (clienteId === null) {

@@ -1,10 +1,12 @@
 import { Redirect, useRouter } from 'expo-router'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native'
-import { Button, HelperText, Text, TextInput, Title } from 'react-native-paper'
+import { Button, HelperText, TextInput, Title } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthContext'
 
 export default function LoginScreen() {
+  const { t } = useTranslation('common')
   const { status, login, error } = useAuth()
   const router = useRouter()
   const [tenantSlug, setTenantSlug] = useState('')
@@ -23,7 +25,7 @@ export default function LoginScreen() {
   const onSubmit = async () => {
     setLocalError(null)
     if (!tenantSlug.trim() || !username.trim() || !password) {
-      setLocalError('Completá tenant, usuario y contraseña.')
+      setLocalError(t('login.failed'))
       return
     }
     setSubmitting(true)
@@ -50,25 +52,23 @@ export default function LoginScreen() {
       testID="seller-login-screen"
     >
       <View style={styles.card}>
-        <Title>BizCode Seller</Title>
-        <Text style={styles.subtitle}>Ingresá con tu cuenta de campo</Text>
+        <Title>{t('login.title')}</Title>
 
         <TextInput
-          label="Tenant"
+          label={t('login.tenant')}
           value={tenantSlug}
           onChangeText={setTenantSlug}
           mode="outlined"
           style={styles.field}
-          // Paper TextInput forwards RN TextInput props at runtime (#167).
           {...({
             autoCapitalize: 'none',
             autoCorrect: false,
             testID: 'seller-login-tenant',
-            accessibilityLabel: 'Slug del tenant',
+            accessibilityLabel: t('login.tenant'),
           } as object)}
         />
         <TextInput
-          label="Usuario"
+          label={t('login.username')}
           value={username}
           onChangeText={setUsername}
           mode="outlined"
@@ -77,11 +77,11 @@ export default function LoginScreen() {
             autoCapitalize: 'none',
             autoCorrect: false,
             testID: 'seller-login-username',
-            accessibilityLabel: 'Nombre de usuario',
+            accessibilityLabel: t('login.username'),
           } as object)}
         />
         <TextInput
-          label="Contraseña"
+          label={t('login.password')}
           value={password}
           onChangeText={setPassword}
           mode="outlined"
@@ -89,7 +89,7 @@ export default function LoginScreen() {
           {...({
             secureTextEntry: true,
             testID: 'seller-login-password',
-            accessibilityLabel: 'Contraseña',
+            accessibilityLabel: t('login.password'),
           } as object)}
         />
 
@@ -109,9 +109,9 @@ export default function LoginScreen() {
           loading={submitting}
           disabled={submitting}
           testID="seller-login-submit"
-          accessibilityLabel="Iniciar sesión"
+          accessibilityLabel={t('login.submit')}
         >
-          Iniciar sesión
+          {t('login.submit')}
         </Button>
       </View>
     </KeyboardAvoidingView>
@@ -127,10 +127,6 @@ const styles = StyleSheet.create({
   },
   card: {
     gap: 8,
-  },
-  subtitle: {
-    marginBottom: 12,
-    opacity: 0.75,
   },
   field: {
     marginBottom: 4,

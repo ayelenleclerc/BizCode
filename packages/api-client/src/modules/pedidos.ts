@@ -11,7 +11,12 @@ import { handleError } from '../errors'
 
 export function createPedidosAPI(http: AxiosInstance) {
   return {
-    list: async (params?: { estado?: string; clienteId?: number }): Promise<PedidoListResponse> => {
+    list: async (params?: {
+      estado?: string
+      clienteId?: number
+      limit?: number
+      offset?: number
+    }): Promise<PedidoListResponse> => {
       try {
         const response = await http.get<PedidoListResponse>('/pedidos', { params })
         return response.data

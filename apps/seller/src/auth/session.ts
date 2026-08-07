@@ -1,22 +1,14 @@
 import {
-  createApiClient,
   createAuthAPI,
   isLoginMfaChallenge,
   type LoginBody,
   type LoginSuccessData,
 } from '@bizcode/api-client'
 import type { AuthClaims } from '@bizcode/types'
-import { SELLER_API_BASE_URL } from '../config'
+import { sellerHttp } from '../api/http'
 import { secureTokenStorage } from './secureTokenStorage'
 
-const http = createApiClient({
-  apiBaseUrl: SELLER_API_BASE_URL,
-  withCredentials: false,
-  tokenStorage: secureTokenStorage,
-  defaultChannel: 'field',
-})
-
-export const sellerAuthApi = createAuthAPI(http)
+const sellerAuthApi = createAuthAPI(sellerHttp)
 
 export async function loginSeller(body: LoginBody): Promise<LoginSuccessData> {
   const data = await sellerAuthApi.login(body)

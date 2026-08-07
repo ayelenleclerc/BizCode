@@ -1,0 +1,56 @@
+{
+  "searchPlaceholder": "Search by name, tax ID or code",
+  "listTitle": "Customers",
+  "empty": "No customers match your search.",
+  "emptyHint": "Type at least one character to search.",
+  "statusActive": "Active",
+  "statusSuspended": "Suspended",
+  "saldo": "Balance",
+  "localidadUnknown": "No locality",
+  "detailTitle": "Customer",
+  "tabs": {
+    "cuenta": "Account",
+    "pedidos": "Orders",
+    "datos": "Details"
+  },
+  "cuenta": {
+    "saldoActual": "Current balance",
+    "limiteCredito": "Credit limit",
+    "sinLimite": "No credit limit",
+    "usoCredito": "{{pct}}% used",
+    "facturasVencidas": "Overdue invoices",
+    "sinVencidas": "No overdue invoices",
+    "diasMora": "{{days}} days overdue",
+    "ledgerUnavailable": "Account ledger module unavailable; showing master balance.",
+    "receiptsUnavailable": "Could not load pending invoices."
+  },
+  "pedidos": {
+    "title": "Recent orders",
+    "empty": "No recent orders.",
+    "estado": "Status",
+    "total": "Total",
+    "detailTitle": "Order #{{id}}",
+    "items": "Lines",
+    "noItems": "No line items returned.",
+    "createdAt": "Created"
+  },
+  "datos": {
+    "telefono": "Phone",
+    "email": "Email",
+    "domicilio": "Address",
+    "zona": "Delivery zone",
+    "zonaUnknown": "No zone assigned",
+    "score": "Payment score",
+    "call": "Call {{phone}}",
+    "sinTelefono": "No phone",
+    "sinEmail": "No email",
+    "sinDomicilio": "No address"
+  },
+  "nuevoPedido": "New order",
+  "suspendedBanner": "This customer is suspended. New orders are blocked.",
+  "score": {
+    "low": "High risk",
+    "mid": "Neutral",
+    "high": "Good payer"
+  }
+}
