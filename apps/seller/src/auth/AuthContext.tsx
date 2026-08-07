@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { AuthClaims } from '@bizcode/types'
 import { isSellerAppRole } from './sellerRoles'
 import { loadSessionClaims, loginSeller, logoutSeller } from './session'
@@ -31,6 +32,7 @@ function statusFromClaims(claims: AuthClaims | null): AuthStatus {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation('common')
   const [status, setStatus] = useState<AuthStatus>('loading')
   const [claims, setClaims] = useState<AuthClaims | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -55,23 +57,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await logoutSeller()
           setClaims(null)
           setStatus('forbidden')
-          setError('Acceso solo para vendedor, gerente o propietario.')
+          setError(t('login.roleDenied'))
           return
         }
         await refreshSession()
       } catch (err) {
         const message = err instanceof Error ? err.message : 'LOGIN_FAILED'
         if (message === 'MFA_REQUIRED') {
-          setError('Esta cuenta requiere MFA. Completá el flujo en la app web y volvé a intentar.')
+          setError(t('login.mfaHint'))
         } else {
-          setError('No se pudo iniciar sesión. Verificá tenant, usuario y contraseña.')
+          setError(t('login.failed'))
         }
         setStatus('anonymous')
         setClaims(null)
         throw err
       }
     },
-    [refreshSession],
+    [refreshSession, t],
   )
 
   const logout = useCallback(async () => {

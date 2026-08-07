@@ -1,0 +1,31 @@
+{
+  "loading": "Carregando",
+  "retry": "Tentar de novo",
+  "cancel": "Cancelar",
+  "errorGeneric": "Algo deu errado. Tente novamente.",
+  "errorOffline": "Sem conexão. Verifique o sinal e tente de novo.",
+  "errorForbidden": "Você não tem permissão para esta ação.",
+  "errorNotFound": "Não encontrado.",
+  "tabs": {
+    "clientes": "Clientes",
+    "pedidos": "Pedidos",
+    "catalogo": "Catálogo",
+    "agenda": "Agenda"
+  },
+  "logout": "Sair",
+  "login": {
+    "title": "BizCode Vendedor",
+    "tenant": "Tenant",
+    "username": "Usuário",
+    "password": "Senha",
+    "submit": "Entrar",
+    "mfaHint": "Esta conta exige MFA. Conclua o fluxo no app web e tente novamente.",
+    "failed": "Não foi possível entrar. Verifique tenant, usuário e senha.",
+    "roleDenied": "Acesso apenas para vendedor, gerente ou proprietário."
+  },
+  "accessDenied": {
+    "title": "Acesso negado",
+    "body": "Seu papel não pode usar o App Vendedor.",
+    "back": "Voltar ao login"
+  }
+}

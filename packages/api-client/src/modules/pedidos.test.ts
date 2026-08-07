@@ -38,12 +38,18 @@ describe('createPedidosAPI', () => {
     const http = mockHttp()
     vi.mocked(http.get)
       .mockResolvedValueOnce({ data: listBody })
+      .mockResolvedValueOnce({ data: listBody })
       .mockResolvedValueOnce({ data: { success: true, data: PEDIDO } })
     const api = createPedidosAPI(http)
 
     await expect(api.list({ estado: 'confirmed', clienteId: 2 })).resolves.toEqual(listBody)
     expect(http.get).toHaveBeenCalledWith('/pedidos', {
       params: { estado: 'confirmed', clienteId: 2 },
+    })
+
+    await expect(api.list({ clienteId: 2, limit: 10, offset: 0 })).resolves.toEqual(listBody)
+    expect(http.get).toHaveBeenCalledWith('/pedidos', {
+      params: { clienteId: 2, limit: 10, offset: 0 },
     })
 
     await expect(api.get(1)).resolves.toEqual(PEDIDO)

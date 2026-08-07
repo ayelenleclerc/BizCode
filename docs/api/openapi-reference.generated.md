@@ -6667,6 +6667,8 @@ Ledger movements, current balance, credit-limit alert, and 6-month debt series (
 - **Path:** `/api/clientes/{id}/cuenta-corriente/saldo`
 - **Tags:** clientes
 
+Current AR balance and credit-limit flag (#232, #168). Requires module `finance.ledger` and either `customers.read` or `reports.financial.read` (App Seller field roles use `customers.read`; backoffice finance uses `reports.financial.read`).
+
 #### Responses
 
 ##### Status: 200 Balance snapshot
@@ -7512,7 +7514,7 @@ Requires sales.create; posts audit event cliente\_cc\_ajuste.
 - **Path:** `/api/clientes/{id}/facturas-pendientes`
 - **Tags:** clientes
 
-Active invoices with remaining balance for imputation (#233). Requires module `finance.receipts`.
+Active invoices with remaining balance for imputation (#233) and App Seller overdue display (#168). Requires module `finance.receipts` and either `customers.read` or `reports.financial.read`.
 
 #### Responses
 

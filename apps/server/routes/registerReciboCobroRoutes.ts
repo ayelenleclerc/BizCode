@@ -1,6 +1,6 @@
 import type { Application, Request, Response } from 'express'
 import type { AuthenticatedRequest } from '../auth'
-import { requirePermission } from '../auth'
+import { requireAnyPermission, requirePermission } from '../auth'
 import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
 import { reciboCobroBodySchema, reciboCobroVoidBodySchema } from '../schemas/domain'
@@ -30,7 +30,8 @@ export function registerReciboCobroRoutes(app: Application, ctx: RestRouteContex
   app.get(
     '/api/clientes/:id/facturas-pendientes',
     receiptsModule,
-    requirePermission('reports.financial.read'),
+    // App Seller (#168): overdue invoices for field visits; not receipt write access.
+    requireAnyPermission('customers.read', 'reports.financial.read'),
     async (req: Request, res: Response) => {
       const clienteId = parsePositiveIntParam(String(req.params.id))
       if (clienteId === null) {

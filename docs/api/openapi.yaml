@@ -1372,6 +1372,10 @@ paths:
     get:
       tags: [clientes]
       summary: Customer accounts-receivable balance only
+      description: |
+        Current AR balance and credit-limit flag (#232, #168).
+        Requires module `finance.ledger` and either `customers.read` or `reports.financial.read`
+        (App Seller field roles use `customers.read`; backoffice finance uses `reports.financial.read`).
       responses:
         '200':
           description: Balance snapshot
@@ -1546,7 +1550,9 @@ paths:
     get:
       tags: [clientes]
       summary: Pending customer invoices for receipt allocation
-      description: Active invoices with remaining balance for imputation (#233). Requires module `finance.receipts`.
+      description: |
+        Active invoices with remaining balance for imputation (#233) and App Seller overdue display (#168).
+        Requires module `finance.receipts` and either `customers.read` or `reports.financial.read`.
       responses:
         '200':
           description: Pending invoices

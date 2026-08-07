@@ -1,0 +1,31 @@
+{
+  "loading": "Loading",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "errorOffline": "No network connection. Check your signal and retry.",
+  "errorForbidden": "You do not have permission for this action.",
+  "errorNotFound": "Not found.",
+  "tabs": {
+    "clientes": "Customers",
+    "pedidos": "Orders",
+    "catalogo": "Catalog",
+    "agenda": "Agenda"
+  },
+  "logout": "Sign out",
+  "login": {
+    "title": "BizCode Seller",
+    "tenant": "Tenant",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "mfaHint": "This account requires MFA. Complete setup in the web app and try again.",
+    "failed": "Could not sign in. Check tenant, username and password.",
+    "roleDenied": "Access is limited to seller, manager or owner."
+  },
+  "accessDenied": {
+    "title": "Access denied",
+    "body": "Your role cannot use the Seller app.",
+    "back": "Back to login"
+  }
+}

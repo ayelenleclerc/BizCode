@@ -144,6 +144,24 @@ describe('Cliente cuenta corriente API (#232)', () => {
     expect(res.body.data.creditLimit).toBe('5000.00')
   })
 
+  it('GET saldo allows seller role with customers.read (#168)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'seller'
+    const app = createApp(prisma)
+    await request(app).get('/api/clientes/1/cuenta-corriente/saldo').expect(200)
+  })
+
+  it('GET saldo forbids driver without customers.read (#168)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    const app = createApp(prisma)
+    await request(app).get('/api/clientes/1/cuenta-corriente/saldo').expect(403)
+  })
+
+  it('GET full cuenta-corriente still requires reports.financial.read (#168)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'seller'
+    const app = createApp(prisma)
+    await request(app).get('/api/clientes/1/cuenta-corriente').expect(403)
+  })
+
   it('GET /api/clientes/:id/cuenta-corriente/antiguedad returns buckets', async () => {
     prisma = buildPrisma({
       factura: {

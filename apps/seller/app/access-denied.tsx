@@ -1,23 +1,25 @@
 import { useRouter } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { Button, Text, Title } from 'react-native-paper'
 import { useAuth } from '../src/auth/AuthContext'
 
 export default function AccessDeniedScreen() {
+  const { t } = useTranslation('common')
   const { logout, claims } = useAuth()
   const router = useRouter()
 
   return (
     <View style={styles.root} testID="seller-access-denied" accessibilityRole="alert">
-      <Title>Acceso solo vendedor</Title>
+      <Title>{t('accessDenied.title')}</Title>
       <Text style={styles.body}>
-        Esta aplicación es para roles seller, manager u owner.
-        {claims?.role ? ` Tu rol actual es «${claims.role}».` : ''}
+        {t('accessDenied.body')}
+        {claims?.role ? ` (${claims.role})` : ''}
       </Text>
       <Button
         mode="contained"
         testID="seller-access-denied-logout"
-        accessibilityLabel="Volver al inicio de sesión"
+        accessibilityLabel={t('accessDenied.back')}
         onPress={() => {
           void (async () => {
             await logout()
@@ -25,7 +27,7 @@ export default function AccessDeniedScreen() {
           })()
         }}
       >
-        Volver al login
+        {t('accessDenied.back')}
       </Button>
     </View>
   )

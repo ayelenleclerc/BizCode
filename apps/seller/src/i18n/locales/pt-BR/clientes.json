@@ -1,0 +1,56 @@
+{
+  "searchPlaceholder": "Buscar por nome, CNPJ/CUIT ou código",
+  "listTitle": "Clientes",
+  "empty": "Nenhum cliente corresponde à busca.",
+  "emptyHint": "Digite ao menos um caractere para buscar.",
+  "statusActive": "Ativo",
+  "statusSuspended": "Suspenso",
+  "saldo": "Saldo",
+  "localidadUnknown": "Sem localidade",
+  "detailTitle": "Cliente",
+  "tabs": {
+    "cuenta": "Conta",
+    "pedidos": "Pedidos",
+    "datos": "Dados"
+  },
+  "cuenta": {
+    "saldoActual": "Saldo atual",
+    "limiteCredito": "Limite de crédito",
+    "sinLimite": "Sem limite de crédito",
+    "usoCredito": "{{pct}}% utilizado",
+    "facturasVencidas": "Faturas vencidas",
+    "sinVencidas": "Sem faturas vencidas",
+    "diasMora": "{{days}} dias em atraso",
+    "ledgerUnavailable": "Módulo de conta corrente indisponível; exibindo saldo do cadastro.",
+    "receiptsUnavailable": "Não foi possível carregar as faturas em aberto."
+  },
+  "pedidos": {
+    "title": "Últimos pedidos",
+    "empty": "Sem pedidos recentes.",
+    "estado": "Status",
+    "total": "Valor",
+    "detailTitle": "Pedido #{{id}}",
+    "items": "Itens",
+    "noItems": "Sem itens na resposta.",
+    "createdAt": "Criado"
+  },
+  "datos": {
+    "telefono": "Telefone",
+    "email": "E-mail",
+    "domicilio": "Endereço",
+    "zona": "Zona de entrega",
+    "zonaUnknown": "Sem zona atribuída",
+    "score": "Score de pagamento",
+    "call": "Ligar para {{phone}}",
+    "sinTelefono": "Sem telefone",
+    "sinEmail": "Sem e-mail",
+    "sinDomicilio": "Sem endereço"
+  },
+  "nuevoPedido": "Novo pedido",
+  "suspendedBanner": "Cliente suspenso. Não é possível criar novos pedidos.",
+  "score": {
+    "low": "Alto risco",
+    "mid": "Neutro",
+    "high": "Bom pagador"
+  }
+}
