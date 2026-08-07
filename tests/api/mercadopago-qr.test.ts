@@ -69,6 +69,21 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       }),
       update: vi.fn().mockResolvedValue({}),
     },
+    paymentProviderConfig: {
+      findMany: vi.fn().mockResolvedValue([]),
+      findUnique: vi.fn().mockResolvedValue(null),
+      findFirst: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({ id: 1 }),
+      update: vi.fn().mockResolvedValue({ id: 1 }),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
+    },
+    paymentTransaction: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      findFirst: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({ id: 1 }),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      update: vi.fn().mockResolvedValue({ id: 1 }),
+    },
     reciboCobroImputacion: {
       groupBy: vi.fn().mockResolvedValue([]),
     },
