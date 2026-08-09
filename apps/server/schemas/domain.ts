@@ -1520,6 +1520,11 @@ export const pedidoBodySchema = z
     vendedorId: z.union([z.number(), z.null()]).optional(),
     validUntil: z.union([z.string(), z.null()]).optional(),
     items: pedidoItemsField,
+    observaciones: z.union([z.string(), z.null()]).optional(),
+    condicionCobro: z
+      .union([z.enum(['contado', 'cuenta_corriente', 'plazo']), z.null()])
+      .optional(),
+    plazoDias: z.union([z.number(), z.null()]).optional(),
   })
   .superRefine((data, ctx) => {
     if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
@@ -1529,15 +1534,58 @@ export const pedidoBodySchema = z
     if (v !== undefined && v !== null && (!Number.isInteger(v) || v < 1)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'vendedorId must be >= 1 or null', path: ['vendedorId'] })
     }
+    if (data.observaciones !== undefined && data.observaciones !== null) {
+      const obs = data.observaciones.trim()
+      if (obs.length > 500) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'observaciones must be at most 500 characters',
+          path: ['observaciones'],
+        })
+      }
+    }
+    if (data.condicionCobro === 'plazo') {
+      const dias = data.plazoDias
+      if (dias === undefined || dias === null || !Number.isInteger(dias) || dias < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'plazoDias must be an integer >= 1 when condicionCobro is plazo',
+          path: ['plazoDias'],
+        })
+      }
+    } else if (data.plazoDias !== undefined && data.plazoDias !== null) {
+      if (!Number.isInteger(data.plazoDias) || data.plazoDias < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'plazoDias must be an integer >= 1 or null',
+          path: ['plazoDias'],
+        })
+      }
+    }
   })
-  .transform(
-    (data): PedidoInput => ({
+  .transform((data): PedidoInput => {
+    const observaciones =
+      data.observaciones === undefined
+        ? undefined
+        : data.observaciones === null
+          ? null
+          : data.observaciones.trim() || null
+    const plazoDias =
+      data.condicionCobro === 'plazo'
+        ? (data.plazoDias as number)
+        : data.plazoDias === undefined
+          ? undefined
+          : data.plazoDias
+    return {
       clienteId: data.clienteId,
       vendedorId: data.vendedorId,
       validUntil: data.validUntil,
       items: data.items,
-    }),
-  )
+      observaciones,
+      condicionCobro: data.condicionCobro,
+      plazoDias,
+    }
+  })
 
 export const pedidoInvoiceBodySchema = z
   .object({

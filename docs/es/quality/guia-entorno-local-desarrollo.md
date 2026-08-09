@@ -10,7 +10,7 @@ BizCode usa **pnpm workspaces** y **Turborepo** (#154):
 |------|-----|
 | `apps/web/` | Frontend React + Vite |
 | `apps/server/` | API Express |
-| `apps/seller/` | Expo (React Native) App Vendedor — ventas en campo (#167, #168) |
+| `apps/seller/` | Expo (React Native) App Vendedor — ventas en campo (#167, #168, #169) |
 | `packages/types/` | Tipos TypeScript y contratos RBAC compartidos |
 | `packages/api-client/` | Cliente HTTP de la API |
 | `prisma/` | Esquema y migraciones (raíz del repo) |
@@ -26,13 +26,15 @@ Opcional en `.env` para la app web:
 
 - `VITE_API_URL` — base completa de la API incluyendo `/api` (p. ej. `http://localhost:3001/api`)
 
-### App Vendedor (`apps/seller`, #167 / #168)
+### App Vendedor (`apps/seller`, #167 / #168 / #169)
 
 App Expo SDK con Expo Router. La UI usa React Native Paper (`@bizcode/ui` queda diferido a #157). Auth en modo **Bearer dual**: la API sigue seteando cookies HttpOnly para web y además devuelve `accessToken` / `refreshToken` / `expiresIn` en el body de login y refresh. La app seller guarda esos tokens en **expo-secure-store** (nunca AsyncStorage) y envía `Authorization: Bearer` más `x-bizcode-channel: field`.
 
 Roles permitidos: `seller`, `manager`, `owner`. Otros roles ven una pantalla accesible de denegación “solo vendedor”.
 
 **Clientes (#168):** búsqueda online (`GET /api/clientes?q=`) y ficha con pestañas Cuenta / Pedidos / Datos (saldo vía `GET …/cuenta-corriente/saldo` si `finance.ledger` está habilitado, facturas vencidas vía `GET …/facturas-pendientes` si `finance.receipts` está habilitado, últimos pedidos, contacto + dialer nativo, score y zona). Roles con `customers.read` pueden llamar esos dos GET (el ledger completo / escritura de recibos sigue exigiendo `reports.financial.read`). Cache offline → **#171**.
+
+**Toma de pedidos (#169):** desde la ficha, **Nuevo pedido** abre `/pedidos/nuevo?clienteId=` con catálogo online (`GET /api/articulos`, rubros), carrito en memoria, resumen (descuento por línea, `condicionCobro` / `plazoDias`, `observaciones` para depósito), luego `POST /api/pedidos` + `POST …/confirm`. Stock y crédito excedido son solo avisos. Cola offline / cache de catálogo → **#171**.
 
 Cadenas de UI con **i18next** (EN / ES / pt-BR) y `expo-localization` para el idioma del dispositivo.
 

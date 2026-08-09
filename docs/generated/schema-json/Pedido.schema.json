@@ -5,6 +5,17 @@
     "clienteId": {
       "type": "integer"
     },
+    "condicionCobro": {
+      "description": "Intended collection terms (#169).",
+      "enum": [
+        "contado",
+        "cuenta_corriente",
+        "plazo",
+        null
+      ],
+      "nullable": true,
+      "type": "string"
+    },
     "createdAt": {
       "format": "date-time",
       "type": "string"
@@ -34,6 +45,18 @@
         "$ref": "./PedidoItem.schema.json"
       },
       "type": "array"
+    },
+    "observaciones": {
+      "description": "Warehouse notes from field sales (#169).",
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "plazoDias": {
+      "description": "Days when condicionCobro is plazo (#169).",
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
     },
     "tenantId": {
       "type": "integer"

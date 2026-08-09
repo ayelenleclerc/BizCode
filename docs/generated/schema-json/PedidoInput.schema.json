@@ -5,6 +5,17 @@
       "minimum": 1,
       "type": "integer"
     },
+    "condicionCobro": {
+      "description": "Intended collection terms (#169).",
+      "enum": [
+        "contado",
+        "cuenta_corriente",
+        "plazo",
+        null
+      ],
+      "nullable": true,
+      "type": "string"
+    },
     "items": {
       "items": {
         "description": "Catalog line requires articuloId. Ad-hoc service line omits articuloId and requires\ndescripcion + condIva (#244).\n",
@@ -62,6 +73,18 @@
       },
       "minItems": 1,
       "type": "array"
+    },
+    "observaciones": {
+      "description": "Warehouse notes (#169).",
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "plazoDias": {
+      "description": "Required when condicionCobro is plazo (#169).",
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
     },
     "validUntil": {
       "nullable": true,

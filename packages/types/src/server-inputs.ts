@@ -15,12 +15,13 @@ import type {
 } from './domain'
 import type { OrdenEntregaEstado, RepartoEstado, RepartoItemEstado, RepartoItemPodInput } from './logistics'
 import type { RecuentoEstado } from './operations'
-import type { PedidoEstado } from './pedidos'
+import type { PedidoCondicionCobro, PedidoEstado } from './pedidos'
 
 export type {
   MovimientoClienteCCTipo,
   MovimientoProveedorCCTipo,
   OrdenEntregaEstado,
+  PedidoCondicionCobro,
   PedidoEstado,
   ProveedorCategoria,
   ProveedorCondicionPago,
@@ -485,6 +486,12 @@ export type PedidoInput = {
   items: PedidoItemInput[]
   /** @en Intended dispatch deposit (#236). @es Depósito de despacho previsto (#236). @pt-BR Depósito de despacho previsto (#236). */
   depositoId?: number | null
+  /** @en Warehouse notes (#169). @es Observaciones depósito (#169). @pt-BR Observações depósito (#169). */
+  observaciones?: string | null
+  /** @en Collection terms (#169). @es Condición de cobro (#169). @pt-BR Condição de cobrança (#169). */
+  condicionCobro?: PedidoCondicionCobro | null
+  /** @en Days when condicionCobro is plazo (#169). @es Días si condición es plazo (#169). @pt-BR Dias se condição é plazo (#169). */
+  plazoDias?: number | null
 }
 
 export type PedidoInvoiceInput = {

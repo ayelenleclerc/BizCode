@@ -11,6 +11,9 @@ export type PedidoEstado =
   | 'collected'
   | 'cancelled'
 
+/** @en Intended collection terms on Pedido (#169). @es Condición de cobro prevista en Pedido (#169). @pt-BR Condição de cobrança prevista no Pedido (#169). */
+export type PedidoCondicionCobro = 'contado' | 'cuenta_corriente' | 'plazo'
+
 export type PedidoRow = {
   id: number
   clienteId: number
@@ -19,6 +22,9 @@ export type PedidoRow = {
   total: number | string
   validUntil: string | null
   facturaId: number | null
+  observaciones?: string | null
+  condicionCobro?: PedidoCondicionCobro | null
+  plazoDias?: number | null
   createdAt: string
   updatedAt: string
   cliente?: { id: number; codigo: number; rsocial: string }

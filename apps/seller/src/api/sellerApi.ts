@@ -1,9 +1,16 @@
-import { createClientesAPI, createPedidosAPI } from '@bizcode/api-client'
+import {
+  createArticulosAPI,
+  createClientesAPI,
+  createPedidosAPI,
+  createRubrosAPI,
+} from '@bizcode/api-client'
 import type { DeliveryZone } from '@bizcode/types'
 import { sellerHttp } from './http'
 
 export const clientesAPI = createClientesAPI(sellerHttp)
 export const pedidosAPI = createPedidosAPI(sellerHttp)
+export const articulosAPI = createArticulosAPI(sellerHttp)
+export const rubrosAPI = createRubrosAPI(sellerHttp)
 
 /**
  * @en Lists delivery zones for the authenticated tenant.
