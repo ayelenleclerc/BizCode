@@ -50,6 +50,8 @@ tags:
     description: Multi-provider online payments — provider config, capabilities and checkout (#377, ADR-0019); Mercado Pago is the only live adapter today
   - name: pedidos
     description: Commercial orders and quotes (ADR-0009)
+  - name: visitas
+    description: Field seller daily visit agenda (#170)
   - name: contratos
     description: Recurring service contracts and scheduled invoicing (#245, module service.contracts)
   - name: ordenes-trabajo
@@ -5101,6 +5103,142 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RemitoEnvelope'
+
+  /api/visitas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [visitas]
+      summary: List seller visits for a day
+      description: |
+        Requires `orders.create`, `reports.operational.read`, or `customers.manage`.
+        Sellers may only query their own `vendedorId` (default = session user).
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      parameters:
+        - name: fecha
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Planned day YYYY-MM-DD
+        - name: vendedorId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated visitas with daily KPI
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitaListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [visitas]
+      summary: Create planned or ad-hoc visit
+      description: Requires `orders.create`. Managers may create for other sellers.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitaCreateInput'
+      responses:
+        '201':
+          description: Visit created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/visitas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [visitas]
+      summary: Get visit by id
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Visit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitaEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+    put:
+      tags: [visitas]
+      summary: Update visit result / plan state
+      description: Requires `orders.create`. Notes required when resultado is sin_pedido or cliente_ausente.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitaUpdateInput'
+      responses:
+        '200':
+          description: Visit updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
 
   /api/contratos:
     parameters:
@@ -22363,6 +22501,144 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Pedido'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    VisitaEstadoPlan:
+      type: string
+      enum: [pendiente, completada, no_visitada]
+
+    VisitaResultado:
+      type: string
+      enum: [venta, sin_pedido, cliente_ausente, otro, null]
+      nullable: true
+
+    Visita:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        vendedorId:
+          type: integer
+        clienteId:
+          type: integer
+        fechaPlanificada:
+          type: string
+          format: date
+        estadoPlan:
+          $ref: '#/components/schemas/VisitaEstadoPlan'
+        resultado:
+          type: string
+          enum: [venta, sin_pedido, cliente_ausente, otro, null]
+          nullable: true
+        notasVisita:
+          type: string
+          maxLength: 500
+          nullable: true
+        pedidoId:
+          type: integer
+          nullable: true
+        orden:
+          type: integer
+        duracionMinutos:
+          type: integer
+          nullable: true
+        ultimaCompraAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    VisitaCreateInput:
+      type: object
+      required: [vendedorId, clienteId, fechaPlanificada]
+      properties:
+        vendedorId:
+          type: integer
+          minimum: 1
+        clienteId:
+          type: integer
+          minimum: 1
+        fechaPlanificada:
+          type: string
+          format: date
+        orden:
+          type: integer
+          minimum: 0
+        notasVisita:
+          type: string
+          maxLength: 500
+          nullable: true
+
+    VisitaUpdateInput:
+      type: object
+      properties:
+        estadoPlan:
+          $ref: '#/components/schemas/VisitaEstadoPlan'
+        resultado:
+          type: string
+          enum: [venta, sin_pedido, cliente_ausente, otro, null]
+          nullable: true
+        notasVisita:
+          type: string
+          maxLength: 500
+          nullable: true
+        pedidoId:
+          type: integer
+          minimum: 1
+          nullable: true
+        orden:
+          type: integer
+          minimum: 0
+        duracionMinutos:
+          type: integer
+          minimum: 0
+          nullable: true
+
+    VisitaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Visita'
+
+    VisitaDiaKpi:
+      type: object
+      required: [planificadas, visitados, pedidos, conversionPct]
+      properties:
+        planificadas:
+          type: integer
+        visitados:
+          type: integer
+        pedidos:
+          type: integer
+        conversionPct:
+          type: number
+
+    VisitaListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Visita'
+            kpi:
+              $ref: '#/components/schemas/VisitaDiaKpi'
         - $ref: '#/components/schemas/ListPaginationMeta'
 
     ContratoFrecuencia:

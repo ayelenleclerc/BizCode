@@ -24,6 +24,8 @@ import type {
   PedidoInput,
   PedidoInvoiceInput,
   PedidoItemInput,
+  VisitaVendedorCreateInput,
+  VisitaVendedorUpdateInput,
   RemitoEntregarInput,
   RemitoInput,
   RemitoItemInput,
@@ -3598,3 +3600,102 @@ export const loteListQuerySchema = z.object({
 export const trazabilidadQuerySchema = z.object({
   loteId: z.coerce.number().int().min(1),
 })
+
+export const visitaCreateBodySchema = z
+  .object({
+    vendedorId: z.number(),
+    clienteId: z.number(),
+    fechaPlanificada: z.string(),
+    orden: z.number().optional(),
+    notasVisita: z.union([z.string(), z.null()]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.vendedorId) || data.vendedorId < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'vendedorId must be >= 1', path: ['vendedorId'] })
+    }
+    if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'clienteId must be >= 1', path: ['clienteId'] })
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.fechaPlanificada.trim())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'fechaPlanificada must be YYYY-MM-DD',
+        path: ['fechaPlanificada'],
+      })
+    }
+    if (data.orden !== undefined && (!Number.isInteger(data.orden) || data.orden < 0)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'orden must be an integer >= 0', path: ['orden'] })
+    }
+    if (data.notasVisita !== undefined && data.notasVisita !== null && data.notasVisita.trim().length > 500) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'notasVisita must be at most 500 characters',
+        path: ['notasVisita'],
+      })
+    }
+  })
+  .transform(
+    (data): VisitaVendedorCreateInput => ({
+      vendedorId: data.vendedorId,
+      clienteId: data.clienteId,
+      fechaPlanificada: data.fechaPlanificada.trim(),
+      orden: data.orden,
+      notasVisita: data.notasVisita === undefined ? undefined : data.notasVisita,
+    }),
+  )
+
+export const visitaUpdateBodySchema = z
+  .object({
+    estadoPlan: z.enum(['pendiente', 'completada', 'no_visitada']).optional(),
+    resultado: z.union([z.enum(['venta', 'sin_pedido', 'cliente_ausente', 'otro']), z.null()]).optional(),
+    notasVisita: z.union([z.string(), z.null()]).optional(),
+    pedidoId: z.union([z.number(), z.null()]).optional(),
+    orden: z.number().optional(),
+    duracionMinutos: z.union([z.number(), z.null()]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.pedidoId !== undefined && data.pedidoId !== null) {
+      if (!Number.isInteger(data.pedidoId) || data.pedidoId < 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'pedidoId must be >= 1 or null', path: ['pedidoId'] })
+      }
+    }
+    if (data.orden !== undefined && (!Number.isInteger(data.orden) || data.orden < 0)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'orden must be an integer >= 0', path: ['orden'] })
+    }
+    if (data.duracionMinutos !== undefined && data.duracionMinutos !== null) {
+      if (!Number.isInteger(data.duracionMinutos) || data.duracionMinutos < 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'duracionMinutos must be an integer >= 0 or null',
+          path: ['duracionMinutos'],
+        })
+      }
+    }
+    if (
+      (data.resultado === 'sin_pedido' || data.resultado === 'cliente_ausente') &&
+      (data.notasVisita === undefined || data.notasVisita === null || data.notasVisita.trim().length < 1)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'notasVisita is required when resultado is sin_pedido or cliente_ausente',
+        path: ['notasVisita'],
+      })
+    }
+    if (data.notasVisita !== undefined && data.notasVisita !== null && data.notasVisita.trim().length > 500) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'notasVisita must be at most 500 characters',
+        path: ['notasVisita'],
+      })
+    }
+  })
+  .transform(
+    (data): VisitaVendedorUpdateInput => ({
+      estadoPlan: data.estadoPlan,
+      resultado: data.resultado,
+      notasVisita: data.notasVisita,
+      pedidoId: data.pedidoId,
+      orden: data.orden,
+      duracionMinutos: data.duracionMinutos,
+    }),
+  )

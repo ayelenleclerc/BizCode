@@ -1,0 +1,51 @@
+{
+  "title": "Visit agenda",
+  "loadError": "Could not load the visit agenda",
+  "forbidden": "You do not have permission to view or plan seller visits.",
+  "filters": {
+    "fecha": "Date",
+    "vendedor": "Seller",
+    "load": "Load"
+  },
+  "kpi": {
+    "planificadas": "Planned",
+    "visitados": "Visited",
+    "pedidos": "Orders",
+    "conversion": "Conversion"
+  },
+  "columns": {
+    "cliente": "Customer",
+    "domicilio": "Address",
+    "estado": "Status",
+    "resultado": "Result",
+    "orden": "Order"
+  },
+  "estado": {
+    "pendiente": "Pending",
+    "completada": "Completed",
+    "no_visitada": "Not visited"
+  },
+  "resultado": {
+    "venta": "Sale",
+    "sin_pedido": "No order",
+    "cliente_ausente": "Absent",
+    "otro": "Other",
+    "none": "—"
+  },
+  "create": {
+    "title": "Schedule visit",
+    "clienteId": "Customer ID",
+    "vendedorId": "Seller ID",
+    "fecha": "Date",
+    "submit": "Add",
+    "errors": {
+      "clienteId": "Enter a valid customer ID",
+      "vendedorId": "Enter a valid seller ID",
+      "fecha": "Enter a YYYY-MM-DD date",
+      "generic": "Could not create the visit"
+    }
+  },
+  "empty": "No visits for the selected date and seller.",
+  "selectVendedor": "Choose a seller",
+  "usersLoadError": "Could not load sellers"
+}

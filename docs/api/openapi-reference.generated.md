@@ -31226,6 +31226,865 @@ Requires `sales.create`. Allowed from `confirmed|packed|shipped|delivered`. From
 }
 ```
 
+### PARAMETERS /api/visitas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/visitas`
+
+### List seller visits for a day
+
+- **Method:** `GET`
+- **Path:** `/api/visitas`
+- **Tags:** visitas
+
+Requires `orders.create`, `reports.operational.read`, or `customers.manage`. Sellers may only query their own `vendedorId` (default = session user).
+
+#### Responses
+
+##### Status: 200 Paginated visitas with daily KPI
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`duracionMinutos`**
+
+    `integer`
+
+  - **`estadoPlan`**
+
+    `string`, possible values: `"pendiente", "completada", "no_visitada"`
+
+  - **`fechaPlanificada`**
+
+    `string`, format: `date`
+
+  - **`id`**
+
+    `integer`
+
+  - **`notasVisita`**
+
+    `string`
+
+  - **`orden`**
+
+    `integer`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`resultado`**
+
+    `string`, possible values: `"venta", "sin_pedido", "cliente_ausente", "otro", null`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`ultimaCompraAt`**
+
+    `string`, format: `date-time`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`kpi`**
+
+  `object`
+
+  - **`conversionPct` (required)**
+
+    `number`
+
+  - **`pedidos` (required)**
+
+    `integer`
+
+  - **`planificadas` (required)**
+
+    `integer`
+
+  - **`visitados` (required)**
+
+    `integer`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "vendedorId": 1,
+      "clienteId": 1,
+      "fechaPlanificada": "",
+      "estadoPlan": "pendiente",
+      "resultado": "venta",
+      "notasVisita": "",
+      "pedidoId": 1,
+      "orden": 1,
+      "duracionMinutos": 1,
+      "ultimaCompraAt": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "additionalProperty": "anything"
+    }
+  ],
+  "kpi": {
+    "planificadas": 1,
+    "visitados": 1,
+    "pedidos": 1,
+    "conversionPct": 1
+  },
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create planned or ad-hoc visit
+
+- **Method:** `POST`
+- **Path:** `/api/visitas`
+- **Tags:** visitas
+
+Requires `orders.create`. Managers may create for other sellers.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`fechaPlanificada` (required)**
+
+  `string`, format: `date`
+
+- **`vendedorId` (required)**
+
+  `integer`
+
+- **`notasVisita`**
+
+  `string`
+
+- **`orden`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "clienteId": 1,
+  "fechaPlanificada": "",
+  "orden": 0,
+  "notasVisita": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Visit created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`duracionMinutos`**
+
+    `integer`
+
+  - **`estadoPlan`**
+
+    `string`, possible values: `"pendiente", "completada", "no_visitada"`
+
+  - **`fechaPlanificada`**
+
+    `string`, format: `date`
+
+  - **`id`**
+
+    `integer`
+
+  - **`notasVisita`**
+
+    `string`
+
+  - **`orden`**
+
+    `integer`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`resultado`**
+
+    `string`, possible values: `"venta", "sin_pedido", "cliente_ausente", "otro", null`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`ultimaCompraAt`**
+
+    `string`, format: `date-time`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "clienteId": 1,
+    "fechaPlanificada": "",
+    "estadoPlan": "pendiente",
+    "resultado": "venta",
+    "notasVisita": "",
+    "pedidoId": 1,
+    "orden": 1,
+    "duracionMinutos": 1,
+    "ultimaCompraAt": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/visitas/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/visitas/{id}`
+
+### Get visit by id
+
+- **Method:** `GET`
+- **Path:** `/api/visitas/{id}`
+- **Tags:** visitas
+
+#### Responses
+
+##### Status: 200 Visit
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`duracionMinutos`**
+
+    `integer`
+
+  - **`estadoPlan`**
+
+    `string`, possible values: `"pendiente", "completada", "no_visitada"`
+
+  - **`fechaPlanificada`**
+
+    `string`, format: `date`
+
+  - **`id`**
+
+    `integer`
+
+  - **`notasVisita`**
+
+    `string`
+
+  - **`orden`**
+
+    `integer`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`resultado`**
+
+    `string`, possible values: `"venta", "sin_pedido", "cliente_ausente", "otro", null`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`ultimaCompraAt`**
+
+    `string`, format: `date-time`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "clienteId": 1,
+    "fechaPlanificada": "",
+    "estadoPlan": "pendiente",
+    "resultado": "venta",
+    "notasVisita": "",
+    "pedidoId": 1,
+    "orden": 1,
+    "duracionMinutos": 1,
+    "ultimaCompraAt": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update visit result / plan state
+
+- **Method:** `PUT`
+- **Path:** `/api/visitas/{id}`
+- **Tags:** visitas
+
+Requires `orders.create`. Notes required when resultado is sin\_pedido or cliente\_ausente.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`duracionMinutos`**
+
+  `integer`
+
+- **`estadoPlan`**
+
+  `string`, possible values: `"pendiente", "completada", "no_visitada"`
+
+- **`notasVisita`**
+
+  `string`
+
+- **`orden`**
+
+  `integer`
+
+- **`pedidoId`**
+
+  `integer`
+
+- **`resultado`**
+
+  `string`, possible values: `"venta", "sin_pedido", "cliente_ausente", "otro", null`
+
+**Example:**
+
+```json
+{
+  "estadoPlan": "pendiente",
+  "resultado": "venta",
+  "notasVisita": "",
+  "pedidoId": 1,
+  "orden": 0,
+  "duracionMinutos": 0
+}
+```
+
+#### Responses
+
+##### Status: 200 Visit updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`duracionMinutos`**
+
+    `integer`
+
+  - **`estadoPlan`**
+
+    `string`, possible values: `"pendiente", "completada", "no_visitada"`
+
+  - **`fechaPlanificada`**
+
+    `string`, format: `date`
+
+  - **`id`**
+
+    `integer`
+
+  - **`notasVisita`**
+
+    `string`
+
+  - **`orden`**
+
+    `integer`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`resultado`**
+
+    `string`, possible values: `"venta", "sin_pedido", "cliente_ausente", "otro", null`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`ultimaCompraAt`**
+
+    `string`, format: `date-time`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "clienteId": 1,
+    "fechaPlanificada": "",
+    "estadoPlan": "pendiente",
+    "resultado": "venta",
+    "notasVisita": "",
+    "pedidoId": 1,
+    "orden": 1,
+    "duracionMinutos": 1,
+    "ultimaCompraAt": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/contratos
 
 - **Method:** `PARAMETERS`
@@ -117662,6 +118521,307 @@ Originating invoice header (selected columns)
 ```
 
 ### PedidoListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### VisitaEstadoPlan
+
+- **Type:**`string`
+
+**Example:**
+
+### VisitaResultado
+
+- **Type:**`string`
+
+**Example:**
+
+### Visita
+
+- **Type:**`object`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`createdAt`**
+
+  `string`, format: `date-time`
+
+* **`duracionMinutos`**
+
+  `integer`
+
+* **`estadoPlan`**
+
+  `string`, possible values: `"pendiente", "completada", "no_visitada"`
+
+* **`fechaPlanificada`**
+
+  `string`, format: `date`
+
+* **`id`**
+
+  `integer`
+
+* **`notasVisita`**
+
+  `string`
+
+* **`orden`**
+
+  `integer`
+
+* **`pedidoId`**
+
+  `integer`
+
+* **`resultado`**
+
+  `string`, possible values: `"venta", "sin_pedido", "cliente_ausente", "otro", null`
+
+* **`tenantId`**
+
+  `integer`
+
+* **`ultimaCompraAt`**
+
+  `string`, format: `date-time`
+
+* **`updatedAt`**
+
+  `string`, format: `date-time`
+
+* **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "vendedorId": 1,
+  "clienteId": 1,
+  "fechaPlanificada": "",
+  "estadoPlan": "pendiente",
+  "resultado": "venta",
+  "notasVisita": "",
+  "pedidoId": 1,
+  "orden": 1,
+  "duracionMinutos": 1,
+  "ultimaCompraAt": "",
+  "createdAt": "",
+  "updatedAt": "",
+  "additionalProperty": "anything"
+}
+```
+
+### VisitaCreateInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`fechaPlanificada` (required)**
+
+  `string`, format: `date`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+* **`notasVisita`**
+
+  `string`
+
+* **`orden`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "clienteId": 1,
+  "fechaPlanificada": "",
+  "orden": 0,
+  "notasVisita": ""
+}
+```
+
+### VisitaUpdateInput
+
+- **Type:**`object`
+
+* **`duracionMinutos`**
+
+  `integer`
+
+* **`estadoPlan`**
+
+  `string`, possible values: `"pendiente", "completada", "no_visitada"`
+
+* **`notasVisita`**
+
+  `string`
+
+* **`orden`**
+
+  `integer`
+
+* **`pedidoId`**
+
+  `integer`
+
+* **`resultado`**
+
+  `string`, possible values: `"venta", "sin_pedido", "cliente_ausente", "otro", null`
+
+**Example:**
+
+```json
+{
+  "estadoPlan": "pendiente",
+  "resultado": "venta",
+  "notasVisita": "",
+  "pedidoId": 1,
+  "orden": 0,
+  "duracionMinutos": 0
+}
+```
+
+### VisitaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`createdAt`**
+
+    `string`, format: `date-time`
+
+  - **`duracionMinutos`**
+
+    `integer`
+
+  - **`estadoPlan`**
+
+    `string`, possible values: `"pendiente", "completada", "no_visitada"`
+
+  - **`fechaPlanificada`**
+
+    `string`, format: `date`
+
+  - **`id`**
+
+    `integer`
+
+  - **`notasVisita`**
+
+    `string`
+
+  - **`orden`**
+
+    `integer`
+
+  - **`pedidoId`**
+
+    `integer`
+
+  - **`resultado`**
+
+    `string`, possible values: `"venta", "sin_pedido", "cliente_ausente", "otro", null`
+
+  - **`tenantId`**
+
+    `integer`
+
+  - **`ultimaCompraAt`**
+
+    `string`, format: `date-time`
+
+  - **`updatedAt`**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "clienteId": 1,
+    "fechaPlanificada": "",
+    "estadoPlan": "pendiente",
+    "resultado": "venta",
+    "notasVisita": "",
+    "pedidoId": 1,
+    "orden": 1,
+    "duracionMinutos": 1,
+    "ultimaCompraAt": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "additionalProperty": "anything"
+  }
+}
+```
+
+### VisitaDiaKpi
+
+- **Type:**`object`
+
+* **`conversionPct` (required)**
+
+  `number`
+
+* **`pedidos` (required)**
+
+  `integer`
+
+* **`planificadas` (required)**
+
+  `integer`
+
+* **`visitados` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "planificadas": 1,
+  "visitados": 1,
+  "pedidos": 1,
+  "conversionPct": 1
+}
+```
+
+### VisitaListEnvelope
 
 - **Type:**
 

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "duracionMinutos": {
+      "minimum": 0,
+      "nullable": true,
+      "type": "integer"
+    },
+    "estadoPlan": {
+      "$ref": "./VisitaEstadoPlan.schema.json"
+    },
+    "notasVisita": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "orden": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "pedidoId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "resultado": {
+      "enum": [
+        "venta",
+        "sin_pedido",
+        "cliente_ausente",
+        "otro",
+        null
+      ],
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "VisitaUpdateInput",
+  "type": "object"
+}

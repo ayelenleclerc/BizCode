@@ -10,7 +10,7 @@ BizCode uses **pnpm workspaces** and **Turborepo** (#154):
 |------|------|
 | `apps/web/` | React + Vite frontend |
 | `apps/server/` | Express API |
-| `apps/seller/` | Expo (React Native) App Seller — field sales (#167, #168, #169) |
+| `apps/seller/` | Expo (React Native) App Seller — field sales (#167–#170) |
 | `packages/types/` | Shared TypeScript types and RBAC contracts |
 | `packages/api-client/` | HTTP API client |
 | `prisma/` | Database schema and migrations (repo root) |
@@ -26,7 +26,7 @@ Optional in `.env` for the web app:
 
 - `VITE_API_URL` — full API base including `/api` (e.g. `http://localhost:3001/api`)
 
-### App Seller (`apps/seller`, #167 / #168 / #169)
+### App Seller (`apps/seller`, #167–#170)
 
 Expo SDK app with Expo Router. UI uses React Native Paper (shared `@bizcode/ui` is deferred to #157). Auth uses **Bearer dual** mode: the API still sets HttpOnly cookies for the web app and also returns `accessToken` / `refreshToken` / `expiresIn` in the login and refresh JSON bodies. The seller app stores those tokens in **expo-secure-store** (never AsyncStorage) and sends `Authorization: Bearer` plus `x-bizcode-channel: field`.
 
@@ -35,6 +35,8 @@ Allowed roles: `seller`, `manager`, `owner`. Other roles see an accessible “se
 **Customers (#168):** online search (`GET /api/clientes?q=`) and customer detail with Account / Orders / Details tabs (balance via `GET …/cuenta-corriente/saldo` when `finance.ledger` is enabled, overdue invoices via `GET …/facturas-pendientes` when `finance.receipts` is enabled, recent pedidos, contact + dialer, payment score). Roles with `customers.read` may call those two GET endpoints (full ledger / receipts write still require `reports.financial.read`). Offline cache is **#171**.
 
 **Order taking (#169):** from the customer card, **New order** opens `/pedidos/nuevo?clienteId=` with online catalog (`GET /api/articulos`, rubros), in-memory cart, summary (line discount, `condicionCobro` / `plazoDias`, warehouse `observaciones`), then `POST /api/pedidos` + `POST …/confirm`. Stock and credit over-limit are warnings only. Offline catalog/order queue remains **#171**.
+
+**Day visit agenda (#170):** tab `/agenda` lists `VisitaVendedor` for the device local date (`GET /api/visitas?fecha=YYYY-MM-DD`); FAB creates a spontaneous visit; result dialog updates estado/resultado/notas/duration; KPI header (planned / visited / orders / conversion). Managers plan agendas in the web app at `/visitas` (same API). GPS route optimization stays **#267**.
 
 UI strings use **i18next** (EN / ES / pt-BR) with `expo-localization` for device language.
 

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "./Visita.schema.json"
+          },
+          "type": "array"
+        },
+        "kpi": {
+          "$ref": "./VisitaDiaKpi.schema.json"
+        },
+        "success": {
+          "const": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ],
+      "type": "object"
+    },
+    {
+      "$ref": "./ListPaginationMeta.schema.json"
+    }
+  ],
+  "title": "VisitaListEnvelope"
+}

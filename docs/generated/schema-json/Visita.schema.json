@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "clienteId": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "duracionMinutos": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "estadoPlan": {
+      "$ref": "./VisitaEstadoPlan.schema.json"
+    },
+    "fechaPlanificada": {
+      "format": "date",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "notasVisita": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "orden": {
+      "type": "integer"
+    },
+    "pedidoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "resultado": {
+      "enum": [
+        "venta",
+        "sin_pedido",
+        "cliente_ausente",
+        "otro",
+        null
+      ],
+      "nullable": true,
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "ultimaCompraAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "vendedorId": {
+      "type": "integer"
+    }
+  },
+  "title": "Visita",
+  "type": "object"
+}

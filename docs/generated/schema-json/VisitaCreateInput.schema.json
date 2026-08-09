@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "fechaPlanificada": {
+      "format": "date",
+      "type": "string"
+    },
+    "notasVisita": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    },
+    "orden": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "vendedorId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "vendedorId",
+    "clienteId",
+    "fechaPlanificada"
+  ],
+  "title": "VisitaCreateInput",
+  "type": "object"
+}
