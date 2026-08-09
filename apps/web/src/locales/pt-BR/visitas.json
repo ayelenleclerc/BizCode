@@ -1,0 +1,51 @@
+{
+  "title": "Agenda de visitas",
+  "loadError": "Não foi possível carregar a agenda de visitas",
+  "forbidden": "Você não tem permissão para ver ou planejar visitas de vendedores.",
+  "filters": {
+    "fecha": "Data",
+    "vendedor": "Vendedor",
+    "load": "Carregar"
+  },
+  "kpi": {
+    "planificadas": "Planejadas",
+    "visitados": "Visitados",
+    "pedidos": "Pedidos",
+    "conversion": "Conversão"
+  },
+  "columns": {
+    "cliente": "Cliente",
+    "domicilio": "Endereço",
+    "estado": "Estado",
+    "resultado": "Resultado",
+    "orden": "Ordem"
+  },
+  "estado": {
+    "pendiente": "Pendente",
+    "completada": "Concluída",
+    "no_visitada": "Não visitada"
+  },
+  "resultado": {
+    "venta": "Venda",
+    "sin_pedido": "Sem pedido",
+    "cliente_ausente": "Ausente",
+    "otro": "Outro",
+    "none": "—"
+  },
+  "create": {
+    "title": "Planejar visita",
+    "clienteId": "ID cliente",
+    "vendedorId": "ID vendedor",
+    "fecha": "Data",
+    "submit": "Adicionar",
+    "errors": {
+      "clienteId": "Informe um ID de cliente válido",
+      "vendedorId": "Informe um ID de vendedor válido",
+      "fecha": "Informe uma data YYYY-MM-DD",
+      "generic": "Não foi possível criar a visita"
+    }
+  },
+  "empty": "Não há visitas para a data e o vendedor selecionados.",
+  "selectVendedor": "Escolha um vendedor",
+  "usersLoadError": "Não foi possível carregar os vendedores"
+}

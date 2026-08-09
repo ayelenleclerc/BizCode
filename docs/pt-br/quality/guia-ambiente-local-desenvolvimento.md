@@ -10,7 +10,7 @@ BizCode usa **pnpm workspaces** e **Turborepo** (#154):
 |---------|-------|
 | `apps/web/` | Frontend React + Vite |
 | `apps/server/` | API Express |
-| `apps/seller/` | Expo (React Native) App Vendedor — vendas em campo (#167, #168, #169) |
+| `apps/seller/` | Expo (React Native) App Vendedor — vendas em campo (#167–#170) |
 | `packages/types/` | Tipos TypeScript e contratos RBAC compartilhados |
 | `packages/api-client/` | Cliente HTTP da API |
 | `prisma/` | Esquema e migrações (raiz do repositório) |
@@ -26,7 +26,7 @@ Opcional em `.env` para o app web:
 
 - `VITE_API_URL` — base completa da API incluindo `/api` (ex.: `http://localhost:3001/api`)
 
-### App Vendedor (`apps/seller`, #167 / #168 / #169)
+### App Vendedor (`apps/seller`, #167–#170)
 
 App Expo SDK com Expo Router. A UI usa React Native Paper (`@bizcode/ui` fica diferido para #157). Auth em modo **Bearer dual**: a API continua definindo cookies HttpOnly para a web e também devolve `accessToken` / `refreshToken` / `expiresIn` no body de login e refresh. O app seller guarda esses tokens no **expo-secure-store** (nunca AsyncStorage) e envia `Authorization: Bearer` mais `x-bizcode-channel: field`.
 
@@ -35,6 +35,8 @@ Papéis permitidos: `seller`, `manager`, `owner`. Outros papéis veem uma tela a
 **Clientes (#168):** busca online (`GET /api/clientes?q=`) e ficha com abas Conta / Pedidos / Dados (saldo via `GET …/cuenta-corriente/saldo` se `finance.ledger` estiver habilitado, faturas vencidas via `GET …/facturas-pendientes` se `finance.receipts` estiver habilitado, últimos pedidos, contato + discador nativo, score e zona). Papéis com `customers.read` podem chamar esses dois GET (ledger completo / escrita de recibos ainda exige `reports.financial.read`). Cache offline → **#171**.
 
 **Tomada de pedidos (#169):** a partir da ficha, **Novo pedido** abre `/pedidos/nuevo?clienteId=` com catálogo online (`GET /api/articulos`, rubros), carrinho em memória, resumo (desconto por linha, `condicionCobro` / `plazoDias`, `observaciones` para depósito), depois `POST /api/pedidos` + `POST …/confirm`. Estoque e crédito excedido são apenas avisos. Fila offline / cache de catálogo → **#171**.
+
+**Agenda de visitas do dia (#170):** aba `/agenda` lista `VisitaVendedor` para a data local do dispositivo (`GET /api/visitas?fecha=YYYY-MM-DD`); FAB cria visita espontânea; diálogo de resultado atualiza estado/resultado/notas/duração; KPI (planejadas / visitados / pedidos / conversão). Managers planejam na web `/visitas` (mesma API). Otimização GPS → **#267**.
 
 Strings de UI com **i18next** (EN / ES / pt-BR) e `expo-localization` para o idioma do dispositivo.
 

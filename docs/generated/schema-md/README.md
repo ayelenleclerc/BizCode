@@ -1274,6 +1274,22 @@
 
 * [TurnoCajaOpenInput](./turnocajaopeninput.md) – `-`
 
+* [Visita](./visita.md) – `-`
+
+* [VisitaCreateInput](./visitacreateinput.md) – `-`
+
+* [VisitaDiaKpi](./visitadiakpi.md) – `-`
+
+* [VisitaEnvelope](./visitaenvelope.md) – `-`
+
+* [VisitaEstadoPlan](./visitaestadoplan.md) – `-`
+
+* [VisitaListEnvelope](./visitalistenvelope.md) – `-`
+
+* [VisitaResultado](./visitaresultado.md) – `-`
+
+* [VisitaUpdateInput](./visitaupdateinput.md) – `-`
+
 * [VoidInput](./voidinput.md) – `-`
 
 * [WooCommerceConfigStatus](./woocommerceconfigstatus.md) – `-`
@@ -1625,6 +1641,8 @@
 * [Untitled object in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0-properties-counts.md) – `undefined#/allOf/0/properties/counts`
+
+* [Untitled object in VisitaListEnvelope](./visitalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in WooCommerceDisconnectEnvelope](./woocommercedisconnectenvelope-properties-data.md) – `undefined#/properties/data`
 
@@ -2051,6 +2069,8 @@
 * [Untitled array in TransferenciaDepositoRecibirInput](./transferenciadepositorecibirinput-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in VisitaListEnvelope](./visitalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in WooCommerceOrdenListEnvelope](./woocommerceordenlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

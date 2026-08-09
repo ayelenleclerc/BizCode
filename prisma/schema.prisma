@@ -98,6 +98,7 @@ model Cliente {
 
   facturas           Factura[]
   pedidos            Pedido[]
+  visitasVendedor    VisitaVendedor[]
   contratos          Contrato[]
   ordenesTrabajo     OrdenTrabajo[]
   garantias          Garantia[]
@@ -1269,6 +1270,7 @@ model Pedido {
   meliOrden        MeliOrden?
   tiendanubeOrden  TiendanubeOrden?
   wooCommerceOrden WooCommerceOrden?
+  visitasVendedor  VisitaVendedor[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
@@ -1276,6 +1278,36 @@ model Pedido {
   @@index([tenantId, clienteId])
   @@index([tenantId, depositoId])
   @@index([tenantId, origen])
+}
+
+/// @en Field seller daily visit agenda (#170). Route optimization / holidays: #267.
+/// @es Agenda diaria de visitas del vendedor de campo (#170). Optimización/feriados: #267.
+/// @pt-BR Agenda diária de visitas do vendedor de campo (#170). Otimização/feriados: #267.
+model VisitaVendedor {
+  id               Int       @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  vendedorId       Int
+  vendedor         AppUser   @relation(fields: [vendedorId], references: [id])
+  clienteId        Int
+  cliente          Cliente   @relation(fields: [clienteId], references: [id])
+  /// Planned calendar day (date-only, stored as UTC midnight).
+  fechaPlanificada DateTime  @db.Date
+  /// pendiente | completada | no_visitada
+  estadoPlan       String    @default("pendiente") @db.VarChar(20)
+  /// venta | sin_pedido | cliente_ausente | otro
+  resultado        String?   @db.VarChar(20)
+  notasVisita      String?   @db.VarChar(500)
+  pedidoId         Int?
+  pedido           Pedido?   @relation(fields: [pedidoId], references: [id], onDelete: SetNull)
+  orden            Int       @default(0)
+  duracionMinutos  Int?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([tenantId, vendedorId, fechaPlanificada])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, pedidoId])
 }
 
 /// Delivery note (remito) — non-fiscal transport document (#230).
@@ -1627,6 +1659,7 @@ model Tenant {
   facturas                         Factura[]
   notasCredito                     NotaCredito[]
   pedidos                          Pedido[]
+  visitasVendedor                  VisitaVendedor[]
   contratos                        Contrato[]
   ordenesTrabajo                   OrdenTrabajo[]
   garantias                        Garantia[]
@@ -2516,6 +2549,7 @@ model AppUser {
   ordenesEntregaPicker           OrdenEntrega[]             @relation("OrdenEntregaPicker")
   repartosChofer                 Reparto[]                  @relation("RepartoChofer")
   pedidosVendedor                Pedido[]
+  visitasVendedor                VisitaVendedor[]
   stockAjustes                   StockAjuste[]
   recuentosOperados              Recuento[]                 @relation("RecuentoOperador")
   depositosResponsable           Deposito[]                 @relation("DepositoResponsable")

@@ -23,6 +23,7 @@ import ContracargosMpPage from './pages/finanzas/ContracargosMpPage'
 import ConciliacionBancariaPage from './pages/finanzas/ConciliacionBancariaPage'
 import CobrosPage from './pages/cobros'
 import PedidosPage from './pages/pedidos'
+import VisitasPage from './pages/visitas'
 import ContratosPage from './pages/contratos'
 import OrdenesTrabajoPage from './pages/ordenes-trabajo'
 import GarantiasPage from './pages/garantias'
@@ -192,6 +193,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="billing.orders">
                 <PedidosPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="visitas"
+            element={
+              <ModuleRoute moduleKey="billing.orders">
+                <VisitasPage />
               </ModuleRoute>
             }
           />

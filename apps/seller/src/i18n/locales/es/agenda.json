@@ -1,0 +1,39 @@
+{
+  "title": "Agenda del día",
+  "empty": "No hay visitas planificadas para hoy.",
+  "kpi": {
+    "planificadas": "Planificadas",
+    "visitados": "Visitados",
+    "pedidos": "Pedidos",
+    "conversion": "Conversión"
+  },
+  "estado": {
+    "pendiente": "Pendiente",
+    "completada": "Completada",
+    "no_visitada": "No visitada"
+  },
+  "resultado": {
+    "venta": "Venta / pedido",
+    "sin_pedido": "Sin pedido",
+    "cliente_ausente": "Cliente ausente",
+    "otro": "Otro"
+  },
+  "ultimaCompra": "Última compra",
+  "ultimaCompraNever": "Sin compras",
+  "zonaUnknown": "Sin zona",
+  "registerResult": "Registrar resultado",
+  "resultTitle": "Resultado de visita",
+  "notas": "Notas",
+  "notasRequired": "Las notas son obligatorias para este resultado.",
+  "duracion": "Duración (min)",
+  "pedidoId": "ID de pedido",
+  "saveResult": "Guardar",
+  "createOrder": "Nuevo pedido",
+  "openClient": "Ver cliente",
+  "fabAdd": "Visita espontánea",
+  "addTitle": "Nueva visita espontánea",
+  "addHint": "Buscá un cliente para agregar a la agenda de hoy.",
+  "addConfirm": "Agregar visita",
+  "routesLater": "Optimización de rutas GPS llegará en una versión posterior (#267).",
+  "saving": "Guardando…"
+}

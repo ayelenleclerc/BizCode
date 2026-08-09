@@ -1,0 +1,39 @@
+{
+  "title": "Day agenda",
+  "empty": "No visits planned for today.",
+  "kpi": {
+    "planificadas": "Planned",
+    "visitados": "Visited",
+    "pedidos": "Orders",
+    "conversion": "Conversion"
+  },
+  "estado": {
+    "pendiente": "Pending",
+    "completada": "Completed",
+    "no_visitada": "Not visited"
+  },
+  "resultado": {
+    "venta": "Sale / order",
+    "sin_pedido": "No order",
+    "cliente_ausente": "Customer absent",
+    "otro": "Other"
+  },
+  "ultimaCompra": "Last purchase",
+  "ultimaCompraNever": "No purchases",
+  "zonaUnknown": "No zone",
+  "registerResult": "Log result",
+  "resultTitle": "Visit result",
+  "notas": "Notes",
+  "notasRequired": "Notes are required for this result.",
+  "duracion": "Duration (min)",
+  "pedidoId": "Order ID",
+  "saveResult": "Save",
+  "createOrder": "New order",
+  "openClient": "View customer",
+  "fabAdd": "Spontaneous visit",
+  "addTitle": "New spontaneous visit",
+  "addHint": "Search for a customer to add to today's agenda.",
+  "addConfirm": "Add visit",
+  "routesLater": "GPS route optimization comes in a later release (#267).",
+  "saving": "Saving…"
+}

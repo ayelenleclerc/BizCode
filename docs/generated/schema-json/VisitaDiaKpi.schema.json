@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "conversionPct": {
+      "type": "number"
+    },
+    "pedidos": {
+      "type": "integer"
+    },
+    "planificadas": {
+      "type": "integer"
+    },
+    "visitados": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "planificadas",
+    "visitados",
+    "pedidos",
+    "conversionPct"
+  ],
+  "title": "VisitaDiaKpi",
+  "type": "object"
+}
