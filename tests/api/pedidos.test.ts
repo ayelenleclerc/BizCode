@@ -15,6 +15,9 @@ const PEDIDO_ROW = {
   total: 100,
   validUntil: null,
   facturaId: null,
+  observaciones: null,
+  condicionCobro: null,
+  plazoDias: null,
   createdAt: new Date('2026-05-18T12:00:00.000Z'),
   updatedAt: new Date('2026-05-18T12:00:00.000Z'),
   cliente: CLIENTE_REF,
@@ -56,6 +59,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
           condIva: '1',
           tipo: 'articulo',
           unidadServicio: null,
+          esPadre: false,
         },
       ]),
       findFirst: vi.fn().mockResolvedValue({
@@ -121,6 +125,57 @@ describe('Pedidos API', () => {
     const res = await request(app).post('/api/pedidos').send(PEDIDO_BODY)
     expect(res.status).toBe(201)
     await assertMatchesOpenApi('/api/pedidos', 'post', '201', res.body)
+  })
+
+  it('POST /api/pedidos accepts observaciones and condicionCobro plazo (#169)', async () => {
+    const create = vi.fn().mockResolvedValue({
+      ...PEDIDO_ROW,
+      observaciones: 'Entregar por fondo',
+      condicionCobro: 'plazo',
+      plazoDias: 30,
+    })
+    const base = buildPrismaMock()
+    const app = createApp(
+      buildPrismaMock({
+        pedido: {
+          count: base.pedido.count,
+          findMany: base.pedido.findMany,
+          findFirst: base.pedido.findFirst,
+          create,
+          update: base.pedido.update,
+        },
+      }),
+    )
+    const res = await request(app)
+      .post('/api/pedidos')
+      .send({
+        ...PEDIDO_BODY,
+        observaciones: 'Entregar por fondo',
+        condicionCobro: 'plazo',
+        plazoDias: 30,
+      })
+    expect(res.status).toBe(201)
+    expect(create).toHaveBeenCalled()
+    const data = create.mock.calls[0]?.[0]?.data as {
+      observaciones?: string
+      condicionCobro?: string
+      plazoDias?: number
+    }
+    expect(data.observaciones).toBe('Entregar por fondo')
+    expect(data.condicionCobro).toBe('plazo')
+    expect(data.plazoDias).toBe(30)
+    await assertMatchesOpenApi('/api/pedidos', 'post', '201', res.body)
+  })
+
+  it('POST /api/pedidos rejects plazo without plazoDias (#169)', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .post('/api/pedidos')
+      .send({
+        ...PEDIDO_BODY,
+        condicionCobro: 'plazo',
+      })
+    expect(res.status).toBe(400)
   })
 
   it('returns 403 without orders.create', async () => {

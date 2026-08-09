@@ -1252,6 +1252,18 @@ model Pedido {
   /// @es Origen del canal de venta; `meli` / `tiendanube` / `woocommerce` cuando se importa del marketplace (#186/#187/#188).
   /// @pt-BR Origem do canal de venda; `meli` / `tiendanube` / `woocommerce` quando importado do marketplace (#186/#187/#188).
   origen           String?           @db.VarChar(20)
+  /// @en Warehouse notes from field sales order taking (#169).
+  /// @es Observaciones para depósito en toma de pedido App Seller (#169).
+  /// @pt-BR Observações para depósito na tomada de pedido App Seller (#169).
+  observaciones    String?           @db.VarChar(500)
+  /// @en Intended collection terms: contado | cuenta_corriente | plazo (#169).
+  /// @es Condición de cobro prevista: contado | cuenta_corriente | plazo (#169).
+  /// @pt-BR Condição de cobrança prevista: contado | cuenta_corriente | plazo (#169).
+  condicionCobro   String?           @db.VarChar(20)
+  /// @en Days for plazo when condicionCobro is plazo (#169).
+  /// @es Días de plazo cuando condicionCobro es plazo (#169).
+  /// @pt-BR Dias de prazo quando condicionCobro é plazo (#169).
+  plazoDias        Int?
   remito           Remito?
   items            PedidoItem[]
   meliOrden        MeliOrden?

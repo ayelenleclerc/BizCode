@@ -264,6 +264,13 @@ export class PedidoService {
         total,
         validUntil: parseValidUntil(input.validUntil),
         ...(input.depositoId != null ? { depositoId: input.depositoId } : {}),
+        ...(input.observaciones !== undefined ? { observaciones: input.observaciones } : {}),
+        ...(input.condicionCobro !== undefined ? { condicionCobro: input.condicionCobro } : {}),
+        ...(input.plazoDias !== undefined
+          ? { plazoDias: input.condicionCobro === 'plazo' ? input.plazoDias : null }
+          : input.condicionCobro !== undefined && input.condicionCobro !== 'plazo'
+            ? { plazoDias: null }
+            : {}),
         items: {
           create: resolved.data,
         },
@@ -306,6 +313,13 @@ export class PedidoService {
           total,
           validUntil: parseValidUntil(input.validUntil),
           ...(input.depositoId !== undefined ? { depositoId: input.depositoId } : {}),
+          ...(input.observaciones !== undefined ? { observaciones: input.observaciones } : {}),
+          ...(input.condicionCobro !== undefined ? { condicionCobro: input.condicionCobro } : {}),
+          ...(input.plazoDias !== undefined
+            ? { plazoDias: input.condicionCobro === 'plazo' ? input.plazoDias : null }
+            : input.condicionCobro !== undefined && input.condicionCobro !== 'plazo'
+              ? { plazoDias: null }
+              : {}),
           items: {
             create: resolved.data,
           },

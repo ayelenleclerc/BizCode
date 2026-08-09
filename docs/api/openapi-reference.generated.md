@@ -27881,6 +27881,10 @@ Requires `orders.create` or `reports.operational.read`.
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -27926,6 +27930,14 @@ Requires `orders.create` or `reports.operational.read`.
     - **`subtotal`**
 
       `number`
+
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
 
   - **`tenantId`**
 
@@ -27978,6 +27990,9 @@ Requires `orders.create` or `reports.operational.read`.
       "total": 1,
       "validUntil": "",
       "facturaId": 1,
+      "observaciones": "",
+      "condicionCobro": "contado",
+      "plazoDias": 1,
       "items": [
         {
           "id": 1,
@@ -28113,6 +28128,18 @@ Requires `orders.create`. Initial estado is `draft`.
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
+- **`condicionCobro`**
+
+  `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
+- **`observaciones`**
+
+  `string` — Warehouse notes (#169).
+
+- **`plazoDias`**
+
+  `integer` — Required when condicionCobro is plazo (#169).
+
 - **`validUntil`**
 
   `string`
@@ -28128,6 +28155,9 @@ Requires `orders.create`. Initial estado is `draft`.
   "clienteId": 1,
   "vendedorId": 1,
   "validUntil": "",
+  "observaciones": "",
+  "condicionCobro": "contado",
+  "plazoDias": 1,
   "items": [
     {
       "articuloId": 1,
@@ -28155,6 +28185,10 @@ Requires `orders.create`. Initial estado is `draft`.
   - **`clienteId`**
 
     `integer`
+
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
 
   - **`createdAt`**
 
@@ -28202,6 +28236,14 @@ Requires `orders.create`. Initial estado is `draft`.
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -28240,6 +28282,9 @@ Requires `orders.create`. Initial estado is `draft`.
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -28390,6 +28435,10 @@ Requires `orders.create` or `reports.operational.read`.
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -28436,6 +28485,14 @@ Requires `orders.create` or `reports.operational.read`.
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -28474,6 +28531,9 @@ Requires `orders.create` or `reports.operational.read`.
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -28626,6 +28686,18 @@ Requires `orders.create`.
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
+- **`condicionCobro`**
+
+  `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
+- **`observaciones`**
+
+  `string` — Warehouse notes (#169).
+
+- **`plazoDias`**
+
+  `integer` — Required when condicionCobro is plazo (#169).
+
 - **`validUntil`**
 
   `string`
@@ -28641,6 +28713,9 @@ Requires `orders.create`.
   "clienteId": 1,
   "vendedorId": 1,
   "validUntil": "",
+  "observaciones": "",
+  "condicionCobro": "contado",
+  "plazoDias": 1,
   "items": [
     {
       "articuloId": 1,
@@ -28668,6 +28743,10 @@ Requires `orders.create`.
   - **`clienteId`**
 
     `integer`
+
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
 
   - **`createdAt`**
 
@@ -28715,6 +28794,14 @@ Requires `orders.create`.
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -28753,6 +28840,9 @@ Requires `orders.create`.
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -28919,6 +29009,10 @@ Requires `sales.cancel`. Sets estado to `cancelled` (not allowed when invoiced).
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -28965,6 +29059,14 @@ Requires `sales.cancel`. Sets estado to `cancelled` (not allowed when invoiced).
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -29003,6 +29105,9 @@ Requires `sales.cancel`. Sets estado to `cancelled` (not allowed when invoiced).
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -29153,6 +29258,10 @@ Requires `orders.create`.
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -29199,6 +29308,14 @@ Requires `orders.create`.
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -29237,6 +29354,9 @@ Requires `orders.create`.
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -29387,6 +29507,10 @@ Requires `orders.pick`. Part of BP1-1 logistics (#391).
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -29433,6 +29557,14 @@ Requires `orders.pick`. Part of BP1-1 logistics (#391).
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -29471,6 +29603,9 @@ Requires `orders.pick`. Part of BP1-1 logistics (#391).
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -29621,6 +29756,10 @@ Requires `orders.dispatch`. Part of BP1-1 logistics (#391).
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -29667,6 +29806,14 @@ Requires `orders.dispatch`. Part of BP1-1 logistics (#391).
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -29705,6 +29852,9 @@ Requires `orders.dispatch`. Part of BP1-1 logistics (#391).
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -29855,6 +30005,10 @@ Requires `orders.deliver.confirm`. Part of BP1-1 logistics (#391).
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -29901,6 +30055,14 @@ Requires `orders.deliver.confirm`. Part of BP1-1 logistics (#391).
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -29939,6 +30101,9 @@ Requires `orders.deliver.confirm`. Part of BP1-1 logistics (#391).
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -30089,6 +30254,10 @@ Requires `sales.create` or `reports.financial.read`. Pedido must be `invoiced` o
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -30135,6 +30304,14 @@ Requires `sales.create` or `reports.financial.read`. Pedido must be `invoiced` o
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -30173,6 +30350,9 @@ Requires `sales.create` or `reports.financial.read`. Pedido must be `invoiced` o
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -30364,6 +30544,10 @@ Body with field to (packed, shipped, delivered, invoiced, collected, cancelled, 
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -30410,6 +30594,14 @@ Body with field to (packed, shipped, delivered, invoiced, collected, cancelled, 
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -30448,6 +30640,9 @@ Body with field to (packed, shipped, delivered, invoiced, collected, cancelled, 
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -30655,6 +30850,10 @@ Requires `sales.create`. Allowed from `confirmed|packed|shipped|delivered`. From
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -30701,6 +30900,14 @@ Requires `sales.create`. Allowed from `confirmed|packed|shipped|delivered`. From
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -30739,6 +30946,9 @@ Requires `sales.create`. Allowed from `confirmed|packed|shipped|delivered`. From
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,
@@ -117049,6 +117259,10 @@ Originating invoice header (selected columns)
 
   `integer`
 
+* **`condicionCobro`**
+
+  `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
 * **`createdAt`**
 
   `string`, format: `date-time`
@@ -117095,6 +117309,14 @@ Originating invoice header (selected columns)
 
     `number`
 
+* **`observaciones`**
+
+  `string` — Warehouse notes from field sales (#169).
+
+* **`plazoDias`**
+
+  `integer` — Days when condicionCobro is plazo (#169).
+
 * **`tenantId`**
 
   `integer`
@@ -117127,6 +117349,9 @@ Originating invoice header (selected columns)
   "total": 1,
   "validUntil": "",
   "facturaId": 1,
+  "observaciones": "",
+  "condicionCobro": "contado",
+  "plazoDias": 1,
   "items": [
     {
       "id": 1,
@@ -117186,6 +117411,18 @@ Originating invoice header (selected columns)
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"`
 
+* **`condicionCobro`**
+
+  `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
+* **`observaciones`**
+
+  `string` — Warehouse notes (#169).
+
+* **`plazoDias`**
+
+  `integer` — Required when condicionCobro is plazo (#169).
+
 * **`validUntil`**
 
   `string`
@@ -117201,6 +117438,9 @@ Originating invoice header (selected columns)
   "clienteId": 1,
   "vendedorId": 1,
   "validUntil": "",
+  "observaciones": "",
+  "condicionCobro": "contado",
+  "plazoDias": 1,
   "items": [
     {
       "articuloId": 1,
@@ -117304,6 +117544,10 @@ Originating invoice header (selected columns)
 
     `integer`
 
+  - **`condicionCobro`**
+
+    `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
+
   - **`createdAt`**
 
     `string`, format: `date-time`
@@ -117350,6 +117594,14 @@ Originating invoice header (selected columns)
 
       `number`
 
+  - **`observaciones`**
+
+    `string` — Warehouse notes from field sales (#169).
+
+  - **`plazoDias`**
+
+    `integer` — Days when condicionCobro is plazo (#169).
+
   - **`tenantId`**
 
     `integer`
@@ -117388,6 +117640,9 @@ Originating invoice header (selected columns)
     "total": 1,
     "validUntil": "",
     "facturaId": 1,
+    "observaciones": "",
+    "condicionCobro": "contado",
+    "plazoDias": 1,
     "items": [
       {
         "id": 1,

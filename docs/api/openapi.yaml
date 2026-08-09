@@ -22211,6 +22211,21 @@ components:
         facturaId:
           type: integer
           nullable: true
+        observaciones:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Warehouse notes from field sales (#169).
+        condicionCobro:
+          type: string
+          enum: [contado, cuenta_corriente, plazo, null]
+          nullable: true
+          description: Intended collection terms (#169).
+        plazoDias:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Days when condicionCobro is plazo (#169).
         items:
           type: array
           items:
@@ -22235,6 +22250,21 @@ components:
         validUntil:
           type: string
           nullable: true
+        observaciones:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Warehouse notes (#169).
+        condicionCobro:
+          type: string
+          enum: [contado, cuenta_corriente, plazo, null]
+          nullable: true
+          description: Intended collection terms (#169).
+        plazoDias:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Required when condicionCobro is plazo (#169).
         items:
           type: array
           minItems: 1
