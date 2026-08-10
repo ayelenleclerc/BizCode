@@ -25,6 +25,9 @@ import { ReportesOperacionalesService } from './ReportesOperacionalesService'
 import { OrdenEntregaService } from './OrdenEntregaService'
 import { PedidoService } from './PedidoService'
 import { VisitaService } from './VisitaService'
+import { FeriadoService } from './FeriadoService'
+import { VendedorZonaService } from './VendedorZonaService'
+import { RutaService } from './RutaService'
 import { EmpresaService } from './EmpresaService'
 import { StockAjusteService } from './StockAjusteService'
 import { RecuentoService } from './RecuentoService'
@@ -67,6 +70,9 @@ export type DomainServices = {
   shippingCarrierConfig: ShippingCarrierConfigService
   pedido: PedidoService
   visita: VisitaService
+  feriado: FeriadoService
+  vendedorZona: VendedorZonaService
+  ruta: RutaService
   empresa: EmpresaService
   stockAjuste: StockAjusteService
   recuentos: RecuentoService
@@ -131,6 +137,9 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     shippingCarrierConfig: new ShippingCarrierConfigService(prisma),
     pedido: new PedidoService(prisma),
     visita: new VisitaService(prisma),
+    feriado: new FeriadoService(prisma),
+    vendedorZona: new VendedorZonaService(prisma),
+    ruta: new RutaService(prisma),
     empresa: new EmpresaService(prisma),
     stockAjuste: new StockAjusteService(prisma),
     recuentos: new RecuentoService(prisma),

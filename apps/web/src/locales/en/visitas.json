@@ -33,7 +33,7 @@
     "none": "—"
   },
   "create": {
-    "title": "Schedule visit",
+    "title": "Plan visit",
     "clienteId": "Customer ID",
     "vendedorId": "Seller ID",
     "fecha": "Date",
@@ -47,5 +47,33 @@
   },
   "empty": "No visits for the selected date and seller.",
   "selectVendedor": "Choose a seller",
-  "usersLoadError": "Could not load sellers"
+  "usersLoadError": "Could not load sellers",
+  "ruta": {
+    "title": "Daily route progress",
+    "pollingHint": "Auto-refreshes every 60 seconds.",
+    "empty": "No route for this date and seller.",
+    "total": "Total",
+    "pendientes": "Pending",
+    "visitados": "Visited",
+    "postergados": "Postponed",
+    "conversion": "Conversion",
+    "estado": {
+      "pendiente": "Pending",
+      "visitado": "Visited",
+      "postergado": "Postponed",
+      "no_visitado": "Not visited"
+    }
+  },
+  "zones": {
+    "title": "Seller zone assignments",
+    "empty": "No zones assigned.",
+    "zone": "Zone",
+    "select": "Choose a zone",
+    "assign": "Assign",
+    "delete": "Remove",
+    "errors": {
+      "invalid": "Select a valid seller and zone",
+      "generic": "Could not update the assignment"
+    }
+  }
 }

@@ -32085,6 +32085,2147 @@ Requires `orders.create`. Notes required when resultado is sin\_pedido or client
 }
 ```
 
+### PARAMETERS /api/feriados
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/feriados`
+
+### List tenant holidays by year or exact date
+
+- **Method:** `GET`
+- **Path:** `/api/feriados`
+- **Tags:** feriados
+
+Requires `orders.create`, `reports.operational.read`, or `customers.manage`. Query `year` (default UTC current year) or `fecha` (YYYY-MM-DD) for a single day.
+
+#### Responses
+
+##### Status: 200 Holiday list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"nacional", "provincial", "local"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "nombre": "",
+      "tipo": "nacional",
+      "provincia": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ],
+  "total": 1
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create a tenant holiday
+
+- **Method:** `POST`
+- **Path:** `/api/feriados`
+- **Tags:** feriados
+
+Requires `customers.manage` (owner/admin/manager).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`, format: `date`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`provincia`**
+
+  `string`
+
+- **`tipo`**
+
+  `string`, possible values: `"nacional", "provincial", "local"`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "nombre": "",
+  "tipo": "nacional",
+  "provincia": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Holiday created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"nacional", "provincial", "local"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "nombre": "",
+    "tipo": "nacional",
+    "provincia": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/vendedor-zonas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/vendedor-zonas`
+
+### List seller zone assignments
+
+- **Method:** `GET`
+- **Path:** `/api/vendedor-zonas`
+- **Tags:** vendedor-zonas
+
+Requires `orders.create`, `reports.operational.read`, or `customers.manage`. Sellers only see their own assignments unless they can manage others.
+
+#### Responses
+
+##### Status: 200 Paginated assignments
+
+###### Content-Type: application/json
+
+**All of:**
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`deliveryZoneId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`deliveryZone`**
+
+    `object`
+
+    - **`activo`**
+
+      `boolean`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nombre`**
+
+      `string`
+
+  - **`vendedor`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+* **`limit` (required)**
+
+  `integer` — Effective page size (same semantics as query \`limit\`)
+
+* **`offset` (required)**
+
+  `integer` — Effective skip (same semantics as query \`offset\`)
+
+* **`total` (required)**
+
+  `integer` — Row count matching the list filter (before limit/offset)
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "vendedorId": 1,
+      "deliveryZoneId": 1,
+      "createdAt": "",
+      "deliveryZone": {
+        "id": 1,
+        "nombre": "",
+        "activo": true
+      },
+      "vendedor": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      }
+    }
+  ],
+  "total": 0,
+  "limit": 1,
+  "offset": 0
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Assign a delivery zone to a seller
+
+- **Method:** `POST`
+- **Path:** `/api/vendedor-zonas`
+- **Tags:** vendedor-zonas
+
+Requires `customers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`deliveryZoneId` (required)**
+
+  `integer`
+
+- **`vendedorId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "deliveryZoneId": 1
+}
+```
+
+#### Responses
+
+##### Status: 201 Assignment created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`deliveryZoneId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`deliveryZone`**
+
+    `object`
+
+    - **`activo`**
+
+      `boolean`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nombre`**
+
+      `string`
+
+  - **`vendedor`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "deliveryZoneId": 1,
+    "createdAt": "",
+    "deliveryZone": {
+      "id": 1,
+      "nombre": "",
+      "activo": true
+    },
+    "vendedor": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/vendedor-zonas/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/vendedor-zonas/{id}`
+
+### Delete a seller zone assignment
+
+- **Method:** `DELETE`
+- **Path:** `/api/vendedor-zonas/{id}`
+- **Tags:** vendedor-zonas
+
+Requires `customers.manage`.
+
+#### Responses
+
+##### Status: 200 Deleted
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `true`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rutas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rutas`
+
+### Get seller route for a day
+
+- **Method:** `GET`
+- **Path:** `/api/rutas`
+- **Tags:** rutas
+
+Requires `orders.create`, `reports.operational.read`, or `customers.manage`. Returns `data: null` when no route exists for the seller/date.
+
+#### Responses
+
+##### Status: 200 Route or null
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "fecha": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "paradas": [
+      {
+        "id": 1,
+        "rutaId": 1,
+        "clienteId": 1,
+        "orden": 1,
+        "estado": "pendiente",
+        "motivo": "",
+        "visitaId": 1,
+        "createdAt": "",
+        "updatedAt": "",
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": "",
+          "localidad": "",
+          "deliveryZoneId": 1,
+          "latitud": 1,
+          "longitud": 1
+        }
+      }
+    ],
+    "vendedor": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create daily seller route
+
+- **Method:** `POST`
+- **Path:** `/api/rutas`
+- **Tags:** rutas
+
+Requires `orders.create`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fecha` (required)**
+
+  `string`, format: `date`
+
+- **`vendedorId` (required)**
+
+  `integer`
+
+- **`clienteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "fecha": "",
+  "clienteIds": [
+    1
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Route created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`paradas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`rutaId` (required)**
+
+      `integer`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`visitaId` (required)**
+
+      `integer`
+
+    - **`cliente`**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`deliveryZoneId` (required)**
+
+        `integer`
+
+      - **`domicilio` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`latitud` (required)**
+
+        `number`
+
+      - **`localidad` (required)**
+
+        `string`
+
+      - **`longitud` (required)**
+
+        `number`
+
+      - **`rsocial` (required)**
+
+        `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vendedor`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "fecha": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "paradas": [
+      {
+        "id": 1,
+        "rutaId": 1,
+        "clienteId": 1,
+        "orden": 1,
+        "estado": "pendiente",
+        "motivo": "",
+        "visitaId": 1,
+        "createdAt": "",
+        "updatedAt": "",
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": "",
+          "localidad": "",
+          "deliveryZoneId": 1,
+          "latitud": 1,
+          "longitud": 1
+        }
+      }
+    ],
+    "vendedor": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Duplicate route for seller/date
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rutas/{id}/paradas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rutas/{id}/paradas`
+
+### Replace / reorder route stops
+
+- **Method:** `PUT`
+- **Path:** `/api/rutas/{id}/paradas`
+- **Tags:** rutas
+
+Requires `orders.create`. Editable for today and future UTC dates only. Max 50 stops.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`paradas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`orden` (required)**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+  - **`motivo`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "paradas": [
+    {
+      "clienteId": 1,
+      "orden": 0,
+      "estado": "pendiente",
+      "motivo": ""
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated route
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`paradas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`rutaId` (required)**
+
+      `integer`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`visitaId` (required)**
+
+      `integer`
+
+    - **`cliente`**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`deliveryZoneId` (required)**
+
+        `integer`
+
+      - **`domicilio` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`latitud` (required)**
+
+        `number`
+
+      - **`localidad` (required)**
+
+        `string`
+
+      - **`longitud` (required)**
+
+        `number`
+
+      - **`rsocial` (required)**
+
+        `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vendedor`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "fecha": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "paradas": [
+      {
+        "id": 1,
+        "rutaId": 1,
+        "clienteId": 1,
+        "orden": 1,
+        "estado": "pendiente",
+        "motivo": "",
+        "visitaId": 1,
+        "createdAt": "",
+        "updatedAt": "",
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": "",
+          "localidad": "",
+          "deliveryZoneId": 1,
+          "latitud": 1,
+          "longitud": 1
+        }
+      }
+    ],
+    "vendedor": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rutas/{id}/paradas/{paradaId}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rutas/{id}/paradas/{paradaId}`
+
+### Update stop status (visitado / postergado / no\_visitado)
+
+- **Method:** `PATCH`
+- **Path:** `/api/rutas/{id}/paradas/{paradaId}`
+- **Tags:** rutas
+
+Requires `orders.create`. `postergado` inserts the client into the next non-holiday day route and notifies managers when the notification channel is available.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`estado` (required)**
+
+  `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+- **`motivo`**
+
+  `string`
+
+- **`visitaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "estado": "pendiente",
+  "motivo": "",
+  "visitaId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated route
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`paradas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`rutaId` (required)**
+
+      `integer`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`visitaId` (required)**
+
+      `integer`
+
+    - **`cliente`**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`deliveryZoneId` (required)**
+
+        `integer`
+
+      - **`domicilio` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`latitud` (required)**
+
+        `number`
+
+      - **`localidad` (required)**
+
+        `string`
+
+      - **`longitud` (required)**
+
+        `number`
+
+      - **`rsocial` (required)**
+
+        `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vendedor`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "fecha": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "paradas": [
+      {
+        "id": 1,
+        "rutaId": 1,
+        "clienteId": 1,
+        "orden": 1,
+        "estado": "pendiente",
+        "motivo": "",
+        "visitaId": 1,
+        "createdAt": "",
+        "updatedAt": "",
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": "",
+          "localidad": "",
+          "deliveryZoneId": 1,
+          "latitud": 1,
+          "longitud": 1
+        }
+      }
+    ],
+    "vendedor": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/rutas/{id}/stats
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/rutas/{id}/stats`
+
+### Route progress stats
+
+- **Method:** `GET`
+- **Path:** `/api/rutas/{id}/stats`
+- **Tags:** rutas
+
+Requires `orders.create`, `reports.operational.read`, or `customers.manage`.
+
+#### Responses
+
+##### Status: 200 Progress counters
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`conversionPct` (required)**
+
+    `number`
+
+  - **`noVisitados` (required)**
+
+    `integer`
+
+  - **`pedidos` (required)**
+
+    `integer`
+
+  - **`pendientes` (required)**
+
+    `integer`
+
+  - **`postergados` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `integer`
+
+  - **`visitados` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "pendientes": 1,
+    "visitados": 1,
+    "postergados": 1,
+    "noVisitados": 1,
+    "pedidos": 1,
+    "conversionPct": 1
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/contratos
 
 - **Method:** `PARAMETERS`
@@ -118826,6 +120967,1175 @@ Originating invoice header (selected columns)
 - **Type:**
 
 **Example:**
+
+### FeriadoTipo
+
+- **Type:**`string`
+
+**Example:**
+
+### Feriado
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`fecha` (required)**
+
+  `string`, format: `date`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`provincia` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"nacional", "provincial", "local"`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "fecha": "",
+  "nombre": "",
+  "tipo": "nacional",
+  "provincia": "",
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### FeriadoCreateInput
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`, format: `date`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`provincia`**
+
+  `string`
+
+* **`tipo`**
+
+  `string`, possible values: `"nacional", "provincial", "local"`
+
+**Example:**
+
+```json
+{
+  "fecha": "",
+  "nombre": "",
+  "tipo": "nacional",
+  "provincia": ""
+}
+```
+
+### FeriadoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"nacional", "provincial", "local"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "nombre": "",
+    "tipo": "nacional",
+    "provincia": "",
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### FeriadoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`provincia` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"nacional", "provincial", "local"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "nombre": "",
+      "tipo": "nacional",
+      "provincia": "",
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ],
+  "total": 1
+}
+```
+
+### VendedorZona
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`deliveryZoneId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+* **`deliveryZone`**
+
+  `object`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nombre`**
+
+    `string`
+
+* **`vendedor`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`
+
+  - **`username`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "vendedorId": 1,
+  "deliveryZoneId": 1,
+  "createdAt": "",
+  "deliveryZone": {
+    "id": 1,
+    "nombre": "",
+    "activo": true
+  },
+  "vendedor": {
+    "id": 1,
+    "username": "",
+    "role": ""
+  }
+}
+```
+
+### VendedorZonaCreateInput
+
+- **Type:**`object`
+
+* **`deliveryZoneId` (required)**
+
+  `integer`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "deliveryZoneId": 1
+}
+```
+
+### VendedorZonaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`deliveryZoneId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`deliveryZone`**
+
+    `object`
+
+    - **`activo`**
+
+      `boolean`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nombre`**
+
+      `string`
+
+  - **`vendedor`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "deliveryZoneId": 1,
+    "createdAt": "",
+    "deliveryZone": {
+      "id": 1,
+      "nombre": "",
+      "activo": true
+    },
+    "vendedor": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    }
+  }
+}
+```
+
+### VendedorZonaListEnvelope
+
+- **Type:**
+
+**Example:**
+
+### RutaParadaEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### RutaParadaCliente
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`deliveryZoneId` (required)**
+
+  `integer`
+
+* **`domicilio` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`latitud` (required)**
+
+  `number`
+
+* **`localidad` (required)**
+
+  `string`
+
+* **`longitud` (required)**
+
+  `number`
+
+* **`rsocial` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "codigo": 1,
+  "rsocial": "",
+  "domicilio": "",
+  "localidad": "",
+  "deliveryZoneId": 1,
+  "latitud": 1,
+  "longitud": 1
+}
+```
+
+### RutaParada
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`motivo` (required)**
+
+  `string`
+
+* **`orden` (required)**
+
+  `integer`
+
+* **`rutaId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`visitaId` (required)**
+
+  `integer`
+
+* **`cliente`**
+
+  `object`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`deliveryZoneId` (required)**
+
+    `integer`
+
+  - **`domicilio` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`latitud` (required)**
+
+    `number`
+
+  - **`localidad` (required)**
+
+    `string`
+
+  - **`longitud` (required)**
+
+    `number`
+
+  - **`rsocial` (required)**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "rutaId": 1,
+  "clienteId": 1,
+  "orden": 1,
+  "estado": "pendiente",
+  "motivo": "",
+  "visitaId": 1,
+  "createdAt": "",
+  "updatedAt": "",
+  "cliente": {
+    "id": 1,
+    "codigo": 1,
+    "rsocial": "",
+    "domicilio": "",
+    "localidad": "",
+    "deliveryZoneId": 1,
+    "latitud": 1,
+    "longitud": 1
+  }
+}
+```
+
+### Ruta
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`fecha` (required)**
+
+  `string`, format: `date`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`paradas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`orden` (required)**
+
+    `integer`
+
+  - **`rutaId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`visitaId` (required)**
+
+    `integer`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`codigo` (required)**
+
+      `integer`
+
+    - **`deliveryZoneId` (required)**
+
+      `integer`
+
+    - **`domicilio` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`latitud` (required)**
+
+      `number`
+
+    - **`localidad` (required)**
+
+      `string`
+
+    - **`longitud` (required)**
+
+      `number`
+
+    - **`rsocial` (required)**
+
+      `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+* **`vendedor`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`role`**
+
+    `string`
+
+  - **`username`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "vendedorId": 1,
+  "fecha": "",
+  "createdAt": "",
+  "updatedAt": "",
+  "paradas": [
+    {
+      "id": 1,
+      "rutaId": 1,
+      "clienteId": 1,
+      "orden": 1,
+      "estado": "pendiente",
+      "motivo": "",
+      "visitaId": 1,
+      "createdAt": "",
+      "updatedAt": "",
+      "cliente": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": "",
+        "domicilio": "",
+        "localidad": "",
+        "deliveryZoneId": 1,
+        "latitud": 1,
+        "longitud": 1
+      }
+    }
+  ],
+  "vendedor": {
+    "id": 1,
+    "username": "",
+    "role": ""
+  }
+}
+```
+
+### RutaCreateInput
+
+- **Type:**`object`
+
+* **`fecha` (required)**
+
+  `string`, format: `date`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+* **`clienteIds`**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "vendedorId": 1,
+  "fecha": "",
+  "clienteIds": [
+    1
+  ]
+}
+```
+
+### RutaParadasReplaceInput
+
+- **Type:**`object`
+
+* **`paradas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`orden` (required)**
+
+    `integer`
+
+  - **`estado`**
+
+    `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+  - **`motivo`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "paradas": [
+    {
+      "clienteId": 1,
+      "orden": 0,
+      "estado": "pendiente",
+      "motivo": ""
+    }
+  ]
+}
+```
+
+### RutaParadaPatchInput
+
+- **Type:**`object`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+* **`motivo`**
+
+  `string`
+
+* **`visitaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "estado": "pendiente",
+  "motivo": "",
+  "visitaId": 1
+}
+```
+
+### RutaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`paradas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`clienteId` (required)**
+
+      `integer`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pendiente", "visitado", "postergado", "no_visitado"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`rutaId` (required)**
+
+      `integer`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`visitaId` (required)**
+
+      `integer`
+
+    - **`cliente`**
+
+      `object`
+
+      - **`codigo` (required)**
+
+        `integer`
+
+      - **`deliveryZoneId` (required)**
+
+        `integer`
+
+      - **`domicilio` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`latitud` (required)**
+
+        `number`
+
+      - **`localidad` (required)**
+
+        `string`
+
+      - **`longitud` (required)**
+
+        `number`
+
+      - **`rsocial` (required)**
+
+        `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+  - **`vendedor`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "fecha": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "paradas": [
+      {
+        "id": 1,
+        "rutaId": 1,
+        "clienteId": 1,
+        "orden": 1,
+        "estado": "pendiente",
+        "motivo": "",
+        "visitaId": 1,
+        "createdAt": "",
+        "updatedAt": "",
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": "",
+          "localidad": "",
+          "deliveryZoneId": 1,
+          "latitud": 1,
+          "longitud": 1
+        }
+      }
+    ],
+    "vendedor": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    }
+  }
+}
+```
+
+### RutaMaybeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "vendedorId": 1,
+    "fecha": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "paradas": [
+      {
+        "id": 1,
+        "rutaId": 1,
+        "clienteId": 1,
+        "orden": 1,
+        "estado": "pendiente",
+        "motivo": "",
+        "visitaId": 1,
+        "createdAt": "",
+        "updatedAt": "",
+        "cliente": {
+          "id": 1,
+          "codigo": 1,
+          "rsocial": "",
+          "domicilio": "",
+          "localidad": "",
+          "deliveryZoneId": 1,
+          "latitud": 1,
+          "longitud": 1
+        }
+      }
+    ],
+    "vendedor": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    }
+  }
+}
+```
+
+### RutaDiaStats
+
+- **Type:**`object`
+
+* **`conversionPct` (required)**
+
+  `number`
+
+* **`noVisitados` (required)**
+
+  `integer`
+
+* **`pedidos` (required)**
+
+  `integer`
+
+* **`pendientes` (required)**
+
+  `integer`
+
+* **`postergados` (required)**
+
+  `integer`
+
+* **`total` (required)**
+
+  `integer`
+
+* **`visitados` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "total": 1,
+  "pendientes": 1,
+  "visitados": 1,
+  "postergados": 1,
+  "noVisitados": 1,
+  "pedidos": 1,
+  "conversionPct": 1
+}
+```
+
+### RutaStatsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`conversionPct` (required)**
+
+    `number`
+
+  - **`noVisitados` (required)**
+
+    `integer`
+
+  - **`pedidos` (required)**
+
+    `integer`
+
+  - **`pendientes` (required)**
+
+    `integer`
+
+  - **`postergados` (required)**
+
+    `integer`
+
+  - **`total` (required)**
+
+    `integer`
+
+  - **`visitados` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 1,
+    "pendientes": 1,
+    "visitados": 1,
+    "postergados": 1,
+    "noVisitados": 1,
+    "pedidos": 1,
+    "conversionPct": 1
+  }
+}
+```
 
 ### ContratoFrecuencia
 

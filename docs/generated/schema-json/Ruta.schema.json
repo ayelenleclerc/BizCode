@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "paradas": {
+      "items": {
+        "$ref": "./RutaParada.schema.json"
+      },
+      "type": "array"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "vendedor": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "role": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "vendedorId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "vendedorId",
+    "fecha",
+    "createdAt",
+    "updatedAt",
+    "paradas"
+  ],
+  "title": "Ruta",
+  "type": "object"
+}

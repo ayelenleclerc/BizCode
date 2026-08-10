@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "deliveryZoneId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "vendedorId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "vendedorId",
+    "deliveryZoneId"
+  ],
+  "title": "VendedorZonaCreateInput",
+  "type": "object"
+}

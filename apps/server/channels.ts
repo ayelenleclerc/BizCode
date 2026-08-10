@@ -321,6 +321,13 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `El envío${nro}${carrier} del cliente ${rsocial}${oe} fue marcado como entregado por el transportista.`,
       }
     }
+    case 'ruta_parada_postergada': {
+      const detail = payload.detail ? `\n${payload.detail}` : ''
+      return {
+        subject: `[BizCode] Parada de ruta postergada — vendedor ${payload.username ?? ''}`,
+        text: `Una parada de la ruta diaria fue postergada al próximo día hábil.${detail}`,
+      }
+    }
   }
 }
 

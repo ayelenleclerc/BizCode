@@ -400,6 +400,16 @@
 
 * [FefoAllocationListEnvelope](./fefoallocationlistenvelope.md) – `-`
 
+* [Feriado](./feriado.md) – `-`
+
+* [FeriadoCreateInput](./feriadocreateinput.md) – `-`
+
+* [FeriadoEnvelope](./feriadoenvelope.md) – `-`
+
+* [FeriadoListEnvelope](./feriadolistenvelope.md) – `-`
+
+* [FeriadoTipo](./feriadotipo.md) – `-`
+
 * [FidelizacionAjusteInput](./fidelizacionajusteinput.md) – `-`
 
 * [FidelizacionDashboard](./fidelizaciondashboard.md) – `-`
@@ -1112,6 +1122,28 @@
 
 * [RunMatchingSummary](./runmatchingsummary.md) – `-`
 
+* [Ruta](./ruta.md) – `-`
+
+* [RutaCreateInput](./rutacreateinput.md) – `-`
+
+* [RutaDiaStats](./rutadiastats.md) – `-`
+
+* [RutaEnvelope](./rutaenvelope.md) – `-`
+
+* [RutaMaybeEnvelope](./rutamaybeenvelope.md) – `-`
+
+* [RutaParada](./rutaparada.md) – `-`
+
+* [RutaParadaCliente](./rutaparadacliente.md) – `-`
+
+* [RutaParadaEstado](./rutaparadaestado.md) – `-`
+
+* [RutaParadaPatchInput](./rutaparadapatchinput.md) – `-`
+
+* [RutaParadasReplaceInput](./rutaparadasreplaceinput.md) – `-`
+
+* [RutaStatsEnvelope](./rutastatsenvelope.md) – `-`
+
 * [SetupOwnerEnvelope](./setupownerenvelope.md) – `-`
 
 * [SetupOwnerInput](./setupownerinput.md) – `-`
@@ -1273,6 +1305,14 @@
 * [TurnoCajaListEnvelope](./turnocajalistenvelope.md) – `-`
 
 * [TurnoCajaOpenInput](./turnocajaopeninput.md) – `-`
+
+* [VendedorZona](./vendedorzona.md) – `-`
+
+* [VendedorZonaCreateInput](./vendedorzonacreateinput.md) – `-`
+
+* [VendedorZonaEnvelope](./vendedorzonaenvelope.md) – `-`
+
+* [VendedorZonaListEnvelope](./vendedorzonalistenvelope.md) – `-`
 
 * [Visita](./visita.md) – `-`
 
@@ -1608,6 +1648,10 @@
 
 * [Untitled object in RubroListEnvelope](./rubrolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in Ruta](./ruta-properties-vendedor.md) – `undefined#/properties/vendedor`
+
+* [Untitled object in RutaParadasReplaceInput](./rutaparadasreplaceinput-properties-paradas-items.md) – `undefined#/properties/paradas/items`
+
 * [Untitled object in StockAdjustData](./stockadjustdata-properties-articulo.md) – `undefined#/properties/articulo`
 
 * [Untitled object in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0.md) – `undefined#/allOf/0`
@@ -1641,6 +1685,12 @@
 * [Untitled object in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0-properties-counts.md) – `undefined#/allOf/0/properties/counts`
+
+* [Untitled object in VendedorZona](./vendedorzona-properties-deliveryzone.md) – `undefined#/properties/deliveryZone`
+
+* [Untitled object in VendedorZona](./vendedorzona-properties-vendedor.md) – `undefined#/properties/vendedor`
+
+* [Untitled object in VendedorZonaListEnvelope](./vendedorzonalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in VisitaListEnvelope](./visitalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
@@ -1797,6 +1847,8 @@
 * [Untitled array in FacturasPendientesEnvelope](./facturaspendientesenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FefoAllocationListEnvelope](./fefoallocationlistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in FeriadoListEnvelope](./feriadolistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FidelizacionDashboard](./fidelizaciondashboard-properties-ranking.md) – `undefined#/properties/ranking`
 
@@ -2024,6 +2076,12 @@
 
 * [Untitled array in RubroListEnvelope](./rubrolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
+* [Untitled array in Ruta](./ruta-properties-paradas.md) – `undefined#/properties/paradas`
+
+* [Untitled array in RutaCreateInput](./rutacreateinput-properties-clienteids.md) – `undefined#/properties/clienteIds`
+
+* [Untitled array in RutaParadasReplaceInput](./rutaparadasreplaceinput-properties-paradas.md) – `undefined#/properties/paradas`
+
 * [Untitled array in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in StockCriticoListEnvelope](./stockcriticolistenvelope-properties-data.md) – `undefined#/properties/data`
@@ -2069,6 +2127,8 @@
 * [Untitled array in TransferenciaDepositoRecibirInput](./transferenciadepositorecibirinput-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in VendedorZonaListEnvelope](./vendedorzonalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in VisitaListEnvelope](./visitalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

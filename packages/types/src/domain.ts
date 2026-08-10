@@ -20,6 +20,9 @@ export interface Cliente {
   score?: number
   suspended?: boolean
   deliveryZoneId?: number | null
+  /** Optional map coordinates for seller route pins (#267). */
+  latitud?: number | string | null
+  longitud?: number | string | null
   listaPrecioId?: number | null
   /** @en Bank CBU used for transfer matching in reconciliation (#191). @es CBU bancario usado para matching de transferencias en conciliación (#191). @pt-BR CBU bancário usado para matching de transferências na conciliação (#191). */
   cbu?: string | null

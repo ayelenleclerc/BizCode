@@ -44,6 +44,7 @@ model DeliveryZone {
 
   clientes       Cliente[]
   ordenesEntrega OrdenEntrega[]
+  vendedorZonas  VendedorZona[]
 
   @@index([tenantId])
 }
@@ -74,6 +75,9 @@ model Cliente {
   // ── Logistics (Issue #32) ─────────────────────────────────────────────────
   deliveryZoneId Int?
   deliveryZone   DeliveryZone? @relation(fields: [deliveryZoneId], references: [id])
+  /// Optional map pin for seller route (#267); null = list-only, no geocoder.
+  latitud        Decimal?      @db.Decimal(10, 7)
+  longitud       Decimal?      @db.Decimal(10, 7)
   // ── Pricing (Issue #234) ──────────────────────────────────────────────────
   /// @en Default price list assigned to this customer; null = base article price (#234).
   /// @es Lista de precios por defecto del cliente; null = precio base del artículo (#234).
@@ -99,6 +103,7 @@ model Cliente {
   facturas           Factura[]
   pedidos            Pedido[]
   visitasVendedor    VisitaVendedor[]
+  rutaParadas        RutaParada[]
   contratos          Contrato[]
   ordenesTrabajo     OrdenTrabajo[]
   garantias          Garantia[]
@@ -1304,10 +1309,88 @@ model VisitaVendedor {
   duracionMinutos  Int?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  rutaParadas      RutaParada[]
 
   @@index([tenantId, vendedorId, fechaPlanificada])
   @@index([tenantId, clienteId])
   @@index([tenantId, pedidoId])
+}
+
+/// @en Seller↔delivery-zone assignment (#267).
+/// @es Asignación vendedor↔zona de entrega (#267).
+/// @pt-BR Atribuição vendedor↔zona de entrega (#267).
+model VendedorZona {
+  id             Int          @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant       @relation(fields: [tenantId], references: [id])
+  vendedorId     Int
+  vendedor       AppUser      @relation(fields: [vendedorId], references: [id])
+  deliveryZoneId Int
+  deliveryZone   DeliveryZone @relation(fields: [deliveryZoneId], references: [id])
+  createdAt      DateTime     @default(now())
+
+  @@unique([tenantId, vendedorId, deliveryZoneId])
+  @@index([tenantId, vendedorId])
+}
+
+/// @en Tenant holiday calendar for seller route planning (#267).
+/// @es Calendario de feriados del tenant para planificación de ruta (#267).
+/// @pt-BR Calendário de feriados do tenant para planejamento de rota (#267).
+model Feriado {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  fecha     DateTime @db.Date
+  nombre    String   @db.VarChar(120)
+  /// nacional | provincial | local
+  tipo      String   @default("nacional") @db.VarChar(20)
+  provincia String?  @db.VarChar(60)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, fecha, nombre])
+  @@index([tenantId, fecha])
+}
+
+/// @en Ordered daily seller route (#267). Visit outcomes remain on VisitaVendedor (#170).
+/// @es Ruta diaria ordenada del vendedor (#267). Resultados de visita en VisitaVendedor (#170).
+/// @pt-BR Rota diária ordenada do vendedor (#267). Resultados de visita em VisitaVendedor (#170).
+model RutaVendedor {
+  id         Int         @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  vendedorId Int
+  vendedor   AppUser     @relation(fields: [vendedorId], references: [id])
+  fecha      DateTime    @db.Date
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  paradas    RutaParada[]
+
+  @@unique([tenantId, vendedorId, fecha])
+  @@index([tenantId, fecha])
+}
+
+/// @en Stop on a seller daily route (#267).
+/// @es Parada de la ruta diaria del vendedor (#267).
+/// @pt-BR Parada da rota diária do vendedor (#267).
+model RutaParada {
+  id        Int            @id @default(autoincrement())
+  rutaId    Int
+  ruta      RutaVendedor   @relation(fields: [rutaId], references: [id], onDelete: Cascade)
+  clienteId Int
+  cliente   Cliente        @relation(fields: [clienteId], references: [id])
+  orden     Int            @default(0)
+  /// pendiente | visitado | postergado | no_visitado
+  estado    String         @default("pendiente") @db.VarChar(20)
+  motivo    String?        @db.VarChar(200)
+  visitaId  Int?
+  visita    VisitaVendedor? @relation(fields: [visitaId], references: [id], onDelete: SetNull)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([rutaId, orden])
+  @@index([clienteId])
+  @@index([visitaId])
 }
 
 /// Delivery note (remito) — non-fiscal transport document (#230).
@@ -1660,6 +1743,9 @@ model Tenant {
   notasCredito                     NotaCredito[]
   pedidos                          Pedido[]
   visitasVendedor                  VisitaVendedor[]
+  vendedorZonas                    VendedorZona[]
+  feriados                         Feriado[]
+  rutasVendedor                    RutaVendedor[]
   contratos                        Contrato[]
   ordenesTrabajo                   OrdenTrabajo[]
   garantias                        Garantia[]
@@ -2550,6 +2636,8 @@ model AppUser {
   repartosChofer                 Reparto[]                  @relation("RepartoChofer")
   pedidosVendedor                Pedido[]
   visitasVendedor                VisitaVendedor[]
+  vendedorZonas                  VendedorZona[]
+  rutasVendedor                  RutaVendedor[]
   stockAjustes                   StockAjuste[]
   recuentosOperados              Recuento[]                 @relation("RecuentoOperador")
   depositosResponsable           Deposito[]                 @relation("DepositoResponsable")

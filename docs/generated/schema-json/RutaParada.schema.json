@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cliente": {
+      "$ref": "./RutaParadaCliente.schema.json"
+    },
+    "clienteId": {
+      "type": "integer"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "estado": {
+      "$ref": "./RutaParadaEstado.schema.json"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "motivo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "orden": {
+      "type": "integer"
+    },
+    "rutaId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "visitaId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "rutaId",
+    "clienteId",
+    "orden",
+    "estado",
+    "motivo",
+    "visitaId",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "RutaParada",
+  "type": "object"
+}

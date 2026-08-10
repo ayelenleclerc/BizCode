@@ -69,6 +69,7 @@
     "fidelizacion:vencimiento": "tsx scripts/fidelizacion-vencimiento-job.ts",
     "lotes:vencimiento": "tsx scripts/lotes-vencimiento-job.ts",
     "contratos:facturacion": "tsx scripts/contratos-facturacion-job.ts",
+    "feriados:seed-ar": "tsx scripts/feriados-seed-ar.ts",
     "tipos-cambio:bcra": "tsx scripts/tipos-cambio-bcra-job.ts",
     "mercadopago:reconciliacion": "tsx scripts/mercadopago-reconciliacion-job.ts",
     "meli:token-refresh": "tsx scripts/meli-token-refresh-job.ts",

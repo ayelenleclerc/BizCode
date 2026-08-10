@@ -52,6 +52,12 @@ tags:
     description: Commercial orders and quotes (ADR-0009)
   - name: visitas
     description: Field seller daily visit agenda (#170)
+  - name: feriados
+    description: Tenant holiday calendar for seller routes (#267)
+  - name: vendedor-zonas
+    description: Seller to delivery-zone assignment (#267)
+  - name: rutas
+    description: Ordered daily seller route planning (#267)
   - name: contratos
     description: Recurring service contracts and scheduled invoicing (#245, module service.contracts)
   - name: ordenes-trabajo
@@ -5229,6 +5235,395 @@ paths:
                 $ref: '#/components/schemas/VisitaEnvelope'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/feriados:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [feriados]
+      summary: List tenant holidays by year or exact date
+      description: |
+        Requires `orders.create`, `reports.operational.read`, or `customers.manage`.
+        Query `year` (default UTC current year) or `fecha` (YYYY-MM-DD) for a single day.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      parameters:
+        - name: year
+          in: query
+          schema:
+            type: integer
+            minimum: 2000
+            maximum: 2100
+        - name: fecha
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Holiday list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeriadoListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [feriados]
+      summary: Create a tenant holiday
+      description: Requires `customers.manage` (owner/admin/manager).
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeriadoCreateInput'
+      responses:
+        '201':
+          description: Holiday created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeriadoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/vendedor-zonas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [vendedor-zonas]
+      summary: List seller zone assignments
+      description: |
+        Requires `orders.create`, `reports.operational.read`, or `customers.manage`.
+        Sellers only see their own assignments unless they can manage others.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      parameters:
+        - name: vendedorId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+      responses:
+        '200':
+          description: Paginated assignments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendedorZonaListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [vendedor-zonas]
+      summary: Assign a delivery zone to a seller
+      description: Requires `customers.manage`.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendedorZonaCreateInput'
+      responses:
+        '201':
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendedorZonaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/vendedor-zonas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    delete:
+      tags: [vendedor-zonas]
+      summary: Delete a seller zone assignment
+      description: Requires `customers.manage`.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    enum: [true]
+                  data:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/rutas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [rutas]
+      summary: Get seller route for a day
+      description: |
+        Requires `orders.create`, `reports.operational.read`, or `customers.manage`.
+        Returns `data: null` when no route exists for the seller/date.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      parameters:
+        - name: fecha
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: vendedorId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Route or null
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RutaMaybeEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [rutas]
+      summary: Create daily seller route
+      description: Requires `orders.create`.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RutaCreateInput'
+      responses:
+        '201':
+          description: Route created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RutaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate route for seller/date
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/rutas/{id}/paradas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    put:
+      tags: [rutas]
+      summary: Replace / reorder route stops
+      description: Requires `orders.create`. Editable for today and future UTC dates only. Max 50 stops.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RutaParadasReplaceInput'
+      responses:
+        '200':
+          description: Updated route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RutaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/rutas/{id}/paradas/{paradaId}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: paradaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    patch:
+      tags: [rutas]
+      summary: Update stop status (visitado / postergado / no_visitado)
+      description: |
+        Requires `orders.create`. `postergado` inserts the client into the next non-holiday day route
+        and notifies managers when the notification channel is available.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RutaParadaPatchInput'
+      responses:
+        '200':
+          description: Updated route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RutaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
+  /api/rutas/{id}/stats:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [rutas]
+      summary: Route progress stats
+      description: Requires `orders.create`, `reports.operational.read`, or `customers.manage`.
+      security:
+        - cookieSession: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Progress counters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RutaStatsEnvelope'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -22640,6 +23035,343 @@ components:
             kpi:
               $ref: '#/components/schemas/VisitaDiaKpi'
         - $ref: '#/components/schemas/ListPaginationMeta'
+
+    FeriadoTipo:
+      type: string
+      enum: [nacional, provincial, local]
+
+    Feriado:
+      type: object
+      required: [id, tenantId, fecha, nombre, tipo, provincia, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        fecha:
+          type: string
+          format: date
+        nombre:
+          type: string
+        tipo:
+          $ref: '#/components/schemas/FeriadoTipo'
+        provincia:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    FeriadoCreateInput:
+      type: object
+      required: [fecha, nombre]
+      properties:
+        fecha:
+          type: string
+          format: date
+        nombre:
+          type: string
+          maxLength: 120
+        tipo:
+          $ref: '#/components/schemas/FeriadoTipo'
+        provincia:
+          type: string
+          nullable: true
+
+    FeriadoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Feriado'
+
+    FeriadoListEnvelope:
+      type: object
+      required: [success, data, total]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feriado'
+        total:
+          type: integer
+
+    VendedorZona:
+      type: object
+      required: [id, tenantId, vendedorId, deliveryZoneId, createdAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        vendedorId:
+          type: integer
+        deliveryZoneId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        deliveryZone:
+          type: object
+          properties:
+            id:
+              type: integer
+            nombre:
+              type: string
+            activo:
+              type: boolean
+        vendedor:
+          type: object
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+            role:
+              type: string
+
+    VendedorZonaCreateInput:
+      type: object
+      required: [vendedorId, deliveryZoneId]
+      properties:
+        vendedorId:
+          type: integer
+          minimum: 1
+        deliveryZoneId:
+          type: integer
+          minimum: 1
+
+    VendedorZonaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/VendedorZona'
+
+    VendedorZonaListEnvelope:
+      allOf:
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/VendedorZona'
+        - $ref: '#/components/schemas/ListPaginationMeta'
+
+    RutaParadaEstado:
+      type: string
+      enum: [pendiente, visitado, postergado, no_visitado]
+
+    RutaParadaCliente:
+      type: object
+      required: [id, codigo, rsocial, domicilio, localidad, deliveryZoneId, latitud, longitud]
+      properties:
+        id:
+          type: integer
+        codigo:
+          type: integer
+        rsocial:
+          type: string
+        domicilio:
+          type: string
+          nullable: true
+        localidad:
+          type: string
+          nullable: true
+        deliveryZoneId:
+          type: integer
+          nullable: true
+        latitud:
+          type: number
+          nullable: true
+        longitud:
+          type: number
+          nullable: true
+
+    RutaParada:
+      type: object
+      required: [id, rutaId, clienteId, orden, estado, motivo, visitaId, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        rutaId:
+          type: integer
+        clienteId:
+          type: integer
+        orden:
+          type: integer
+        estado:
+          $ref: '#/components/schemas/RutaParadaEstado'
+        motivo:
+          type: string
+          nullable: true
+        visitaId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        cliente:
+          $ref: '#/components/schemas/RutaParadaCliente'
+
+    Ruta:
+      type: object
+      required: [id, tenantId, vendedorId, fecha, createdAt, updatedAt, paradas]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        vendedorId:
+          type: integer
+        fecha:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        paradas:
+          type: array
+          items:
+            $ref: '#/components/schemas/RutaParada'
+        vendedor:
+          type: object
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+            role:
+              type: string
+
+    RutaCreateInput:
+      type: object
+      required: [vendedorId, fecha]
+      properties:
+        vendedorId:
+          type: integer
+          minimum: 1
+        fecha:
+          type: string
+          format: date
+        clienteIds:
+          type: array
+          maxItems: 50
+          items:
+            type: integer
+            minimum: 1
+
+    RutaParadasReplaceInput:
+      type: object
+      required: [paradas]
+      properties:
+        paradas:
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            required: [clienteId, orden]
+            properties:
+              clienteId:
+                type: integer
+                minimum: 1
+              orden:
+                type: integer
+                minimum: 0
+              estado:
+                $ref: '#/components/schemas/RutaParadaEstado'
+              motivo:
+                type: string
+                maxLength: 200
+                nullable: true
+
+    RutaParadaPatchInput:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          $ref: '#/components/schemas/RutaParadaEstado'
+        motivo:
+          type: string
+          maxLength: 200
+          nullable: true
+        visitaId:
+          type: integer
+          minimum: 1
+          nullable: true
+
+    RutaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/Ruta'
+
+    RutaMaybeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/Ruta'
+            - type: 'null'
+
+    RutaDiaStats:
+      type: object
+      required: [total, pendientes, visitados, postergados, noVisitados, pedidos, conversionPct]
+      properties:
+        total:
+          type: integer
+        pendientes:
+          type: integer
+        visitados:
+          type: integer
+        postergados:
+          type: integer
+        noVisitados:
+          type: integer
+        pedidos:
+          type: integer
+        conversionPct:
+          type: number
+
+    RutaStatsEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/RutaDiaStats'
 
     ContratoFrecuencia:
       type: string

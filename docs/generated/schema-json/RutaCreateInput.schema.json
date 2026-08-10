@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteIds": {
+      "items": {
+        "minimum": 1,
+        "type": "integer"
+      },
+      "maxItems": 50,
+      "type": "array"
+    },
+    "fecha": {
+      "format": "date",
+      "type": "string"
+    },
+    "vendedorId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "vendedorId",
+    "fecha"
+  ],
+  "title": "RutaCreateInput",
+  "type": "object"
+}

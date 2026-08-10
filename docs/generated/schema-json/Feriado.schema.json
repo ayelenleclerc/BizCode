@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "fecha": {
+      "format": "date",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "provincia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipo": {
+      "$ref": "./FeriadoTipo.schema.json"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "fecha",
+    "nombre",
+    "tipo",
+    "provincia",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "Feriado",
+  "type": "object"
+}

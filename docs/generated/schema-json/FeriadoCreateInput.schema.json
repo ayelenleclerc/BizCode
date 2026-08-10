@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fecha": {
+      "format": "date",
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 120,
+      "type": "string"
+    },
+    "provincia": {
+      "nullable": true,
+      "type": "string"
+    },
+    "tipo": {
+      "$ref": "./FeriadoTipo.schema.json"
+    }
+  },
+  "required": [
+    "fecha",
+    "nombre"
+  ],
+  "title": "FeriadoCreateInput",
+  "type": "object"
+}

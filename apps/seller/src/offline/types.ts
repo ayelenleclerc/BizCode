@@ -1,4 +1,10 @@
-export type OutboxActionType = 'pedido_create_confirm' | 'visita_create' | 'visita_update'
+export type OutboxActionType =
+  | 'pedido_create_confirm'
+  | 'visita_create'
+  | 'visita_update'
+  | 'ruta_create'
+  | 'ruta_paradas_replace'
+  | 'ruta_parada_patch'
 
 export type OutboxRow = {
   id: number
@@ -22,6 +28,22 @@ export type VisitaCreatePayload = {
 export type VisitaUpdatePayload = {
   /** Server id when known; negative local id when created offline. */
   visitaId: number
+  body: Record<string, unknown>
+}
+
+export type RutaCreatePayload = {
+  localRutaId: number
+  body: Record<string, unknown>
+}
+
+export type RutaParadasReplacePayload = {
+  rutaId: number
+  body: Record<string, unknown>
+}
+
+export type RutaParadaPatchPayload = {
+  rutaId: number
+  paradaId: number
   body: Record<string, unknown>
 }
 
