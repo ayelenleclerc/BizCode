@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, View } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthContext'
+import { OfflineBanner } from '../../src/offline/OfflineBanner'
 
 export default function AppLayout() {
   const { t } = useTranslation('common')
@@ -41,15 +42,18 @@ export default function AppLayout() {
   )
 
   return (
-    <Tabs
-      screenOptions={{
-        headerRight: logoutButton,
-      }}
-    >
-      <Tabs.Screen name="clientes" options={{ title: t('tabs.clientes') }} />
-      <Tabs.Screen name="pedidos" options={{ title: t('tabs.pedidos') }} />
-      <Tabs.Screen name="catalogo" options={{ title: t('tabs.catalogo') }} />
-      <Tabs.Screen name="agenda" options={{ title: t('tabs.agenda') }} />
-    </Tabs>
+    <View style={{ flex: 1 }}>
+      <OfflineBanner />
+      <Tabs
+        screenOptions={{
+          headerRight: logoutButton,
+        }}
+      >
+        <Tabs.Screen name="clientes" options={{ title: t('tabs.clientes') }} />
+        <Tabs.Screen name="pedidos" options={{ title: t('tabs.pedidos') }} />
+        <Tabs.Screen name="catalogo" options={{ title: t('tabs.catalogo') }} />
+        <Tabs.Screen name="agenda" options={{ title: t('tabs.agenda') }} />
+      </Tabs>
+    </View>
   )
 }

@@ -89,6 +89,17 @@ export default function ClienteDetailScreen() {
 
       setCliente(clienteRaw)
       setPedidos(Array.isArray(pedidosRes.data) ? pedidosRes.data.slice(0, 10) : [])
+      try {
+        const { getOfflineDb } = await import('../../../src/offline/db')
+        const { upsertCliente, upsertPedidoCache } = await import('../../../src/offline/repos')
+        const db = await getOfflineDb()
+        await upsertCliente(db, clienteRaw as unknown as Record<string, unknown>)
+        for (const p of Array.isArray(pedidosRes.data) ? pedidosRes.data.slice(0, 10) : []) {
+          await upsertPedidoCache(db, p as unknown as Record<string, unknown>)
+        }
+      } catch {
+        // cache best-effort
+      }
 
       if (saldoResult.ok && saldoResult.data) {
         setSaldoCc(saldoResult.data)
@@ -128,7 +139,27 @@ export default function ClienteDetailScreen() {
 
       setState('success')
     } catch (err) {
-      setState(mapApiErrorToUiState(err))
+      try {
+        const { getOfflineDb } = await import('../../../src/offline/db')
+        const { getClienteLocal, listPedidosByClienteLocal } = await import('../../../src/offline/repos')
+        const db = await getOfflineDb()
+        const cached = (await getClienteLocal(db, clienteId)) as ClienteDetail | null
+        if (!cached) {
+          setState(mapApiErrorToUiState(err))
+          return
+        }
+        const pedCached = (await listPedidosByClienteLocal(db, clienteId, 10)) as PedidoRow[]
+        setCliente(cached)
+        setPedidos(pedCached)
+        setSaldoCc(null)
+        setLedgerFallback(true)
+        setOverdue([])
+        setReceiptsUnavailable(true)
+        setZonaNombre(null)
+        setState('success')
+      } catch {
+        setState(mapApiErrorToUiState(err))
+      }
     }
   }, [clienteId])
 

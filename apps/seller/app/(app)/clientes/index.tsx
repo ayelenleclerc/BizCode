@@ -47,9 +47,20 @@ export default function ClientesListScreen() {
       setState(list.length === 0 ? 'empty' : 'success')
     } catch (err) {
       if (id !== reqId.current) return
-      setItems([])
-      setState(mapApiErrorToUiState(err))
-      setErrorDetail(err instanceof Error ? err.message : null)
+      try {
+        const { getOfflineDb } = await import('../../../src/offline/db')
+        const { searchClientesLocal } = await import('../../../src/offline/repos')
+        const db = await getOfflineDb()
+        const cached = (await searchClientesLocal(db, trimmed)) as ClienteListItem[]
+        if (id !== reqId.current) return
+        setItems(cached)
+        setState(cached.length === 0 ? 'empty' : 'success')
+        setErrorDetail(null)
+      } catch {
+        setItems([])
+        setState(mapApiErrorToUiState(err))
+        setErrorDetail(err instanceof Error ? err.message : null)
+      }
     }
   }, [])
 

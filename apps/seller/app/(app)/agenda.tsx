@@ -88,11 +88,41 @@ export default function AgendaScreen() {
       setItems(list)
       setKpi(res.kpi ?? null)
       setState(list.length === 0 ? 'empty' : 'success')
+      try {
+        const { getOfflineDb } = await import('../../src/offline/db')
+        const { upsertVisita } = await import('../../src/offline/repos')
+        const db = await getOfflineDb()
+        for (const v of list) {
+          await upsertVisita(db, v as unknown as Record<string, unknown>)
+        }
+      } catch {
+        // best-effort cache
+      }
     } catch (err) {
-      setItems([])
-      setKpi(null)
-      setState(mapApiErrorToUiState(err))
-      setErrorDetail(err instanceof Error ? err.message : null)
+      try {
+        const { getOfflineDb } = await import('../../src/offline/db')
+        const { listVisitasByFechaLocal } = await import('../../src/offline/repos')
+        const db = await getOfflineDb()
+        const cached = (await listVisitasByFechaLocal(db, fecha)) as VisitaVendedorRow[]
+        setItems(cached)
+        const visitados = cached.filter((v) => v.estadoPlan === 'completada').length
+        const pedidos = cached.filter(
+          (v) => v.resultado === 'venta' || (v.pedidoId != null && v.pedidoId > 0),
+        ).length
+        setKpi({
+          planificadas: cached.length,
+          visitados,
+          pedidos,
+          conversionPct: visitados > 0 ? Math.round((pedidos / visitados) * 1000) / 10 : 0,
+        })
+        setState(cached.length === 0 ? 'empty' : 'success')
+        setErrorDetail(null)
+      } catch {
+        setItems([])
+        setKpi(null)
+        setState(mapApiErrorToUiState(err))
+        setErrorDetail(err instanceof Error ? err.message : null)
+      }
     }
   }, [fecha])
 
@@ -129,8 +159,18 @@ export default function AgendaScreen() {
       setAddState(list.length === 0 ? 'empty' : 'success')
     } catch (err) {
       if (id !== addReqId.current) return
-      setAddItems([])
-      setAddState(mapApiErrorToUiState(err))
+      try {
+        const { getOfflineDb } = await import('../../src/offline/db')
+        const { searchClientesLocal } = await import('../../src/offline/repos')
+        const db = await getOfflineDb()
+        const cached = (await searchClientesLocal(db, trimmed)) as ClienteSearchItem[]
+        if (id !== addReqId.current) return
+        setAddItems(cached)
+        setAddState(cached.length === 0 ? 'empty' : 'success')
+      } catch {
+        setAddItems([])
+        setAddState(mapApiErrorToUiState(err))
+      }
     }
   }, [])
 
@@ -182,18 +222,30 @@ export default function AgendaScreen() {
     const duracionMinutos = Math.max(1, Math.round(elapsedMs / 60000))
     setResultSaving(true)
     setResultError(null)
+    const body = {
+      estadoPlan: 'completada' as const,
+      resultado,
+      notasVisita: notas.trim() || null,
+      pedidoId: pedidoId ?? null,
+      duracionMinutos,
+    }
     try {
-      await visitasAPI.update(resultVisit.id, {
-        estadoPlan: 'completada',
-        resultado,
-        notasVisita: notas.trim() || null,
-        pedidoId: pedidoId ?? null,
-        duracionMinutos,
-      })
+      await visitasAPI.update(resultVisit.id, body)
       closeResult()
       await load()
     } catch (err) {
-      setResultError(err instanceof Error ? err.message : t('common:errorGeneric'))
+      try {
+        const { enqueueVisitaUpdate } = await import('../../src/offline/actions')
+        await enqueueVisitaUpdate({
+          visitaId: resultVisit.id,
+          body,
+          previous: resultVisit as unknown as Record<string, unknown>,
+        })
+        closeResult()
+        await load()
+      } catch {
+        setResultError(err instanceof Error ? err.message : t('common:errorGeneric'))
+      }
     } finally {
       setResultSaving(false)
     }
@@ -202,18 +254,38 @@ export default function AgendaScreen() {
   const addSpontaneous = async (cliente: ClienteSearchItem) => {
     if (!claims?.userId) return
     setAddSaving(true)
+    const body = {
+      vendedorId: claims.userId,
+      clienteId: cliente.id,
+      fechaPlanificada: fecha,
+    }
     try {
-      await visitasAPI.create({
-        vendedorId: claims.userId,
-        clienteId: cliente.id,
-        fechaPlanificada: fecha,
-      })
+      await visitasAPI.create(body)
       setAddOpen(false)
       setAddQuery('')
       setAddItems([])
       await load()
     } catch (err) {
-      setAddState(mapApiErrorToUiState(err))
+      try {
+        const { enqueueVisitaCreate } = await import('../../src/offline/actions')
+        await enqueueVisitaCreate({
+          body,
+          clienteSnapshot: {
+            id: cliente.id,
+            codigo: cliente.codigo,
+            rsocial: cliente.rsocial,
+            domicilio: null,
+            localidad: null,
+            deliveryZoneId: null,
+          },
+        })
+        setAddOpen(false)
+        setAddQuery('')
+        setAddItems([])
+        await load()
+      } catch {
+        setAddState(mapApiErrorToUiState(err))
+      }
     } finally {
       setAddSaving(false)
     }
@@ -221,7 +293,7 @@ export default function AgendaScreen() {
 
   return (
     <View style={styles.root} testID="seller-agenda">
-      <Title accessibilityRole="header">{t('agenda:title')}</Title>
+      <Title>{t('agenda:title')}</Title>
       <Text variant="bodySmall" style={styles.muted}>
         {t('agenda:routesLater')}
       </Text>
@@ -417,9 +489,11 @@ export default function AgendaScreen() {
                     label={t('agenda:pedidoId')}
                     value={pedidoIdText}
                     onChangeText={setPedidoIdText}
-                    keyboardType="number-pad"
                     mode="outlined"
-                    testID="seller-agenda-pedido-id"
+                    {...({
+                      keyboardType: 'number-pad',
+                      testID: 'seller-agenda-pedido-id',
+                    } as object)}
                   />
                   <Button
                     mode="text"
@@ -435,7 +509,7 @@ export default function AgendaScreen() {
                 </>
               ) : null}
               {resultError ? (
-                <Text style={styles.error} testID="seller-agenda-result-error">
+                <Text style={styles.error} {...({ testID: 'seller-agenda-result-error' } as object)}>
                   {resultError}
                 </Text>
               ) : null}
