@@ -10,7 +10,7 @@ BizCode usa **pnpm workspaces** e **Turborepo** (#154):
 |---------|-------|
 | `apps/web/` | Frontend React + Vite |
 | `apps/server/` | API Express |
-| `apps/seller/` | Expo (React Native) App Vendedor — vendas em campo (#167–#170) |
+| `apps/seller/` | Expo (React Native) App Vendedor — vendas em campo (#167–#171) |
 | `packages/types/` | Tipos TypeScript e contratos RBAC compartilhados |
 | `packages/api-client/` | Cliente HTTP da API |
 | `prisma/` | Esquema e migrações (raiz do repositório) |
@@ -26,7 +26,7 @@ Opcional em `.env` para o app web:
 
 - `VITE_API_URL` — base completa da API incluindo `/api` (ex.: `http://localhost:3001/api`)
 
-### App Vendedor (`apps/seller`, #167–#170)
+### App Vendedor (`apps/seller`, #167–#171)
 
 App Expo SDK com Expo Router. A UI usa React Native Paper (`@bizcode/ui` fica diferido para #157). Auth em modo **Bearer dual**: a API continua definindo cookies HttpOnly para a web e também devolve `accessToken` / `refreshToken` / `expiresIn` no body de login e refresh. O app seller guarda esses tokens no **expo-secure-store** (nunca AsyncStorage) e envia `Authorization: Bearer` mais `x-bizcode-channel: field`.
 
@@ -37,6 +37,8 @@ Papéis permitidos: `seller`, `manager`, `owner`. Outros papéis veem uma tela a
 **Tomada de pedidos (#169):** a partir da ficha, **Novo pedido** abre `/pedidos/nuevo?clienteId=` com catálogo online (`GET /api/articulos`, rubros), carrinho em memória, resumo (desconto por linha, `condicionCobro` / `plazoDias`, `observaciones` para depósito), depois `POST /api/pedidos` + `POST …/confirm`. Estoque e crédito excedido são apenas avisos. Fila offline / cache de catálogo → **#171**.
 
 **Agenda de visitas do dia (#170):** aba `/agenda` lista `VisitaVendedor` para a data local do dispositivo (`GET /api/visitas?fecha=YYYY-MM-DD`); FAB cria visita espontânea; diálogo de resultado atualiza estado/resultado/notas/duração; KPI (planejadas / visitados / pedidos / conversão). Managers planejam na web `/visitas` (mesma API). Otimização GPS → **#267**.
+
+**Modo offline (#171):** após login (online), hydrate do dia em `expo-sqlite` (clientes, artigos, rubros, agenda, pedidos recentes dos clientes da agenda) com metadados MMKV (`cacheDay`; fallback em memória se MMKV nativo indisponível). Sem sinal, listas/ficha/catálogo/agenda/confirmação de pedido leem SQLite e enfileiram escritas (pedidos + visitas) na outbox FIFO esvaziada pelo NetInfo ao reconectar. Banner com data offline e pendentes. Invalidação ao mudar o dia local. Subconjunto por zona → **#267**. Alvo principal nativo Expo; web pode degradar.
 
 Strings de UI com **i18next** (EN / ES / pt-BR) e `expo-localization` para o idioma do dispositivo.
 

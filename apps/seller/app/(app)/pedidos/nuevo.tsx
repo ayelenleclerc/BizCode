@@ -83,7 +83,19 @@ export default function NuevoPedidoScreen() {
   useEffect(() => {
     void rubrosAPI.list({ limit: 100 }).then(
       (rows) => setRubros(Array.isArray(rows) ? rows : []),
-      () => setRubros([]),
+      () => {
+        void (async () => {
+          try {
+            const { getOfflineDb } = await import('../../../src/offline/db')
+            const { listRubrosLocal } = await import('../../../src/offline/repos')
+            const db = await getOfflineDb()
+            const cached = await listRubrosLocal(db)
+            setRubros(cached as unknown as Rubro[])
+          } catch {
+            setRubros([])
+          }
+        })()
+      },
     )
   }, [])
 
@@ -98,8 +110,21 @@ export default function NuevoPedidoScreen() {
       setState(list.length === 0 ? 'empty' : 'success')
     } catch (err) {
       if (id !== reqId.current) return
-      setItems([])
-      setState(mapApiErrorToUiState(err))
+      try {
+        const { getOfflineDb } = await import('../../../src/offline/db')
+        const { searchArticulosLocal } = await import('../../../src/offline/repos')
+        const db = await getOfflineDb()
+        const cached = await searchArticulosLocal(db, q.trim())
+        if (id !== reqId.current) return
+        const list = cached
+          .map((a) => a as unknown as ArticuloListItem)
+          .filter((a) => a.activo !== false && !a.esPadre)
+        setItems(list)
+        setState(list.length === 0 ? 'empty' : 'success')
+      } catch {
+        setItems([])
+        setState(mapApiErrorToUiState(err))
+      }
     }
   }, [])
 

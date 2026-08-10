@@ -27,5 +27,15 @@
     "title": "Acceso denegado",
     "body": "Tu rol no puede usar la App Vendedor.",
     "back": "Volver al login"
+  },
+  "offline": {
+    "banner": "Modo offline — datos del {{date}}",
+    "hydrating": "Descargando datos del día…",
+    "syncing": "Sincronizando {{count}} acciones…",
+    "pending": "{{count}} pendientes de sync",
+    "synced": "Todo sincronizado",
+    "syncError": "Error de sincronización — se reintentará",
+    "retrySync": "Sincronizar",
+    "queuedOrder": "Pedido guardado offline (#{{id}}). Se enviará al reconectar."
   }
 }

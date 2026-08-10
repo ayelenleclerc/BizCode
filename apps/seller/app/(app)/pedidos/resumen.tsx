@@ -14,6 +14,7 @@ import { clientesAPI, pedidosAPI } from '../../../src/api/sellerApi'
 import { useAuth } from '../../../src/auth/AuthContext'
 import { mapApiErrorToUiState } from '../../../src/lib/apiErrors'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
+import { useOffline } from '../../../src/offline/OfflineContext'
 import { usePedidoCart } from '../../../src/pedidos/CartContext'
 import {
   availableCredit,
@@ -28,6 +29,7 @@ export default function PedidoResumenScreen() {
   const router = useRouter()
   const cart = usePedidoCart()
   const { claims } = useAuth()
+  const { refreshMeta } = useOffline()
   const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt-BR' ? 'pt-BR' : 'es-AR'
 
   const [saldo, setSaldo] = useState<number | null>(null)
@@ -82,19 +84,55 @@ export default function PedidoResumenScreen() {
         plazoDias,
         vendedorId: claims?.userId ?? null,
       })
+      const { isOnline } = await import('../../../src/offline/network')
+      const online = await isOnline()
+      if (!online) {
+        const { enqueuePedidoCreateConfirm } = await import('../../../src/offline/actions')
+        const localId = await enqueuePedidoCreateConfirm({
+          body: body as unknown as Record<string, unknown>,
+          clienteId: cart.clienteId,
+        })
+        setConfirmedId(localId)
+        cart.clear()
+        await refreshMeta()
+        return
+      }
       const created = await pedidosAPI.create(body as unknown as Record<string, unknown>)
       const confirmed = await pedidosAPI.confirm(created.id)
       setConfirmedId(confirmed.id)
       cart.clear()
     } catch (err) {
       const ui = mapApiErrorToUiState(err)
-      if (ui === 'offline') setError(t('common:errorOffline'))
-      else if (ui === 'forbidden') setError(t('common:errorForbidden'))
+      if (ui === 'offline') {
+        try {
+          const plazoDias =
+            cart.condicionCobro === 'plazo' ? Number.parseInt(cart.plazoDias, 10) : null
+          const body = buildPedidoBody({
+            clienteId: cart.clienteId,
+            lines: cart.lines,
+            observaciones: cart.observaciones.trim() || null,
+            condicionCobro: cart.condicionCobro,
+            plazoDias,
+            vendedorId: claims?.userId ?? null,
+          })
+          const { enqueuePedidoCreateConfirm } = await import('../../../src/offline/actions')
+          const localId = await enqueuePedidoCreateConfirm({
+            body: body as unknown as Record<string, unknown>,
+            clienteId: cart.clienteId!,
+          })
+          setConfirmedId(localId)
+          cart.clear()
+          await refreshMeta()
+          return
+        } catch {
+          setError(t('common:errorOffline'))
+        }
+      } else if (ui === 'forbidden') setError(t('common:errorForbidden'))
       else setError(err instanceof Error ? err.message : t('common:errorGeneric'))
     } finally {
       setSubmitting(false)
     }
-  }, [cart, t, claims?.userId])
+  }, [cart, t, claims?.userId, refreshMeta])
 
   if (cart.clienteId == null) {
     return (
@@ -105,16 +143,31 @@ export default function PedidoResumenScreen() {
   }
 
   if (confirmedId != null) {
+    const pending = confirmedId < 0
     return (
       <View style={styles.root} testID="seller-pedido-success">
-        <Text variant="titleLarge">{t('pedidos:successTitle', { id: confirmedId })}</Text>
-        <Button
-          mode="contained"
-          onPress={() => router.replace(`/(app)/pedidos/${confirmedId}`)}
-          testID="seller-pedido-view-detail"
-        >
-          {t('pedidos:viewDetail')}
-        </Button>
+        <Text variant="titleLarge">
+          {pending
+            ? t('common:offline.queuedOrder', { id: confirmedId })
+            : t('pedidos:successTitle', { id: confirmedId })}
+        </Text>
+        {!pending ? (
+          <Button
+            mode="contained"
+            onPress={() => router.replace(`/(app)/pedidos/${confirmedId}`)}
+            testID="seller-pedido-view-detail"
+          >
+            {t('pedidos:viewDetail')}
+          </Button>
+        ) : (
+          <Button
+            mode="contained"
+            onPress={() => router.replace('/(app)/pedidos')}
+            testID="seller-pedido-back-list"
+          >
+            {t('common:tabs.pedidos')}
+          </Button>
+        )}
       </View>
     )
   }

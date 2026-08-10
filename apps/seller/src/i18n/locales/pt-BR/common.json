@@ -27,5 +27,15 @@
     "title": "Acesso negado",
     "body": "Seu papel não pode usar o App Vendedor.",
     "back": "Voltar ao login"
+  },
+  "offline": {
+    "banner": "Modo offline — dados de {{date}}",
+    "hydrating": "Baixando dados do dia…",
+    "syncing": "Sincronizando {{count}} ações…",
+    "pending": "{{count}} pendentes de sync",
+    "synced": "Tudo sincronizado",
+    "syncError": "Erro de sincronização — será tentado de novo",
+    "retrySync": "Sincronizar",
+    "queuedOrder": "Pedido salvo offline (#{{id}}). Será enviado ao reconectar."
   }
 }

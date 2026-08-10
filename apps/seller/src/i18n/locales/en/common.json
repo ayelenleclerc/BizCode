@@ -27,5 +27,15 @@
     "title": "Access denied",
     "body": "Your role cannot use the Seller app.",
     "back": "Back to login"
+  },
+  "offline": {
+    "banner": "Offline mode — data from {{date}}",
+    "hydrating": "Downloading today’s data…",
+    "syncing": "Syncing {{count}} actions…",
+    "pending": "{{count}} pending sync",
+    "synced": "Fully synced",
+    "syncError": "Sync error — will retry",
+    "retrySync": "Sync",
+    "queuedOrder": "Order saved offline (#{{id}}). It will upload when online."
   }
 }

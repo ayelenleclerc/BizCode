@@ -10,7 +10,7 @@ BizCode uses **pnpm workspaces** and **Turborepo** (#154):
 |------|------|
 | `apps/web/` | React + Vite frontend |
 | `apps/server/` | Express API |
-| `apps/seller/` | Expo (React Native) App Seller — field sales (#167–#170) |
+| `apps/seller/` | Expo (React Native) App Seller — field sales (#167–#171) |
 | `packages/types/` | Shared TypeScript types and RBAC contracts |
 | `packages/api-client/` | HTTP API client |
 | `prisma/` | Database schema and migrations (repo root) |
@@ -26,7 +26,7 @@ Optional in `.env` for the web app:
 
 - `VITE_API_URL` — full API base including `/api` (e.g. `http://localhost:3001/api`)
 
-### App Seller (`apps/seller`, #167–#170)
+### App Seller (`apps/seller`, #167–#171)
 
 Expo SDK app with Expo Router. UI uses React Native Paper (shared `@bizcode/ui` is deferred to #157). Auth uses **Bearer dual** mode: the API still sets HttpOnly cookies for the web app and also returns `accessToken` / `refreshToken` / `expiresIn` in the login and refresh JSON bodies. The seller app stores those tokens in **expo-secure-store** (never AsyncStorage) and sends `Authorization: Bearer` plus `x-bizcode-channel: field`.
 
@@ -37,6 +37,8 @@ Allowed roles: `seller`, `manager`, `owner`. Other roles see an accessible “se
 **Order taking (#169):** from the customer card, **New order** opens `/pedidos/nuevo?clienteId=` with online catalog (`GET /api/articulos`, rubros), in-memory cart, summary (line discount, `condicionCobro` / `plazoDias`, warehouse `observaciones`), then `POST /api/pedidos` + `POST …/confirm`. Stock and credit over-limit are warnings only. Offline catalog/order queue remains **#171**.
 
 **Day visit agenda (#170):** tab `/agenda` lists `VisitaVendedor` for the device local date (`GET /api/visitas?fecha=YYYY-MM-DD`); FAB creates a spontaneous visit; result dialog updates estado/resultado/notas/duration; KPI header (planned / visited / orders / conversion). Managers plan agendas in the web app at `/visitas` (same API). GPS route optimization stays **#267**.
+
+**Offline mode (#171):** after login (online), the app hydrates a day cache into `expo-sqlite` (clientes, artículos, rubros, agenda, recent pedidos for agenda clients) with MMKV metadata (`cacheDay`; in-memory fallback if MMKV native is unavailable). With no signal, lists/ficha/catálogo/agenda/pedido confirm read from SQLite and enqueue writes (pedidos confirm + visitas) into a FIFO outbox flushed by NetInfo on reconnect. Banner shows offline date and pending sync count. Cache invalidates when the local calendar day changes. Zone-assigned client subsets remain **#267**. Primary target is native Expo; web may degrade if native stores are unavailable.
 
 UI strings use **i18next** (EN / ES / pt-BR) with `expo-localization` for device language.
 
