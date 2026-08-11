@@ -78,6 +78,8 @@ describe('libroIvaVentasMapper', () => {
     suspended: false,
     deliveryZoneId: null,
     listaPrecioId: null,
+    latitud: null,
+    longitud: null,
     anonymizedAt: null,
     cbu: null,
     alias: null,

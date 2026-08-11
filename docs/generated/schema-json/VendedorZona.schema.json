@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "deliveryZone": {
+      "properties": {
+        "activo": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "nombre": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "deliveryZoneId": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "vendedor": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "role": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "vendedorId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "vendedorId",
+    "deliveryZoneId",
+    "createdAt"
+  ],
+  "title": "VendedorZona",
+  "type": "object"
+}

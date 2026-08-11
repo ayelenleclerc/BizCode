@@ -3699,3 +3699,108 @@ export const visitaUpdateBodySchema = z
       duracionMinutos: data.duracionMinutos,
     }),
   )
+
+export const feriadoCreateBodySchema = z
+  .object({
+    fecha: z.string(),
+    nombre: z.string(),
+    tipo: z.enum(['nacional', 'provincial', 'local']).optional(),
+    provincia: z.union([z.string(), z.null()]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.fecha.trim())) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha must be YYYY-MM-DD', path: ['fecha'] })
+    }
+    if (data.nombre.trim().length < 1 || data.nombre.trim().length > 120) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'nombre must be 1–120 characters',
+        path: ['nombre'],
+      })
+    }
+  })
+  .transform((data) => ({
+    fecha: data.fecha.trim(),
+    nombre: data.nombre.trim(),
+    tipo: data.tipo,
+    provincia: data.provincia,
+  }))
+
+export const vendedorZonaCreateBodySchema = z
+  .object({
+    vendedorId: z.number(),
+    deliveryZoneId: z.number(),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.vendedorId) || data.vendedorId < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'vendedorId must be >= 1', path: ['vendedorId'] })
+    }
+    if (!Number.isInteger(data.deliveryZoneId) || data.deliveryZoneId < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'deliveryZoneId must be >= 1',
+        path: ['deliveryZoneId'],
+      })
+    }
+  })
+
+export const rutaCreateBodySchema = z
+  .object({
+    vendedorId: z.number(),
+    fecha: z.string(),
+    clienteIds: z.array(z.number()).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!Number.isInteger(data.vendedorId) || data.vendedorId < 1) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'vendedorId must be >= 1', path: ['vendedorId'] })
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.fecha.trim())) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha must be YYYY-MM-DD', path: ['fecha'] })
+    }
+    if (data.clienteIds) {
+      for (const [i, id] of data.clienteIds.entries()) {
+        if (!Number.isInteger(id) || id < 1) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'clienteIds entries must be integers >= 1',
+            path: ['clienteIds', i],
+          })
+        }
+      }
+    }
+  })
+  .transform((data) => ({
+    vendedorId: data.vendedorId,
+    fecha: data.fecha.trim(),
+    clienteIds: data.clienteIds,
+  }))
+
+export const rutaParadasReplaceBodySchema = z.object({
+  paradas: z.array(
+    z.object({
+      clienteId: z.number().int().min(1),
+      orden: z.number().int().min(0),
+      estado: z.enum(['pendiente', 'visitado', 'postergado', 'no_visitado']).optional(),
+      motivo: z.union([z.string().max(200), z.null()]).optional(),
+    }),
+  ),
+})
+
+export const rutaParadaPatchBodySchema = z
+  .object({
+    estado: z.enum(['pendiente', 'visitado', 'postergado', 'no_visitado']),
+    motivo: z.union([z.string().max(200), z.null()]).optional(),
+    visitaId: z.union([z.number().int().min(1), z.null()]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.estado === 'no_visitado' &&
+      (data.motivo === undefined || data.motivo === null || data.motivo.trim().length < 1)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'motivo is required when estado is no_visitado',
+        path: ['motivo'],
+      })
+    }
+  })

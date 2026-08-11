@@ -56,6 +56,45 @@ vi.mock('@/lib/api', () => ({
     }),
     create: vi.fn(),
   },
+  rutasAPI: {
+    getRuta: vi.fn().mockResolvedValue({
+      id: 9,
+      tenantId: 1,
+      vendedorId: 5,
+      fecha: '2026-08-09',
+      createdAt: '2026-08-09T00:00:00.000Z',
+      updatedAt: '2026-08-09T00:00:00.000Z',
+      paradas: [
+        {
+          id: 1,
+          rutaId: 9,
+          clienteId: 2,
+          orden: 0,
+          estado: 'pendiente',
+          motivo: null,
+          visitaId: null,
+          createdAt: '2026-08-09T00:00:00.000Z',
+          updatedAt: '2026-08-09T00:00:00.000Z',
+          cliente: { id: 2, codigo: 100, rsocial: 'Cliente Demo', domicilio: null, localidad: null, deliveryZoneId: null, latitud: null, longitud: null },
+        },
+      ],
+    }),
+    getRutaStats: vi.fn().mockResolvedValue({
+      total: 1,
+      pendientes: 1,
+      visitados: 0,
+      postergados: 0,
+      noVisitados: 0,
+      pedidos: 0,
+      conversionPct: 0,
+    }),
+    listVendedorZonas: vi.fn().mockResolvedValue({ success: true, data: [], total: 0 }),
+    createVendedorZona: vi.fn(),
+    deleteVendedorZona: vi.fn(),
+  },
+  zonasEntregaAPI: {
+    list: vi.fn().mockResolvedValue([{ id: 1, nombre: 'Centro', tipo: 'barrio', activo: true }]),
+  },
 }))
 
 describe('VisitasPage', () => {
@@ -75,7 +114,9 @@ describe('VisitasPage', () => {
     await waitFor(() => {
       expect(screen.getByTestId('visitas-table')).toBeInTheDocument()
     })
-    expect(screen.getByText('Cliente Demo')).toBeInTheDocument()
+    expect(screen.getAllByText('Cliente Demo').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByTestId('visitas-kpi')).toBeInTheDocument()
+    expect(screen.getByTestId('visitas-ruta-panel')).toBeInTheDocument()
+    expect(screen.getByTestId('visitas-ruta-stats')).toBeInTheDocument()
   })
 })

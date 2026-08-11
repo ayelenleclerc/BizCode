@@ -133,6 +133,14 @@ vi.mock('@/lib/api', async () => {
       update: vi.fn(),
       get: vi.fn(),
     },
+    rutasAPI: {
+      getRuta: vi.fn().mockResolvedValue(null),
+      getRutaStats: vi.fn(),
+      listVendedorZonas: vi.fn().mockResolvedValue({ success: true, data: [], total: 0 }),
+      createVendedorZona: vi.fn(),
+      deleteVendedorZona: vi.fn(),
+      listFeriados: vi.fn().mockResolvedValue({ success: true, data: [], total: 0 }),
+    },
     contratosAPI: {
       list: vi.fn().mockResolvedValue({ success: true, data: [], total: 0, limit: 100, offset: 0 }),
       get: vi.fn(),

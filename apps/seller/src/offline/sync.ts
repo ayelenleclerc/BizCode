@@ -1,4 +1,4 @@
-import { pedidosAPI, visitasAPI } from '../api/sellerApi'
+import { pedidosAPI, rutasAPI, visitasAPI } from '../api/sellerApi'
 import { getOfflineDb } from './db'
 import { offlineMeta } from './meta'
 import {
@@ -8,9 +8,12 @@ import {
   resolveServerId,
   saveIdMap,
 } from './outbox'
-import { replacePedidoId, replaceVisitaId, upsertVisita } from './repos'
+import { replacePedidoId, replaceRutaId, replaceVisitaId, upsertRuta, upsertVisita } from './repos'
 import type {
   PedidoCreateConfirmPayload,
+  RutaCreatePayload,
+  RutaParadaPatchPayload,
+  RutaParadasReplacePayload,
   VisitaCreatePayload,
   VisitaUpdatePayload,
 } from './types'
@@ -54,6 +57,27 @@ export async function flushOutbox(): Promise<SyncResult> {
         }
         const updated = await visitasAPI.update(serverId, p.body)
         await upsertVisita(db, updated as unknown as Record<string, unknown>, { pendingSync: false })
+      } else if (item.actionType === 'ruta_create') {
+        const p = payload as unknown as RutaCreatePayload
+        const created = await rutasAPI.createRuta(p.body)
+        await saveIdMap(db, 'ruta', p.localRutaId, created.id)
+        await replaceRutaId(db, p.localRutaId, created as unknown as Record<string, unknown>)
+      } else if (item.actionType === 'ruta_paradas_replace') {
+        const p = payload as unknown as RutaParadasReplacePayload
+        const serverRutaId = await resolveServerId(db, 'ruta', p.rutaId)
+        if (serverRutaId == null) {
+          throw new Error(`ruta local ${p.rutaId} not synced yet`)
+        }
+        const updated = await rutasAPI.replaceParadas(serverRutaId, p.body)
+        await upsertRuta(db, updated as unknown as Record<string, unknown>, { pendingSync: false })
+      } else if (item.actionType === 'ruta_parada_patch') {
+        const p = payload as unknown as RutaParadaPatchPayload
+        const serverRutaId = await resolveServerId(db, 'ruta', p.rutaId)
+        if (serverRutaId == null) {
+          throw new Error(`ruta local ${p.rutaId} not synced yet`)
+        }
+        const updated = await rutasAPI.patchParada(serverRutaId, p.paradaId, p.body)
+        await upsertRuta(db, updated as unknown as Record<string, unknown>, { pendingSync: false })
       }
       await deleteOutbox(db, item.id)
       processed += 1
@@ -61,7 +85,6 @@ export async function flushOutbox(): Promise<SyncResult> {
       const message = err instanceof Error ? err.message : 'sync_failed'
       lastError = message
       await markOutboxError(db, item.id, item.attempts + 1, message)
-      // stop FIFO to preserve order (creates before updates)
       break
     }
   }

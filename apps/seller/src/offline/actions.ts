@@ -1,7 +1,7 @@
 import { getOfflineDb } from './db'
 import { localYmd } from './localYmd'
 import { allocateLocalId, enqueueOutbox } from './outbox'
-import { upsertPedidoCache, upsertVisita } from './repos'
+import { upsertPedidoCache, upsertRuta, upsertVisita } from './repos'
 
 /**
  * @en Queues pedido create+confirm for offline sync; returns provisional local id.
@@ -83,6 +83,66 @@ export async function enqueueVisitaUpdate(input: {
   await upsertVisita(db, merged, { pendingSync: true })
   await enqueueOutbox(db, 'visita_update', {
     visitaId: input.visitaId,
+    body: input.body,
+  })
+}
+
+/**
+ * @en Queues route create offline.
+ * @es Encola creación de ruta offline.
+ * @pt-BR Enfileira criação de rota offline.
+ */
+export async function enqueueRutaCreate(input: {
+  body: Record<string, unknown>
+}): Promise<number> {
+  const db = await getOfflineDb()
+  const localRutaId = await allocateLocalId(db, 'ruta')
+  const provisional: Record<string, unknown> = {
+    id: localRutaId,
+    fecha: String(input.body.fecha ?? localYmd()).slice(0, 10),
+    paradas: [],
+    pendingSync: true,
+    ...input.body,
+  }
+  await upsertRuta(db, provisional, { pendingSync: true })
+  await enqueueOutbox(db, 'ruta_create', { localRutaId, body: input.body })
+  return localRutaId
+}
+
+/**
+ * @en Queues full stop list replace offline.
+ * @es Encola reemplazo de paradas offline.
+ * @pt-BR Enfileira substituição de paradas offline.
+ */
+export async function enqueueRutaParadasReplace(input: {
+  rutaId: number
+  body: Record<string, unknown>
+  nextRuta: Record<string, unknown>
+}): Promise<void> {
+  const db = await getOfflineDb()
+  await upsertRuta(db, { ...input.nextRuta, pendingSync: true }, { pendingSync: true })
+  await enqueueOutbox(db, 'ruta_paradas_replace', {
+    rutaId: input.rutaId,
+    body: input.body,
+  })
+}
+
+/**
+ * @en Queues stop status patch offline.
+ * @es Encola patch de estado de parada offline.
+ * @pt-BR Enfileira patch de estado de parada offline.
+ */
+export async function enqueueRutaParadaPatch(input: {
+  rutaId: number
+  paradaId: number
+  body: Record<string, unknown>
+  nextRuta: Record<string, unknown>
+}): Promise<void> {
+  const db = await getOfflineDb()
+  await upsertRuta(db, { ...input.nextRuta, pendingSync: true }, { pendingSync: true })
+  await enqueueOutbox(db, 'ruta_parada_patch', {
+    rutaId: input.rutaId,
+    paradaId: input.paradaId,
     body: input.body,
   })
 }

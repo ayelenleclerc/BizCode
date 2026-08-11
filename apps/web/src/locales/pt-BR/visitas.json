@@ -45,7 +45,35 @@
       "generic": "Não foi possível criar a visita"
     }
   },
-  "empty": "Não há visitas para a data e o vendedor selecionados.",
+  "empty": "Não há visitas para a data e vendedor selecionados.",
   "selectVendedor": "Escolha um vendedor",
-  "usersLoadError": "Não foi possível carregar os vendedores"
+  "usersLoadError": "Não foi possível carregar os vendedores",
+  "ruta": {
+    "title": "Progresso da rota diária",
+    "pollingHint": "Atualiza automaticamente a cada 60 segundos.",
+    "empty": "Não há rota para esta data e vendedor.",
+    "total": "Total",
+    "pendientes": "Pendentes",
+    "visitados": "Visitados",
+    "postergados": "Adiados",
+    "conversion": "Conversão",
+    "estado": {
+      "pendiente": "Pendente",
+      "visitado": "Visitado",
+      "postergado": "Adiado",
+      "no_visitado": "Não visitado"
+    }
+  },
+  "zones": {
+    "title": "Zonas atribuídas ao vendedor",
+    "empty": "Sem zonas atribuídas.",
+    "zone": "Zona",
+    "select": "Escolha uma zona",
+    "assign": "Atribuir",
+    "delete": "Remover",
+    "errors": {
+      "invalid": "Selecione vendedor e zona válidos",
+      "generic": "Não foi possível atualizar a atribuição"
+    }
+  }
 }

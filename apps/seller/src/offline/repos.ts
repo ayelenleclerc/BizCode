@@ -191,3 +191,67 @@ export async function replaceVisitaId(
   await db.runAsync('DELETE FROM visitas WHERE id = ?', localId)
   await upsertVisita(db, serverVisita, { pendingSync: false })
 }
+
+export async function upsertRuta(
+  db: SQLiteDatabase,
+  ruta: Record<string, unknown>,
+  opts?: { pendingSync?: boolean },
+): Promise<void> {
+  const id = Number(ruta.id)
+  if (!Number.isInteger(id)) return
+  const fecha = String(ruta.fecha ?? '').slice(0, 10)
+  await db.runAsync(
+    `INSERT INTO rutas (id, fecha, json, pending_sync, updated_at) VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET fecha=excluded.fecha, json=excluded.json, pending_sync=excluded.pending_sync, updated_at=excluded.updated_at`,
+    id,
+    fecha,
+    JSON.stringify(ruta),
+    opts?.pendingSync ? 1 : 0,
+    now(),
+  )
+}
+
+export async function getRutaByFechaLocal(
+  db: SQLiteDatabase,
+  fecha: string,
+): Promise<Record<string, unknown> | null> {
+  const row = await db.getFirstAsync<{ json: string }>(
+    'SELECT json FROM rutas WHERE fecha = ? ORDER BY id DESC LIMIT 1',
+    fecha.slice(0, 10),
+  )
+  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+}
+
+export async function replaceRutaId(
+  db: SQLiteDatabase,
+  localId: number,
+  serverRuta: Record<string, unknown>,
+): Promise<void> {
+  await db.runAsync('DELETE FROM rutas WHERE id = ?', localId)
+  await upsertRuta(db, serverRuta, { pendingSync: false })
+}
+
+export async function upsertFeriado(db: SQLiteDatabase, feriado: Record<string, unknown>): Promise<void> {
+  const id = Number(feriado.id)
+  if (!Number.isInteger(id)) return
+  await db.runAsync(
+    `INSERT INTO feriados_cache (id, fecha, json, updated_at) VALUES (?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET fecha=excluded.fecha, json=excluded.json, updated_at=excluded.updated_at`,
+    id,
+    String(feriado.fecha ?? '').slice(0, 10),
+    JSON.stringify(feriado),
+    now(),
+  )
+}
+
+export async function listFeriadosOnDateLocal(
+  db: SQLiteDatabase,
+  fecha: string,
+): Promise<Record<string, unknown>[]> {
+  const rows = await db.getAllAsync<{ json: string }>(
+    'SELECT json FROM feriados_cache WHERE fecha = ?',
+    fecha.slice(0, 10),
+  )
+  return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+}
+

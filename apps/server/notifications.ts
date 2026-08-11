@@ -39,6 +39,7 @@ export const NOTIFICATION_TYPES = [
   'security_alert_critical',
   'security_alert_high',
   'shipment_delivered',
+  'ruta_parada_postergada',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]

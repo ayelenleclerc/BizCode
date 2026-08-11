@@ -8,7 +8,15 @@ import { getTenantId } from '../routes/restDomainShared'
  * @es Modelos con alcance de tenant soportados por `verifyOwnership` (#215 anti-IDOR).
  * @pt-BR Modelos com escopo de tenant suportados por `verifyOwnership` (#215 anti-IDOR).
  */
-export type OwnershipModel = 'cliente' | 'articulo' | 'factura' | 'proveedor' | 'pedido' | 'visita'
+export type OwnershipModel =
+  | 'cliente'
+  | 'articulo'
+  | 'factura'
+  | 'proveedor'
+  | 'pedido'
+  | 'visita'
+  | 'ruta'
+  | 'vendedorZona'
 
 /**
  * @en Ensures `:id` belongs to the session tenant via `findFirst({ id, tenantId })`; 404 otherwise (no cross-tenant leak).
@@ -45,6 +53,18 @@ export function verifyOwnership(prisma: PrismaClient, model: OwnershipModel, par
           break
         case 'visita':
           found = await prisma.visitaVendedor.findFirst({
+            where: { id, tenantId },
+            select: { id: true },
+          })
+          break
+        case 'ruta':
+          found = await prisma.rutaVendedor.findFirst({
+            where: { id, tenantId },
+            select: { id: true },
+          })
+          break
+        case 'vendedorZona':
+          found = await prisma.vendedorZona.findFirst({
             where: { id, tenantId },
             select: { id: true },
           })

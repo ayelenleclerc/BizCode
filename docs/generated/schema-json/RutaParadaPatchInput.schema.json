@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "estado": {
+      "$ref": "./RutaParadaEstado.schema.json"
+    },
+    "motivo": {
+      "maxLength": 200,
+      "nullable": true,
+      "type": "string"
+    },
+    "visitaId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "estado"
+  ],
+  "title": "RutaParadaPatchInput",
+  "type": "object"
+}

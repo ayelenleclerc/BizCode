@@ -47,5 +47,33 @@
   },
   "empty": "No hay visitas para la fecha y vendedor seleccionados.",
   "selectVendedor": "Elegí un vendedor",
-  "usersLoadError": "No se pudieron cargar los vendedores"
+  "usersLoadError": "No se pudieron cargar los vendedores",
+  "ruta": {
+    "title": "Progreso de ruta diaria",
+    "pollingHint": "Se actualiza automáticamente cada 60 segundos.",
+    "empty": "No hay ruta para esta fecha y vendedor.",
+    "total": "Total",
+    "pendientes": "Pendientes",
+    "visitados": "Visitados",
+    "postergados": "Postergados",
+    "conversion": "Conversión",
+    "estado": {
+      "pendiente": "Pendiente",
+      "visitado": "Visitado",
+      "postergado": "Postergado",
+      "no_visitado": "No visitado"
+    }
+  },
+  "zones": {
+    "title": "Zonas asignadas al vendedor",
+    "empty": "Sin zonas asignadas.",
+    "zone": "Zona",
+    "select": "Elegí una zona",
+    "assign": "Asignar",
+    "delete": "Quitar",
+    "errors": {
+      "invalid": "Seleccioná vendedor y zona válidos",
+      "generic": "No se pudo actualizar la asignación"
+    }
+  }
 }

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "codigo": {
+      "type": "integer"
+    },
+    "deliveryZoneId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "domicilio": {
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "latitud": {
+      "nullable": true,
+      "type": "number"
+    },
+    "localidad": {
+      "nullable": true,
+      "type": "string"
+    },
+    "longitud": {
+      "nullable": true,
+      "type": "number"
+    },
+    "rsocial": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "codigo",
+    "rsocial",
+    "domicilio",
+    "localidad",
+    "deliveryZoneId",
+    "latitud",
+    "longitud"
+  ],
+  "title": "RutaParadaCliente",
+  "type": "object"
+}

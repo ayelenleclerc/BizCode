@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "paradas": {
+      "items": {
+        "properties": {
+          "clienteId": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "estado": {
+            "$ref": "./RutaParadaEstado.schema.json"
+          },
+          "motivo": {
+            "maxLength": 200,
+            "nullable": true,
+            "type": "string"
+          },
+          "orden": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "clienteId",
+          "orden"
+        ],
+        "type": "object"
+      },
+      "maxItems": 50,
+      "type": "array"
+    }
+  },
+  "required": [
+    "paradas"
+  ],
+  "title": "RutaParadasReplaceInput",
+  "type": "object"
+}

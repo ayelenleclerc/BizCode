@@ -9,31 +9,44 @@ import {
   Dialog,
   FAB,
   Portal,
-  RadioButton,
   Searchbar,
   Text,
   TextInput,
   Title,
 } from 'react-native-paper'
-import type { DeliveryZone, VisitaDiaKpi, VisitaResultado, VisitaVendedorRow } from '@bizcode/types'
-import { clientesAPI, listZonasEntrega, visitasAPI } from '../../src/api/sellerApi'
+import MapView, { Marker } from 'react-native-maps'
+import type {
+  FeriadoRow,
+  RutaDiaStats,
+  RutaParadaRow,
+  RutaVendedorRow,
+  VendedorZonaRow,
+} from '@bizcode/types'
+import { clientesAPI, rutasAPI } from '../../src/api/sellerApi'
 import { useAuth } from '../../src/auth/AuthContext'
 import { mapApiErrorToUiState, type UiLoadState } from '../../src/lib/apiErrors'
+import { useOffline } from '../../src/offline/OfflineContext'
+import {
+  enqueueRutaCreate,
+  enqueueRutaParadaPatch,
+  enqueueRutaParadasReplace,
+} from '../../src/offline/actions'
 
 const DEBOUNCE_MS = 300
-const RESULTADOS: VisitaResultado[] = ['venta', 'sin_pedido', 'cliente_ausente', 'otro']
+const MAX_PARADAS = 50
 
 type ClienteSearchItem = {
   id: number
   codigo: number
   rsocial: string
+  deliveryZoneId?: number | null
   suspended?: boolean
 }
 
 /**
- * @en Local calendar date as YYYY-MM-DD for agenda list filter.
- * @es Fecha de calendario local como YYYY-MM-DD para filtrar la agenda.
- * @pt-BR Data local do calendário como YYYY-MM-DD para filtrar a agenda.
+ * @en Local calendar date as YYYY-MM-DD.
+ * @es Fecha de calendario local como YYYY-MM-DD.
+ * @pt-BR Data local do calendário como YYYY-MM-DD.
  */
 function localYmd(d = new Date()): string {
   const y = d.getFullYear()
@@ -42,490 +55,610 @@ function localYmd(d = new Date()): string {
   return `${y}-${m}-${day}`
 }
 
-function notesRequired(resultado: VisitaResultado | null): boolean {
-  return resultado === 'sin_pedido' || resultado === 'cliente_ausente'
-}
-
-function chipColor(estado: VisitaVendedorRow['estadoPlan']): string {
-  if (estado === 'completada') return '#C8E6C9'
-  if (estado === 'no_visitada') return '#FFCDD2'
+function chipColor(estado: RutaParadaRow['estado']): string {
+  if (estado === 'visitado') return '#C8E6C9'
+  if (estado === 'no_visitado') return '#FFCDD2'
+  if (estado === 'postergado') return '#BBDEFB'
   return '#FFF9C4'
 }
 
+/**
+ * @en Seller “Mi Ruta Hoy” screen (#267) — ordered stops, holiday banner, map, offline.
+ * @es Pantalla Seller “Mi Ruta Hoy” (#267) — paradas, feriado, mapa, offline.
+ * @pt-BR Tela Seller “Minha Rota Hoje” (#267) — paradas, feriado, mapa, offline.
+ */
 export default function AgendaScreen() {
   const { t } = useTranslation(['agenda', 'common', 'clientes'])
   const router = useRouter()
   const { claims } = useAuth()
+  const offline = useOffline()
   const fecha = useMemo(() => localYmd(), [])
+  const userId = claims?.userId ?? 0
 
-  const [items, setItems] = useState<VisitaVendedorRow[]>([])
-  const [kpi, setKpi] = useState<VisitaDiaKpi | null>(null)
+  const [ruta, setRuta] = useState<RutaVendedorRow | null>(null)
+  const [stats, setStats] = useState<RutaDiaStats | null>(null)
+  const [feriados, setFeriados] = useState<FeriadoRow[]>([])
+  const [zonas, setZonas] = useState<VendedorZonaRow[]>([])
+  const [zoneFilter, setZoneFilter] = useState<number | null>(null)
   const [state, setState] = useState<UiLoadState>('loading')
   const [errorDetail, setErrorDetail] = useState<string | null>(null)
-  const [zonasById, setZonasById] = useState<Record<number, string>>({})
+  const [saving, setSaving] = useState(false)
+  const [showMap, setShowMap] = useState(true)
+  const [completedOpen, setCompletedOpen] = useState(false)
 
   const [addOpen, setAddOpen] = useState(false)
   const [addQuery, setAddQuery] = useState('')
   const [addItems, setAddItems] = useState<ClienteSearchItem[]>([])
   const [addState, setAddState] = useState<UiLoadState>('idle')
-  const [addSaving, setAddSaving] = useState(false)
   const addReqId = useRef(0)
 
-  const [resultVisit, setResultVisit] = useState<VisitaVendedorRow | null>(null)
-  const [resultado, setResultado] = useState<VisitaResultado | null>(null)
-  const [notas, setNotas] = useState('')
-  const [pedidoIdText, setPedidoIdText] = useState('')
-  const [resultError, setResultError] = useState<string | null>(null)
-  const [resultSaving, setResultSaving] = useState(false)
-  const resultOpenedAt = useRef<number | null>(null)
+  const [motivoParada, setMotivoParada] = useState<RutaParadaRow | null>(null)
+  const [motivoText, setMotivoText] = useState('')
+  const [motivoError, setMotivoError] = useState<string | null>(null)
+
+  const paradas = ruta?.paradas ?? []
+  const doneCount = paradas.filter((p) => p.estado === 'visitado' || p.estado === 'no_visitado').length
+  const zoneIds = useMemo(() => new Set(zonas.map((z) => z.deliveryZoneId)), [zonas])
+  const mapped = useMemo(
+    () =>
+      paradas.filter(
+        (p) =>
+          p.cliente?.latitud != null &&
+          p.cliente?.longitud != null &&
+          Number.isFinite(Number(p.cliente.latitud)) &&
+          Number.isFinite(Number(p.cliente.longitud)),
+      ),
+    [paradas],
+  )
+
+  const cacheRuta = useCallback(async (row: RutaVendedorRow | null) => {
+    if (!row) return
+    try {
+      const { getOfflineDb } = await import('../../src/offline/db')
+      const { upsertRuta, upsertFeriado } = await import('../../src/offline/repos')
+      const db = await getOfflineDb()
+      await upsertRuta(db, row as unknown as Record<string, unknown>)
+      for (const f of feriados) {
+        await upsertFeriado(db, f as unknown as Record<string, unknown>)
+      }
+    } catch {
+      // best-effort
+    }
+  }, [feriados])
 
   const load = useCallback(async () => {
     setState('loading')
     setErrorDetail(null)
     try {
-      const res = await visitasAPI.list({ fecha })
-      const list = Array.isArray(res.data) ? res.data : []
-      setItems(list)
-      setKpi(res.kpi ?? null)
+      const [rutaRes, feriadoRes, zonaRes] = await Promise.all([
+        rutasAPI.getRuta({ fecha }),
+        rutasAPI.listFeriados({ fecha }),
+        rutasAPI.listVendedorZonas(),
+      ])
+      let current = rutaRes
+      if (!current && userId > 0) {
+        current = await rutasAPI.createRuta({ vendedorId: userId, fecha, clienteIds: [] })
+      }
+      setRuta(current)
+      setFeriados(feriadoRes.data ?? [])
+      setZonas(zonaRes.data ?? [])
+      if (current) {
+        const st = await rutasAPI.getRutaStats(current.id)
+        setStats(st)
+        await cacheRuta(current)
+      } else {
+        setStats(null)
+      }
+      const list = current?.paradas ?? []
       setState(list.length === 0 ? 'empty' : 'success')
-      try {
-        const { getOfflineDb } = await import('../../src/offline/db')
-        const { upsertVisita } = await import('../../src/offline/repos')
-        const db = await getOfflineDb()
-        for (const v of list) {
-          await upsertVisita(db, v as unknown as Record<string, unknown>)
-        }
-      } catch {
-        // best-effort cache
-      }
     } catch (err) {
-      try {
-        const { getOfflineDb } = await import('../../src/offline/db')
-        const { listVisitasByFechaLocal } = await import('../../src/offline/repos')
-        const db = await getOfflineDb()
-        const cached = (await listVisitasByFechaLocal(db, fecha)) as VisitaVendedorRow[]
-        setItems(cached)
-        const visitados = cached.filter((v) => v.estadoPlan === 'completada').length
-        const pedidos = cached.filter(
-          (v) => v.resultado === 'venta' || (v.pedidoId != null && v.pedidoId > 0),
-        ).length
-        setKpi({
-          planificadas: cached.length,
-          visitados,
-          pedidos,
-          conversionPct: visitados > 0 ? Math.round((pedidos / visitados) * 1000) / 10 : 0,
-        })
-        setState(cached.length === 0 ? 'empty' : 'success')
-        setErrorDetail(null)
-      } catch {
-        setItems([])
-        setKpi(null)
-        setState(mapApiErrorToUiState(err))
-        setErrorDetail(err instanceof Error ? err.message : null)
+      const ui = mapApiErrorToUiState(err)
+      if (ui === 'offline' || !offline.online) {
+        try {
+          const { getOfflineDb } = await import('../../src/offline/db')
+          const { getRutaByFechaLocal, listFeriadosOnDateLocal } = await import('../../src/offline/repos')
+          const db = await getOfflineDb()
+          const cached = await getRutaByFechaLocal(db, fecha)
+          const fer = await listFeriadosOnDateLocal(db, fecha)
+          if (cached) {
+            setRuta(cached as unknown as RutaVendedorRow)
+            setFeriados(fer as unknown as FeriadoRow[])
+            setState((cached.paradas as unknown[])?.length ? 'success' : 'empty')
+            return
+          }
+        } catch {
+          // fall through
+        }
       }
+      setState(ui)
+      setErrorDetail(err instanceof Error ? err.message : t('loadError'))
     }
-  }, [fecha])
+  }, [cacheRuta, fecha, offline.online, t, userId])
 
   useEffect(() => {
     void load()
   }, [load])
 
   useEffect(() => {
-    void listZonasEntrega()
-      .then((zones: DeliveryZone[]) => {
-        const map: Record<number, string> = {}
-        for (const z of zones) {
-          map[z.id] = z.nombre
-        }
-        setZonasById(map)
-      })
-      .catch(() => setZonasById({}))
-  }, [])
+    if (!ruta || !stats) return
+    if (ruta.paradas.length > 0 && stats.pendientes === 0 && stats.postergados === 0) {
+      setCompletedOpen(true)
+    }
+  }, [ruta, stats])
 
-  const searchClientes = useCallback(async (q: string) => {
-    const trimmed = q.trim()
-    if (!trimmed) {
-      setAddItems([])
-      setAddState('idle')
+  const persistParadas = async (nextParadas: RutaParadaRow[]) => {
+    if (!ruta) return
+    if (nextParadas.length > MAX_PARADAS) {
+      setErrorDetail(t('maxStops'))
       return
     }
-    const id = ++addReqId.current
-    setAddState('loading')
-    try {
-      const data = (await clientesAPI.list(trimmed)) as ClienteSearchItem[] | undefined
-      if (id !== addReqId.current) return
-      const list = Array.isArray(data) ? data : []
-      setAddItems(list)
-      setAddState(list.length === 0 ? 'empty' : 'success')
-    } catch (err) {
-      if (id !== addReqId.current) return
-      try {
-        const { getOfflineDb } = await import('../../src/offline/db')
-        const { searchClientesLocal } = await import('../../src/offline/repos')
-        const db = await getOfflineDb()
-        const cached = (await searchClientesLocal(db, trimmed)) as ClienteSearchItem[]
-        if (id !== addReqId.current) return
-        setAddItems(cached)
-        setAddState(cached.length === 0 ? 'empty' : 'success')
-      } catch {
-        setAddItems([])
-        setAddState(mapApiErrorToUiState(err))
-      }
+    const body = {
+      paradas: nextParadas.map((p, index) => ({
+        clienteId: p.clienteId,
+        orden: index,
+        estado: p.estado,
+        motivo: p.motivo,
+      })),
     }
-  }, [])
+    const optimistic: RutaVendedorRow = {
+      ...ruta,
+      paradas: nextParadas.map((p, index) => ({ ...p, orden: index })),
+    }
+    setRuta(optimistic)
+    setSaving(true)
+    try {
+      if (!offline.online || ruta.id < 0) {
+        await enqueueRutaParadasReplace({
+          rutaId: ruta.id,
+          body,
+          nextRuta: optimistic as unknown as Record<string, unknown>,
+        })
+        return
+      }
+      const updated = await rutasAPI.replaceParadas(ruta.id, body)
+      setRuta(updated)
+      await cacheRuta(updated)
+      const st = await rutasAPI.getRutaStats(updated.id)
+      setStats(st)
+    } catch (err) {
+      if (!offline.online || mapApiErrorToUiState(err) === 'offline') {
+        await enqueueRutaParadasReplace({
+          rutaId: ruta.id,
+          body,
+          nextRuta: optimistic as unknown as Record<string, unknown>,
+        })
+        return
+      }
+      setErrorDetail(err instanceof Error ? err.message : t('loadError'))
+      await load()
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const patchParada = async (parada: RutaParadaRow, body: Record<string, unknown>) => {
+    if (!ruta) return
+    setSaving(true)
+    const optimistic: RutaVendedorRow = {
+      ...ruta,
+      paradas: ruta.paradas.map((p) =>
+        p.id === parada.id
+          ? {
+              ...p,
+              estado: String(body.estado ?? p.estado) as RutaParadaRow['estado'],
+              motivo: (body.motivo as string | null | undefined) ?? p.motivo,
+            }
+          : p,
+      ),
+    }
+    setRuta(optimistic)
+    try {
+      if (!offline.online || ruta.id < 0) {
+        await enqueueRutaParadaPatch({
+          rutaId: ruta.id,
+          paradaId: parada.id,
+          body,
+          nextRuta: optimistic as unknown as Record<string, unknown>,
+        })
+        return
+      }
+      const updated = await rutasAPI.patchParada(ruta.id, parada.id, body)
+      setRuta(updated)
+      await cacheRuta(updated)
+      const st = await rutasAPI.getRutaStats(updated.id)
+      setStats(st)
+    } catch (err) {
+      if (!offline.online || mapApiErrorToUiState(err) === 'offline') {
+        await enqueueRutaParadaPatch({
+          rutaId: ruta.id,
+          paradaId: parada.id,
+          body,
+          nextRuta: optimistic as unknown as Record<string, unknown>,
+        })
+        return
+      }
+      setErrorDetail(err instanceof Error ? err.message : t('loadError'))
+      await load()
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const moveParada = async (index: number, dir: -1 | 1) => {
+    const next = [...paradas]
+    const target = index + dir
+    if (target < 0 || target >= next.length) return
+    const tmp = next[index]
+    next[index] = next[target]
+    next[target] = tmp
+    await persistParadas(next)
+  }
+
+  const searchAdd = useCallback(
+    async (q: string) => {
+      const req = ++addReqId.current
+      setAddState('loading')
+      try {
+        const res = await clientesAPI.list({ q: q.trim() || undefined, limit: 30 })
+        if (req !== addReqId.current) return
+        let items = (res.data ?? []) as ClienteSearchItem[]
+        if (zoneIds.size > 0) {
+          items = items.filter((c) => c.deliveryZoneId != null && zoneIds.has(c.deliveryZoneId))
+        }
+        if (zoneFilter != null) {
+          items = items.filter((c) => c.deliveryZoneId === zoneFilter)
+        }
+        const existing = new Set(paradas.map((p) => p.clienteId))
+        items = items.filter((c) => !existing.has(c.id) && !c.suspended)
+        setAddItems(items)
+        setAddState(items.length === 0 ? 'empty' : 'success')
+      } catch {
+        if (req !== addReqId.current) return
+        setAddState('error')
+      }
+    },
+    [paradas, zoneFilter, zoneIds],
+  )
 
   useEffect(() => {
     if (!addOpen) return
-    const timer = setTimeout(() => {
-      void searchClientes(addQuery)
-    }, DEBOUNCE_MS)
-    return () => clearTimeout(timer)
-  }, [addOpen, addQuery, searchClientes])
+    const h = setTimeout(() => void searchAdd(addQuery), DEBOUNCE_MS)
+    return () => clearTimeout(h)
+  }, [addOpen, addQuery, searchAdd])
 
-  const openResult = (visit: VisitaVendedorRow) => {
-    setResultVisit(visit)
-    setResultado(visit.resultado)
-    setNotas(visit.notasVisita ?? '')
-    setPedidoIdText(visit.pedidoId != null ? String(visit.pedidoId) : '')
-    setResultError(null)
-    resultOpenedAt.current = Date.now()
-  }
-
-  const closeResult = () => {
-    setResultVisit(null)
-    setResultado(null)
-    setNotas('')
-    setPedidoIdText('')
-    setResultError(null)
-    resultOpenedAt.current = null
-  }
-
-  const saveResult = async () => {
-    if (!resultVisit || !resultado) {
-      setResultError(t('agenda:notasRequired'))
+  const addCliente = async (cliente: ClienteSearchItem) => {
+    if (!ruta) return
+    if (paradas.length >= MAX_PARADAS) {
+      setErrorDetail(t('maxStops'))
       return
     }
-    if (notesRequired(resultado) && !notas.trim()) {
-      setResultError(t('agenda:notasRequired'))
-      return
-    }
-    let pedidoId: number | null | undefined
-    if (resultado === 'venta' && pedidoIdText.trim()) {
-      const parsed = Number.parseInt(pedidoIdText.trim(), 10)
-      if (!Number.isInteger(parsed) || parsed < 1) {
-        setResultError(t('common:errorGeneric'))
-        return
-      }
-      pedidoId = parsed
-    }
-    const elapsedMs = resultOpenedAt.current != null ? Date.now() - resultOpenedAt.current : 0
-    const duracionMinutos = Math.max(1, Math.round(elapsedMs / 60000))
-    setResultSaving(true)
-    setResultError(null)
-    const body = {
-      estadoPlan: 'completada' as const,
-      resultado,
-      notasVisita: notas.trim() || null,
-      pedidoId: pedidoId ?? null,
-      duracionMinutos,
-    }
+    const next: RutaParadaRow[] = [
+      ...paradas,
+      {
+        id: -Date.now(),
+        rutaId: ruta.id,
+        clienteId: cliente.id,
+        orden: paradas.length,
+        estado: 'pendiente',
+        motivo: null,
+        visitaId: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        cliente: {
+          id: cliente.id,
+          codigo: cliente.codigo,
+          rsocial: cliente.rsocial,
+          domicilio: null,
+          localidad: null,
+          deliveryZoneId: cliente.deliveryZoneId ?? null,
+          latitud: null,
+          longitud: null,
+        },
+      },
+    ]
+    setAddOpen(false)
+    await persistParadas(next)
+  }
+
+  const createEmptyRouteOffline = async () => {
+    if (userId < 1) return
+    setSaving(true)
     try {
-      await visitasAPI.update(resultVisit.id, body)
-      closeResult()
-      await load()
-    } catch (err) {
-      try {
-        const { enqueueVisitaUpdate } = await import('../../src/offline/actions')
-        await enqueueVisitaUpdate({
-          visitaId: resultVisit.id,
-          body,
-          previous: resultVisit as unknown as Record<string, unknown>,
-        })
-        closeResult()
-        await load()
-      } catch {
-        setResultError(err instanceof Error ? err.message : t('common:errorGeneric'))
-      }
+      const localId = await enqueueRutaCreate({
+        body: { vendedorId: userId, fecha, clienteIds: [] },
+      })
+      setRuta({
+        id: localId,
+        tenantId: 0,
+        vendedorId: userId,
+        fecha,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        paradas: [],
+      })
+      setState('empty')
     } finally {
-      setResultSaving(false)
+      setSaving(false)
     }
   }
 
-  const addSpontaneous = async (cliente: ClienteSearchItem) => {
-    if (!claims?.userId) return
-    setAddSaving(true)
-    const body = {
-      vendedorId: claims.userId,
-      clienteId: cliente.id,
-      fechaPlanificada: fecha,
-    }
-    try {
-      await visitasAPI.create(body)
-      setAddOpen(false)
-      setAddQuery('')
-      setAddItems([])
-      await load()
-    } catch (err) {
-      try {
-        const { enqueueVisitaCreate } = await import('../../src/offline/actions')
-        await enqueueVisitaCreate({
-          body,
-          clienteSnapshot: {
-            id: cliente.id,
-            codigo: cliente.codigo,
-            rsocial: cliente.rsocial,
-            domicilio: null,
-            localidad: null,
-            deliveryZoneId: null,
-          },
-        })
-        setAddOpen(false)
-        setAddQuery('')
-        setAddItems([])
-        await load()
-      } catch {
-        setAddState(mapApiErrorToUiState(err))
-      }
-    } finally {
-      setAddSaving(false)
-    }
-  }
+  const holidayName = feriados[0]?.nombre
 
   return (
-    <View style={styles.root} testID="seller-agenda">
-      <Title>{t('agenda:title')}</Title>
-      <Text variant="bodySmall" style={styles.muted}>
-        {t('agenda:routesLater')}
-      </Text>
+    <View style={styles.root} testID="seller-ruta-hoy">
+      <Title style={styles.title} testID="seller-ruta-title">
+        {t('title')}
+      </Title>
 
-      {kpi != null && (
-        <View
-          style={styles.kpiRow}
-          testID="seller-agenda-kpi"
-          accessibilityLabel={t('agenda:title')}
-        >
-          <View style={styles.kpiCell} testID="seller-agenda-kpi-planificadas">
-            <Text variant="labelSmall">{t('agenda:kpi.planificadas')}</Text>
-            <Text variant="titleMedium">{kpi.planificadas}</Text>
-          </View>
-          <View style={styles.kpiCell} testID="seller-agenda-kpi-visitados">
-            <Text variant="labelSmall">{t('agenda:kpi.visitados')}</Text>
-            <Text variant="titleMedium">{kpi.visitados}</Text>
-          </View>
-          <View style={styles.kpiCell} testID="seller-agenda-kpi-pedidos">
-            <Text variant="labelSmall">{t('agenda:kpi.pedidos')}</Text>
-            <Text variant="titleMedium">{kpi.pedidos}</Text>
-          </View>
-          <View style={styles.kpiCell} testID="seller-agenda-kpi-conversion">
-            <Text variant="labelSmall">{t('agenda:kpi.conversion')}</Text>
-            <Text variant="titleMedium">{kpi.conversionPct}%</Text>
-          </View>
-        </View>
-      )}
+      {holidayName ? (
+        <Chip icon="calendar-alert" style={styles.banner} testID="seller-ruta-feriado">
+          {t('holidayBanner', { nombre: holidayName })}
+        </Chip>
+      ) : null}
 
-      {state === 'loading' && (
-        <View
-          testID="seller-agenda-loading"
-          style={styles.centered}
-          accessibilityLabel={t('common:loading')}
-        >
-          <ActivityIndicator />
+      {ruta ? (
+        <Text style={styles.progress} testID="seller-ruta-progress">
+          {t('progress', { done: doneCount, total: paradas.length })}
+        </Text>
+      ) : null}
+
+      {state === 'loading' ? (
+        <ActivityIndicator testID="seller-ruta-loading" style={{ marginTop: 24 }} />
+      ) : null}
+
+      {state === 'error' || state === 'forbidden' ? (
+        <View style={styles.center}>
+          <Text testID="seller-ruta-error">{errorDetail ?? t('loadError')}</Text>
+          <Button onPress={() => void load()}>{t('common:retry', { defaultValue: 'Retry' })}</Button>
         </View>
-      )}
-      {state === 'empty' && (
-        <View testID="seller-agenda-empty">
-          <Text style={styles.hint}>{t('agenda:empty')}</Text>
-        </View>
-      )}
-      {(state === 'error' || state === 'offline' || state === 'forbidden') && (
-        <View testID={`seller-agenda-${state}`} style={styles.centered}>
-          <Text>
-            {state === 'offline'
-              ? t('common:errorOffline')
-              : state === 'forbidden'
-                ? t('common:errorForbidden')
-                : t('common:errorGeneric')}
-          </Text>
-          {errorDetail ? <Text variant="bodySmall">{errorDetail}</Text> : null}
-          <Button mode="text" onPress={() => void load()} testID="seller-agenda-retry">
-            {t('common:retry')}
+      ) : null}
+
+      {!ruta && state !== 'loading' && !offline.online ? (
+        <View style={styles.center}>
+          <Button mode="contained" onPress={() => void createEmptyRouteOffline()} testID="seller-ruta-create-offline">
+            {t('createRoute')}
           </Button>
         </View>
-      )}
+      ) : null}
 
-      {(state === 'success' || state === 'empty') && items.length > 0 && (
+      {zonas.length === 0 && state !== 'loading' ? (
+        <Text style={styles.hint} testID="seller-ruta-no-zones">
+          {t('noZones')}
+        </Text>
+      ) : null}
+
+      {showMap && mapped.length > 0 ? (
+        <View style={styles.mapWrap} testID="seller-ruta-map">
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: Number(mapped[0].cliente!.latitud),
+              longitude: Number(mapped[0].cliente!.longitud),
+              latitudeDelta: 0.08,
+              longitudeDelta: 0.08,
+            }}
+          >
+            {mapped.map((p) => (
+              <Marker
+                key={p.id}
+                coordinate={{
+                  latitude: Number(p.cliente!.latitud),
+                  longitude: Number(p.cliente!.longitud),
+                }}
+                title={p.cliente?.rsocial}
+                description={t(`estado.${p.estado}`)}
+                onCalloutPress={() => router.push(`/(app)/clientes/${p.clienteId}`)}
+              />
+            ))}
+          </MapView>
+        </View>
+      ) : showMap && paradas.length > 0 ? (
+        <Text style={styles.hint} testID="seller-ruta-map-empty">
+          {t('mapUnavailable')}
+        </Text>
+      ) : null}
+
+      <Button compact onPress={() => setShowMap((v) => !v)} testID="seller-ruta-toggle-map">
+        {t('mapTitle')}
+      </Button>
+
+      {(state === 'success' || state === 'empty') && ruta ? (
         <FlatList
-          data={items}
+          data={paradas}
           keyExtractor={(item) => String(item.id)}
-          testID="seller-agenda-list"
-          contentContainerStyle={{ paddingBottom: 88 }}
-          renderItem={({ item }) => {
-            const zoneId = item.cliente?.deliveryZoneId
-            const zoneLabel =
-              zoneId != null && zonasById[zoneId] ? zonasById[zoneId] : t('agenda:zonaUnknown')
-            const lastBuy = item.ultimaCompraAt
-              ? new Date(item.ultimaCompraAt).toLocaleDateString()
-              : t('agenda:ultimaCompraNever')
-            return (
-              <View style={styles.row} testID={`seller-agenda-row-${item.id}`}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={item.cliente?.rsocial ?? String(item.clienteId)}
-                  onPress={() => router.push(`/(app)/clientes/${item.clienteId}`)}
-                  style={styles.rowMain}
+          ListEmptyComponent={
+            <Text style={styles.hint} testID="seller-ruta-empty">
+              {t('empty')}
+            </Text>
+          }
+          renderItem={({ item, index }) => (
+            <View style={styles.card} testID={`seller-ruta-parada-${item.id}`}>
+              <Pressable onPress={() => router.push(`/(app)/clientes/${item.clienteId}`)}>
+                <Text variant="titleMedium">
+                  {index + 1}. {item.cliente?.rsocial ?? `#${item.clienteId}`}
+                </Text>
+                <Text>{item.cliente?.domicilio}</Text>
+              </Pressable>
+              <Chip style={{ backgroundColor: chipColor(item.estado), alignSelf: 'flex-start', marginTop: 4 }}>
+                {t(`estado.${item.estado}`)}
+              </Chip>
+              <View style={styles.row}>
+                <Button
+                  compact
+                  disabled={index === 0 || saving}
+                  onPress={() => void moveParada(index, -1)}
+                  testID={`seller-ruta-up-${item.id}`}
                 >
-                  <Text variant="titleMedium">{item.cliente?.rsocial ?? `#${item.clienteId}`}</Text>
-                  <Text variant="bodySmall">
-                    {item.cliente?.domicilio?.trim() || t('clientes:datos.sinDomicilio')}
-                  </Text>
-                  <Text variant="bodySmall">
-                    {zoneLabel} · {t('agenda:ultimaCompra')}: {lastBuy}
-                  </Text>
-                </Pressable>
-                <View style={styles.rowActions}>
-                  <Chip
-                    compact
-                    style={{ backgroundColor: chipColor(item.estadoPlan) }}
-                    {...({ testID: `seller-agenda-estado-${item.id}` } as object)}
-                  >
-                    {t(`agenda:estado.${item.estadoPlan}`)}
-                  </Chip>
-                  {item.estadoPlan === 'pendiente' ? (
-                    <Button
-                      mode="outlined"
-                      compact
-                      onPress={() => openResult(item)}
-                      testID={`seller-agenda-result-${item.id}`}
-                    >
-                      {t('agenda:registerResult')}
-                    </Button>
-                  ) : null}
-                </View>
+                  {t('actions.moveUp')}
+                </Button>
+                <Button
+                  compact
+                  disabled={index === paradas.length - 1 || saving}
+                  onPress={() => void moveParada(index, 1)}
+                  testID={`seller-ruta-down-${item.id}`}
+                >
+                  {t('actions.moveDown')}
+                </Button>
               </View>
-            )
-          }}
+              {item.estado === 'pendiente' ? (
+                <View style={styles.row}>
+                  <Button
+                    mode="contained"
+                    compact
+                    disabled={saving}
+                    onPress={() => {
+                      void patchParada(item, { estado: 'visitado' }).then(() => {
+                        router.push(`/(app)/pedidos/nuevo?clienteId=${item.clienteId}`)
+                      })
+                    }}
+                    testID={`seller-ruta-visitado-${item.id}`}
+                  >
+                    {t('actions.visitado')}
+                  </Button>
+                  <Button
+                    compact
+                    disabled={saving}
+                    onPress={() => void patchParada(item, { estado: 'postergado' })}
+                    testID={`seller-ruta-postergar-${item.id}`}
+                  >
+                    {t('actions.postergar')}
+                  </Button>
+                  <Button
+                    compact
+                    disabled={saving}
+                    onPress={() => {
+                      setMotivoParada(item)
+                      setMotivoText('')
+                      setMotivoError(null)
+                    }}
+                    testID={`seller-ruta-no-visitado-${item.id}`}
+                  >
+                    {t('actions.noVisitado')}
+                  </Button>
+                </View>
+              ) : null}
+              <Button
+                compact
+                disabled={saving || item.estado === 'visitado'}
+                onPress={() => void persistParadas(paradas.filter((p) => p.id !== item.id))}
+                testID={`seller-ruta-remove-${item.id}`}
+              >
+                {t('actions.remove')}
+              </Button>
+            </View>
+          )}
         />
-      )}
+      ) : null}
 
       <FAB
         icon="plus"
         style={styles.fab}
         onPress={() => setAddOpen(true)}
-        accessibilityLabel={t('agenda:fabAdd')}
-        {...({ testID: 'seller-agenda-fab' } as object)}
+        disabled={!ruta || saving}
+        testID="seller-ruta-fab-add"
+        accessibilityLabel={t('fabAdd')}
       />
 
       <Portal>
-        <Dialog
-          visible={addOpen}
-          onDismiss={() => !addSaving && setAddOpen(false)}
-          testID="seller-agenda-add-dialog"
-        >
-          <Dialog.Title>{t('agenda:addTitle')}</Dialog.Title>
+        <Dialog visible={addOpen} onDismiss={() => setAddOpen(false)} testID="seller-ruta-add-dialog">
+          <Dialog.Title>{t('addTitle')}</Dialog.Title>
           <Dialog.Content>
-            <Text style={styles.hint}>{t('agenda:addHint')}</Text>
+            <Text>{t('addHint')}</Text>
             <Searchbar
-              placeholder={t('clientes:searchPlaceholder')}
               value={addQuery}
               onChangeText={setAddQuery}
-              style={styles.search}
-              {...({ testID: 'seller-agenda-add-search' } as object)}
+              style={{ marginVertical: 8 }}
+              testID="seller-ruta-add-search"
             />
-            {addState === 'loading' && <ActivityIndicator />}
-            {addState === 'empty' && <Text>{t('clientes:empty')}</Text>}
-            {addItems.map((c) => (
-              <Pressable
-                key={c.id}
-                accessibilityRole="button"
-                testID={`seller-agenda-add-cliente-${c.id}`}
-                style={styles.searchRow}
-                disabled={addSaving || c.suspended}
-                onPress={() => void addSpontaneous(c)}
-              >
-                <Text>{c.rsocial}</Text>
-                <Text variant="bodySmall">#{c.codigo}</Text>
-              </Pressable>
-            ))}
+            {zonas.length > 0 ? (
+              <View style={styles.row}>
+                <Chip
+                  selected={zoneFilter == null}
+                  onPress={() => setZoneFilter(null)}
+                  testID="seller-ruta-zone-all"
+                >
+                  {t('zoneAll')}
+                </Chip>
+                {zonas.map((z) => (
+                  <Chip
+                    key={z.id}
+                    selected={zoneFilter === z.deliveryZoneId}
+                    onPress={() => setZoneFilter(z.deliveryZoneId)}
+                    testID={`seller-ruta-zone-${z.deliveryZoneId}`}
+                  >
+                    {z.deliveryZone?.nombre ?? z.deliveryZoneId}
+                  </Chip>
+                ))}
+              </View>
+            ) : null}
+            {addState === 'loading' ? <ActivityIndicator /> : null}
+            <FlatList
+              data={addItems}
+              keyExtractor={(c) => String(c.id)}
+              style={{ maxHeight: 240 }}
+              renderItem={({ item }) => (
+                <Pressable
+                  onPress={() => void addCliente(item)}
+                  style={styles.addRow}
+                  testID={`seller-ruta-add-cliente-${item.id}`}
+                >
+                  <Text>
+                    {item.codigo} — {item.rsocial}
+                  </Text>
+                </Pressable>
+              )}
+            />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setAddOpen(false)} disabled={addSaving}>
-              {t('common:cancel')}
+            <Button onPress={() => setAddOpen(false)}>{t('common:cancel', { defaultValue: 'Cancel' })}</Button>
+          </Dialog.Actions>
+        </Dialog>
+
+        <Dialog visible={motivoParada != null} onDismiss={() => setMotivoParada(null)}>
+          <Dialog.Title>{t('motivoTitle')}</Dialog.Title>
+          <Dialog.Content>
+            <TextInput
+              value={motivoText}
+              onChangeText={setMotivoText}
+              mode="outlined"
+              testID="seller-ruta-motivo-input"
+            />
+            {motivoError ? <Text style={{ color: '#b00020' }}>{motivoError}</Text> : null}
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setMotivoParada(null)}>{t('common:cancel', { defaultValue: 'Cancel' })}</Button>
+            <Button
+              onPress={() => {
+                if (!motivoParada) return
+                if (motivoText.trim().length < 1) {
+                  setMotivoError(t('motivoRequired'))
+                  return
+                }
+                const p = motivoParada
+                setMotivoParada(null)
+                void patchParada(p, { estado: 'no_visitado', motivo: motivoText.trim() })
+              }}
+              testID="seller-ruta-motivo-save"
+            >
+              {t('motivoSave')}
             </Button>
           </Dialog.Actions>
         </Dialog>
 
-        <Dialog
-          visible={resultVisit != null}
-          onDismiss={() => !resultSaving && closeResult()}
-          testID="seller-agenda-result-dialog"
-        >
-          <Dialog.Title>{t('agenda:resultTitle')}</Dialog.Title>
-          <Dialog.ScrollArea>
-            <View style={styles.dialogBody}>
-              <RadioButton.Group
-                onValueChange={(v) => setResultado(v as VisitaResultado)}
-                value={resultado ?? ''}
-              >
-                {RESULTADOS.map((r) => (
-                  <RadioButton.Item
-                    key={r}
-                    label={t(`agenda:resultado.${r}`)}
-                    value={r}
-                    {...({ testID: `seller-agenda-resultado-${r}` } as object)}
-                  />
-                ))}
-              </RadioButton.Group>
-              <TextInput
-                label={t('agenda:notas')}
-                value={notas}
-                onChangeText={setNotas}
-                multiline
-                mode="outlined"
-                testID="seller-agenda-notas"
-              />
-              {resultado === 'venta' ? (
-                <>
-                  <TextInput
-                    label={t('agenda:pedidoId')}
-                    value={pedidoIdText}
-                    onChangeText={setPedidoIdText}
-                    mode="outlined"
-                    {...({
-                      keyboardType: 'number-pad',
-                      testID: 'seller-agenda-pedido-id',
-                    } as object)}
-                  />
-                  <Button
-                    mode="text"
-                    onPress={() => {
-                      if (!resultVisit) return
-                      closeResult()
-                      router.push(`/(app)/pedidos/nuevo?clienteId=${resultVisit.clienteId}`)
-                    }}
-                    testID="seller-agenda-create-order"
-                  >
-                    {t('agenda:createOrder')}
-                  </Button>
-                </>
-              ) : null}
-              {resultError ? (
-                <Text style={styles.error} {...({ testID: 'seller-agenda-result-error' } as object)}>
-                  {resultError}
-                </Text>
-              ) : null}
-            </View>
-          </Dialog.ScrollArea>
+        <Dialog visible={completedOpen} onDismiss={() => setCompletedOpen(false)} testID="seller-ruta-completed">
+          <Dialog.Title>{t('completedTitle')}</Dialog.Title>
+          <Dialog.Content>
+            <Text>
+              {t('completedBody', {
+                visitados: stats?.visitados ?? 0,
+                pedidos: stats?.pedidos ?? 0,
+                conversion: stats?.conversionPct ?? 0,
+              })}
+            </Text>
+          </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={closeResult} disabled={resultSaving}>
-              {t('common:cancel')}
-            </Button>
-            <Button
-              onPress={() => void saveResult()}
-              loading={resultSaving}
-              disabled={resultSaving}
-              testID="seller-agenda-save-result"
-            >
-              {resultSaving ? t('agenda:saving') : t('agenda:saveResult')}
+            <Button onPress={() => setCompletedOpen(false)} testID="seller-ruta-completed-ok">
+              {t('completedOk')}
             </Button>
           </Dialog.Actions>
         </Dialog>
@@ -535,36 +668,23 @@ export default function AgendaScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, padding: 12, gap: 8 },
-  muted: { opacity: 0.7, marginBottom: 4 },
-  hint: { paddingVertical: 8, opacity: 0.75 },
-  centered: { padding: 24, alignItems: 'center', gap: 8 },
-  kpiRow: { flexDirection: 'row', gap: 6, marginBottom: 4 },
-  kpiCell: {
-    flex: 1,
-    padding: 8,
+  root: { flex: 1, padding: 12 },
+  title: { marginBottom: 8 },
+  banner: { marginBottom: 8, backgroundColor: '#FFE0B2' },
+  progress: { marginBottom: 8, fontWeight: '600' },
+  hint: { marginVertical: 8, opacity: 0.8 },
+  center: { marginTop: 24, alignItems: 'center', gap: 8 },
+  card: {
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
     borderRadius: 8,
-    backgroundColor: '#ECEFF1',
-    alignItems: 'center',
+    backgroundColor: '#fff',
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#ccc',
-    gap: 8,
-  },
-  rowMain: { flex: 1, gap: 2 },
-  rowActions: { alignItems: 'flex-end', gap: 6, maxWidth: 140 },
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 6 },
   fab: { position: 'absolute', right: 16, bottom: 16 },
-  search: { marginVertical: 8 },
-  searchRow: {
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#ddd',
-  },
-  dialogBody: { paddingVertical: 8, gap: 8 },
-  error: { color: '#B71C1C' },
+  mapWrap: { height: 180, borderRadius: 8, overflow: 'hidden', marginBottom: 8 },
+  map: { flex: 1 },
+  addRow: { paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#ddd' },
 })

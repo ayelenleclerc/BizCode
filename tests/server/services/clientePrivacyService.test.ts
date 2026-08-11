@@ -32,6 +32,8 @@ const baseCliente = {
   suspended: false,
   deliveryZoneId: null,
   listaPrecioId: null,
+  latitud: null,
+  longitud: null,
   anonymizedAt: null as Date | null,
   cbu: null as string | null,
   alias: null as string | null,

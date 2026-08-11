@@ -45,6 +45,23 @@ CREATE TABLE IF NOT EXISTS pedidos_cache (
 );
 CREATE INDEX IF NOT EXISTS idx_pedidos_cliente ON pedidos_cache(cliente_id);
 
+CREATE TABLE IF NOT EXISTS rutas (
+  id INTEGER PRIMARY KEY NOT NULL,
+  fecha TEXT NOT NULL,
+  json TEXT NOT NULL,
+  pending_sync INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_rutas_fecha ON rutas(fecha);
+
+CREATE TABLE IF NOT EXISTS feriados_cache (
+  id INTEGER PRIMARY KEY NOT NULL,
+  fecha TEXT NOT NULL,
+  json TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_feriados_fecha ON feriados_cache(fecha);
+
 CREATE TABLE IF NOT EXISTS outbox (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   action_type TEXT NOT NULL,
