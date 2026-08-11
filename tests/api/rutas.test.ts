@@ -49,11 +49,22 @@ const PARADA_ROW = {
   cliente: CLIENTE,
 }
 
+/**
+ * @en UTC calendar midnight for assertEditable (past routes return 400).
+ * @es Medianoche UTC para assertEditable (rutas pasadas devuelven 400).
+ * @pt-BR Meia-noite UTC para assertEditable (rotas passadas retornam 400).
+ */
+function todayUtcMidnight(): Date {
+  const ymd = new Date().toISOString().slice(0, 10)
+  return new Date(`${ymd}T00:00:00.000Z`)
+}
+
 const RUTA_ROW = {
   id: 5,
   tenantId: 1,
   vendedorId: 1,
-  fecha: new Date('2026-08-10T00:00:00.000Z'),
+  // Must be today-or-future in UTC; fixed past dates break after calendar day rolls over.
+  fecha: todayUtcMidnight(),
   createdAt: new Date('2026-08-10T12:00:00.000Z'),
   updatedAt: new Date('2026-08-10T12:00:00.000Z'),
   paradas: [PARADA_ROW],
@@ -139,6 +150,8 @@ describe('Feriados / VendedorZonas / Rutas API (#267)', () => {
     process.env.BIZCODE_TEST_ROLE = 'seller'
     process.env.BIZCODE_TEST_USER_ID = '1'
     delete process.env.BIZCODE_TEST_MODULES
+    // Keep editable-route fixtures on today's UTC date (assertEditable blocks past).
+    RUTA_ROW.fecha = todayUtcMidnight()
   })
 
   it('GET /api/feriados lists by year', async () => {
