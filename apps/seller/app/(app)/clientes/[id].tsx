@@ -7,13 +7,23 @@ import {
   Banner,
   Button,
   Chip,
+  Dialog,
   List,
+  Portal,
   ProgressBar,
   SegmentedButtons,
   Text,
 } from 'react-native-paper'
-import type { ClienteCuentaCorrienteSaldo, FacturaPendienteCliente, PedidoRow } from '@bizcode/types'
-import { clientesAPI, listZonasEntrega, pedidosAPI } from '../../../src/api/sellerApi'
+import type {
+  ClienteCuentaCorrienteSaldo,
+  EstadoCredito,
+  FacturaPendienteCliente,
+  PedidoRow,
+  SellerPolicies,
+} from '@bizcode/types'
+import { clientesAPI, listZonasEntrega, pedidosAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
+import { ackCreditAlert, isCreditAlertAcked } from '../../../src/alerts/creditSessionAck'
+import { isCreditBlocked } from '../../../src/alerts/policyGates'
 import {
   isModuleNotEnabledError,
   mapApiErrorToUiState,
@@ -42,6 +52,13 @@ type TabKey = 'cuenta' | 'pedidos' | 'datos'
 
 type OverdueInvoice = FacturaPendienteCliente & { daysPastDue: number }
 
+function nivelColor(nivel: EstadoCredito['nivel']): string {
+  if (nivel === 'rojo') return '#B71C1C'
+  if (nivel === 'naranja') return '#E65100'
+  if (nivel === 'amarillo') return '#F9A825'
+  return '#1B5E20'
+}
+
 export default function ClienteDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const clienteId = Number.parseInt(String(id), 10)
@@ -57,6 +74,10 @@ export default function ClienteDetailScreen() {
   const [receiptsUnavailable, setReceiptsUnavailable] = useState(false)
   const [pedidos, setPedidos] = useState<PedidoRow[]>([])
   const [zonaNombre, setZonaNombre] = useState<string | null>(null)
+  const [estadoCredito, setEstadoCredito] = useState<EstadoCredito | null>(null)
+  const [policies, setPolicies] = useState<SellerPolicies | null>(null)
+  const [creditDialogVisible, setCreditDialogVisible] = useState(false)
+  const [creditAsOfOffline, setCreditAsOfOffline] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     if (!Number.isInteger(clienteId) || clienteId < 1) {
@@ -65,7 +86,15 @@ export default function ClienteDetailScreen() {
     }
     setState('loading')
     try {
-      const [clienteRaw, pedidosRes, saldoResult, facturasResult, zonasResult] = await Promise.all([
+      const [
+        clienteRaw,
+        pedidosRes,
+        saldoResult,
+        facturasResult,
+        zonasResult,
+        creditoResult,
+        policiesResult,
+      ] = await Promise.all([
         clientesAPI.get(clienteId) as Promise<ClienteDetail | null | undefined>,
         pedidosAPI.list({ clienteId, limit: 10 }),
         clientesAPI.cuentaCorrienteSaldo(clienteId).then(
@@ -80,6 +109,14 @@ export default function ClienteDetailScreen() {
           (data) => ({ ok: true as const, data }),
           (err: unknown) => ({ ok: false as const, err }),
         ),
+        sellerAlertsAPI.getEstadoCredito(clienteId).then(
+          (data) => ({ ok: true as const, data }),
+          (err: unknown) => ({ ok: false as const, err }),
+        ),
+        sellerAlertsAPI.getSellerPolicies().then(
+          (data) => ({ ok: true as const, data }),
+          (err: unknown) => ({ ok: false as const, err }),
+        ),
       ])
 
       if (!clienteRaw) {
@@ -91,11 +128,20 @@ export default function ClienteDetailScreen() {
       setPedidos(Array.isArray(pedidosRes.data) ? pedidosRes.data.slice(0, 10) : [])
       try {
         const { getOfflineDb } = await import('../../../src/offline/db')
-        const { upsertCliente, upsertPedidoCache } = await import('../../../src/offline/repos')
+        const { upsertCliente, upsertPedidoCache, upsertEstadoCredito } = await import(
+          '../../../src/offline/repos'
+        )
         const db = await getOfflineDb()
         await upsertCliente(db, clienteRaw as unknown as Record<string, unknown>)
         for (const p of Array.isArray(pedidosRes.data) ? pedidosRes.data.slice(0, 10) : []) {
           await upsertPedidoCache(db, p as unknown as Record<string, unknown>)
+        }
+        if (creditoResult.ok) {
+          await upsertEstadoCredito(
+            db,
+            clienteId,
+            creditoResult.data as unknown as Record<string, unknown>,
+          )
         }
       } catch {
         // cache best-effort
@@ -137,11 +183,27 @@ export default function ClienteDetailScreen() {
         setZonaNombre(null)
       }
 
+      const credit = creditoResult.ok ? creditoResult.data : null
+      const pols = policiesResult.ok ? policiesResult.data : null
+      setEstadoCredito(credit)
+      setPolicies(pols)
+      setCreditAsOfOffline(null)
+      if (credit && credit.nivel !== 'ok' && !isCreditAlertAcked(clienteId)) {
+        setCreditDialogVisible(true)
+      } else {
+        setCreditDialogVisible(false)
+      }
+
       setState('success')
     } catch (err) {
       try {
         const { getOfflineDb } = await import('../../../src/offline/db')
-        const { getClienteLocal, listPedidosByClienteLocal } = await import('../../../src/offline/repos')
+        const {
+          getClienteLocal,
+          listPedidosByClienteLocal,
+          getEstadoCreditoLocal,
+          getSellerPoliciesLocal,
+        } = await import('../../../src/offline/repos')
         const db = await getOfflineDb()
         const cached = (await getClienteLocal(db, clienteId)) as ClienteDetail | null
         if (!cached) {
@@ -149,6 +211,8 @@ export default function ClienteDetailScreen() {
           return
         }
         const pedCached = (await listPedidosByClienteLocal(db, clienteId, 10)) as PedidoRow[]
+        const creditCached = (await getEstadoCreditoLocal(db, clienteId)) as EstadoCredito | null
+        const polsCached = (await getSellerPoliciesLocal(db)) as SellerPolicies | null
         setCliente(cached)
         setPedidos(pedCached)
         setSaldoCc(null)
@@ -156,6 +220,12 @@ export default function ClienteDetailScreen() {
         setOverdue([])
         setReceiptsUnavailable(true)
         setZonaNombre(null)
+        setEstadoCredito(creditCached)
+        setPolicies(polsCached)
+        setCreditAsOfOffline(creditCached?.asOf ?? null)
+        if (creditCached && creditCached.nivel !== 'ok' && !isCreditAlertAcked(clienteId)) {
+          setCreditDialogVisible(true)
+        }
         setState('success')
       } catch {
         setState(mapApiErrorToUiState(err))
@@ -168,19 +238,22 @@ export default function ClienteDetailScreen() {
   }, [load])
 
   const balance = useMemo(() => {
+    if (estadoCredito) return parseMoney(estadoCredito.deudaTotal)
     if (saldoCc) return parseMoney(saldoCc.saldo)
     return parseMoney(cliente?.balance)
-  }, [saldoCc, cliente])
+  }, [estadoCredito, saldoCc, cliente])
 
   const creditLimit = useMemo(() => {
+    if (estadoCredito?.limiteCredito != null) return parseMoney(estadoCredito.limiteCredito)
     if (saldoCc?.creditLimit != null) return parseMoney(saldoCc.creditLimit)
     if (cliente?.creditLimit != null) return parseMoney(cliente.creditLimit)
     return null
-  }, [saldoCc, cliente])
+  }, [estadoCredito, saldoCc, cliente])
 
   const usage = creditUsagePercent(balance, creditLimit)
   const suspended = Boolean(cliente?.suspended)
   const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt-BR' ? 'pt-BR' : 'es-AR'
+  const creditBlocked = isCreditBlocked(estadoCredito?.nivel, policies)
 
   const scoreColor = (score: number) => {
     if (score < 40) return '#B71C1C'
@@ -231,6 +304,91 @@ export default function ClienteDetailScreen() {
 
   return (
     <View style={styles.root} testID="seller-cliente-detail">
+      <Portal>
+        <Dialog
+          visible={creditDialogVisible}
+          dismissable={!creditBlocked}
+          onDismiss={() => {
+            if (creditBlocked) return
+            ackCreditAlert(clienteId)
+            setCreditDialogVisible(false)
+          }}
+          testID="seller-cliente-credit-alert"
+        >
+          <Dialog.Title
+            style={{ color: estadoCredito ? nivelColor(estadoCredito.nivel) : undefined }}
+            {...({ testID: `seller-cliente-credit-nivel-${estadoCredito?.nivel ?? 'ok'}` } as object)}
+          >
+            {t(`clientes:creditAlert.title.${estadoCredito?.nivel ?? 'ok'}`)}
+          </Dialog.Title>
+          <Dialog.Content>
+            {creditAsOfOffline ? (
+              <Text style={styles.asOf} testID="seller-cliente-credit-asof">
+                {t('clientes:creditAlert.asOf', {
+                  when: new Date(creditAsOfOffline).toLocaleString(locale),
+                })}
+              </Text>
+            ) : null}
+            <Text>
+              {t('clientes:creditAlert.deudaTotal', {
+                amount: formatMoney(estadoCredito?.deudaTotal ?? balance, locale),
+              })}
+            </Text>
+            <Text>
+              {t('clientes:creditAlert.deudaVencida', {
+                amount: formatMoney(estadoCredito?.deudaVencida ?? 0, locale),
+              })}
+            </Text>
+            <Text>
+              {t('clientes:creditAlert.disponible', {
+                amount:
+                  estadoCredito?.disponible != null
+                    ? formatMoney(estadoCredito.disponible, locale)
+                    : t('clientes:cuenta.sinLimite'),
+              })}
+            </Text>
+            {creditBlocked ? (
+              <Text style={styles.blockHint} testID="seller-cliente-credit-blocked-hint">
+                {t('clientes:creditAlert.blockedHint')}
+              </Text>
+            ) : null}
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              onPress={() => router.back()}
+              testID="seller-cliente-credit-back"
+              accessibilityLabel={t('clientes:creditAlert.back')}
+            >
+              {t('clientes:creditAlert.back')}
+            </Button>
+            <Button
+              onPress={() => {
+                ackCreditAlert(clienteId)
+                setCreditDialogVisible(false)
+                setTab('cuenta')
+              }}
+              testID="seller-cliente-credit-ver-cuenta"
+              accessibilityLabel={t('clientes:creditAlert.verCuenta')}
+            >
+              {t('clientes:creditAlert.verCuenta')}
+            </Button>
+            {!creditBlocked ? (
+              <Button
+                mode="contained"
+                onPress={() => {
+                  ackCreditAlert(clienteId)
+                  setCreditDialogVisible(false)
+                }}
+                testID="seller-cliente-credit-continue"
+                accessibilityLabel={t('clientes:creditAlert.continue')}
+              >
+                {t('clientes:creditAlert.continue')}
+              </Button>
+            ) : null}
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
       <View style={styles.header}>
         <View testID="seller-cliente-detail-name">
           <Text variant="headlineSmall">{cliente.rsocial}</Text>
@@ -245,6 +403,16 @@ export default function ClienteDetailScreen() {
             {t('clientes:statusSuspended')}
           </Chip>
         ) : null}
+        {estadoCredito && estadoCredito.nivel !== 'ok' ? (
+          <Chip
+            compact
+            style={{ backgroundColor: nivelColor(estadoCredito.nivel), alignSelf: 'flex-start' }}
+            textStyle={{ color: '#fff' }}
+            {...({ testID: 'seller-cliente-credit-chip' } as object)}
+          >
+            {t(`clientes:creditAlert.chip.${estadoCredito.nivel}`)}
+          </Chip>
+        ) : null}
       </View>
 
       {suspended ? (
@@ -255,11 +423,11 @@ export default function ClienteDetailScreen() {
 
       <Button
         mode="contained"
-        disabled={suspended}
+        disabled={suspended || creditBlocked}
         testID="seller-cliente-nuevo-pedido"
         accessibilityLabel={t('clientes:nuevoPedido')}
         onPress={() => {
-          if (suspended) return
+          if (suspended || creditBlocked) return
           router.push(`/(app)/pedidos/nuevo?clienteId=${cliente.id}`)
         }}
         style={styles.cta}
@@ -439,4 +607,6 @@ const styles = StyleSheet.create({
   mt: { marginTop: 12 },
   progress: { height: 8, borderRadius: 4, marginVertical: 8 },
   scoreBlock: { marginTop: 16, gap: 4 },
+  asOf: { opacity: 0.7, marginBottom: 8, fontSize: 12 },
+  blockHint: { marginTop: 8, color: '#B71C1C' },
 })

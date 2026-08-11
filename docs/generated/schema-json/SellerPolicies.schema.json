@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "sellerCreditOverLimitAction": {
+      "$ref": "./SellerAlertAction.schema.json"
+    },
+    "sellerCreditOverdueAction": {
+      "$ref": "./SellerAlertAction.schema.json"
+    },
+    "sellerStockCapQtyToAvailable": {
+      "type": "boolean"
+    },
+    "sellerStockZeroAction": {
+      "$ref": "./SellerAlertAction.schema.json"
+    }
+  },
+  "required": [
+    "sellerCreditOverLimitAction",
+    "sellerCreditOverdueAction",
+    "sellerStockZeroAction",
+    "sellerStockCapQtyToAvailable"
+  ],
+  "title": "SellerPolicies",
+  "type": "object"
+}

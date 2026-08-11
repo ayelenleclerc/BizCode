@@ -1579,6 +1579,38 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/clientes/{id}/estado-credito:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [clientes]
+      summary: Lightweight seller credit alert state
+      description: |
+        Derived credit alert for App Seller (#256): debt totals, overdue, available credit and level
+        (`ok` | `amarillo` | `naranja` | `rojo`). Requires `orders.create`, `customers.read`, or `customers.manage`.
+      responses:
+        '200':
+          description: Credit alert state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstadoCreditoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/clientes/{id}/recibos:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -1712,6 +1744,36 @@ paths:
                 format: binary
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/articulos/stock-multiple:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: ids
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Comma-separated article ids (max 100)
+    get:
+      tags: [articulos]
+      summary: Bulk stock snapshot for seller cart lines
+      description: |
+        Lightweight stock status for multiple articles (#256). Requires `orders.create` or `products.read`.
+      responses:
+        '200':
+          description: Stock snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMultipleEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
         '401':
@@ -11244,6 +11306,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/tenant-config/seller-policies:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [settings]
+      summary: Seller credit/stock alert policies
+      description: |
+        Read-only seller subset of TenantConfig policies (#256). Requires `orders.create`.
+      responses:
+        '200':
+          description: Seller policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerPoliciesEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags: [settings]
+      summary: Update seller credit/stock alert policies
+      description: |
+        Partial update of seller alert policies (#256). Requires `settings.business.manage` or `users.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SellerPoliciesPatchBody'
+      responses:
+        '200':
+          description: Updated seller policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerPoliciesEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -27787,6 +27897,153 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/TenantConfig'
+
+    SellerAlertAction:
+      type: string
+      enum: [warn, block]
+
+    SellerPolicies:
+      type: object
+      required:
+        - sellerCreditOverLimitAction
+        - sellerCreditOverdueAction
+        - sellerStockZeroAction
+        - sellerStockCapQtyToAvailable
+      properties:
+        sellerCreditOverLimitAction:
+          $ref: '#/components/schemas/SellerAlertAction'
+        sellerCreditOverdueAction:
+          $ref: '#/components/schemas/SellerAlertAction'
+        sellerStockZeroAction:
+          $ref: '#/components/schemas/SellerAlertAction'
+        sellerStockCapQtyToAvailable:
+          type: boolean
+
+    SellerPoliciesEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SellerPolicies'
+
+    SellerPoliciesPatchBody:
+      type: object
+      properties:
+        sellerCreditOverLimitAction:
+          $ref: '#/components/schemas/SellerAlertAction'
+        sellerCreditOverdueAction:
+          $ref: '#/components/schemas/SellerAlertAction'
+        sellerStockZeroAction:
+          $ref: '#/components/schemas/SellerAlertAction'
+        sellerStockCapQtyToAvailable:
+          type: boolean
+      additionalProperties: false
+
+    SellerCreditNivel:
+      type: string
+      enum: [ok, amarillo, naranja, rojo]
+
+    EstadoCreditoFacturaPendiente:
+      type: object
+      required: [id, saldo, vencimiento, diasMora]
+      properties:
+        id:
+          type: integer
+        saldo:
+          type: string
+        vencimiento:
+          type: string
+          format: date-time
+        diasMora:
+          type: integer
+          minimum: 0
+
+    EstadoCredito:
+      type: object
+      required:
+        - deudaTotal
+        - deudaVencida
+        - limiteCredito
+        - disponible
+        - diasMoraMax
+        - nivel
+        - facturasPendientes
+        - asOf
+      properties:
+        deudaTotal:
+          type: string
+        deudaVencida:
+          type: string
+        limiteCredito:
+          type: string
+          nullable: true
+        disponible:
+          type: string
+          nullable: true
+        diasMoraMax:
+          type: integer
+          minimum: 0
+        nivel:
+          $ref: '#/components/schemas/SellerCreditNivel'
+        facturasPendientes:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstadoCreditoFacturaPendiente'
+        asOf:
+          type: string
+          format: date-time
+
+    EstadoCreditoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/EstadoCredito'
+
+    SellerStockEstado:
+      type: string
+      enum: [ok, bajo, cero]
+
+    StockMultipleItem:
+      type: object
+      required: [articuloId, stock, stockMin, estado]
+      properties:
+        articuloId:
+          type: integer
+        stock:
+          type: number
+        stockMin:
+          type: number
+        estado:
+          $ref: '#/components/schemas/SellerStockEstado'
+
+    StockMultipleResult:
+      type: object
+      required: [asOf, items]
+      properties:
+        asOf:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockMultipleItem'
+
+    StockMultipleEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/StockMultipleResult'
 
     TenantConfigUpsertBody:
       type: object

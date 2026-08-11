@@ -255,3 +255,89 @@ export async function listFeriadosOnDateLocal(
   return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
 }
 
+/**
+ * @en Upserts cached estado-credito for offline seller alerts (#256).
+ * @es Guarda estado-crédito en cache offline (#256).
+ * @pt-BR Salva estado-crédito no cache offline (#256).
+ */
+export async function upsertEstadoCredito(
+  db: SQLiteDatabase,
+  clienteId: number,
+  data: Record<string, unknown>,
+): Promise<void> {
+  if (!Number.isInteger(clienteId) || clienteId < 1) return
+  const asOf = String(data.asOf ?? new Date().toISOString())
+  await db.runAsync(
+    `INSERT INTO estado_credito_cache (cliente_id, json, as_of, updated_at) VALUES (?, ?, ?, ?)
+     ON CONFLICT(cliente_id) DO UPDATE SET json=excluded.json, as_of=excluded.as_of, updated_at=excluded.updated_at`,
+    clienteId,
+    JSON.stringify(data),
+    asOf,
+    now(),
+  )
+}
+
+export async function getEstadoCreditoLocal(
+  db: SQLiteDatabase,
+  clienteId: number,
+): Promise<Record<string, unknown> | null> {
+  const row = await db.getFirstAsync<{ json: string }>(
+    'SELECT json FROM estado_credito_cache WHERE cliente_id = ?',
+    clienteId,
+  )
+  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+}
+
+/**
+ * @en Upserts stock-multiple snapshot (#256).
+ * @es Guarda snapshot stock-multiple (#256).
+ * @pt-BR Salva snapshot stock-multiple (#256).
+ */
+export async function upsertStockSnapshot(
+  db: SQLiteDatabase,
+  snapshot: { asOf: string; items: unknown[] },
+): Promise<void> {
+  await db.runAsync(
+    `INSERT INTO stock_snapshot (id, json, as_of, updated_at) VALUES (1, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET json=excluded.json, as_of=excluded.as_of, updated_at=excluded.updated_at`,
+    JSON.stringify(snapshot),
+    snapshot.asOf,
+    now(),
+  )
+}
+
+export async function getStockSnapshotLocal(
+  db: SQLiteDatabase,
+): Promise<{ asOf: string; items: unknown[] } | null> {
+  const row = await db.getFirstAsync<{ json: string; as_of: string }>(
+    'SELECT json, as_of FROM stock_snapshot WHERE id = 1',
+  )
+  if (!row) return null
+  const parsed = JSON.parse(row.json) as { asOf?: string; items?: unknown[] }
+  return {
+    asOf: parsed.asOf ?? row.as_of,
+    items: Array.isArray(parsed.items) ? parsed.items : [],
+  }
+}
+
+export async function upsertSellerPolicies(
+  db: SQLiteDatabase,
+  policies: Record<string, unknown>,
+): Promise<void> {
+  await db.runAsync(
+    `INSERT INTO seller_policies_cache (id, json, updated_at) VALUES (1, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET json=excluded.json, updated_at=excluded.updated_at`,
+    JSON.stringify(policies),
+    now(),
+  )
+}
+
+export async function getSellerPoliciesLocal(
+  db: SQLiteDatabase,
+): Promise<Record<string, unknown> | null> {
+  const row = await db.getFirstAsync<{ json: string }>(
+    'SELECT json FROM seller_policies_cache WHERE id = 1',
+  )
+  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+}
+

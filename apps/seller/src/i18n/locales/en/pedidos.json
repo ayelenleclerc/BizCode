@@ -25,7 +25,16 @@
   "successTitle": "Order #{{id}} confirmed",
   "viewDetail": "View order",
   "stockWarning": "One or more lines exceed available stock. You can still confirm.",
+  "stockWarningBlock": "Some lines have zero stock. Tenant policy blocks confirming the order.",
+  "stockStatus": {
+    "ok": "Stock OK",
+    "bajo": "Low stock",
+    "cero": "Out of stock"
+  },
+  "stockAsOf": "Stock as of {{when}}",
   "creditWarning": "Order total exceeds available credit ({{available}}).",
+  "creditWarningBlock": "Insufficient credit. Tenant policy blocks confirming the order.",
+  "confirmBlocked": "Confirm is blocked by alert policy.",
   "suspendedBanner": "This customer is suspended and cannot receive new orders.",
   "missingCliente": "Missing customer. Start from the customer card.",
   "listEmpty": "No orders yet",

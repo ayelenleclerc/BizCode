@@ -10,7 +10,9 @@ import {
   Text,
   TextInput,
 } from 'react-native-paper'
-import { clientesAPI, pedidosAPI } from '../../../src/api/sellerApi'
+import type { EstadoCredito, SellerPolicies } from '@bizcode/types'
+import { clientesAPI, pedidosAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
+import { isCreditBlocked, shouldBlockConfirmForStock } from '../../../src/alerts/policyGates'
 import { useAuth } from '../../../src/auth/AuthContext'
 import { mapApiErrorToUiState } from '../../../src/lib/apiErrors'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
@@ -34,6 +36,8 @@ export default function PedidoResumenScreen() {
 
   const [saldo, setSaldo] = useState<number | null>(null)
   const [creditLimit, setCreditLimit] = useState<number | null>(null)
+  const [estado, setEstado] = useState<EstadoCredito | null>(null)
+  const [policies, setPolicies] = useState<SellerPolicies | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmedId, setConfirmedId] = useState<number | null>(null)
@@ -52,8 +56,45 @@ export default function PedidoResumenScreen() {
         )
         setSaldo(saldoRes ? parseMoney(saldoRes.saldo) : null)
       } catch {
-        setSaldo(null)
-        setCreditLimit(null)
+        try {
+          const { getOfflineDb } = await import('../../../src/offline/db')
+          const { getClienteLocal } = await import('../../../src/offline/repos')
+          const db = await getOfflineDb()
+          const cached = (await getClienteLocal(db, id)) as {
+            creditLimit?: number | string | null
+          } | null
+          setCreditLimit(
+            cached?.creditLimit == null ? null : parseMoney(cached.creditLimit),
+          )
+          setSaldo(null)
+        } catch {
+          setSaldo(null)
+          setCreditLimit(null)
+        }
+      }
+
+      try {
+        const [estadoRes, pols] = await Promise.all([
+          sellerAlertsAPI.getEstadoCredito(id),
+          sellerAlertsAPI.getSellerPolicies(),
+        ])
+        setEstado(estadoRes)
+        setPolicies(pols)
+      } catch {
+        try {
+          const { getOfflineDb } = await import('../../../src/offline/db')
+          const { getEstadoCreditoLocal, getSellerPoliciesLocal } = await import(
+            '../../../src/offline/repos'
+          )
+          const db = await getOfflineDb()
+          const creditCached = (await getEstadoCreditoLocal(db, id)) as EstadoCredito | null
+          const polsCached = (await getSellerPoliciesLocal(db)) as SellerPolicies | null
+          setEstado(creditCached)
+          setPolicies(polsCached)
+        } catch {
+          setEstado(null)
+          setPolicies(null)
+        }
       }
     })()
   }, [cart.clienteId])
@@ -61,6 +102,22 @@ export default function PedidoResumenScreen() {
   const stockWarn = hasStockWarnings(cart.lines)
   const avail = availableCredit(saldo, creditLimit)
   const creditWarn = avail != null && cart.total > avail
+
+  const stockBlocked = shouldBlockConfirmForStock(cart.lines, policies)
+  const creditBlocked =
+    isCreditBlocked(estado?.nivel, policies) ||
+    (creditWarn && !estado && policies?.sellerCreditOverLimitAction === 'block') ||
+    (creditWarn && avail != null && avail < 0 && policies?.sellerCreditOverLimitAction === 'block')
+
+  const confirmDisabled =
+    submitting ||
+    stockBlocked ||
+    creditBlocked ||
+    (creditWarn && policies?.sellerCreditOverLimitAction === 'block')
+  const policyBlocked =
+    stockBlocked ||
+    creditBlocked ||
+    (creditWarn && policies?.sellerCreditOverLimitAction === 'block')
 
   const onConfirm = useCallback(async () => {
     if (cart.clienteId == null || cart.lines.length === 0) return
@@ -185,15 +242,27 @@ export default function PedidoResumenScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.root} testID="seller-pedido-resumen">
-      {stockWarn && (
-        <Banner visible icon="alert" testID="seller-pedido-stock-warning">
-          {t('pedidos:stockWarning')}
+      {stockBlocked ? (
+        <Banner visible icon="alert" testID="seller-pedido-stock-warning-block">
+          {t('pedidos:stockWarningBlock')}
         </Banner>
+      ) : (
+        stockWarn && (
+          <Banner visible icon="alert" testID="seller-pedido-stock-warning">
+            {t('pedidos:stockWarning')}
+          </Banner>
+        )
       )}
-      {creditWarn && (
-        <Banner visible icon="alert-circle" testID="seller-pedido-credit-warning">
-          {t('pedidos:creditWarning', { available: formatMoney(avail, locale) })}
+      {creditBlocked || (creditWarn && policies?.sellerCreditOverLimitAction === 'block') ? (
+        <Banner visible icon="alert-circle" testID="seller-pedido-credit-warning-block">
+          {t('pedidos:creditWarningBlock')}
         </Banner>
+      ) : (
+        creditWarn && (
+          <Banner visible icon="alert-circle" testID="seller-pedido-credit-warning">
+            {t('pedidos:creditWarning', { available: formatMoney(avail, locale) })}
+          </Banner>
+        )
       )}
 
       {cart.lines.map((line) => (
@@ -277,9 +346,9 @@ export default function PedidoResumenScreen() {
       <Button
         mode="contained"
         onPress={() => void onConfirm()}
-        disabled={submitting}
+        disabled={confirmDisabled}
         loading={submitting}
-        testID="seller-pedido-confirm"
+        testID={policyBlocked ? 'seller-pedido-confirm-blocked' : 'seller-pedido-confirm'}
         accessibilityLabel={t('pedidos:confirm')}
       >
         {submitting ? t('pedidos:confirming') : t('pedidos:confirm')}

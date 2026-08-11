@@ -2433,6 +2433,22 @@ model TenantConfig {
   /// @pt-BR Tipo de câmbio preferido para preços USD/EUR de catálogo (#243).
   /// oficial | mep | ccl | blue | manual
   tipoCambioPreferido   String   @default("oficial") @db.VarChar(20)
+  /// @en Seller action when credit limit is exceeded (#256). warn | block
+  /// @es Acción Seller al superar límite de crédito (#256). warn | block
+  /// @pt-BR Ação Seller ao superar limite de crédito (#256). warn | block
+  sellerCreditOverLimitAction String @default("block") @db.VarChar(10)
+  /// @en Seller action when overdue debt exists (#256). warn | block
+  /// @es Acción Seller con deuda vencida (#256). warn | block
+  /// @pt-BR Ação Seller com dívida vencida (#256). warn | block
+  sellerCreditOverdueAction String @default("warn") @db.VarChar(10)
+  /// @en Seller action when line stock is zero (#256). warn | block
+  /// @es Acción Seller con stock cero en línea (#256). warn | block
+  /// @pt-BR Ação Seller com estoque zero na linha (#256). warn | block
+  sellerStockZeroAction String @default("warn") @db.VarChar(10)
+  /// @en Cap order qty to available stock in Seller app (#256).
+  /// @es Limitar cantidad del pedido al stock disponible en Seller (#256).
+  /// @pt-BR Limitar a quantidade do pedido ao estoque disponível no Seller (#256).
+  sellerStockCapQtyToAvailable Boolean @default(true)
   updatedById           Int?
   updatedBy             AppUser? @relation("TenantConfigUpdatedBy", fields: [updatedById], references: [id])
   updatedAt             DateTime @updatedAt

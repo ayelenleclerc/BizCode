@@ -53,6 +53,8 @@ export type OfflineHydrateStats = {
   rubros: number
   visitas: number
   pedidos: number
+  estadoCredito: number
+  stockItems: number
 }
 
 export type SyncStatus = 'idle' | 'syncing' | 'error' | 'ok'

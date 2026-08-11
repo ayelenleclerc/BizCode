@@ -12,8 +12,9 @@ import {
   Text,
 } from 'react-native-paper'
 import type { ArticuloListItem } from '@bizcode/api-client'
-import type { Rubro } from '@bizcode/types'
-import { articulosAPI, clientesAPI, rubrosAPI } from '../../../src/api/sellerApi'
+import type { Rubro, SellerPolicies, SellerStockEstado, StockMultipleItem } from '@bizcode/types'
+import { articulosAPI, clientesAPI, rubrosAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
+import { capQtyToStock } from '../../../src/alerts/policyGates'
 import { mapApiErrorToUiState, type UiLoadState } from '../../../src/lib/apiErrors'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
 import { usePedidoCart } from '../../../src/pedidos/CartContext'
@@ -21,10 +22,20 @@ import { usePedidoCart } from '../../../src/pedidos/CartContext'
 const DEBOUNCE_MS = 300
 const CATALOG_LIMIT = 80
 
+const STOCK_COLOR: Record<SellerStockEstado, string> = {
+  ok: '#1B5E20',
+  bajo: '#E65100',
+  cero: '#B71C1C',
+}
+
 type ClienteMini = {
   id: number
   rsocial: string
   suspended?: boolean
+}
+
+function deriveStockEstado(stock: number): SellerStockEstado {
+  return stock <= 0 ? 'cero' : 'ok'
 }
 
 export default function NuevoPedidoScreen() {
@@ -41,6 +52,9 @@ export default function NuevoPedidoScreen() {
   const [state, setState] = useState<UiLoadState>('idle')
   const [cliente, setCliente] = useState<ClienteMini | null>(null)
   const [clienteState, setClienteState] = useState<UiLoadState>('loading')
+  const [policies, setPolicies] = useState<SellerPolicies | null>(null)
+  const [stockById, setStockById] = useState<Record<number, StockMultipleItem>>({})
+  const [stockAsOf, setStockAsOf] = useState<string | null>(null)
   const reqId = useRef(0)
 
   useEffect(() => {
@@ -48,6 +62,29 @@ export default function NuevoPedidoScreen() {
       cart.setClienteId(parsedClienteId)
     }
   }, [parsedClienteId, cart])
+
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      try {
+        const pols = await sellerAlertsAPI.getSellerPolicies()
+        if (!cancelled) setPolicies(pols)
+      } catch {
+        try {
+          const { getOfflineDb } = await import('../../../src/offline/db')
+          const { getSellerPoliciesLocal } = await import('../../../src/offline/repos')
+          const db = await getOfflineDb()
+          const cached = (await getSellerPoliciesLocal(db)) as SellerPolicies | null
+          if (!cancelled) setPolicies(cached)
+        } catch {
+          if (!cancelled) setPolicies(null)
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -140,8 +177,103 @@ export default function NuevoPedidoScreen() {
     return items.filter((a) => a.rubroId === rubroId || a.rubro?.id === rubroId)
   }, [items, rubroId])
 
+  const stockIdsKey = useMemo(() => {
+    const ids = new Set<number>()
+    for (const a of filtered) ids.add(a.id)
+    for (const l of cart.lines) ids.add(l.articuloId)
+    return Array.from(ids)
+      .filter((n) => Number.isInteger(n) && n >= 1)
+      .sort((a, b) => a - b)
+      .join(',')
+  }, [filtered, cart.lines])
+
+  useEffect(() => {
+    if (state !== 'success') return
+    const ids = stockIdsKey
+      ? stockIdsKey.split(',').map((s) => Number.parseInt(s, 10)).filter((n) => Number.isInteger(n) && n >= 1)
+      : []
+    if (ids.length === 0) {
+      setStockById({})
+      setStockAsOf(null)
+      return
+    }
+    let cancelled = false
+    void (async () => {
+      const applyItems = (asOf: string, rows: StockMultipleItem[]) => {
+        const map: Record<number, StockMultipleItem> = {}
+        const stockPatch: Record<number, number> = {}
+        for (const row of rows) {
+          map[row.articuloId] = row
+          stockPatch[row.articuloId] = row.stock
+        }
+        setStockById(map)
+        setStockAsOf(asOf)
+        cart.updateLineStocks(stockPatch)
+      }
+      try {
+        const res = await sellerAlertsAPI.getStockMultiple(ids)
+        if (cancelled) return
+        applyItems(res.asOf, res.items)
+      } catch {
+        try {
+          const { getOfflineDb } = await import('../../../src/offline/db')
+          const { getStockSnapshotLocal } = await import('../../../src/offline/repos')
+          const db = await getOfflineDb()
+          const snap = (await getStockSnapshotLocal(db)) as {
+            asOf: string
+            items: StockMultipleItem[]
+          }
+          if (cancelled) return
+          const idSet = new Set(ids)
+          applyItems(
+            snap.asOf,
+            snap.items.filter((row) => idSet.has(row.articuloId)),
+          )
+        } catch {
+          if (!cancelled) {
+            setStockById({})
+            setStockAsOf(null)
+          }
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [state, stockIdsKey, cart])
+
   const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt-BR' ? 'pt-BR' : 'es-AR'
   const suspended = Boolean(cliente?.suspended)
+  const capEnabled = policies?.sellerStockCapQtyToAvailable ?? true
+
+  const resolveStock = (item: ArticuloListItem) => {
+    const fromMulti = stockById[item.id]
+    const stock = fromMulti?.stock ?? Number(item.stock ?? 0)
+    const estado = fromMulti?.estado || deriveStockEstado(stock)
+    return { stock, estado }
+  }
+
+  const tryAddOrInc = (item: ArticuloListItem, currentQty: number) => {
+    const { stock } = resolveStock(item)
+    const desired = currentQty + 1
+    const capped = capQtyToStock(desired, stock, capEnabled)
+    if (capped === 0 && policies?.sellerStockZeroAction === 'block') return
+    if (capped <= 0) return
+    if (currentQty > 0) {
+      if (capped === currentQty) return
+      cart.setCantidad(item.id, capped)
+      return
+    }
+    const precio = parseMoney(item.precioLista1)
+    cart.addOrIncrement({
+      articuloId: item.id,
+      descripcion: item.descripcion,
+      precio,
+      stock,
+      condIva: item.condIva ?? '1',
+      cantidad: capped,
+    })
+  }
 
   if (cart.clienteId == null || clienteState === 'not_found') {
     return (
@@ -172,6 +304,12 @@ export default function NuevoPedidoScreen() {
         <View testID="seller-pedido-cliente-name">
           <Text style={styles.cliente}>{cliente.rsocial}</Text>
         </View>
+      )}
+
+      {stockAsOf != null && stockAsOf !== '' && (
+        <Banner visible icon="clock-outline" testID="seller-pedido-stock-asof">
+          {t('pedidos:stockAsOf', { when: stockAsOf })}
+        </Banner>
       )}
 
       <Searchbar
@@ -237,15 +375,25 @@ export default function NuevoPedidoScreen() {
           }
           renderItem={({ item }) => {
             const precio = parseMoney(item.precioLista1)
-            const stock = Number(item.stock ?? 0)
+            const { stock, estado } = resolveStock(item)
             const inCart = cart.lines.find((l) => l.articuloId === item.id)
+            const stockColor = STOCK_COLOR[estado]
             return (
               <View style={styles.row} testID={`seller-pedido-articulo-${item.id}`}>
                 <View style={styles.rowMain}>
                   <Text variant="titleSmall">{item.descripcion}</Text>
                   <Text style={styles.meta}>
-                    {formatMoney(precio, locale)} · {t('pedidos:stock', { count: stock })}
+                    {formatMoney(precio, locale)}
                   </Text>
+                  <View style={styles.stockRow} testID={`seller-pedido-stock-${item.id}`}>
+                    <Chip
+                      compact
+                      style={[styles.stockChip, { borderColor: stockColor }]}
+                      textStyle={{ color: stockColor, fontSize: 12 }}
+                    >
+                      {t(`pedidos:stockStatus.${estado}`)} · {t('pedidos:stock', { count: stock })}
+                    </Chip>
+                  </View>
                 </View>
                 {inCart ? (
                   <View style={styles.qtyRow}>
@@ -265,7 +413,7 @@ export default function NuevoPedidoScreen() {
                     <Button
                       compact
                       mode="outlined"
-                      onPress={() => cart.setCantidad(item.id, inCart.cantidad + 1)}
+                      onPress={() => tryAddOrInc(item, inCart.cantidad)}
                       disabled={suspended}
                       testID={`seller-pedido-qty-inc-${item.id}`}
                       accessibilityLabel="+"
@@ -278,15 +426,7 @@ export default function NuevoPedidoScreen() {
                     mode="contained-tonal"
                     compact
                     disabled={suspended}
-                    onPress={() =>
-                      cart.addOrIncrement({
-                        articuloId: item.id,
-                        descripcion: item.descripcion,
-                        precio,
-                        stock,
-                        condIva: item.condIva ?? '1',
-                      })
-                    }
+                    onPress={() => tryAddOrInc(item, 0)}
                     testID={`seller-pedido-add-${item.id}`}
                     accessibilityLabel={t('pedidos:add')}
                   >
@@ -334,6 +474,8 @@ const styles = StyleSheet.create({
   },
   rowMain: { flex: 1, gap: 2 },
   meta: { opacity: 0.7, fontSize: 13 },
+  stockRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 2 },
+  stockChip: { alignSelf: 'flex-start', backgroundColor: 'transparent', borderWidth: 1 },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   hint: { opacity: 0.7, padding: 8 },
   fab: { position: 'absolute', right: 16, bottom: 16 },

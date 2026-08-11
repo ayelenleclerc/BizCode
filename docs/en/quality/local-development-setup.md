@@ -43,6 +43,8 @@ Allowed roles: `seller`, `manager`, `owner`. Other roles see an accessible “se
 
 **Push notifications (#172):** on authenticated session the app requests notification permission, obtains an Expo push token, and registers it via `POST /api/users/me/push-token` (deleted on logout). Backend sends Expo Push for pedido confirm/cancel (to `pedido.vendedorId`), customer credit alerts / payments (sellers by `VendedorZona` + recent pedidos), and chat messages. Profile tab `/perfil` mutes types via `GET/PUT /api/users/me/push-preferences`. Notification taps deep-link to pedido or cliente screens. Shared token/Expo pipeline is reused later by App Driver (#165). Physical push delivery needs a native build / Expo project credentials; CI covers API + Expo sender unit tests.
 
+**Debt/stock alerts (#256):** `TenantConfig` seller policies (defaults: over-limit `block`, overdue `warn`, stock-zero `warn`, qty capped to stock). Seller reads `GET /api/tenant-config/seller-policies` (`orders.create`); owners/managers patch with `settings.business.manage` or `users.manage`. Customer card opens a credit dialog from `GET /api/clientes/:id/estado-credito` (levels `ok`/`amarillo`/`naranja`/`rojo`). Order cart uses `GET /api/articulos/stock-multiple?ids=` for inline stock colours and caps; summary can block confirm by policy. Offline hydrate also caches credit/stock/policies with an `asOf` timestamp banner. No in-app collections and no manager-approval workflow.
+
 UI strings use **i18next** (EN / ES / pt-BR) with `expo-localization` for device language.
 
 ```bash

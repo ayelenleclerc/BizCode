@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "diasMora": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "saldo": {
+      "type": "string"
+    },
+    "vencimiento": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "saldo",
+    "vencimiento",
+    "diasMora"
+  ],
+  "title": "EstadoCreditoFacturaPendiente",
+  "type": "object"
+}

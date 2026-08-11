@@ -52,5 +52,26 @@
     "low": "Alto risco",
     "mid": "Neutro",
     "high": "Bom pagador"
+  },
+  "creditAlert": {
+    "title": {
+      "ok": "Crédito em dia",
+      "amarillo": "Cliente com saldo pendente",
+      "naranja": "Cliente com dívida vencida",
+      "rojo": "Cliente acima do limite de crédito"
+    },
+    "chip": {
+      "amarillo": "Saldo pendente",
+      "naranja": "Dívida vencida",
+      "rojo": "Limite excedido"
+    },
+    "deudaTotal": "Dívida total: {{amount}}",
+    "deudaVencida": "Dívida vencida: {{amount}}",
+    "disponible": "Disponível: {{amount}}",
+    "asOf": "Crédito em {{when}} (offline)",
+    "blockedHint": "A política do tenant bloqueia novos pedidos para este nível de risco.",
+    "verCuenta": "Ver conta corrente",
+    "continue": "Continuar",
+    "back": "Voltar"
   }
 }

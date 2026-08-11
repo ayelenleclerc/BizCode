@@ -57,6 +57,7 @@ import { BancoExtractoService } from './BancoExtractoService'
 import { BancoConciliacionService } from './BancoConciliacionService'
 import { ShippingTrackingService } from './ShippingTrackingService'
 import { ShippingCarrierConfigService } from './ShippingCarrierConfigService'
+import { SellerAlertService } from './SellerAlertService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -117,6 +118,7 @@ export type DomainServices = {
   clientePrivacy: ClientePrivacyService
   bancoExtracto: BancoExtractoService
   bancoConciliacion: BancoConciliacionService
+  sellerAlert: SellerAlertService
 }
 
 /**
@@ -184,5 +186,6 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     clientePrivacy: new ClientePrivacyService(prisma),
     bancoExtracto: new BancoExtractoService(prisma),
     bancoConciliacion: new BancoConciliacionService(prisma),
+    sellerAlert: new SellerAlertService(prisma),
   }
 }

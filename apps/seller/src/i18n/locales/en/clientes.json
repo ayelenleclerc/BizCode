@@ -52,5 +52,26 @@
     "low": "High risk",
     "mid": "Neutral",
     "high": "Good payer"
+  },
+  "creditAlert": {
+    "title": {
+      "ok": "Credit OK",
+      "amarillo": "Customer has outstanding balance",
+      "naranja": "Customer has overdue debt",
+      "rojo": "Customer is over the credit limit"
+    },
+    "chip": {
+      "amarillo": "Outstanding balance",
+      "naranja": "Overdue debt",
+      "rojo": "Over limit"
+    },
+    "deudaTotal": "Total debt: {{amount}}",
+    "deudaVencida": "Overdue debt: {{amount}}",
+    "disponible": "Available: {{amount}}",
+    "asOf": "Credit as of {{when}} (offline)",
+    "blockedHint": "Tenant policy blocks new orders for this risk level.",
+    "verCuenta": "View account",
+    "continue": "Continue",
+    "back": "Go back"
   }
 }

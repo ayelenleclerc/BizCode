@@ -16,6 +16,8 @@ type CartContextValue = {
   addOrIncrement: (line: Omit<SellerCartLine, 'cantidad' | 'dscto'> & { cantidad?: number }) => void
   setCantidad: (articuloId: number, cantidad: number) => void
   setDscto: (articuloId: number, dscto: number) => void
+  /** @en Sync line.stock from stock-multiple (#256). @es Sincroniza line.stock desde stock-multiple (#256). @pt-BR Sincroniza line.stock a partir de stock-multiple (#256). */
+  updateLineStocks: (stockByArticuloId: Record<number, number>) => void
   removeLine: (articuloId: number) => void
   clear: () => void
   total: number
@@ -83,6 +85,19 @@ export function PedidoCartProvider({ children }: { children: ReactNode }) {
     setLines((prev) => prev.map((l) => (l.articuloId === articuloId ? { ...l, dscto: clamped } : l)))
   }, [])
 
+  const updateLineStocks = useCallback((stockByArticuloId: Record<number, number>) => {
+    setLines((prev) => {
+      let changed = false
+      const next = prev.map((l) => {
+        const stock = stockByArticuloId[l.articuloId]
+        if (stock == null || stock === l.stock) return l
+        changed = true
+        return { ...l, stock }
+      })
+      return changed ? next : prev
+    })
+  }, [])
+
   const removeLine = useCallback((articuloId: number) => {
     setLines((prev) => prev.filter((l) => l.articuloId !== articuloId))
   }, [])
@@ -104,6 +119,7 @@ export function PedidoCartProvider({ children }: { children: ReactNode }) {
       addOrIncrement,
       setCantidad,
       setDscto,
+      updateLineStocks,
       removeLine,
       clear,
       total,
@@ -120,6 +136,7 @@ export function PedidoCartProvider({ children }: { children: ReactNode }) {
       addOrIncrement,
       setCantidad,
       setDscto,
+      updateLineStocks,
       removeLine,
       clear,
       total,

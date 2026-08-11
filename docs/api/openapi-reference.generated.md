@@ -7679,6 +7679,213 @@ Active invoices with remaining balance for imputation (#233) and App Seller over
 }
 ```
 
+### PARAMETERS /api/clientes/{id}/estado-credito
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/estado-credito`
+
+### Lightweight seller credit alert state
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/estado-credito`
+- **Tags:** clientes
+
+Derived credit alert for App Seller (#256): debt totals, overdue, available credit and level (`ok` | `amarillo` | `naranja` | `rojo`). Requires `orders.create`, `customers.read`, or `customers.manage`.
+
+#### Responses
+
+##### Status: 200 Credit alert state
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`asOf` (required)**
+
+    `string`, format: `date-time`
+
+  - **`deudaTotal` (required)**
+
+    `string`
+
+  - **`deudaVencida` (required)**
+
+    `string`
+
+  - **`diasMoraMax` (required)**
+
+    `integer`
+
+  - **`disponible` (required)**
+
+    `string`
+
+  - **`facturasPendientes` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`diasMora` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`saldo` (required)**
+
+      `string`
+
+    - **`vencimiento` (required)**
+
+      `string`, format: `date-time`
+
+  - **`limiteCredito` (required)**
+
+    `string`
+
+  - **`nivel` (required)**
+
+    `string`, possible values: `"ok", "amarillo", "naranja", "rojo"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "deudaTotal": "",
+    "deudaVencida": "",
+    "limiteCredito": "",
+    "disponible": "",
+    "diasMoraMax": 0,
+    "nivel": "ok",
+    "facturasPendientes": [
+      {
+        "id": 1,
+        "saldo": "",
+        "vencimiento": "",
+        "diasMora": 0
+      }
+    ],
+    "asOf": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/clientes/{id}/recibos
 
 - **Method:** `PARAMETERS`
@@ -9055,6 +9262,162 @@ Returns PDF with amount in words (#233). Requires module `finance.receipts`.
 ```
 
 ##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/articulos/stock-multiple
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/stock-multiple`
+
+### Bulk stock snapshot for seller cart lines
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/stock-multiple`
+- **Tags:** articulos
+
+Lightweight stock status for multiple articles (#256). Requires `orders.create` or `products.read`.
+
+#### Responses
+
+##### Status: 200 Stock snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`asOf` (required)**
+
+    `string`, format: `date-time`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"ok", "bajo", "cero"`
+
+    - **`stock` (required)**
+
+      `number`
+
+    - **`stockMin` (required)**
+
+      `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "asOf": "",
+    "items": [
+      {
+        "articuloId": 1,
+        "stock": 1,
+        "stockMin": 1,
+        "estado": "ok"
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
 
 ###### Content-Type: application/json
 
@@ -66023,6 +66386,293 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 ```
 
 ##### Status: 404 User not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/tenant-config/seller-policies
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/tenant-config/seller-policies`
+
+### Seller credit/stock alert policies
+
+- **Method:** `GET`
+- **Path:** `/api/tenant-config/seller-policies`
+- **Tags:** settings
+
+Read-only seller subset of TenantConfig policies (#256). Requires `orders.create`.
+
+#### Responses
+
+##### Status: 200 Seller policies
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`sellerCreditOverdueAction` (required)**
+
+    `string`, possible values: `"warn", "block"`
+
+  - **`sellerCreditOverLimitAction` (required)**
+
+    `string`, possible values: `"warn", "block"`
+
+  - **`sellerStockCapQtyToAvailable` (required)**
+
+    `boolean`
+
+  - **`sellerStockZeroAction` (required)**
+
+    `string`, possible values: `"warn", "block"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sellerCreditOverLimitAction": "warn",
+    "sellerCreditOverdueAction": "warn",
+    "sellerStockZeroAction": "warn",
+    "sellerStockCapQtyToAvailable": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update seller credit/stock alert policies
+
+- **Method:** `PATCH`
+- **Path:** `/api/tenant-config/seller-policies`
+- **Tags:** settings
+
+Partial update of seller alert policies (#256). Requires `settings.business.manage` or `users.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`sellerCreditOverdueAction`**
+
+  `string`, possible values: `"warn", "block"`
+
+- **`sellerCreditOverLimitAction`**
+
+  `string`, possible values: `"warn", "block"`
+
+- **`sellerStockCapQtyToAvailable`**
+
+  `boolean`
+
+- **`sellerStockZeroAction`**
+
+  `string`, possible values: `"warn", "block"`
+
+**Example:**
+
+```json
+{
+  "sellerCreditOverLimitAction": "warn",
+  "sellerCreditOverdueAction": "warn",
+  "sellerStockZeroAction": "warn",
+  "sellerStockCapQtyToAvailable": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated seller policies
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`sellerCreditOverdueAction` (required)**
+
+    `string`, possible values: `"warn", "block"`
+
+  - **`sellerCreditOverLimitAction` (required)**
+
+    `string`, possible values: `"warn", "block"`
+
+  - **`sellerStockCapQtyToAvailable` (required)**
+
+    `boolean`
+
+  - **`sellerStockZeroAction` (required)**
+
+    `string`, possible values: `"warn", "block"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sellerCreditOverLimitAction": "warn",
+    "sellerCreditOverdueAction": "warn",
+    "sellerStockZeroAction": "warn",
+    "sellerStockCapQtyToAvailable": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
 
 ###### Content-Type: application/json
 
@@ -134963,6 +135613,456 @@ Originating invoice header (selected columns)
       ""
     ],
     "updatedAt": ""
+  }
+}
+```
+
+### SellerAlertAction
+
+- **Type:**`string`
+
+**Example:**
+
+### SellerPolicies
+
+- **Type:**`object`
+
+* **`sellerCreditOverdueAction` (required)**
+
+  `string`, possible values: `"warn", "block"`
+
+* **`sellerCreditOverLimitAction` (required)**
+
+  `string`, possible values: `"warn", "block"`
+
+* **`sellerStockCapQtyToAvailable` (required)**
+
+  `boolean`
+
+* **`sellerStockZeroAction` (required)**
+
+  `string`, possible values: `"warn", "block"`
+
+**Example:**
+
+```json
+{
+  "sellerCreditOverLimitAction": "warn",
+  "sellerCreditOverdueAction": "warn",
+  "sellerStockZeroAction": "warn",
+  "sellerStockCapQtyToAvailable": true
+}
+```
+
+### SellerPoliciesEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`sellerCreditOverdueAction` (required)**
+
+    `string`, possible values: `"warn", "block"`
+
+  - **`sellerCreditOverLimitAction` (required)**
+
+    `string`, possible values: `"warn", "block"`
+
+  - **`sellerStockCapQtyToAvailable` (required)**
+
+    `boolean`
+
+  - **`sellerStockZeroAction` (required)**
+
+    `string`, possible values: `"warn", "block"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "sellerCreditOverLimitAction": "warn",
+    "sellerCreditOverdueAction": "warn",
+    "sellerStockZeroAction": "warn",
+    "sellerStockCapQtyToAvailable": true
+  }
+}
+```
+
+### SellerPoliciesPatchBody
+
+- **Type:**`object`
+
+* **`sellerCreditOverdueAction`**
+
+  `string`, possible values: `"warn", "block"`
+
+* **`sellerCreditOverLimitAction`**
+
+  `string`, possible values: `"warn", "block"`
+
+* **`sellerStockCapQtyToAvailable`**
+
+  `boolean`
+
+* **`sellerStockZeroAction`**
+
+  `string`, possible values: `"warn", "block"`
+
+**Example:**
+
+```json
+{
+  "sellerCreditOverLimitAction": "warn",
+  "sellerCreditOverdueAction": "warn",
+  "sellerStockZeroAction": "warn",
+  "sellerStockCapQtyToAvailable": true
+}
+```
+
+### SellerCreditNivel
+
+- **Type:**`string`
+
+**Example:**
+
+### EstadoCreditoFacturaPendiente
+
+- **Type:**`object`
+
+* **`diasMora` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`saldo` (required)**
+
+  `string`
+
+* **`vencimiento` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "saldo": "",
+  "vencimiento": "",
+  "diasMora": 0
+}
+```
+
+### EstadoCredito
+
+- **Type:**`object`
+
+* **`asOf` (required)**
+
+  `string`, format: `date-time`
+
+* **`deudaTotal` (required)**
+
+  `string`
+
+* **`deudaVencida` (required)**
+
+  `string`
+
+* **`diasMoraMax` (required)**
+
+  `integer`
+
+* **`disponible` (required)**
+
+  `string`
+
+* **`facturasPendientes` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`diasMora` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`saldo` (required)**
+
+    `string`
+
+  - **`vencimiento` (required)**
+
+    `string`, format: `date-time`
+
+* **`limiteCredito` (required)**
+
+  `string`
+
+* **`nivel` (required)**
+
+  `string`, possible values: `"ok", "amarillo", "naranja", "rojo"`
+
+**Example:**
+
+```json
+{
+  "deudaTotal": "",
+  "deudaVencida": "",
+  "limiteCredito": "",
+  "disponible": "",
+  "diasMoraMax": 0,
+  "nivel": "ok",
+  "facturasPendientes": [
+    {
+      "id": 1,
+      "saldo": "",
+      "vencimiento": "",
+      "diasMora": 0
+    }
+  ],
+  "asOf": ""
+}
+```
+
+### EstadoCreditoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`asOf` (required)**
+
+    `string`, format: `date-time`
+
+  - **`deudaTotal` (required)**
+
+    `string`
+
+  - **`deudaVencida` (required)**
+
+    `string`
+
+  - **`diasMoraMax` (required)**
+
+    `integer`
+
+  - **`disponible` (required)**
+
+    `string`
+
+  - **`facturasPendientes` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`diasMora` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`saldo` (required)**
+
+      `string`
+
+    - **`vencimiento` (required)**
+
+      `string`, format: `date-time`
+
+  - **`limiteCredito` (required)**
+
+    `string`
+
+  - **`nivel` (required)**
+
+    `string`, possible values: `"ok", "amarillo", "naranja", "rojo"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "deudaTotal": "",
+    "deudaVencida": "",
+    "limiteCredito": "",
+    "disponible": "",
+    "diasMoraMax": 0,
+    "nivel": "ok",
+    "facturasPendientes": [
+      {
+        "id": 1,
+        "saldo": "",
+        "vencimiento": "",
+        "diasMora": 0
+      }
+    ],
+    "asOf": ""
+  }
+}
+```
+
+### SellerStockEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### StockMultipleItem
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"ok", "bajo", "cero"`
+
+* **`stock` (required)**
+
+  `number`
+
+* **`stockMin` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "stock": 1,
+  "stockMin": 1,
+  "estado": "ok"
+}
+```
+
+### StockMultipleResult
+
+- **Type:**`object`
+
+* **`asOf` (required)**
+
+  `string`, format: `date-time`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"ok", "bajo", "cero"`
+
+  - **`stock` (required)**
+
+    `number`
+
+  - **`stockMin` (required)**
+
+    `number`
+
+**Example:**
+
+```json
+{
+  "asOf": "",
+  "items": [
+    {
+      "articuloId": 1,
+      "stock": 1,
+      "stockMin": 1,
+      "estado": "ok"
+    }
+  ]
+}
+```
+
+### StockMultipleEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`asOf` (required)**
+
+    `string`, format: `date-time`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"ok", "bajo", "cero"`
+
+    - **`stock` (required)**
+
+      `number`
+
+    - **`stockMin` (required)**
+
+      `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "asOf": "",
+    "items": [
+      {
+        "articuloId": 1,
+        "stock": 1,
+        "stockMin": 1,
+        "estado": "ok"
+      }
+    ]
   }
 }
 ```
