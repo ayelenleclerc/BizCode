@@ -2,6 +2,7 @@ import type { Application, Request, Response } from 'express'
 import type { PrismaClient, Prisma } from '@prisma/client'
 import { type AuthenticatedRequest } from './auth'
 import { writeAuditEvent } from './audit'
+import { deliverMobilePush } from './services/mobilePushDelivery'
 
 export const NOTIFICATION_TYPES = [
   'credit_limit_exceeded',
@@ -40,6 +41,10 @@ export const NOTIFICATION_TYPES = [
   'security_alert_high',
   'shipment_delivered',
   'ruta_parada_postergada',
+  'pedido_confirmed',
+  'pedido_cancelled',
+  'cliente_credit_alert',
+  'cliente_payment_received',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -108,6 +113,9 @@ export async function createNotification(
 ): Promise<void> {
   await prisma.notification.create({
     data: { tenantId, userId, type, payload },
+  })
+  await deliverMobilePush(prisma, tenantId, userId, type, payload).catch(() => {
+    /* push must not break callers */
   })
 }
 

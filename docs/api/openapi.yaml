@@ -10538,6 +10538,110 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
+  /api/users/me/push-token:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [users]
+      summary: Register Expo/device push token (#172)
+      description: >
+        Upserts the caller's device push token for Expo Push delivery.
+        Shared infrastructure for App Seller (#172) and App Driver (#165).
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushTokenRegisterInput'
+      responses:
+        '200':
+          description: Token registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushTokenEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags: [users]
+      summary: Unregister Expo/device push token (#172)
+      description: Deletes the caller's push token (logout / rotation).
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushTokenRegisterInput'
+      responses:
+        '200':
+          description: Token deleted count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushTokenDeleteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/users/me/push-preferences:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [users]
+      summary: Get mute preferences for mobile push (#172)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Mute preferences
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushPreferencesEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [users]
+      summary: Update mute preferences for mobile push (#172)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushPreferencesInput'
+      responses:
+        '200':
+          description: Updated mute preferences
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushPreferencesEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/auth/change-password:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -26417,6 +26521,86 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/AppUser'
+
+    PushTokenRegisterInput:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          minLength: 8
+          maxLength: 255
+        platform:
+          type: string
+          maxLength: 20
+          nullable: true
+
+    PushTokenEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [token]
+          properties:
+            token:
+              type: string
+            platform:
+              type: string
+              nullable: true
+
+    PushTokenDeleteEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [deleted]
+          properties:
+            deleted:
+              type: integer
+              minimum: 0
+
+    PushPreferencesInput:
+      type: object
+      required: [mutedTypes]
+      properties:
+        mutedTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - pedido_confirmed
+              - pedido_cancelled
+              - cliente_credit_alert
+              - cliente_payment_received
+              - chat_message
+
+    PushPreferencesEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [mutedTypes, muteableTypes]
+          properties:
+            mutedTypes:
+              type: array
+              items:
+                type: string
+            muteableTypes:
+              type: array
+              items:
+                type: string
 
     ChangePasswordInput:
       type: object

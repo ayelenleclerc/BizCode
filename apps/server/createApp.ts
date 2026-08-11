@@ -11,6 +11,7 @@ import { registerAuthRoutes, resolveSession, type AuthenticatedRequest } from '.
 import { registerUserRoutes } from './users'
 import { registerDashboardRoutes } from './dashboard'
 import { registerNotificationRoutes } from './notifications'
+import { registerPushNotificationRoutes } from './routes/registerPushNotificationRoutes'
 import { isSmtpConfigured, isTwilioConfigured } from './channels'
 import { registerChatRoutes } from './chat'
 import { registerAuditEventRoutes } from './auditEvents'
@@ -151,6 +152,7 @@ export function createApp(prisma: PrismaClient): Application {
   registerUserRoutes(app, prisma)
   registerDashboardRoutes(app, prisma)
   registerNotificationRoutes(app, prisma)
+  registerPushNotificationRoutes(app, prisma)
   registerChatRoutes(app, prisma)
   registerAuditEventRoutes(app, prisma)
   registerMetricsRoute(app)

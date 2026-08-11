@@ -71,3 +71,15 @@ export type AuditEventListResult = {
   limit: number
   offset: number
 }
+
+/** @en Registered Expo/device push token (#172). */
+export type DevicePushTokenDTO = {
+  token: string
+  platform: string | null
+}
+
+/** @en User mute preferences for mobile push (#172). */
+export type PushPreferencesDTO = {
+  mutedTypes: string[]
+  muteableTypes: string[]
+}

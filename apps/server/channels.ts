@@ -328,6 +328,16 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Una parada de la ruta diaria fue postergada al próximo día hábil.${detail}`,
       }
     }
+    case 'pedido_confirmed':
+    case 'pedido_cancelled':
+    case 'cliente_credit_alert':
+    case 'cliente_payment_received':
+      return {
+        subject: `[BizCode] ${type}`,
+        text: payload.rsocial
+          ? `${payload.rsocial}${payload.pedidoId != null ? ` — pedido #${payload.pedidoId}` : ''}`
+          : type,
+      }
   }
 }
 

@@ -10,7 +10,8 @@ BizCode uses **pnpm workspaces** and **Turborepo** (#154):
 |------|------|
 | `apps/web/` | React + Vite frontend |
 | `apps/server/` | Express API |
-| `apps/seller/` | Expo (React Native) App Seller — field sales (#167–#171) |
+| `apps/seller/` | Expo (React Native) App Seller — field sales (#167–#172) |
+
 | `packages/types/` | Shared TypeScript types and RBAC contracts |
 | `packages/api-client/` | HTTP API client |
 | `prisma/` | Database schema and migrations (repo root) |
@@ -26,7 +27,7 @@ Optional in `.env` for the web app:
 
 - `VITE_API_URL` — full API base including `/api` (e.g. `http://localhost:3001/api`)
 
-### App Seller (`apps/seller`, #167–#171)
+### App Seller (`apps/seller`, #167–#172)
 
 Expo SDK app with Expo Router. UI uses React Native Paper (shared `@bizcode/ui` is deferred to #157). Auth uses **Bearer dual** mode: the API still sets HttpOnly cookies for the web app and also returns `accessToken` / `refreshToken` / `expiresIn` in the login and refresh JSON bodies. The seller app stores those tokens in **expo-secure-store** (never AsyncStorage) and sends `Authorization: Bearer` plus `x-bizcode-channel: field`.
 
@@ -39,6 +40,8 @@ Allowed roles: `seller`, `manager`, `owner`. Other roles see an accessible “se
 **Agenda / Mi Ruta Hoy (#170 + #267):** tab `/agenda` is **Mi Ruta Hoy**: `GET/POST /api/rutas`, stop reorder/replace, `PATCH` estado (`visitado` → `/(app)/pedidos/nuevo?clienteId=` and links/creates `VisitaVendedor`; `postergado` → next non-`Feriado` day; `no_visitado` + motivo). Holiday banner via `GET /api/feriados?fecha=`. Map pins with `react-native-maps` only when `Cliente.latitud`/`longitud` are set (no geocoder). Offline outbox extends to route create/paradas/patch. Managers watch progress on web `/visitas` (`GET /api/rutas/:id/stats`, 60s polling) and assign `VendedorZona`. Seed AR holidays: `npm run feriados:seed-ar` (fixture under `scripts/data/`; optional `--live`).
 
 **Offline mode (#171):** after login (online), the app hydrates a day cache into `expo-sqlite` (clientes, artículos, rubros, agenda/ruta, feriados del día, recent pedidos) with MMKV metadata (`cacheDay`; in-memory fallback if MMKV native is unavailable). With no signal, lists/ficha/catálogo/ruta/pedido confirm read from SQLite and enqueue writes (pedidos confirm, visitas, rutas) into a FIFO outbox flushed by NetInfo on reconnect. Banner shows offline date and pending sync count. Cache invalidates when the local calendar day changes. Primary target is native Expo; maps may require a development build rather than Expo Go.
+
+**Push notifications (#172):** on authenticated session the app requests notification permission, obtains an Expo push token, and registers it via `POST /api/users/me/push-token` (deleted on logout). Backend sends Expo Push for pedido confirm/cancel (to `pedido.vendedorId`), customer credit alerts / payments (sellers by `VendedorZona` + recent pedidos), and chat messages. Profile tab `/perfil` mutes types via `GET/PUT /api/users/me/push-preferences`. Notification taps deep-link to pedido or cliente screens. Shared token/Expo pipeline is reused later by App Driver (#165). Physical push delivery needs a native build / Expo project credentials; CI covers API + Expo sender unit tests.
 
 UI strings use **i18next** (EN / ES / pt-BR) with `expo-localization` for device language.
 

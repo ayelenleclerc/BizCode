@@ -984,6 +984,16 @@
 
 * [PublicPlan](./publicplan.md) – `-`
 
+* [PushPreferencesEnvelope](./pushpreferencesenvelope.md) – `-`
+
+* [PushPreferencesInput](./pushpreferencesinput.md) – `-`
+
+* [PushTokenDeleteEnvelope](./pushtokendeleteenvelope.md) – `-`
+
+* [PushTokenEnvelope](./pushtokenenvelope.md) – `-`
+
+* [PushTokenRegisterInput](./pushtokenregisterinput.md) – `-`
+
 * [RecalcFxResult](./recalcfxresult.md) – `-`
 
 * [ReciboCobro](./recibocobro.md) – `-`
@@ -1602,6 +1612,12 @@
 
 * [Untitled object in ProveedorListEnvelope](./proveedorlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in PushPreferencesEnvelope](./pushpreferencesenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PushTokenDeleteEnvelope](./pushtokendeleteenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in PushTokenEnvelope](./pushtokenenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in ReciboCobro](./recibocobro-properties-cliente.md) – `undefined#/properties/cliente`
 
 * [Untitled object in ReciboCobro](./recibocobro-properties-usuario.md) – `undefined#/properties/usuario`
@@ -2015,6 +2031,12 @@
 * [Untitled array in ProveedorListEnvelope](./proveedorlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in PublicPlan](./publicplan-properties-features.md) – `undefined#/properties/features`
+
+* [Untitled array in PushPreferencesEnvelope](./pushpreferencesenvelope-properties-data-properties-muteabletypes.md) – `undefined#/properties/data/properties/muteableTypes`
+
+* [Untitled array in PushPreferencesEnvelope](./pushpreferencesenvelope-properties-data-properties-mutedtypes.md) – `undefined#/properties/data/properties/mutedTypes`
+
+* [Untitled array in PushPreferencesInput](./pushpreferencesinput-properties-mutedtypes.md) – `undefined#/properties/mutedTypes`
 
 * [Untitled array in ReciboCobro](./recibocobro-properties-formas.md) – `undefined#/properties/formas`
 

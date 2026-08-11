@@ -2,6 +2,7 @@ import type { Application, Request, Response } from 'express'
 import type { PrismaClient, Prisma } from '@prisma/client'
 import type { AuthenticatedRequest } from './auth'
 import { writeAuditEvent } from './audit'
+import { createNotification } from './notifications'
 
 const CHAT_PAGE_SIZE_DEFAULT = 50
 const CHAT_PAGE_SIZE_MAX = 100
@@ -207,17 +208,10 @@ export function registerChatRoutes(app: Application, prisma: PrismaClient): void
         },
       })
 
-      await prisma.notification.create({
-        data: {
-          tenantId: me.tenantId,
-          userId: toUserId,
-          type: 'chat_message',
-          payload: {
-            messageId: message.id,
-            fromUserId: me.userId,
-            preview: toPreview(content),
-          },
-        },
+      await createNotification(prisma, me.tenantId, toUserId, 'chat_message', {
+        messageId: message.id,
+        fromUserId: me.userId,
+        preview: toPreview(content),
       })
 
       await writeAuditEvent({

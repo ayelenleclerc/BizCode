@@ -4,11 +4,13 @@ import { ActivityIndicator, View } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthContext'
 import { OfflineBanner } from '../../src/offline/OfflineBanner'
+import { usePushNotificationNavigation } from '../../src/push/usePushNotificationNavigation'
 
 export default function AppLayout() {
   const { t } = useTranslation('common')
   const { status, logout } = useAuth()
   const router = useRouter()
+  usePushNotificationNavigation(status === 'authenticated')
 
   if (status === 'loading') {
     return (
@@ -53,6 +55,7 @@ export default function AppLayout() {
         <Tabs.Screen name="pedidos" options={{ title: t('tabs.pedidos') }} />
         <Tabs.Screen name="catalogo" options={{ title: t('tabs.catalogo') }} />
         <Tabs.Screen name="agenda" options={{ title: t('tabs.agenda') }} />
+        <Tabs.Screen name="perfil" options={{ title: t('tabs.perfil') }} />
       </Tabs>
     </View>
   )

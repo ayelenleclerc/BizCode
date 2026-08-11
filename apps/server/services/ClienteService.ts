@@ -1,6 +1,7 @@
 import { Prisma, type Cliente, type PrismaClient } from '@prisma/client'
 import type { ClienteInput } from '@bizcode/types'
 import type { ServiceResult } from './serviceResults'
+import { notifySellersForCliente } from './sellerPushTargets'
 
 export type ClienteListResult = {
   total: number
@@ -85,6 +86,18 @@ export class ClienteService {
       where: { id },
       data,
     })
+
+    if (
+      canManageFinancials &&
+      suspended === true &&
+      existingCliente.suspended !== true
+    ) {
+      await notifySellersForCliente(this.prisma, tenantId, cliente.id, 'cliente_credit_alert', {
+        clienteId: cliente.id,
+        rsocial: cliente.rsocial,
+      }).catch(() => {})
+    }
+
     return { ok: true, data: cliente }
   }
 
