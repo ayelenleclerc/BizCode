@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "muteableTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "mutedTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "mutedTypes",
+        "muteableTypes"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "PushPreferencesEnvelope",
+  "type": "object"
+}

@@ -10,7 +10,21 @@
     "clientes": "Clientes",
     "pedidos": "Pedidos",
     "catalogo": "Catálogo",
-    "agenda": "Agenda"
+    "agenda": "Agenda",
+    "perfil": "Perfil"
+  },
+  "perfil": {
+    "title": "Perfil",
+    "pushSection": "Notificações push",
+    "enabled": "Ativa",
+    "muted": "Silenciada",
+    "pushTypes": {
+      "pedido_confirmed": "Pedido aprovado",
+      "pedido_cancelled": "Pedido rejeitado",
+      "cliente_credit_alert": "Alerta de crédito do cliente",
+      "cliente_payment_received": "Pagamento do cliente",
+      "chat_message": "Mensagens do gerente"
+    }
   },
   "logout": "Sair",
   "login": {

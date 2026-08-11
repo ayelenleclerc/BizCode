@@ -63069,6 +63069,494 @@ Owner or super\_admin with users.manage may set enabled=false. When the caller h
 }
 ```
 
+### PARAMETERS /api/users/me/push-token
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/users/me/push-token`
+
+### Register Expo/device push token (#172)
+
+- **Method:** `POST`
+- **Path:** `/api/users/me/push-token`
+- **Tags:** users
+
+Upserts the caller's device push token for Expo Push delivery. Shared infrastructure for App Seller (#172) and App Driver (#165).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`token` (required)**
+
+  `string`
+
+- **`platform`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "platform": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Token registered
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`token` (required)**
+
+    `string`
+
+  - **`platform`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "",
+    "platform": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Unregister Expo/device push token (#172)
+
+- **Method:** `DELETE`
+- **Path:** `/api/users/me/push-token`
+- **Tags:** users
+
+Deletes the caller's push token (logout / rotation).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`token` (required)**
+
+  `string`
+
+- **`platform`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "platform": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Token deleted count
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`deleted` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "deleted": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/users/me/push-preferences
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/users/me/push-preferences`
+
+### Get mute preferences for mobile push (#172)
+
+- **Method:** `GET`
+- **Path:** `/api/users/me/push-preferences`
+- **Tags:** users
+
+#### Responses
+
+##### Status: 200 Mute preferences
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`muteableTypes` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`mutedTypes` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mutedTypes": [
+      ""
+    ],
+    "muteableTypes": [
+      ""
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update mute preferences for mobile push (#172)
+
+- **Method:** `PUT`
+- **Path:** `/api/users/me/push-preferences`
+- **Tags:** users
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`mutedTypes` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"pedido_confirmed", "pedido_cancelled", "cliente_credit_alert", "cliente_payment_received", "chat_message"`
+
+**Example:**
+
+```json
+{
+  "mutedTypes": [
+    "pedido_confirmed"
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated mute preferences
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`muteableTypes` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`mutedTypes` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mutedTypes": [
+      ""
+    ],
+    "muteableTypes": [
+      ""
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/auth/change-password
 
 - **Method:** `PARAMETERS`
@@ -130818,6 +131306,152 @@ Originating invoice header (selected columns)
     ],
     "createdAt": "",
     "updatedAt": ""
+  }
+}
+```
+
+### PushTokenRegisterInput
+
+- **Type:**`object`
+
+* **`token` (required)**
+
+  `string`
+
+* **`platform`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "platform": ""
+}
+```
+
+### PushTokenEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`token` (required)**
+
+    `string`
+
+  - **`platform`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "",
+    "platform": ""
+  }
+}
+```
+
+### PushTokenDeleteEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`deleted` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "deleted": 0
+  }
+}
+```
+
+### PushPreferencesInput
+
+- **Type:**`object`
+
+* **`mutedTypes` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"pedido_confirmed", "pedido_cancelled", "cliente_credit_alert", "cliente_payment_received", "chat_message"`
+
+**Example:**
+
+```json
+{
+  "mutedTypes": [
+    "pedido_confirmed"
+  ]
+}
+```
+
+### PushPreferencesEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`muteableTypes` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`mutedTypes` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "mutedTypes": [
+      ""
+    ],
+    "muteableTypes": [
+      ""
+    ]
   }
 }
 ```

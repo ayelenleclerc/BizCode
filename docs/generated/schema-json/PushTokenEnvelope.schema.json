@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "platform": {
+          "nullable": true,
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "token"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "PushTokenEnvelope",
+  "type": "object"
+}

@@ -10,7 +10,8 @@ BizCode usa **pnpm workspaces** y **Turborepo** (#154):
 |------|-----|
 | `apps/web/` | Frontend React + Vite |
 | `apps/server/` | API Express |
-| `apps/seller/` | Expo (React Native) App Vendedor — ventas en campo (#167–#171) |
+| `apps/seller/` | Expo (React Native) App Vendedor — ventas en campo (#167–#172) |
+
 | `packages/types/` | Tipos TypeScript y contratos RBAC compartidos |
 | `packages/api-client/` | Cliente HTTP de la API |
 | `prisma/` | Esquema y migraciones (raíz del repo) |
@@ -26,7 +27,7 @@ Opcional en `.env` para la app web:
 
 - `VITE_API_URL` — base completa de la API incluyendo `/api` (p. ej. `http://localhost:3001/api`)
 
-### App Vendedor (`apps/seller`, #167–#171)
+### App Vendedor (`apps/seller`, #167–#172)
 
 App Expo SDK con Expo Router. La UI usa React Native Paper (`@bizcode/ui` queda diferido a #157). Auth en modo **Bearer dual**: la API sigue seteando cookies HttpOnly para web y además devuelve `accessToken` / `refreshToken` / `expiresIn` en el body de login y refresh. La app seller guarda esos tokens en **expo-secure-store** (nunca AsyncStorage) y envía `Authorization: Bearer` más `x-bizcode-channel: field`.
 
@@ -39,6 +40,8 @@ Roles permitidos: `seller`, `manager`, `owner`. Otros roles ven una pantalla acc
 **Agenda / Mi Ruta Hoy (#170 + #267):** pestaña `/agenda` es **Mi Ruta Hoy**: `GET/POST /api/rutas`, reordenar/reemplazar paradas, `PATCH` estado (`visitado` → `/(app)/pedidos/nuevo?clienteId=` y crea/actualiza `VisitaVendedor`; `postergado` → próximo día sin `Feriado`; `no_visitado` + motivo). Banner de feriado vía `GET /api/feriados?fecha=`. Pines de mapa (`react-native-maps`) solo si hay `Cliente.latitud`/`longitud` (sin geocoder). Outbox offline ampliada a mutaciones de ruta. Managers ven progreso en web `/visitas` (`GET /api/rutas/:id/stats`, polling 60s) y asignan `VendedorZona`. Seed feriados AR: `npm run feriados:seed-ar`.
 
 **Modo offline (#171):** tras login (online), hydrate del día a `expo-sqlite` (clientes, artículos, rubros, agenda/ruta, feriados del día, pedidos recientes) con metadatos MMKV (`cacheDay`; fallback en memoria si MMKV nativo no está). Sin señal, listas/ficha/catálogo/ruta/confirmación de pedido leen SQLite y encolan escrituras (pedidos + visitas + rutas) en outbox FIFO vaciada por NetInfo al reconectar. Banner con fecha offline y pendientes. Invalidación al cambiar el día local. Objetivo principal nativo Expo; el mapa puede requerir development build.
+
+**Notificaciones push (#172):** tras autenticarse la app pide permiso, obtiene el token Expo y lo registra con `POST /api/users/me/push-token` (se borra al logout). El backend envía Expo Push en confirm/cancel de pedido (al `vendedorId`), alertas de crédito / pagos de cliente (sellers por `VendedorZona` + pedidos recientes) y chat. La pestaña Perfil `/perfil` silencia tipos con `GET/PUT /api/users/me/push-preferences`. El tap abre pedido o cliente. Infra compartida para App Driver (#165). Entrega física requiere build nativo; CI cubre API + unit tests del sender.
 
 Cadenas de UI con **i18next** (EN / ES / pt-BR) y `expo-localization` para el idioma del dispositivo.
 

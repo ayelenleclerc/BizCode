@@ -6,6 +6,7 @@ import { facturaBodySchema, facturaPrintBodySchema, facturaVoidBodySchema } from
 import type { FacturaInput, FacturaPrintInput } from '@bizcode/types'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import { dispatchNotification } from '../channels'
+import { notifySellersForCliente } from '../services/sellerPushTargets'
 import type { RestRouteContext } from './restRouteTypes'
 import { planErrorBody, TenantPlanService } from '../services/TenantPlanService'
 import {
@@ -79,6 +80,18 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
             amount: String(updatedCliente.balance),
             limit: String(updatedCliente.creditLimit),
           }).catch(() => { /* notification failure must not block the sale */ })
+          notifySellersForCliente(
+            prisma,
+            authReq.auth!.claims.tenantId,
+            updatedCliente.id,
+            'cliente_credit_alert',
+            {
+              clienteId: updatedCliente.id,
+              rsocial: updatedCliente.rsocial,
+              amount: String(updatedCliente.balance),
+              limit: String(updatedCliente.creditLimit),
+            },
+          ).catch(() => { /* seller push must not block the sale */ })
         }
         for (const alert of stockBelowMinimum) {
           dispatchNotification(prisma, authReq.auth!.claims.tenantId, 'stock_below_minimum', {

@@ -7,6 +7,7 @@ import { RetencionConstanciaService } from './RetencionConstanciaService'
 import { validateCobroRetenciones } from './RetencionCobroValidation'
 import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { TurnoCajaService } from './TurnoCajaService'
+import { notifySellersForCliente } from './sellerPushTargets'
 
 type CobroWithCliente = Prisma.CobroGetPayload<{
   include: { cliente: { select: { id: true; codigo: true; rsocial: true } } }
@@ -364,6 +365,18 @@ export class CobroService {
         /* Cash drawer posting must not fail cobro create */
       }
     }
+
+    await notifySellersForCliente(
+      this.prisma,
+      tenantId,
+      result.updatedCliente.id,
+      'cliente_payment_received',
+      {
+        clienteId: result.updatedCliente.id,
+        rsocial: result.updatedCliente.rsocial,
+        amount: result.montoBruto,
+      },
+    ).catch(() => {})
 
     return { ok: true, data: result }
   }

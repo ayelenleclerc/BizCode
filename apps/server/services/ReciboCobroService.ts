@@ -10,6 +10,7 @@ import { validateCobroRetenciones } from './RetencionCobroValidation'
 import { computeScoreChange } from './CobroService'
 import { PedidoService } from './PedidoService'
 import { TurnoCajaService } from './TurnoCajaService'
+import { notifySellersForCliente } from './sellerPushTargets'
 
 function decimalToMoneyString(value: Decimal | number): string {
   const n = typeof value === 'number' ? value : value.toNumber()
@@ -544,6 +545,12 @@ export class ReciboCobroService {
     } catch {
       /* Pedido collect sync must not fail recibo create */
     }
+
+    await notifySellersForCliente(this.prisma, tenantId, clienteId, 'cliente_payment_received', {
+      clienteId,
+      rsocial: created.cliente.rsocial,
+      amount: decimalToMoneyString(created.totalCobrado),
+    }).catch(() => {})
 
     return { ok: true, data: mapRecibo(created) }
   }

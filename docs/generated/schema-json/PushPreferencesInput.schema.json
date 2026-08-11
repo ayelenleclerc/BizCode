@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "mutedTypes": {
+      "items": {
+        "enum": [
+          "pedido_confirmed",
+          "pedido_cancelled",
+          "cliente_credit_alert",
+          "cliente_payment_received",
+          "chat_message"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "mutedTypes"
+  ],
+  "title": "PushPreferencesInput",
+  "type": "object"
+}

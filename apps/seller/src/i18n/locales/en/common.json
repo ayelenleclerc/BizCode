@@ -10,7 +10,21 @@
     "clientes": "Customers",
     "pedidos": "Orders",
     "catalogo": "Catalog",
-    "agenda": "Agenda"
+    "agenda": "Agenda",
+    "perfil": "Profile"
+  },
+  "perfil": {
+    "title": "Profile",
+    "pushSection": "Push notifications",
+    "enabled": "On",
+    "muted": "Muted",
+    "pushTypes": {
+      "pedido_confirmed": "Order approved",
+      "pedido_cancelled": "Order rejected",
+      "cliente_credit_alert": "Customer credit alert",
+      "cliente_payment_received": "Customer payment",
+      "chat_message": "Manager messages"
+    }
   },
   "logout": "Sign out",
   "login": {

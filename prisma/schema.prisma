@@ -1721,6 +1721,8 @@ model Tenant {
   users                            AppUser[]
   auditEvents                      AuditEvent[]
   notifications                    Notification[]
+  devicePushTokens                 DevicePushToken[]
+  pushNotificationPreferences      PushNotificationPreference[]
   deliveryZones                    DeliveryZone[]
   chatMessages                     ChatMessage[]
   clientes                         Cliente[]
@@ -2629,6 +2631,8 @@ model AppUser {
   mfaBackupCodes                 AppMfaBackupCode[]
   auditEvents                    AuditEvent[]
   notifications                  Notification[]
+  devicePushTokens               DevicePushToken[]
+  pushNotificationPreference     PushNotificationPreference?
   chatMessagesSent               ChatMessage[]              @relation("ChatMessageSender")
   chatMessagesReceived           ChatMessage[]              @relation("ChatMessageRecipient")
   ordenesEntregaDriver           OrdenEntrega[]             @relation("OrdenEntregaDriver")
@@ -3420,6 +3424,40 @@ model Notification {
 
   @@index([userId, readAt])
   @@index([tenantId, createdAt])
+}
+
+/// @en Expo/device push token for mobile apps (#172; shared with #165).
+/// @es Token Expo/dispositivo para apps móviles (#172; compartido con #165).
+/// @pt-BR Token Expo/dispositivo para apps móveis (#172; compartilhado com #165).
+model DevicePushToken {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  userId    Int
+  user      AppUser  @relation(fields: [userId], references: [id])
+  token     String   @db.VarChar(255)
+  platform  String?  @db.VarChar(20)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([token])
+  @@index([tenantId, userId])
+}
+
+/// @en Per-user muted push notification types (#172).
+/// @es Tipos de push silenciados por usuario (#172).
+/// @pt-BR Tipos de push silenciados por usuário (#172).
+model PushNotificationPreference {
+  id         Int      @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  userId     Int      @unique
+  user       AppUser  @relation(fields: [userId], references: [id])
+  mutedTypes String[] @default([])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([tenantId, userId])
 }
 
 model ChatMessage {

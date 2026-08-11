@@ -11,6 +11,7 @@ import {
 } from '../lib/pedidoStateMachine'
 import { FacturaService } from './FacturaService'
 import type { ServiceResult } from './serviceResults'
+import { createNotification } from '../notifications'
 
 const pedidoInclude = {
   cliente: { select: { id: true, codigo: true, rsocial: true, condIva: true } },
@@ -359,7 +360,11 @@ export class PedidoService {
   }
 
   async confirm(tenantId: number, id: number): Promise<ServiceResult<PedidoRow>> {
-    return this.applySimpleTransition(tenantId, id, 'confirm')
+    const result = await this.applySimpleTransition(tenantId, id, 'confirm')
+    if (result.ok) {
+      await this.notifySellerPedidoTransition(tenantId, result.data, 'pedido_confirmed').catch(() => {})
+    }
+    return result
   }
 
   async pack(tenantId: number, id: number): Promise<ServiceResult<PedidoRow>> {
@@ -611,7 +616,34 @@ export class PedidoService {
       }
       return { ok: false, status: 409, error: 'INVALID_STATE_TRANSITION' }
     }
-    return this.applySimpleTransition(tenantId, id, 'cancel')
+    return this.applySimpleTransition(tenantId, id, 'cancel').then(async (result) => {
+      if (result.ok) {
+        await this.notifySellerPedidoTransition(tenantId, result.data, 'pedido_cancelled').catch(
+          () => {},
+        )
+      }
+      return result
+    })
+  }
+
+  /**
+   * @en Notifies the pedido seller via in-app + push after confirm/cancel (#172).
+   * @es Notifica al vendedor del pedido vía in-app + push tras confirm/cancel (#172).
+   * @pt-BR Notifica o vendedor do pedido via in-app + push após confirm/cancel (#172).
+   */
+  private async notifySellerPedidoTransition(
+    tenantId: number,
+    pedido: PedidoRow,
+    type: 'pedido_confirmed' | 'pedido_cancelled',
+  ): Promise<void> {
+    if (pedido.vendedorId == null) {
+      return
+    }
+    await createNotification(this.prisma, tenantId, pedido.vendedorId, type, {
+      pedidoId: pedido.id,
+      clienteId: pedido.clienteId,
+      rsocial: pedido.cliente.rsocial,
+    })
   }
 }
 
