@@ -111,6 +111,12 @@ CREATE TABLE IF NOT EXISTS ultimo_pedido_repeat_cache (
   json TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS sugerencias_pedido_cache (
+  cliente_id INTEGER PRIMARY KEY NOT NULL,
+  json TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
 `
 
 /**

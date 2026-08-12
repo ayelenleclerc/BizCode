@@ -1644,6 +1644,56 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/clientes/{id}/sugerencias-pedido:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [pedidos]
+      summary: Habituales + active offers suggestions for a customer
+      description: |
+        Ranks the most frequent SKUs from non-cancelled pedidos in the last ~6 months and
+        lists active ArticuloOferta rows not already in habituales (#254). Requires
+        `orders.create` or `customers.manage`. Results may be cached for 1 hour.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Suggestions payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SugerenciasPedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/clientes/{id}/plantillas-pedido:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -23395,6 +23445,108 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/PedidoPrefill'
+
+    SugerenciasPedidoSource:
+      type: string
+      enum: [historial, ultimo_pedido, vacio]
+
+    SugerenciaOrigenPrecio:
+      type: string
+      enum: [lista, oferta]
+
+    SugerenciaHabitual:
+      type: object
+      required:
+        - articuloId
+        - descripcion
+        - cantidadSugerida
+        - diasDesdeUltima
+        - frecuenciaDias
+        - anomalia
+        - precio
+        - stock
+        - condIva
+        - origenPrecio
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        descripcion:
+          type: string
+        cantidadSugerida:
+          type: number
+        diasDesdeUltima:
+          type: integer
+          minimum: 0
+        frecuenciaDias:
+          type: number
+          nullable: true
+        anomalia:
+          type: boolean
+        precio:
+          type: number
+        stock:
+          type: number
+        condIva:
+          type: string
+        origenPrecio:
+          $ref: '#/components/schemas/SugerenciaOrigenPrecio'
+
+    SugerenciaOferta:
+      type: object
+      required:
+        - articuloId
+        - descripcion
+        - precioOferta
+        - precioLista
+        - descuentoPct
+        - stock
+        - condIva
+        - vigenciaHasta
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        descripcion:
+          type: string
+        precioOferta:
+          type: number
+        precioLista:
+          type: number
+        descuentoPct:
+          type: number
+        stock:
+          type: number
+        condIva:
+          type: string
+        vigenciaHasta:
+          type: string
+          format: date-time
+
+    SugerenciasPedido:
+      type: object
+      required: [source, habituales, ofertas]
+      properties:
+        source:
+          $ref: '#/components/schemas/SugerenciasPedidoSource'
+        habituales:
+          type: array
+          items:
+            $ref: '#/components/schemas/SugerenciaHabitual'
+        ofertas:
+          type: array
+          items:
+            $ref: '#/components/schemas/SugerenciaOferta'
+
+    SugerenciasPedidoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SugerenciasPedido'
 
     PlantillaPedidoItem:
       type: object

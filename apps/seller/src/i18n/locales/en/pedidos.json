@@ -47,5 +47,16 @@
   "omittedItems": "{{count}} unavailable items were omitted.",
   "saveAsTemplate": "Save cart as template",
   "templateName": "Template name",
-  "saveTemplate": "Save"
+  "saveTemplate": "Save",
+  "suggestions": {
+    "habitualesTitle": "Usual items",
+    "ofertasTitle": "Active offers",
+    "empty": "No suggestions for this customer yet.",
+    "agoDays": "{{count}}d ago",
+    "anomaly": "Longer than usual",
+    "suggestedQty": "Suggested qty {{count}}",
+    "discount": "-{{pct}}%",
+    "addSuggested": "Add suggested quantity",
+    "searchOthers": "Search other articles"
+  }
 }

@@ -1,4 +1,4 @@
-import { articulosAPI, pedidosAPI, plantillasPedidoAPI, rubrosAPI, sellerAlertsAPI, visitasAPI } from '../api/sellerApi'
+import { articulosAPI, pedidosAPI, plantillasPedidoAPI, rubrosAPI, sellerAlertsAPI, sugerenciasPedidoAPI, visitasAPI } from '../api/sellerApi'
 import { sellerHttp } from '../api/http'
 import { getOfflineDb } from './db'
 import { localYmd } from './localYmd'
@@ -12,6 +12,7 @@ import {
   upsertSellerPolicies,
   upsertStockSnapshot,
   upsertPlantillaPedido,
+  upsertSugerenciasPedido,
   upsertUltimoPedidoRepeat,
   upsertVisita,
 } from './repos'
@@ -51,6 +52,7 @@ export async function hydrateOfflineCache(opts?: {
     estadoCredito: 0,
     stockItems: 0,
     plantillas: 0,
+    sugerencias: 0,
   }
 
   for (let page = 0; page < MAX_CLIENT_PAGES; page++) {
@@ -140,6 +142,13 @@ export async function hydrateOfflineCache(opts?: {
       await upsertUltimoPedidoRepeat(db, clienteId, prefill as unknown as Record<string, unknown>)
     } catch {
       // no last order is fine
+    }
+    try {
+      const sug = await sugerenciasPedidoAPI.get(clienteId)
+      await upsertSugerenciasPedido(db, clienteId, sug as unknown as Record<string, unknown>)
+      stats.sugerencias += 1
+    } catch {
+      // best-effort suggestions
     }
   }
 

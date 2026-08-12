@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "condIva": {
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "descuentoPct": {
+      "type": "number"
+    },
+    "precioLista": {
+      "type": "number"
+    },
+    "precioOferta": {
+      "type": "number"
+    },
+    "stock": {
+      "type": "number"
+    },
+    "vigenciaHasta": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "articuloId",
+    "descripcion",
+    "precioOferta",
+    "precioLista",
+    "descuentoPct",
+    "stock",
+    "condIva",
+    "vigenciaHasta"
+  ],
+  "title": "SugerenciaOferta",
+  "type": "object"
+}

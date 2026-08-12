@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "anomalia": {
+      "type": "boolean"
+    },
+    "articuloId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "cantidadSugerida": {
+      "type": "number"
+    },
+    "condIva": {
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "diasDesdeUltima": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "frecuenciaDias": {
+      "nullable": true,
+      "type": "number"
+    },
+    "origenPrecio": {
+      "$ref": "./SugerenciaOrigenPrecio.schema.json"
+    },
+    "precio": {
+      "type": "number"
+    },
+    "stock": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "articuloId",
+    "descripcion",
+    "cantidadSugerida",
+    "diasDesdeUltima",
+    "frecuenciaDias",
+    "anomalia",
+    "precio",
+    "stock",
+    "condIva",
+    "origenPrecio"
+  ],
+  "title": "SugerenciaHabitual",
+  "type": "object"
+}

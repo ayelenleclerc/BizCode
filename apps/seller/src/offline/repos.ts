@@ -400,3 +400,34 @@ export async function getUltimoPedidoRepeatLocal(
   return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
 }
 
+/**
+ * @en Upserts order suggestions for offline check mode (#254).
+ * @es Guarda sugerencias de pedido en cache offline (#254).
+ * @pt-BR Salva sugestões de pedido no cache offline (#254).
+ */
+export async function upsertSugerenciasPedido(
+  db: SQLiteDatabase,
+  clienteId: number,
+  data: Record<string, unknown>,
+): Promise<void> {
+  if (!Number.isInteger(clienteId) || clienteId < 1) return
+  await db.runAsync(
+    `INSERT INTO sugerencias_pedido_cache (cliente_id, json, updated_at) VALUES (?, ?, ?)
+     ON CONFLICT(cliente_id) DO UPDATE SET json=excluded.json, updated_at=excluded.updated_at`,
+    clienteId,
+    JSON.stringify(data),
+    now(),
+  )
+}
+
+export async function getSugerenciasPedidoLocal(
+  db: SQLiteDatabase,
+  clienteId: number,
+): Promise<Record<string, unknown> | null> {
+  const row = await db.getFirstAsync<{ json: string }>(
+    'SELECT json FROM sugerencias_pedido_cache WHERE cliente_id = ?',
+    clienteId,
+  )
+  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+}
+

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "habituales": {
+      "items": {
+        "$ref": "./SugerenciaHabitual.schema.json"
+      },
+      "type": "array"
+    },
+    "ofertas": {
+      "items": {
+        "$ref": "./SugerenciaOferta.schema.json"
+      },
+      "type": "array"
+    },
+    "source": {
+      "$ref": "./SugerenciasPedidoSource.schema.json"
+    }
+  },
+  "required": [
+    "source",
+    "habituales",
+    "ofertas"
+  ],
+  "title": "SugerenciasPedido",
+  "type": "object"
+}
