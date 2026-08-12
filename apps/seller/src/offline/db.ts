@@ -77,6 +77,26 @@ CREATE TABLE IF NOT EXISTS id_map (
   server_id INTEGER NOT NULL,
   PRIMARY KEY (entity, local_id)
 );
+
+CREATE TABLE IF NOT EXISTS estado_credito_cache (
+  cliente_id INTEGER PRIMARY KEY NOT NULL,
+  json TEXT NOT NULL,
+  as_of TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS stock_snapshot (
+  id INTEGER PRIMARY KEY NOT NULL CHECK (id = 1),
+  json TEXT NOT NULL,
+  as_of TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS seller_policies_cache (
+  id INTEGER PRIMARY KEY NOT NULL CHECK (id = 1),
+  json TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
 `
 
 /**

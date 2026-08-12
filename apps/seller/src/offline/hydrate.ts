@@ -1,4 +1,4 @@
-import { articulosAPI, pedidosAPI, rubrosAPI, visitasAPI } from '../api/sellerApi'
+import { articulosAPI, pedidosAPI, rubrosAPI, sellerAlertsAPI, visitasAPI } from '../api/sellerApi'
 import { sellerHttp } from '../api/http'
 import { getOfflineDb } from './db'
 import { localYmd } from './localYmd'
@@ -6,8 +6,11 @@ import { offlineMeta } from './meta'
 import {
   upsertArticulo,
   upsertCliente,
+  upsertEstadoCredito,
   upsertPedidoCache,
   upsertRubro,
+  upsertSellerPolicies,
+  upsertStockSnapshot,
   upsertVisita,
 } from './repos'
 import type { OfflineHydrateStats } from './types'
@@ -16,6 +19,7 @@ const PAGE = 500
 const MAX_CLIENT_PAGES = 4
 const MAX_ARTICULO_PAGES = 8
 const PEDIDOS_PER_AGENDA_CLIENT = 5
+const STOCK_CHUNK = 100
 
 type Paginated<T> = {
   success: boolean
@@ -42,6 +46,8 @@ export async function hydrateOfflineCache(opts?: {
     rubros: 0,
     visitas: 0,
     pedidos: 0,
+    estadoCredito: 0,
+    stockItems: 0,
   }
 
   for (let page = 0; page < MAX_CLIENT_PAGES; page++) {
@@ -56,12 +62,14 @@ export async function hydrateOfflineCache(opts?: {
     if (rows.length < PAGE) break
   }
 
+  const articuloIds: number[] = []
   for (let page = 0; page < MAX_ARTICULO_PAGES; page++) {
     const rows = await articulosAPI.list('', { limit: PAGE, offset: page * PAGE })
     const list = Array.isArray(rows) ? rows : []
     for (const a of list) {
       await upsertArticulo(db, a as unknown as Record<string, unknown>)
       stats.articulos += 1
+      if (typeof a.id === 'number') articuloIds.push(a.id)
     }
     if (list.length < PAGE) break
   }
@@ -98,6 +106,40 @@ export async function hydrateOfflineCache(opts?: {
     } catch {
       // best-effort: agenda clients may lack pedidos permission edge cases
     }
+  }
+
+  try {
+    const policies = await sellerAlertsAPI.getSellerPolicies()
+    await upsertSellerPolicies(db, policies as unknown as Record<string, unknown>)
+  } catch {
+    // policies optional for offline
+  }
+
+  for (const clienteId of clienteIds) {
+    try {
+      const credit = await sellerAlertsAPI.getEstadoCredito(clienteId)
+      await upsertEstadoCredito(db, clienteId, credit as unknown as Record<string, unknown>)
+      stats.estadoCredito += 1
+    } catch {
+      // best-effort per cliente
+    }
+  }
+
+  const stockItems: unknown[] = []
+  let stockAsOf = new Date().toISOString()
+  for (let i = 0; i < articuloIds.length; i += STOCK_CHUNK) {
+    const chunk = articuloIds.slice(i, i + STOCK_CHUNK)
+    try {
+      const snap = await sellerAlertsAPI.getStockMultiple(chunk)
+      stockAsOf = snap.asOf
+      stockItems.push(...snap.items)
+      stats.stockItems += snap.items.length
+    } catch {
+      // best-effort chunk
+    }
+  }
+  if (stockItems.length > 0) {
+    await upsertStockSnapshot(db, { asOf: stockAsOf, items: stockItems })
   }
 
   offlineMeta.setCacheDay(fecha)

@@ -2865,6 +2865,25 @@ export const alertaProveedorConfigBodySchema = z
     }
   })
 
+const sellerAlertActionSchema = z.enum(['warn', 'block'])
+
+/** @en Partial TenantConfig seller alert policies patch (#256). */
+export const sellerPoliciesPatchBodySchema = z
+  .object({
+    sellerCreditOverLimitAction: sellerAlertActionSchema.optional(),
+    sellerCreditOverdueAction: sellerAlertActionSchema.optional(),
+    sellerStockZeroAction: sellerAlertActionSchema.optional(),
+    sellerStockCapQtyToAvailable: z.boolean().optional(),
+  })
+  .refine(
+    (data) =>
+      data.sellerCreditOverLimitAction !== undefined ||
+      data.sellerCreditOverdueAction !== undefined ||
+      data.sellerStockZeroAction !== undefined ||
+      data.sellerStockCapQtyToAvailable !== undefined,
+    { message: 'At least one seller policy field is required' },
+  )
+
 const regimenTipoSchema = z.enum(['ganancias', 'iva', 'iibb'])
 const regimenSubtipoSchema = z.enum(['retencion', 'percepcion'])
 

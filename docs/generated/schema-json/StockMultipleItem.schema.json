@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "estado": {
+      "$ref": "./SellerStockEstado.schema.json"
+    },
+    "stock": {
+      "type": "number"
+    },
+    "stockMin": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "articuloId",
+    "stock",
+    "stockMin",
+    "estado"
+  ],
+  "title": "StockMultipleItem",
+  "type": "object"
+}

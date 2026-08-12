@@ -25,7 +25,16 @@
   "successTitle": "Pedido #{{id}} confirmado",
   "viewDetail": "Ver pedido",
   "stockWarning": "Uma ou mais linhas excedem o estoque. Você ainda pode confirmar.",
+  "stockWarningBlock": "Há linhas sem estoque. A política do tenant bloqueia confirmar o pedido.",
+  "stockStatus": {
+    "ok": "Estoque OK",
+    "bajo": "Estoque baixo",
+    "cero": "Sem estoque"
+  },
+  "stockAsOf": "Estoque em {{when}}",
   "creditWarning": "O total excede o crédito disponível ({{available}}).",
+  "creditWarningBlock": "Crédito insuficiente. A política do tenant bloqueia confirmar o pedido.",
+  "confirmBlocked": "A confirmação está bloqueada pela política de alerta.",
   "suspendedBanner": "Este cliente está suspenso e não pode receber novos pedidos.",
   "missingCliente": "Cliente ausente. Comece pela ficha do cliente.",
   "listEmpty": "Ainda não há pedidos",

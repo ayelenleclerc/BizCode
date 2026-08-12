@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "asOf": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "deudaTotal": {
+      "type": "string"
+    },
+    "deudaVencida": {
+      "type": "string"
+    },
+    "diasMoraMax": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "disponible": {
+      "nullable": true,
+      "type": "string"
+    },
+    "facturasPendientes": {
+      "items": {
+        "$ref": "./EstadoCreditoFacturaPendiente.schema.json"
+      },
+      "type": "array"
+    },
+    "limiteCredito": {
+      "nullable": true,
+      "type": "string"
+    },
+    "nivel": {
+      "$ref": "./SellerCreditNivel.schema.json"
+    }
+  },
+  "required": [
+    "deudaTotal",
+    "deudaVencida",
+    "limiteCredito",
+    "disponible",
+    "diasMoraMax",
+    "nivel",
+    "facturasPendientes",
+    "asOf"
+  ],
+  "title": "EstadoCredito",
+  "type": "object"
+}

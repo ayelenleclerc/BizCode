@@ -43,6 +43,8 @@ Roles permitidos: `seller`, `manager`, `owner`. Otros roles ven una pantalla acc
 
 **Notificaciones push (#172):** tras autenticarse la app pide permiso, obtiene el token Expo y lo registra con `POST /api/users/me/push-token` (se borra al logout). El backend envía Expo Push en confirm/cancel de pedido (al `vendedorId`), alertas de crédito / pagos de cliente (sellers por `VendedorZona` + pedidos recientes) y chat. La pestaña Perfil `/perfil` silencia tipos con `GET/PUT /api/users/me/push-preferences`. El tap abre pedido o cliente. Infra compartida para App Driver (#165). Entrega física requiere build nativo; CI cubre API + unit tests del sender.
 
+**Alertas de deuda/stock (#256):** políticas Seller en `TenantConfig` (defaults: sobre límite `block`, vencida `warn`, stock cero `warn`, tope de cantidad al stock). El Seller lee `GET /api/tenant-config/seller-policies` (`orders.create`); owner/manager patch con `settings.business.manage` o `users.manage`. La ficha abre diálogo desde `GET /api/clientes/:id/estado-credito` (niveles `ok`/`amarillo`/`naranja`/`rojo`). El carrito usa `GET /api/articulos/stock-multiple?ids=` para colores y tope; el resumen puede bloquear confirm. El hydrate offline cachea crédito/stock/políticas con banner `asOf`. Sin cobros in-app ni aprobación manager.
+
 Cadenas de UI con **i18next** (EN / ES / pt-BR) y `expo-localization` para el idioma del dispositivo.
 
 ```bash

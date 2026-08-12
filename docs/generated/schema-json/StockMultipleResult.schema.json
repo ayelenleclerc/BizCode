@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "asOf": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "./StockMultipleItem.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "asOf",
+    "items"
+  ],
+  "title": "StockMultipleResult",
+  "type": "object"
+}

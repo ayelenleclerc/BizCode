@@ -1,0 +1,15 @@
+# Untitled number in StockMultipleItem Schema
+
+```txt
+undefined#/properties/stockMin
+```
+
+
+
+| Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                             |
+| :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [StockMultipleItem.schema.json\*](../schema-json/StockMultipleItem.schema.json "open original schema") |
+
+## stockMin Type
+
+`number`

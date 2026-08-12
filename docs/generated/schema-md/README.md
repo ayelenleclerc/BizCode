@@ -362,6 +362,12 @@
 
 * [EmpresaInput](./empresainput.md) – `-`
 
+* [EstadoCredito](./estadocredito.md) – `-`
+
+* [EstadoCreditoEnvelope](./estadocreditoenvelope.md) – `-`
+
+* [EstadoCreditoFacturaPendiente](./estadocreditofacturapendiente.md) – `-`
+
 * [Factura](./factura.md) – `-`
 
 * [FacturaEnvelope](./facturaenvelope.md) – `-`
@@ -1154,6 +1160,18 @@
 
 * [RutaStatsEnvelope](./rutastatsenvelope.md) – `-`
 
+* [SellerAlertAction](./selleralertaction.md) – `-`
+
+* [SellerCreditNivel](./sellercreditnivel.md) – `-`
+
+* [SellerPolicies](./sellerpolicies.md) – `-`
+
+* [SellerPoliciesEnvelope](./sellerpoliciesenvelope.md) – `-`
+
+* [SellerPoliciesPatchBody](./sellerpoliciespatchbody.md) – `-`
+
+* [SellerStockEstado](./sellerstockestado.md) – `-`
+
 * [SetupOwnerEnvelope](./setupownerenvelope.md) – `-`
 
 * [SetupOwnerInput](./setupownerinput.md) – `-`
@@ -1187,6 +1205,12 @@
 * [StockCriticoRow](./stockcriticorow.md) – `-`
 
 * [StockDeposito](./stockdeposito.md) – `-`
+
+* [StockMultipleEnvelope](./stockmultipleenvelope.md) – `-`
+
+* [StockMultipleItem](./stockmultipleitem.md) – `-`
+
+* [StockMultipleResult](./stockmultipleresult.md) – `-`
 
 * [SuperadminGlobalStats](./superadminglobalstats.md) – `-`
 
@@ -1850,6 +1874,8 @@
 
 * [Untitled array in EcommerceSyncLogListEnvelope](./ecommercesyncloglistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
+* [Untitled array in EstadoCredito](./estadocredito-properties-facturaspendientes.md) – `undefined#/properties/facturasPendientes`
+
 * [Untitled array in Factura](./factura-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in FacturaInput](./facturainput-properties-items.md) – `undefined#/properties/items`
@@ -2107,6 +2133,8 @@
 * [Untitled array in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in StockCriticoListEnvelope](./stockcriticolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in StockMultipleResult](./stockmultipleresult-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in SuperadminSecurityEventsEnvelope](./superadminsecurityeventsenvelope-properties-data.md) – `undefined#/properties/data`
 
