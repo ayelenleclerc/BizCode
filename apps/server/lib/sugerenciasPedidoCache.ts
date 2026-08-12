@@ -10,6 +10,15 @@ function cacheKey(tenantId: number, clienteId: number): string {
 }
 
 /**
+ * @en Prefer in-process memory during API test bypass so Redis does not leak across cases.
+ * @es En bypass de tests API usa solo memoria para que Redis no contamine casos.
+ * @pt-BR No bypass de testes da API usa só memória para o Redis não contaminar casos.
+ */
+function preferMemoryCacheInTests(): boolean {
+  return process.env.BIZCODE_TEST_AUTH_BYPASS === 'true'
+}
+
+/**
  * @en Reads cached suggestions JSON (Redis when available, else process memory).
  * @es Lee JSON de sugerencias cacheado (Redis si hay, si no memoria del proceso).
  * @pt-BR Lê JSON de sugestões em cache (Redis se houver, senão memória do processo).
@@ -19,7 +28,7 @@ export async function getSugerenciasCache(
   clienteId: number,
 ): Promise<string | null> {
   const key = cacheKey(tenantId, clienteId)
-  const redis = getSharedRedisClient()
+  const redis = preferMemoryCacheInTests() ? null : getSharedRedisClient()
   if (redis) {
     try {
       if (redis.status !== 'ready') {
@@ -51,7 +60,7 @@ export async function setSugerenciasCache(
   payload: string,
 ): Promise<void> {
   const key = cacheKey(tenantId, clienteId)
-  const redis = getSharedRedisClient()
+  const redis = preferMemoryCacheInTests() ? null : getSharedRedisClient()
   if (redis) {
     try {
       if (redis.status !== 'ready') {
@@ -70,10 +79,23 @@ export async function setSugerenciasCache(
 }
 
 /**
- * @en Clears in-process suggestion cache (unit tests).
- * @es Limpia el cache en memoria de sugerencias (tests).
- * @pt-BR Limpa o cache em memória de sugestões (testes).
+ * @en Clears in-process suggestion cache (and Redis `bizcode:sug:*` when connected).
+ * @es Limpia el cache en memoria de sugerencias (y Redis `bizcode:sug:*` si hay conexión).
+ * @pt-BR Limpa o cache em memória de sugestões (e Redis `bizcode:sug:*` se conectado).
  */
-export function clearSugerenciasMemoryCache(): void {
+export async function clearSugerenciasMemoryCache(): Promise<void> {
   memory.clear()
+  const redis = getSharedRedisClient()
+  if (!redis) return
+  try {
+    if (redis.status !== 'ready') {
+      await redis.connect().catch(() => undefined)
+    }
+    const keys = await redis.keys('bizcode:sug:*')
+    if (keys.length > 0) {
+      await redis.del(...keys)
+    }
+  } catch {
+    // ignore Redis errors in tests / shutdown
+  }
 }

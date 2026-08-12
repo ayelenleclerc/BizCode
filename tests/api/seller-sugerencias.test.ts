@@ -184,12 +184,12 @@ describe('sugerenciasPedidoAlgo (#254)', () => {
 })
 
 describe('GET sugerencias-pedido (#254)', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'seller'
     process.env.BIZCODE_TEST_USER_ID = '1'
     process.env.BIZCODE_TEST_TENANT_ID = '1'
-    clearSugerenciasMemoryCache()
+    await clearSugerenciasMemoryCache()
   })
 
   it('returns habituales omitting inactive/parent and offers excluding habituals', async () => {
