@@ -37,6 +37,8 @@ export interface Cliente {
 export interface Articulo {
   id: number
   codigo: number
+  /** @en Optional barcode for seller scan (#255). @es Código de barras opcional para escaneo seller (#255). @pt-BR Código de barras opcional para leitura seller (#255). */
+  codigoBarras?: string | null
   descripcion: string
   rubroId: number
   rubro?: Rubro

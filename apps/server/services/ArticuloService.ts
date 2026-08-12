@@ -25,13 +25,18 @@ export class ArticuloService {
   }
 
   async list(tenantId: number, filtro: string, take: number, skip: number): Promise<ArticuloListResult> {
-    const where = {
-      tenantId,
-      OR: [
-        { descripcion: { contains: filtro, mode: Prisma.QueryMode.insensitive } },
-        { codigo: { equals: filtro ? parseInt(filtro, 10) : undefined } },
-      ],
-    }
+    const trimmed = filtro.trim()
+    const codigoNum = trimmed ? Number.parseInt(trimmed, 10) : Number.NaN
+    const where: Prisma.ArticuloWhereInput = trimmed
+      ? {
+          tenantId,
+          OR: [
+            { descripcion: { contains: trimmed, mode: Prisma.QueryMode.insensitive } },
+            ...(Number.isFinite(codigoNum) ? [{ codigo: { equals: codigoNum } }] : []),
+            { codigoBarras: { equals: trimmed } },
+          ],
+        }
+      : { tenantId }
     const [total, articulos] = await Promise.all([
       this.prisma.articulo.count({ where }),
       this.prisma.articulo.findMany({
@@ -43,6 +48,26 @@ export class ArticuloService {
       }),
     ])
     return { total, articulos }
+  }
+
+  /**
+   * @en Exact barcode lookup for sellable SKUs (seller scan #255).
+   * @es Búsqueda exacta por código de barras de SKUs vendibles (escaneo seller #255).
+   * @pt-BR Busca exata por código de barras de SKUs vendáveis (leitura seller #255).
+   */
+  async findByBarcode(tenantId: number, codigoBarras: string): Promise<ArticuloWithRubro | null> {
+    const code = ArticuloService.normalizeCodigoBarras(codigoBarras)
+    if (!code) return null
+    return this.prisma.articulo.findFirst({
+      where: {
+        tenantId,
+        codigoBarras: code,
+        activo: true,
+        esPadre: false,
+        NOT: { tipo: 'servicio' },
+      },
+      include: { rubro: true },
+    })
   }
 
   async getById(tenantId: number, id: number): Promise<ArticuloWithRubro | null> {
@@ -57,13 +82,19 @@ export class ArticuloService {
     if (!rubroCheck.ok) {
       return rubroCheck
     }
-    const normalized = ArticuloService.applyUomDefaultsForCreate(body)
+    const normalized = ArticuloService.applyUomDefaultsForCreate(
+      ArticuloService.withNormalizedBarcode(body),
+    )
     const priced = await this.applyFxPricing(tenantId, normalized)
     if (!priced.ok) return priced
-    const articulo = await this.prisma.articulo.create({
-      data: { ...priced.data, tenantId },
-    })
-    return { ok: true, data: articulo }
+    try {
+      const articulo = await this.prisma.articulo.create({
+        data: { ...priced.data, tenantId },
+      })
+      return { ok: true, data: articulo }
+    } catch (err: unknown) {
+      return ArticuloService.mapUniqueConflict(err)
+    }
   }
 
   async update(tenantId: number, id: number, body: ArticuloInput): Promise<ServiceResult<Articulo>> {
@@ -75,16 +106,52 @@ export class ArticuloService {
     if (!existing) {
       return { ok: false, status: 404, error: 'Articulo not found' }
     }
-    const normalized = ArticuloService.syncUmedidaFromUnidadBase(body)
+    const normalized = ArticuloService.syncUmedidaFromUnidadBase(
+      ArticuloService.withNormalizedBarcode(body),
+    )
     const priced = await this.applyFxPricing(tenantId, normalized)
     if (!priced.ok) return priced
-    const articulo = await this.prisma.articulo.update({
-      where: { id },
-      data: priced.data,
-    })
-    // Fire-and-forget MeLi catalog sync when an opt-in listing exists (#184).
-    void new MeliCatalogService(this.prisma).syncAfterArticuloChange(tenantId, id).catch(() => undefined)
-    return { ok: true, data: articulo }
+    try {
+      const articulo = await this.prisma.articulo.update({
+        where: { id },
+        data: priced.data,
+      })
+      // Fire-and-forget MeLi catalog sync when an opt-in listing exists (#184).
+      void new MeliCatalogService(this.prisma).syncAfterArticuloChange(tenantId, id).catch(() => undefined)
+      return { ok: true, data: articulo }
+    } catch (err: unknown) {
+      return ArticuloService.mapUniqueConflict(err)
+    }
+  }
+
+  /**
+   * @en Trims barcode; empty becomes null (#255).
+   * @es Normaliza barras; vacío → null (#255).
+   * @pt-BR Normaliza barras; vazio → null (#255).
+   */
+  static normalizeCodigoBarras(value: string | null | undefined): string | null {
+    if (value == null) return null
+    const trimmed = value.trim()
+    return trimmed.length > 0 ? trimmed.slice(0, 32) : null
+  }
+
+  private static withNormalizedBarcode(body: ArticuloInput): ArticuloInput {
+    if (body.codigoBarras === undefined) return body
+    return { ...body, codigoBarras: ArticuloService.normalizeCodigoBarras(body.codigoBarras) }
+  }
+
+  private static mapUniqueConflict(err: unknown): ServiceResult<Articulo> {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      const target = Array.isArray(err.meta?.target) ? err.meta.target.join(',') : String(err.meta?.target ?? '')
+      if (target.includes('codigoBarras')) {
+        return { ok: false, status: 409, error: 'codigoBarras already exists for this tenant' }
+      }
+      if (target.includes('codigo')) {
+        return { ok: false, status: 409, error: 'codigo already exists for this tenant' }
+      }
+      return { ok: false, status: 409, error: 'Unique constraint violation' }
+    }
+    throw err
   }
 
   /**

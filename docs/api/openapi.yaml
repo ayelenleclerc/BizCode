@@ -2043,7 +2043,13 @@ paths:
           in: query
           schema:
             type: string
-          description: Filter by code or description
+          description: Filter by code, barcode, or description
+        - name: codigoBarras
+          in: query
+          schema:
+            type: string
+            maxLength: 32
+          description: Exact barcode lookup for sellable SKUs (seller scan #255). When set, ignores q text search.
         - $ref: '#/components/parameters/ListLimit'
         - $ref: '#/components/parameters/ListOffset'
       responses:
@@ -18691,6 +18697,11 @@ components:
           type: integer
         codigo:
           type: integer
+        codigoBarras:
+          type: string
+          maxLength: 32
+          nullable: true
+          description: Optional retail/logistics barcode for seller scan (#255).
         descripcion:
           type: string
         rubroId:
@@ -18770,6 +18781,11 @@ components:
         codigo:
           type: integer
           minimum: 1
+        codigoBarras:
+          type: string
+          maxLength: 32
+          nullable: true
+          description: Optional barcode; empty string stored as null (#255).
         descripcion:
           type: string
           minLength: 3

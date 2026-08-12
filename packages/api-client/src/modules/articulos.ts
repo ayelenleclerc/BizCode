@@ -14,12 +14,26 @@ export type ArticuloListItem = Articulo & {
  */
 export function createArticulosAPI(http: AxiosInstance) {
   return {
-    list: async (filtro?: string, params?: { limit?: number; offset?: number }): Promise<ArticuloListItem[]> => {
+    list: async (
+      filtro?: string,
+      params?: { limit?: number; offset?: number; codigoBarras?: string },
+    ): Promise<ArticuloListItem[]> => {
       try {
         const response = await http.get<{ success: boolean; data: ArticuloListItem[] }>('/articulos', {
           params: { q: filtro, ...params },
         })
         return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    getByBarcode: async (codigoBarras: string): Promise<ArticuloListItem | null> => {
+      try {
+        const response = await http.get<{ success: boolean; data: ArticuloListItem[] }>('/articulos', {
+          params: { codigoBarras },
+        })
+        return response.data.data[0] ?? null
       } catch (error) {
         return handleError(error as AxiosError<ApiErrorPayload>)
       }

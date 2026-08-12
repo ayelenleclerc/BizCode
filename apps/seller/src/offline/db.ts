@@ -17,9 +17,11 @@ CREATE TABLE IF NOT EXISTS articulos (
   json TEXT NOT NULL,
   descripcion TEXT,
   codigo INTEGER,
+  codigo_barras TEXT,
   updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_articulos_desc ON articulos(descripcion);
+CREATE INDEX IF NOT EXISTS idx_articulos_barcode ON articulos(codigo_barras);
 
 CREATE TABLE IF NOT EXISTS rubros (
   id INTEGER PRIMARY KEY NOT NULL,
@@ -129,6 +131,15 @@ export async function getOfflineDb(): Promise<SQLite.SQLiteDatabase> {
     dbPromise = (async () => {
       const db = await SQLite.openDatabaseAsync('bizcode-seller-offline.db')
       await db.execAsync(SCHEMA)
+      // @en Add codigo_barras for DBs created before #255 (CREATE TABLE IF NOT EXISTS does not alter).
+      // @es Añade codigo_barras en DBs previas a #255 (CREATE TABLE IF NOT EXISTS no altera).
+      // @pt-BR Adiciona codigo_barras em DBs anteriores a #255 (CREATE TABLE IF NOT EXISTS não altera).
+      try {
+        await db.execAsync('ALTER TABLE articulos ADD COLUMN codigo_barras TEXT')
+      } catch {
+        // column already exists
+      }
+      await db.execAsync('CREATE INDEX IF NOT EXISTS idx_articulos_barcode ON articulos(codigo_barras)')
       return db
     })()
   }

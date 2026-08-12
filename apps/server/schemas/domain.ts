@@ -222,6 +222,7 @@ export const clienteBodySchema = z
 export const articuloBodySchema = z
   .object({
     codigo: z.number(),
+    codigoBarras: z.union([z.string().max(32), z.null()]).optional(),
     descripcion: z.string(),
     rubroId: z.number(),
     categoriaId: z.union([z.number().int().min(1), z.null()]).optional(),
@@ -265,6 +266,16 @@ export const articuloBodySchema = z
     const d = data.descripcion.trim()
     if (d.length < 3 || d.length > 120) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'descripcion must be a string between 3 and 120 characters', path: ['descripcion'] })
+    }
+    if (data.codigoBarras != null) {
+      const barcode = data.codigoBarras.trim()
+      if (barcode.length > 32) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'codigoBarras must be at most 32 characters',
+          path: ['codigoBarras'],
+        })
+      }
     }
     if (!Number.isInteger(data.rubroId) || data.rubroId < 1) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'rubroId must be an integer', path: ['rubroId'] })

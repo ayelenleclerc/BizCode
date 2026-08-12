@@ -8,6 +8,12 @@
       "minimum": 1,
       "type": "integer"
     },
+    "codigoBarras": {
+      "description": "Optional barcode; empty string stored as null (#255).",
+      "maxLength": 32,
+      "nullable": true,
+      "type": "string"
+    },
     "condIva": {
       "enum": [
         "1",

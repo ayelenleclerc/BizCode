@@ -48,7 +48,7 @@
   "saveAsTemplate": "Guardar carrito como plantilla",
   "templateName": "Nombre de la plantilla",
   "saveTemplate": "Guardar",
-  "suggestions": {
+    "suggestions": {
     "habitualesTitle": "Habituales",
     "ofertasTitle": "Ofertas activas",
     "empty": "Todavía no hay sugerencias para este cliente.",
@@ -58,5 +58,19 @@
     "discount": "-{{pct}}%",
     "addSuggested": "Agregar cantidad sugerida",
     "searchOthers": "Buscar otros artículos"
+  },
+  "scan": {
+    "title": "Escanear",
+    "open": "Escanear código",
+    "hint": "Apuntá al código de barras del producto",
+    "permission": "Se necesita permiso de cámara para escanear.",
+    "grantPermission": "Permitir cámara",
+    "done": "Listo",
+    "notFoundTitle": "Código no encontrado",
+    "notFound": "El código {{code}} no está en el catálogo",
+    "searchManual": "Buscar manual",
+    "scanAnother": "Escanear otro",
+    "added": "Agregado: {{name}}",
+    "addOnePref": "Sumar 1 por cada escaneo"
   }
 }

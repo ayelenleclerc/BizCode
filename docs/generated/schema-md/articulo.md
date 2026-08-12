@@ -20,6 +20,7 @@ undefined#/properties/articulo
 | :-------------------------------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------- |
 | [activo](#activo)                             | `boolean` | Optional | cannot be null | [Articulo](articulo-properties-activo.md "undefined#/properties/activo")                             |
 | [codigo](#codigo)                             | `integer` | Optional | cannot be null | [Articulo](articulo-properties-codigo.md "undefined#/properties/codigo")                             |
+| [codigoBarras](#codigobarras)                 | `string`  | Optional | cannot be null | [Articulo](articulo-properties-codigobarras.md "undefined#/properties/codigoBarras")                 |
 | [condIva](#condiva)                           | `string`  | Optional | cannot be null | [Articulo](articulo-properties-condiva.md "undefined#/properties/condIva")                           |
 | [controlLote](#controllote)                   | `boolean` | Optional | cannot be null | [Articulo](articulo-properties-controllote.md "undefined#/properties/controlLote")                   |
 | [costo](#costo)                               | `number`  | Optional | cannot be null | [Articulo](articulo-properties-costo.md "undefined#/properties/costo")                               |
@@ -80,6 +81,28 @@ undefined#/properties/articulo
 ### codigo Type
 
 `integer`
+
+## codigoBarras
+
+Optional retail/logistics barcode for seller scan (#255).
+
+`codigoBarras`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-codigobarras.md "undefined#/properties/codigoBarras")
+
+### codigoBarras Type
+
+`string`
+
+### codigoBarras Constraints
+
+**maximum length**: the maximum number of characters for this string is: `32`
 
 ## condIva
 

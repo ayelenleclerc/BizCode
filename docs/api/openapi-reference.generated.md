@@ -11354,6 +11354,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
     `integer`
 
+  - **`codigoBarras`**
+
+    `string` — Optional retail/logistics barcode for seller scan (#255).
+
   - **`condIva`**
 
     `string`
@@ -11483,6 +11487,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
     {
       "id": 1,
       "codigo": 1,
+      "codigoBarras": "",
       "descripcion": "",
       "rubroId": 1,
       "rubro": {
@@ -11637,6 +11642,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
   `string`
 
+- **`codigoBarras`**
+
+  `string` — Optional barcode; empty string stored as null (#255).
+
 - **`controlLote`**
 
   `boolean` — Lot control opt-in (#202).
@@ -11690,6 +11699,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 ```json
 {
   "codigo": 1,
+  "codigoBarras": "",
   "descripcion": "",
   "rubroId": 1,
   "condIva": "1",
@@ -11732,6 +11742,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   - **`codigo`**
 
     `integer`
+
+  - **`codigoBarras`**
+
+    `string` — Optional retail/logistics barcode for seller scan (#255).
 
   - **`condIva`**
 
@@ -11849,6 +11863,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   "data": {
     "id": 1,
     "codigo": 1,
+    "codigoBarras": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -11999,6 +12014,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   "data": {
     "id": 1,
     "codigo": 1,
+    "codigoBarras": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -12149,6 +12165,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
   `string`
 
+- **`codigoBarras`**
+
+  `string` — Optional barcode; empty string stored as null (#255).
+
 - **`controlLote`**
 
   `boolean` — Lot control opt-in (#202).
@@ -12202,6 +12222,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 ```json
 {
   "codigo": 1,
+  "codigoBarras": "",
   "descripcion": "",
   "rubroId": 1,
   "condIva": "1",
@@ -12244,6 +12265,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   - **`codigo`**
 
     `integer`
+
+  - **`codigoBarras`**
+
+    `string` — Optional retail/logistics barcode for seller scan (#255).
 
   - **`condIva`**
 
@@ -12361,6 +12386,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   "data": {
     "id": 1,
     "codigo": 1,
+    "codigoBarras": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -23728,6 +23754,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `integer`
 
+      - **`codigoBarras`**
+
+        `string` — Optional retail/logistics barcode for seller scan (#255).
+
       - **`condIva`**
 
         `string`
@@ -23962,6 +23992,7 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
           "articulo": {
             "id": 1,
             "codigo": 1,
+            "codigoBarras": "",
             "descripcion": "",
             "rubroId": 1,
             "rubro": {
@@ -24295,6 +24326,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `integer`
 
+      - **`codigoBarras`**
+
+        `string` — Optional retail/logistics barcode for seller scan (#255).
+
       - **`condIva`**
 
         `string`
@@ -24516,6 +24551,7 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
         "articulo": {
           "id": 1,
           "codigo": 1,
+          "codigoBarras": "",
           "descripcion": "",
           "rubroId": 1,
           "rubro": {
@@ -52654,6 +52690,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
           `integer`
 
+        - **`codigoBarras`**
+
+          `string` — Optional retail/logistics barcode for seller scan (#255).
+
         - **`condIva`**
 
           `string`
@@ -52940,6 +52980,7 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
           "articulo": {
             "id": 1,
             "codigo": 1,
+            "codigoBarras": "",
             "descripcion": "",
             "rubroId": 1,
             "rubro": {
@@ -104587,6 +104628,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `integer`
 
+* **`codigoBarras`**
+
+  `string` — Optional retail/logistics barcode for seller scan (#255).
+
 * **`condIva`**
 
   `string`
@@ -104697,6 +104742,7 @@ Rate-limited mutation; requires products.manage. USD only.
 {
   "id": 1,
   "codigo": 1,
+  "codigoBarras": "",
   "descripcion": "",
   "rubroId": 1,
   "rubro": {
@@ -104777,6 +104823,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`
 
+* **`codigoBarras`**
+
+  `string` — Optional barcode; empty string stored as null (#255).
+
 * **`controlLote`**
 
   `boolean` — Lot control opt-in (#202).
@@ -104830,6 +104880,7 @@ Rate-limited mutation; requires products.manage. USD only.
 ```json
 {
   "codigo": 1,
+  "codigoBarras": "",
   "descripcion": "",
   "rubroId": 1,
   "condIva": "1",
@@ -104876,6 +104927,10 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`codigo`**
 
     `integer`
+
+  - **`codigoBarras`**
+
+    `string` — Optional retail/logistics barcode for seller scan (#255).
 
   - **`condIva`**
 
@@ -104993,6 +105048,7 @@ Rate-limited mutation; requires products.manage. USD only.
   "data": {
     "id": 1,
     "codigo": 1,
+    "codigoBarras": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -105046,6 +105102,7 @@ Rate-limited mutation; requires products.manage. USD only.
   "data": {
     "id": 1,
     "codigo": 1,
+    "codigoBarras": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -109108,6 +109165,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
       `integer`
 
+    - **`codigoBarras`**
+
+      `string` — Optional retail/logistics barcode for seller scan (#255).
+
     - **`condIva`**
 
       `string`
@@ -109323,6 +109384,7 @@ Rate-limited mutation; requires products.manage. USD only.
       "articulo": {
         "id": 1,
         "codigo": 1,
+        "codigoBarras": "",
         "descripcion": "",
         "rubroId": 1,
         "rubro": {
@@ -109381,6 +109443,10 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`codigo`**
 
     `integer`
+
+  - **`codigoBarras`**
+
+    `string` — Optional retail/logistics barcode for seller scan (#255).
 
   - **`condIva`**
 
@@ -109542,6 +109608,7 @@ Rate-limited mutation; requires products.manage. USD only.
   "articulo": {
     "id": 1,
     "codigo": 1,
+    "codigoBarras": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -112357,6 +112424,10 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
 
         `integer`
 
+      - **`codigoBarras`**
+
+        `string` — Optional retail/logistics barcode for seller scan (#255).
+
       - **`condIva`**
 
         `string`
@@ -112578,6 +112649,7 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
         "articulo": {
           "id": 1,
           "codigo": 1,
+          "codigoBarras": "",
           "descripcion": "",
           "rubroId": 1,
           "rubro": {
@@ -117176,6 +117248,10 @@ Originating invoice header (selected columns)
 
         `integer`
 
+      - **`codigoBarras`**
+
+        `string` — Optional retail/logistics barcode for seller scan (#255).
+
       - **`condIva`**
 
         `string`
@@ -117456,6 +117532,7 @@ Originating invoice header (selected columns)
         "articulo": {
           "id": 1,
           "codigo": 1,
+          "codigoBarras": "",
           "descripcion": "",
           "rubroId": 1,
           "rubro": {
@@ -117580,6 +117657,10 @@ Originating invoice header (selected columns)
         - **`codigo`**
 
           `integer`
+
+        - **`codigoBarras`**
+
+          `string` — Optional retail/logistics barcode for seller scan (#255).
 
         - **`condIva`**
 
@@ -117867,6 +117948,7 @@ Originating invoice header (selected columns)
           "articulo": {
             "id": 1,
             "codigo": 1,
+            "codigoBarras": "",
             "descripcion": "",
             "rubroId": 1,
             "rubro": {

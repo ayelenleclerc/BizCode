@@ -66,6 +66,12 @@ export const META_KEYS = {
  * @pt-BR Lê/escreve metadados de cache offline (MMKV com fallback em memória).
  */
 export const offlineMeta = {
+  getString(key: string): string | null {
+    return getStore().getString(key) ?? null
+  },
+  setString(key: string, value: string): void {
+    getStore().set(key, value)
+  },
   getCacheDay(): string | null {
     return getStore().getString(META_KEYS.cacheDay) ?? null
   },

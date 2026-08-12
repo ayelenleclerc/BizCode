@@ -13,6 +13,14 @@
       "expo-secure-store",
       "expo-sqlite",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow BizCode Seller to use the camera for barcode scanning.",
+          "barcodeScannerEnabled": true,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
