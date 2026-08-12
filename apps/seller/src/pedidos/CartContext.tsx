@@ -18,6 +18,8 @@ type CartContextValue = {
   setDscto: (articuloId: number, dscto: number) => void
   /** @en Sync line.stock from stock-multiple (#256). @es Sincroniza line.stock desde stock-multiple (#256). @pt-BR Sincroniza line.stock a partir de stock-multiple (#256). */
   updateLineStocks: (stockByArticuloId: Record<number, number>) => void
+  /** @en Replace cart lines (repeat last order / load template) (#253). @es Reemplaza líneas del carrito (#253). @pt-BR Substitui linhas do carrinho (#253). */
+  replaceLines: (lines: SellerCartLine[]) => void
   removeLine: (articuloId: number) => void
   clear: () => void
   total: number
@@ -98,6 +100,20 @@ export function PedidoCartProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  const replaceLines = useCallback((next: SellerCartLine[]) => {
+    setLines(
+      next.map((l) => ({
+        articuloId: l.articuloId,
+        descripcion: l.descripcion,
+        precio: l.precio,
+        stock: l.stock,
+        cantidad: l.cantidad,
+        dscto: l.dscto,
+        condIva: l.condIva,
+      })),
+    )
+  }, [])
+
   const removeLine = useCallback((articuloId: number) => {
     setLines((prev) => prev.filter((l) => l.articuloId !== articuloId))
   }, [])
@@ -120,6 +136,7 @@ export function PedidoCartProvider({ children }: { children: ReactNode }) {
       setCantidad,
       setDscto,
       updateLineStocks,
+      replaceLines,
       removeLine,
       clear,
       total,
@@ -137,6 +154,7 @@ export function PedidoCartProvider({ children }: { children: ReactNode }) {
       setCantidad,
       setDscto,
       updateLineStocks,
+      replaceLines,
       removeLine,
       clear,
       total,

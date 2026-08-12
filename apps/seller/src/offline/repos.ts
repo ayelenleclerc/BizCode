@@ -341,3 +341,62 @@ export async function getSellerPoliciesLocal(
   return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
 }
 
+/**
+ * @en Upserts a customer order template for offline use (#253).
+ * @es Guarda una plantilla de pedido en cache offline (#253).
+ * @pt-BR Salva um modelo de pedido no cache offline (#253).
+ */
+export async function upsertPlantillaPedido(
+  db: SQLiteDatabase,
+  plantilla: Record<string, unknown>,
+): Promise<void> {
+  const id = Number(plantilla.id)
+  const clienteId = Number(plantilla.clienteId)
+  if (!Number.isInteger(id) || id < 1 || !Number.isInteger(clienteId) || clienteId < 1) return
+  await db.runAsync(
+    `INSERT INTO plantillas_pedido_cache (id, cliente_id, json, updated_at) VALUES (?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET cliente_id=excluded.cliente_id, json=excluded.json, updated_at=excluded.updated_at`,
+    id,
+    clienteId,
+    JSON.stringify(plantilla),
+    now(),
+  )
+}
+
+export async function listPlantillasByClienteLocal(
+  db: SQLiteDatabase,
+  clienteId: number,
+): Promise<Record<string, unknown>[]> {
+  const rows = await db.getAllAsync<{ json: string }>(
+    'SELECT json FROM plantillas_pedido_cache WHERE cliente_id = ?',
+    clienteId,
+  )
+  return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+}
+
+export async function upsertUltimoPedidoRepeat(
+  db: SQLiteDatabase,
+  clienteId: number,
+  data: Record<string, unknown>,
+): Promise<void> {
+  if (!Number.isInteger(clienteId) || clienteId < 1) return
+  await db.runAsync(
+    `INSERT INTO ultimo_pedido_repeat_cache (cliente_id, json, updated_at) VALUES (?, ?, ?)
+     ON CONFLICT(cliente_id) DO UPDATE SET json=excluded.json, updated_at=excluded.updated_at`,
+    clienteId,
+    JSON.stringify(data),
+    now(),
+  )
+}
+
+export async function getUltimoPedidoRepeatLocal(
+  db: SQLiteDatabase,
+  clienteId: number,
+): Promise<Record<string, unknown> | null> {
+  const row = await db.getFirstAsync<{ json: string }>(
+    'SELECT json FROM ultimo_pedido_repeat_cache WHERE cliente_id = ?',
+    clienteId,
+  )
+  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+}
+

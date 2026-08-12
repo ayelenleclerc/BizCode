@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activo": {
+      "type": "boolean"
+    },
+    "articuloId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "cantidad": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "orden": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "articuloId",
+    "cantidad"
+  ],
+  "title": "PlantillaPedidoItemInput",
+  "type": "object"
+}

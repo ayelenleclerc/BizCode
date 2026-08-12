@@ -73,5 +73,23 @@
     "verCuenta": "View account",
     "continue": "Continue",
     "back": "Go back"
+  },
+  "repeat": {
+    "button": "Repeat last order",
+    "buttonDetail": "Repeat last order — {{amount}} {{ago}}",
+    "agoDays": "{{count}}d ago",
+    "agoWeeks": "{{count}}w ago"
+  },
+  "plantillas": {
+    "title": "Order templates",
+    "empty": "No templates for this customer.",
+    "itemCount": "{{count}} items",
+    "edit": "Edit",
+    "load": "Load {{name}}",
+    "itemActive": "Include when loading",
+    "createFromLast": "New template from last order",
+    "nombre": "Name",
+    "save": "Save",
+    "delete": "Delete"
   }
 }

@@ -43,5 +43,9 @@
   "lineStockWarn": "Over stock",
   "remove": "Remove",
   "total": "Total",
-  "plazoRequired": "Enter days when using term payment"
+  "plazoRequired": "Enter days when using term payment",
+  "omittedItems": "{{count}} unavailable items were omitted.",
+  "saveAsTemplate": "Save cart as template",
+  "templateName": "Template name",
+  "saveTemplate": "Save"
 }

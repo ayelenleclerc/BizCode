@@ -102,6 +102,7 @@ model Cliente {
 
   facturas           Factura[]
   pedidos            Pedido[]
+  plantillasPedido   PlantillaPedido[]
   visitasVendedor    VisitaVendedor[]
   rutaParadas        RutaParada[]
   contratos          Contrato[]
@@ -345,6 +346,7 @@ model Articulo {
 
   facturaItems           FacturaItem[]
   pedidoItems            PedidoItem[]
+  plantillaPedidoItems   PlantillaPedidoItem[]
   contratoItems          ContratoItem[]
   ordenTrabajoItems      OrdenTrabajoItem[]
   remitoItems            RemitoItem[]
@@ -1523,6 +1525,41 @@ model PedidoItem {
   @@index([loteId])
 }
 
+/// @en Per-customer order template for App Seller repeat/load (#253).
+/// @es Plantilla de pedido por cliente para repetir/cargar en App Seller (#253).
+/// @pt-BR Modelo de pedido por cliente para repetir/carregar no App Seller (#253).
+model PlantillaPedido {
+  id         Int      @id @default(autoincrement())
+  tenantId   Int
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  clienteId  Int
+  cliente    Cliente  @relation(fields: [clienteId], references: [id])
+  vendedorId Int?
+  vendedor   AppUser? @relation(fields: [vendedorId], references: [id])
+  nombre     String   @db.VarChar(80)
+  activa     Boolean  @default(true)
+  items      PlantillaPedidoItem[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([tenantId, clienteId])
+  @@index([tenantId, vendedorId])
+}
+
+model PlantillaPedidoItem {
+  id          Int             @id @default(autoincrement())
+  plantillaId Int
+  plantilla   PlantillaPedido @relation(fields: [plantillaId], references: [id], onDelete: Cascade)
+  articuloId  Int
+  articulo    Articulo        @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  cantidad    Decimal         @db.Decimal(14, 4)
+  activo      Boolean         @default(true)
+  orden       Int             @default(0)
+
+  @@index([plantillaId, orden])
+  @@index([articuloId])
+}
+
 model FacturaItem {
   id        Int     @id @default(autoincrement())
   facturaId Int
@@ -1744,6 +1781,7 @@ model Tenant {
   facturas                         Factura[]
   notasCredito                     NotaCredito[]
   pedidos                          Pedido[]
+  plantillasPedido                 PlantillaPedido[]
   visitasVendedor                  VisitaVendedor[]
   vendedorZonas                    VendedorZona[]
   feriados                         Feriado[]
@@ -2655,6 +2693,7 @@ model AppUser {
   ordenesEntregaPicker           OrdenEntrega[]             @relation("OrdenEntregaPicker")
   repartosChofer                 Reparto[]                  @relation("RepartoChofer")
   pedidosVendedor                Pedido[]
+  plantillasPedido               PlantillaPedido[]
   visitasVendedor                VisitaVendedor[]
   vendedorZonas                  VendedorZona[]
   rutasVendedor                  RutaVendedor[]

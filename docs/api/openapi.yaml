@@ -1611,6 +1611,207 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
 
+  /api/clientes/{id}/ultimo-pedido-repeat:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [pedidos]
+      summary: Prefill cart from the customer's last non-cancelled pedido
+      description: |
+        Resolves last pedido lines against the current catalog (#253). Inactive, parent,
+        missing, or service lines are omitted. Requires `orders.create` or `customers.manage`.
+      responses:
+        '200':
+          description: Prefill payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoPrefillEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/clientes/{id}/plantillas-pedido:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [pedidos]
+      summary: List order templates for a customer
+      description: Requires `orders.create` or `customers.manage`.
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantillaPedidoListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags: [pedidos]
+      summary: Create an order template for a customer
+      description: Requires `orders.create` or `customers.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlantillaPedidoCreateBody'
+      responses:
+        '201':
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantillaPedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/plantillas-pedido/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [pedidos]
+      summary: Get an order template
+      description: Requires `orders.create` or `customers.manage`.
+      responses:
+        '200':
+          description: Template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantillaPedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    patch:
+      tags: [pedidos]
+      summary: Update an order template
+      description: Requires `orders.create` or `customers.manage`. Replacing `items` deletes previous rows.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlantillaPedidoPatchBody'
+      responses:
+        '200':
+          description: Updated template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantillaPedidoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    delete:
+      tags: [pedidos]
+      summary: Delete an order template
+      description: Requires `orders.create` or `customers.manage`.
+      responses:
+        '200':
+          description: Deleted id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlantillaPedidoDeleteEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /api/plantillas-pedido/{id}/cargar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [pedidos]
+      summary: Prefill cart from an order template
+      description: Resolves active template items against the current catalog (#253). Requires `orders.create` or `customers.manage`.
+      responses:
+        '200':
+          description: Prefill payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoPrefillEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/clientes/{id}/recibos:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -23111,6 +23312,233 @@ components:
               items:
                 $ref: '#/components/schemas/Pedido'
         - $ref: '#/components/schemas/ListPaginationMeta'
+
+    RepeatOmitReason:
+      type: string
+      enum: [inactive, parent, missing, service]
+
+    PedidoPrefillLine:
+      type: object
+      required: [articuloId, descripcion, precio, stock, cantidad, condIva]
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        descripcion:
+          type: string
+        precio:
+          type: number
+        stock:
+          type: number
+        cantidad:
+          type: number
+        condIva:
+          type: string
+
+    PedidoPrefillOmitted:
+      type: object
+      required: [articuloId, descripcion, reason]
+      properties:
+        articuloId:
+          type: integer
+          nullable: true
+        descripcion:
+          type: string
+        reason:
+          $ref: '#/components/schemas/RepeatOmitReason'
+
+    PedidoPrefill:
+      type: object
+      required:
+        - source
+        - pedidoId
+        - plantillaId
+        - total
+        - createdAt
+        - lines
+        - omitted
+        - omittedCount
+      properties:
+        source:
+          type: string
+          enum: [last_pedido, plantilla]
+        pedidoId:
+          type: integer
+          nullable: true
+        plantillaId:
+          type: integer
+          nullable: true
+        total:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/PedidoPrefillLine'
+        omitted:
+          type: array
+          items:
+            $ref: '#/components/schemas/PedidoPrefillOmitted'
+        omittedCount:
+          type: integer
+          minimum: 0
+
+    PedidoPrefillEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PedidoPrefill'
+
+    PlantillaPedidoItem:
+      type: object
+      required: [id, articuloId, cantidad, activo, orden]
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        cantidad:
+          type: number
+        activo:
+          type: boolean
+        orden:
+          type: integer
+        descripcion:
+          type: string
+
+    PlantillaPedido:
+      type: object
+      required:
+        - id
+        - tenantId
+        - clienteId
+        - vendedorId
+        - nombre
+        - activa
+        - createdAt
+        - updatedAt
+        - items
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        clienteId:
+          type: integer
+        vendedorId:
+          type: integer
+          nullable: true
+        nombre:
+          type: string
+        activa:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlantillaPedidoItem'
+
+    PlantillaPedidoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/PlantillaPedido'
+
+    PlantillaPedidoListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlantillaPedido'
+
+    PlantillaPedidoItemInput:
+      type: object
+      required: [articuloId, cantidad]
+      additionalProperties: false
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        cantidad:
+          type: number
+          exclusiveMinimum: 0
+        activo:
+          type: boolean
+        orden:
+          type: integer
+          minimum: 0
+
+    PlantillaPedidoCreateBody:
+      type: object
+      required: [nombre, items]
+      additionalProperties: false
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 80
+        activa:
+          type: boolean
+        vendedorId:
+          type: integer
+          nullable: true
+          minimum: 1
+        items:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/PlantillaPedidoItemInput'
+
+    PlantillaPedidoPatchBody:
+      type: object
+      additionalProperties: false
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 80
+        activa:
+          type: boolean
+        items:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/PlantillaPedidoItemInput'
+
+    PlantillaPedidoDeleteEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [id]
+          properties:
+            id:
+              type: integer
 
     VisitaEstadoPlan:
       type: string

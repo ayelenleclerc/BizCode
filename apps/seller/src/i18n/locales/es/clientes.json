@@ -73,5 +73,23 @@
     "verCuenta": "Ver cuenta corriente",
     "continue": "Continuar",
     "back": "Volver"
+  },
+  "repeat": {
+    "button": "Repetir último pedido",
+    "buttonDetail": "Repetir último pedido — {{amount}} {{ago}}",
+    "agoDays": "hace {{count}} d",
+    "agoWeeks": "hace {{count}} sem"
+  },
+  "plantillas": {
+    "title": "Plantillas de pedido",
+    "empty": "Sin plantillas para este cliente.",
+    "itemCount": "{{count}} artículos",
+    "edit": "Editar",
+    "load": "Cargar {{name}}",
+    "itemActive": "Incluir al cargar",
+    "createFromLast": "Nueva plantilla desde el último pedido",
+    "nombre": "Nombre",
+    "save": "Guardar",
+    "delete": "Eliminar"
   }
 }

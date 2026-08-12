@@ -4,6 +4,7 @@ import { ActivityIndicator, View } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthContext'
 import { OfflineBanner } from '../../src/offline/OfflineBanner'
+import { PedidoCartProvider } from '../../src/pedidos/CartContext'
 import { usePushNotificationNavigation } from '../../src/push/usePushNotificationNavigation'
 
 export default function AppLayout() {
@@ -44,19 +45,21 @@ export default function AppLayout() {
   )
 
   return (
-    <View style={{ flex: 1 }}>
-      <OfflineBanner />
-      <Tabs
-        screenOptions={{
-          headerRight: logoutButton,
-        }}
-      >
-        <Tabs.Screen name="clientes" options={{ title: t('tabs.clientes') }} />
-        <Tabs.Screen name="pedidos" options={{ title: t('tabs.pedidos') }} />
-        <Tabs.Screen name="catalogo" options={{ title: t('tabs.catalogo') }} />
-        <Tabs.Screen name="agenda" options={{ title: t('tabs.agenda') }} />
-        <Tabs.Screen name="perfil" options={{ title: t('tabs.perfil') }} />
-      </Tabs>
-    </View>
+    <PedidoCartProvider>
+      <View style={{ flex: 1 }}>
+        <OfflineBanner />
+        <Tabs
+          screenOptions={{
+            headerRight: logoutButton,
+          }}
+        >
+          <Tabs.Screen name="clientes" options={{ title: t('tabs.clientes') }} />
+          <Tabs.Screen name="pedidos" options={{ title: t('tabs.pedidos') }} />
+          <Tabs.Screen name="catalogo" options={{ title: t('tabs.catalogo') }} />
+          <Tabs.Screen name="agenda" options={{ title: t('tabs.agenda') }} />
+          <Tabs.Screen name="perfil" options={{ title: t('tabs.perfil') }} />
+        </Tabs>
+      </View>
+    </PedidoCartProvider>
   )
 }

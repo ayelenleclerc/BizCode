@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "lines": {
+      "items": {
+        "$ref": "./PedidoPrefillLine.schema.json"
+      },
+      "type": "array"
+    },
+    "omitted": {
+      "items": {
+        "$ref": "./PedidoPrefillOmitted.schema.json"
+      },
+      "type": "array"
+    },
+    "omittedCount": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "pedidoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "plantillaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "source": {
+      "enum": [
+        "last_pedido",
+        "plantilla"
+      ],
+      "type": "string"
+    },
+    "total": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "source",
+    "pedidoId",
+    "plantillaId",
+    "total",
+    "createdAt",
+    "lines",
+    "omitted",
+    "omittedCount"
+  ],
+  "title": "PedidoPrefill",
+  "type": "object"
+}

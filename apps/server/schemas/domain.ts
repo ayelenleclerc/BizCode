@@ -24,6 +24,8 @@ import type {
   PedidoInput,
   PedidoInvoiceInput,
   PedidoItemInput,
+  PlantillaPedidoCreateInput,
+  PlantillaPedidoPatchInput,
   VisitaVendedorCreateInput,
   VisitaVendedorUpdateInput,
   RemitoEntregarInput,
@@ -2882,6 +2884,49 @@ export const sellerPoliciesPatchBodySchema = z
       data.sellerStockZeroAction !== undefined ||
       data.sellerStockCapQtyToAvailable !== undefined,
     { message: 'At least one seller policy field is required' },
+  )
+
+const plantillaPedidoItemInputSchema = z.object({
+  articuloId: z.number().int().min(1),
+  cantidad: z.number().positive(),
+  activo: z.boolean().optional(),
+  orden: z.number().int().min(0).optional(),
+})
+
+/** @en Create body for customer order templates (#253). */
+export const plantillaPedidoCreateBodySchema = z
+  .object({
+    nombre: z.string().trim().min(1).max(80),
+    activa: z.boolean().optional(),
+    vendedorId: z.union([z.number().int().min(1), z.null()]).optional(),
+    items: z.array(plantillaPedidoItemInputSchema).max(100),
+  })
+  .transform(
+    (data): PlantillaPedidoCreateInput => ({
+      nombre: data.nombre,
+      activa: data.activa,
+      vendedorId: data.vendedorId,
+      items: data.items,
+    }),
+  )
+
+/** @en Partial patch for customer order templates (#253). */
+export const plantillaPedidoPatchBodySchema = z
+  .object({
+    nombre: z.string().trim().min(1).max(80).optional(),
+    activa: z.boolean().optional(),
+    items: z.array(plantillaPedidoItemInputSchema).max(100).optional(),
+  })
+  .refine(
+    (data) => data.nombre !== undefined || data.activa !== undefined || data.items !== undefined,
+    { message: 'At least one plantilla field is required' },
+  )
+  .transform(
+    (data): PlantillaPedidoPatchInput => ({
+      nombre: data.nombre,
+      activa: data.activa,
+      items: data.items,
+    }),
   )
 
 const regimenTipoSchema = z.enum(['ganancias', 'iva', 'iibb'])
