@@ -43,5 +43,9 @@
   "lineStockWarn": "Sin stock suficiente",
   "remove": "Quitar",
   "total": "Total",
-  "plazoRequired": "Indicá los días si la condición es plazo"
+  "plazoRequired": "Indicá los días si la condición es plazo",
+  "omittedItems": "{{count}} artículos no disponibles se omitieron.",
+  "saveAsTemplate": "Guardar carrito como plantilla",
+  "templateName": "Nombre de la plantilla",
+  "saveTemplate": "Guardar"
 }

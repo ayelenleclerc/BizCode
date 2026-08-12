@@ -12,16 +12,20 @@ import {
   Portal,
   ProgressBar,
   SegmentedButtons,
+  Switch,
   Text,
+  TextInput,
 } from 'react-native-paper'
 import type {
   ClienteCuentaCorrienteSaldo,
   EstadoCredito,
   FacturaPendienteCliente,
+  PedidoPrefill,
   PedidoRow,
+  PlantillaPedido,
   SellerPolicies,
 } from '@bizcode/types'
-import { clientesAPI, listZonasEntrega, pedidosAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
+import { clientesAPI, listZonasEntrega, pedidosAPI, plantillasPedidoAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
 import { ackCreditAlert, isCreditAlertAcked } from '../../../src/alerts/creditSessionAck'
 import { isCreditBlocked } from '../../../src/alerts/policyGates'
 import {
@@ -31,6 +35,8 @@ import {
 } from '../../../src/lib/apiErrors'
 import { computeDaysPastDue, creditUsagePercent } from '../../../src/lib/daysPastDue'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
+import { usePedidoCart } from '../../../src/pedidos/CartContext'
+import { daysSince, prefillToCartLines } from '../../../src/pedidos/repeatLines'
 
 type ClienteDetail = {
   id: number
@@ -64,6 +70,7 @@ export default function ClienteDetailScreen() {
   const clienteId = Number.parseInt(String(id), 10)
   const { t, i18n } = useTranslation(['clientes', 'common'])
   const router = useRouter()
+  const cart = usePedidoCart()
 
   const [tab, setTab] = useState<TabKey>('cuenta')
   const [state, setState] = useState<UiLoadState>('loading')
@@ -78,6 +85,11 @@ export default function ClienteDetailScreen() {
   const [policies, setPolicies] = useState<SellerPolicies | null>(null)
   const [creditDialogVisible, setCreditDialogVisible] = useState(false)
   const [creditAsOfOffline, setCreditAsOfOffline] = useState<string | null>(null)
+  const [plantillas, setPlantillas] = useState<PlantillaPedido[]>([])
+  const [plantillaDialog, setPlantillaDialog] = useState<'none' | 'create' | 'edit'>('none')
+  const [editingPlantilla, setEditingPlantilla] = useState<PlantillaPedido | null>(null)
+  const [plantillaNombre, setPlantillaNombre] = useState('')
+  const [plantillaBusy, setPlantillaBusy] = useState(false)
 
   const load = useCallback(async () => {
     if (!Number.isInteger(clienteId) || clienteId < 1) {
@@ -94,6 +106,7 @@ export default function ClienteDetailScreen() {
         zonasResult,
         creditoResult,
         policiesResult,
+        plantillasResult,
       ] = await Promise.all([
         clientesAPI.get(clienteId) as Promise<ClienteDetail | null | undefined>,
         pedidosAPI.list({ clienteId, limit: 10 }),
@@ -117,6 +130,10 @@ export default function ClienteDetailScreen() {
           (data) => ({ ok: true as const, data }),
           (err: unknown) => ({ ok: false as const, err }),
         ),
+        plantillasPedidoAPI.list(clienteId).then(
+          (data) => ({ ok: true as const, data }),
+          (err: unknown) => ({ ok: false as const, err }),
+        ),
       ])
 
       if (!clienteRaw) {
@@ -128,7 +145,7 @@ export default function ClienteDetailScreen() {
       setPedidos(Array.isArray(pedidosRes.data) ? pedidosRes.data.slice(0, 10) : [])
       try {
         const { getOfflineDb } = await import('../../../src/offline/db')
-        const { upsertCliente, upsertPedidoCache, upsertEstadoCredito } = await import(
+        const { upsertCliente, upsertPedidoCache, upsertEstadoCredito, upsertPlantillaPedido } = await import(
           '../../../src/offline/repos'
         )
         const db = await getOfflineDb()
@@ -142,6 +159,11 @@ export default function ClienteDetailScreen() {
             clienteId,
             creditoResult.data as unknown as Record<string, unknown>,
           )
+        }
+        if (plantillasResult.ok) {
+          for (const pl of plantillasResult.data) {
+            await upsertPlantillaPedido(db, pl as unknown as Record<string, unknown>)
+          }
         }
       } catch {
         // cache best-effort
@@ -187,6 +209,7 @@ export default function ClienteDetailScreen() {
       const pols = policiesResult.ok ? policiesResult.data : null
       setEstadoCredito(credit)
       setPolicies(pols)
+      setPlantillas(plantillasResult.ok ? plantillasResult.data : [])
       setCreditAsOfOffline(null)
       if (credit && credit.nivel !== 'ok' && !isCreditAlertAcked(clienteId)) {
         setCreditDialogVisible(true)
@@ -203,6 +226,7 @@ export default function ClienteDetailScreen() {
           listPedidosByClienteLocal,
           getEstadoCreditoLocal,
           getSellerPoliciesLocal,
+          listPlantillasByClienteLocal,
         } = await import('../../../src/offline/repos')
         const db = await getOfflineDb()
         const cached = (await getClienteLocal(db, clienteId)) as ClienteDetail | null
@@ -213,6 +237,7 @@ export default function ClienteDetailScreen() {
         const pedCached = (await listPedidosByClienteLocal(db, clienteId, 10)) as PedidoRow[]
         const creditCached = (await getEstadoCreditoLocal(db, clienteId)) as EstadoCredito | null
         const polsCached = (await getSellerPoliciesLocal(db)) as SellerPolicies | null
+        const plantillasCached = (await listPlantillasByClienteLocal(db, clienteId)) as PlantillaPedido[]
         setCliente(cached)
         setPedidos(pedCached)
         setSaldoCc(null)
@@ -222,6 +247,7 @@ export default function ClienteDetailScreen() {
         setZonaNombre(null)
         setEstadoCredito(creditCached)
         setPolicies(polsCached)
+        setPlantillas(plantillasCached)
         setCreditAsOfOffline(creditCached?.asOf ?? null)
         if (creditCached && creditCached.nivel !== 'ok' && !isCreditAlertAcked(clienteId)) {
           setCreditDialogVisible(true)
@@ -254,6 +280,145 @@ export default function ClienteDetailScreen() {
   const suspended = Boolean(cliente?.suspended)
   const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt-BR' ? 'pt-BR' : 'es-AR'
   const creditBlocked = isCreditBlocked(estadoCredito?.nivel, policies)
+  const lastPedido = pedidos[0] ?? null
+
+  const applyPrefillAndGo = async (prefill: PedidoPrefill) => {
+    cart.setClienteId(clienteId)
+    cart.replaceLines(prefillToCartLines(prefill))
+    const omitted = prefill.omittedCount
+    router.push(
+      `/(app)/pedidos/nuevo?clienteId=${clienteId}${omitted > 0 ? `&omitted=${omitted}` : ''}`,
+    )
+  }
+
+  const onRepeatLast = async () => {
+    if (suspended || creditBlocked) return
+    try {
+      const prefill = await plantillasPedidoAPI.getUltimoPedidoRepeat(clienteId)
+      await applyPrefillAndGo(prefill)
+    } catch {
+      try {
+        const { getOfflineDb } = await import('../../../src/offline/db')
+        const { getUltimoPedidoRepeatLocal } = await import('../../../src/offline/repos')
+        const db = await getOfflineDb()
+        const cached = (await getUltimoPedidoRepeatLocal(db, clienteId)) as PedidoPrefill | null
+        if (cached) await applyPrefillAndGo(cached)
+      } catch {
+        // keep current screen
+      }
+    }
+  }
+
+  const onCargarPlantilla = async (id: number) => {
+    if (suspended || creditBlocked) return
+    try {
+      const prefill = await plantillasPedidoAPI.cargar(id)
+      await applyPrefillAndGo(prefill)
+    } catch {
+      const local = plantillas.find((p) => p.id === id)
+      if (!local) return
+      const prefill: PedidoPrefill = {
+        source: 'plantilla',
+        pedidoId: null,
+        plantillaId: local.id,
+        total: '0.00',
+        createdAt: local.updatedAt,
+        lines: local.items
+          .filter((it) => it.activo)
+          .map((it) => ({
+            articuloId: it.articuloId,
+            descripcion: it.descripcion ?? `#${it.articuloId}`,
+            precio: 0,
+            stock: 0,
+            cantidad: it.cantidad,
+            condIva: '1',
+          })),
+        omitted: [],
+        omittedCount: 0,
+      }
+      await applyPrefillAndGo(prefill)
+    }
+  }
+
+  const refreshPlantillas = async () => {
+    try {
+      const rows = await plantillasPedidoAPI.list(clienteId)
+      setPlantillas(rows)
+    } catch {
+      // keep current list
+    }
+  }
+
+  const onCreateFromLast = async () => {
+    const nombre = plantillaNombre.trim()
+    if (!nombre || plantillaBusy) return
+    setPlantillaBusy(true)
+    try {
+      const prefill = await plantillasPedidoAPI.getUltimoPedidoRepeat(clienteId)
+      await plantillasPedidoAPI.create(clienteId, {
+        nombre,
+        items: prefill.lines.map((l, i) => ({
+          articuloId: l.articuloId,
+          cantidad: l.cantidad,
+          activo: true,
+          orden: i,
+        })),
+      })
+      setPlantillaDialog('none')
+      setPlantillaNombre('')
+      await refreshPlantillas()
+    } catch {
+      // keep dialog
+    } finally {
+      setPlantillaBusy(false)
+    }
+  }
+
+  const onSaveEditPlantilla = async () => {
+    if (!editingPlantilla || plantillaBusy) return
+    const nombre = plantillaNombre.trim()
+    if (!nombre) return
+    setPlantillaBusy(true)
+    try {
+      await plantillasPedidoAPI.patch(editingPlantilla.id, {
+        nombre,
+        items: editingPlantilla.items.map((it) => ({
+          articuloId: it.articuloId,
+          cantidad: it.cantidad,
+          activo: it.activo,
+          orden: it.orden,
+        })),
+      })
+      setPlantillaDialog('none')
+      setEditingPlantilla(null)
+      await refreshPlantillas()
+    } catch {
+      // keep dialog
+    } finally {
+      setPlantillaBusy(false)
+    }
+  }
+
+  const onDeletePlantilla = async () => {
+    if (!editingPlantilla || plantillaBusy) return
+    setPlantillaBusy(true)
+    try {
+      await plantillasPedidoAPI.remove(editingPlantilla.id)
+      setPlantillaDialog('none')
+      setEditingPlantilla(null)
+      await refreshPlantillas()
+    } catch {
+      // keep dialog
+    } finally {
+      setPlantillaBusy(false)
+    }
+  }
+
+  const formatAgo = (iso: string) => {
+    const days = daysSince(iso)
+    if (days >= 14) return t('clientes:repeat.agoWeeks', { count: Math.floor(days / 7) })
+    return t('clientes:repeat.agoDays', { count: days })
+  }
 
   const scoreColor = (score: number) => {
     if (score < 40) return '#B71C1C'
@@ -435,6 +600,21 @@ export default function ClienteDetailScreen() {
         {t('clientes:nuevoPedido')}
       </Button>
 
+      {lastPedido && !suspended && !creditBlocked ? (
+        <Button
+          mode="outlined"
+          testID="seller-cliente-repeat-last"
+          accessibilityLabel={t('clientes:repeat.button')}
+          onPress={() => void onRepeatLast()}
+          style={styles.cta}
+        >
+          {t('clientes:repeat.buttonDetail', {
+            amount: formatMoney(lastPedido.total, locale),
+            ago: formatAgo(lastPedido.createdAt),
+          })}
+        </Button>
+      ) : null}
+
       <SegmentedButtons
         value={tab}
         onValueChange={(v) => setTab(v as TabKey)}
@@ -540,6 +720,54 @@ export default function ClienteDetailScreen() {
                 />
               ))
             )}
+
+            <Text variant="titleMedium" style={styles.mt}>
+              {t('clientes:plantillas.title')}
+            </Text>
+            {plantillas.length === 0 ? (
+              <View testID="seller-cliente-plantillas-empty">
+                <Text>{t('clientes:plantillas.empty')}</Text>
+              </View>
+            ) : (
+              plantillas.map((pl) => (
+                <List.Item
+                  key={pl.id}
+                  title={pl.nombre}
+                  description={t('clientes:plantillas.itemCount', { count: pl.items.length })}
+                  onPress={() => void onCargarPlantilla(pl.id)}
+                  right={() => (
+                    <Button
+                      compact
+                      onPress={() => {
+                        setEditingPlantilla(pl)
+                        setPlantillaNombre(pl.nombre)
+                        setPlantillaDialog('edit')
+                      }}
+                      testID={`seller-cliente-plantilla-edit-${pl.id}`}
+                      accessibilityLabel={t('clientes:plantillas.edit')}
+                    >
+                      {t('clientes:plantillas.edit')}
+                    </Button>
+                  )}
+                  {...({
+                    testID: `seller-cliente-plantilla-${pl.id}`,
+                    accessibilityRole: 'button',
+                    accessibilityLabel: t('clientes:plantillas.load', { name: pl.nombre }),
+                  } as object)}
+                />
+              ))
+            )}
+            <Button
+              mode="outlined"
+              disabled={!lastPedido || suspended}
+              onPress={() => {
+                setPlantillaNombre('')
+                setPlantillaDialog('create')
+              }}
+              testID="seller-cliente-plantilla-create"
+            >
+              {t('clientes:plantillas.createFromLast')}
+            </Button>
           </View>
         )}
 
@@ -591,6 +819,96 @@ export default function ClienteDetailScreen() {
           </View>
         )}
       </ScrollView>
+
+      <Portal>
+        <Dialog
+          visible={plantillaDialog === 'create'}
+          onDismiss={() => setPlantillaDialog('none')}
+          testID="seller-cliente-plantilla-create-dialog"
+        >
+          <Dialog.Title>{t('clientes:plantillas.createFromLast')}</Dialog.Title>
+          <Dialog.Content>
+            <TextInput
+              mode="outlined"
+              label={t('clientes:plantillas.nombre')}
+              value={plantillaNombre}
+              onChangeText={setPlantillaNombre}
+              {...({ testID: 'seller-cliente-plantilla-nombre' } as object)}
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setPlantillaDialog('none')}>{t('common:cancel')}</Button>
+            <Button
+              onPress={() => void onCreateFromLast()}
+              loading={plantillaBusy}
+              disabled={!plantillaNombre.trim() || plantillaBusy}
+              testID="seller-cliente-plantilla-create-save"
+            >
+              {t('clientes:plantillas.save')}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog
+          visible={plantillaDialog === 'edit' && editingPlantilla != null}
+          onDismiss={() => {
+            setPlantillaDialog('none')
+            setEditingPlantilla(null)
+          }}
+          testID="seller-cliente-plantilla-edit-dialog"
+        >
+          <Dialog.Title>{t('clientes:plantillas.edit')}</Dialog.Title>
+          <Dialog.Content>
+            <TextInput
+              mode="outlined"
+              label={t('clientes:plantillas.nombre')}
+              value={plantillaNombre}
+              onChangeText={setPlantillaNombre}
+              {...({ testID: 'seller-cliente-plantilla-edit-nombre' } as object)}
+            />
+            {editingPlantilla?.items.map((it) => (
+              <View key={it.id} style={styles.plantillaItemRow}>
+                <Text style={styles.plantillaItemLabel}>
+                  {it.descripcion ?? `#${it.articuloId}`} · {it.cantidad}
+                </Text>
+                <Switch
+                  value={it.activo}
+                  accessibilityLabel={t('clientes:plantillas.itemActive')}
+                  onValueChange={(v) => {
+                    setEditingPlantilla((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            items: prev.items.map((row) =>
+                              row.id === it.id ? { ...row, activo: v } : row,
+                            ),
+                          }
+                        : prev,
+                    )
+                  }}
+                  {...({ testID: `seller-cliente-plantilla-item-activo-${it.id}` } as object)}
+                />
+              </View>
+            ))}
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              onPress={() => void onDeletePlantilla()}
+              textColor="#B71C1C"
+              testID="seller-cliente-plantilla-delete"
+            >
+              {t('clientes:plantillas.delete')}
+            </Button>
+            <Button
+              onPress={() => void onSaveEditPlantilla()}
+              loading={plantillaBusy}
+              disabled={!plantillaNombre.trim() || plantillaBusy}
+              testID="seller-cliente-plantilla-edit-save"
+            >
+              {t('clientes:plantillas.save')}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   )
 }
@@ -609,4 +927,6 @@ const styles = StyleSheet.create({
   scoreBlock: { marginTop: 16, gap: 4 },
   asOf: { opacity: 0.7, marginBottom: 8, fontSize: 12 },
   blockHint: { marginTop: 8, color: '#B71C1C' },
+  plantillaItemRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },
+  plantillaItemLabel: { flex: 1, marginRight: 8 },
 })

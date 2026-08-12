@@ -7,13 +7,16 @@ import {
   Banner,
   Button,
   Chip,
+  Dialog,
   FAB,
+  Portal,
   Searchbar,
   Text,
+  TextInput,
 } from 'react-native-paper'
 import type { ArticuloListItem } from '@bizcode/api-client'
 import type { Rubro, SellerPolicies, SellerStockEstado, StockMultipleItem } from '@bizcode/types'
-import { articulosAPI, clientesAPI, rubrosAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
+import { articulosAPI, clientesAPI, plantillasPedidoAPI, rubrosAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
 import { capQtyToStock } from '../../../src/alerts/policyGates'
 import { mapApiErrorToUiState, type UiLoadState } from '../../../src/lib/apiErrors'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
@@ -39,8 +42,12 @@ function deriveStockEstado(stock: number): SellerStockEstado {
 }
 
 export default function NuevoPedidoScreen() {
-  const { clienteId: clienteIdParam } = useLocalSearchParams<{ clienteId?: string }>()
+  const { clienteId: clienteIdParam, omitted: omittedParam } = useLocalSearchParams<{
+    clienteId?: string
+    omitted?: string
+  }>()
   const parsedClienteId = Number.parseInt(String(clienteIdParam ?? ''), 10)
+  const omittedCount = Number.parseInt(String(omittedParam ?? ''), 10)
   const { t, i18n } = useTranslation(['pedidos', 'common'])
   const router = useRouter()
   const cart = usePedidoCart()
@@ -55,6 +62,9 @@ export default function NuevoPedidoScreen() {
   const [policies, setPolicies] = useState<SellerPolicies | null>(null)
   const [stockById, setStockById] = useState<Record<number, StockMultipleItem>>({})
   const [stockAsOf, setStockAsOf] = useState<string | null>(null)
+  const [saveDialog, setSaveDialog] = useState(false)
+  const [saveNombre, setSaveNombre] = useState('')
+  const [saveBusy, setSaveBusy] = useState(false)
   const reqId = useRef(0)
 
   useEffect(() => {
@@ -312,6 +322,12 @@ export default function NuevoPedidoScreen() {
         </Banner>
       )}
 
+      {Number.isInteger(omittedCount) && omittedCount > 0 ? (
+        <Banner visible icon="alert" testID="seller-pedido-omitted-banner">
+          {t('pedidos:omittedItems', { count: omittedCount })}
+        </Banner>
+      ) : null}
+
       <Searchbar
         placeholder={t('pedidos:searchPlaceholder')}
         value={query}
@@ -440,18 +456,76 @@ export default function NuevoPedidoScreen() {
       )}
 
       {cart.lines.length > 0 && !suspended && (
-        <FAB
-          icon="cart"
-          label={t('pedidos:cartFab', {
-            count: cart.lines.length,
-            total: formatMoney(cart.total, locale),
-          })}
-          style={styles.fab}
-          onPress={() => router.push('/(app)/pedidos/resumen')}
-          testID="seller-pedido-cart-fab"
-          accessibilityLabel={t('pedidos:resume')}
-        />
+        <>
+          <Button
+            mode="outlined"
+            onPress={() => setSaveDialog(true)}
+            testID="seller-pedido-save-plantilla"
+            style={styles.saveTpl}
+          >
+            {t('pedidos:saveAsTemplate')}
+          </Button>
+          <FAB
+            icon="cart"
+            label={t('pedidos:cartFab', {
+              count: cart.lines.length,
+              total: formatMoney(cart.total, locale),
+            })}
+            style={styles.fab}
+            onPress={() => router.push('/(app)/pedidos/resumen')}
+            testID="seller-pedido-cart-fab"
+            accessibilityLabel={t('pedidos:resume')}
+          />
+        </>
       )}
+
+      <Portal>
+        <Dialog visible={saveDialog} onDismiss={() => setSaveDialog(false)} testID="seller-pedido-save-plantilla-dialog">
+          <Dialog.Title>{t('pedidos:saveAsTemplate')}</Dialog.Title>
+          <Dialog.Content>
+            <TextInput
+              mode="outlined"
+              label={t('pedidos:templateName')}
+              value={saveNombre}
+              onChangeText={setSaveNombre}
+              {...({ testID: 'seller-pedido-plantilla-nombre' } as object)}
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setSaveDialog(false)}>{t('common:cancel')}</Button>
+            <Button
+              loading={saveBusy}
+              disabled={!saveNombre.trim() || saveBusy || cart.clienteId == null}
+              testID="seller-pedido-save-plantilla-confirm"
+              onPress={() => {
+                void (async () => {
+                  if (cart.clienteId == null) return
+                  setSaveBusy(true)
+                  try {
+                    await plantillasPedidoAPI.create(cart.clienteId, {
+                      nombre: saveNombre.trim(),
+                      items: cart.lines.map((l, i) => ({
+                        articuloId: l.articuloId,
+                        cantidad: l.cantidad,
+                        activo: true,
+                        orden: i,
+                      })),
+                    })
+                    setSaveDialog(false)
+                    setSaveNombre('')
+                  } catch {
+                    // keep dialog
+                  } finally {
+                    setSaveBusy(false)
+                  }
+                })()
+              }}
+            >
+              {t('pedidos:saveTemplate')}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   )
 }
@@ -478,5 +552,6 @@ const styles = StyleSheet.create({
   stockChip: { alignSelf: 'flex-start', backgroundColor: 'transparent', borderWidth: 1 },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   hint: { opacity: 0.7, padding: 8 },
+  saveTpl: { marginHorizontal: 8, marginBottom: 72 },
   fab: { position: 'absolute', right: 16, bottom: 16 },
 })

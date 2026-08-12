@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "reason": {
+      "$ref": "./RepeatOmitReason.schema.json"
+    }
+  },
+  "required": [
+    "articuloId",
+    "descripcion",
+    "reason"
+  ],
+  "title": "PedidoPrefillOmitted",
+  "type": "object"
+}

@@ -850,6 +850,14 @@
 
 * [PedidoListEnvelope](./pedidolistenvelope.md) – `-`
 
+* [PedidoPrefill](./pedidoprefill.md) – `-`
+
+* [PedidoPrefillEnvelope](./pedidoprefillenvelope.md) – `-`
+
+* [PedidoPrefillLine](./pedidoprefillline.md) – `-`
+
+* [PedidoPrefillOmitted](./pedidoprefillomitted.md) – `-`
+
 * [PedidoTransitionInput](./pedidotransitioninput.md) – `-`
 
 * [PeriodoLockEnvelope](./periodolockenvelope.md) – `-`
@@ -859,6 +867,22 @@
 * [PlanCatalogEnvelope](./plancatalogenvelope.md) – `-`
 
 * [PlanLimitErrorEnvelope](./planlimiterrorenvelope.md) – `-`
+
+* [PlantillaPedido](./plantillapedido.md) – `-`
+
+* [PlantillaPedidoCreateBody](./plantillapedidocreatebody.md) – `-`
+
+* [PlantillaPedidoDeleteEnvelope](./plantillapedidodeleteenvelope.md) – `-`
+
+* [PlantillaPedidoEnvelope](./plantillapedidoenvelope.md) – `-`
+
+* [PlantillaPedidoItem](./plantillapedidoitem.md) – `-`
+
+* [PlantillaPedidoItemInput](./plantillapedidoiteminput.md) – `-`
+
+* [PlantillaPedidoListEnvelope](./plantillapedidolistenvelope.md) – `-`
+
+* [PlantillaPedidoPatchBody](./plantillapedidopatchbody.md) – `-`
 
 * [PortalBranding](./portalbranding.md) – `-`
 
@@ -1109,6 +1133,8 @@
 * [RepartoUbicacionInput](./repartoubicacioninput.md) – `-`
 
 * [RepartoUbicacionNullableEnvelope](./repartoubicacionnullableenvelope.md) – `-`
+
+* [RepeatOmitReason](./repeatomitreason.md) – `-`
 
 * [ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope.md) – `-`
 
@@ -1620,6 +1646,8 @@
 
 * [Untitled object in PedidoListEnvelope](./pedidolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in PlantillaPedidoDeleteEnvelope](./plantillapedidodeleteenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in PortalFacturaListEnvelope](./portalfacturalistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in PortalLogoutEnvelope](./portallogoutenvelope-properties-data.md) – `undefined#/properties/data`
@@ -2024,7 +2052,19 @@
 
 * [Untitled array in PedidoListEnvelope](./pedidolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
+* [Untitled array in PedidoPrefill](./pedidoprefill-properties-lines.md) – `undefined#/properties/lines`
+
+* [Untitled array in PedidoPrefill](./pedidoprefill-properties-omitted.md) – `undefined#/properties/omitted`
+
 * [Untitled array in PlanCatalogEnvelope](./plancatalogenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in PlantillaPedido](./plantillapedido-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in PlantillaPedidoCreateBody](./plantillapedidocreatebody-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in PlantillaPedidoListEnvelope](./plantillapedidolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in PlantillaPedidoPatchBody](./plantillapedidopatchbody-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in PortalFacturaListEnvelope](./portalfacturalistenvelope-properties-data-properties-facturas.md) – `undefined#/properties/data/properties/facturas`
 

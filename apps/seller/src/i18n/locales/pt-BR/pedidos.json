@@ -43,5 +43,9 @@
   "lineStockWarn": "Acima do estoque",
   "remove": "Remover",
   "total": "Total",
-  "plazoRequired": "Informe os dias quando a condição for prazo"
+  "plazoRequired": "Informe os dias quando a condição for prazo",
+  "omittedItems": "{{count}} artigos indisponíveis foram omitidos.",
+  "saveAsTemplate": "Salvar carrinho como modelo",
+  "templateName": "Nome do modelo",
+  "saveTemplate": "Salvar"
 }

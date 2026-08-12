@@ -97,6 +97,20 @@ CREATE TABLE IF NOT EXISTS seller_policies_cache (
   json TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS plantillas_pedido_cache (
+  id INTEGER PRIMARY KEY NOT NULL,
+  cliente_id INTEGER NOT NULL,
+  json TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_plantillas_cliente ON plantillas_pedido_cache(cliente_id);
+
+CREATE TABLE IF NOT EXISTS ultimo_pedido_repeat_cache (
+  cliente_id INTEGER PRIMARY KEY NOT NULL,
+  json TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
 `
 
 /**

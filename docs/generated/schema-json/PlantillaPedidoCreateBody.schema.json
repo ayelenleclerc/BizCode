@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activa": {
+      "type": "boolean"
+    },
+    "items": {
+      "items": {
+        "$ref": "./PlantillaPedidoItemInput.schema.json"
+      },
+      "maxItems": 100,
+      "type": "array"
+    },
+    "nombre": {
+      "maxLength": 80,
+      "minLength": 1,
+      "type": "string"
+    },
+    "vendedorId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "nombre",
+    "items"
+  ],
+  "title": "PlantillaPedidoCreateBody",
+  "type": "object"
+}

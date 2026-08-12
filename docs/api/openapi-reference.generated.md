@@ -7886,6 +7886,1611 @@ Derived credit alert for App Seller (#256): debt totals, overdue, available cred
 }
 ```
 
+### PARAMETERS /api/clientes/{id}/ultimo-pedido-repeat
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/ultimo-pedido-repeat`
+
+### Prefill cart from the customer's last non-cancelled pedido
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/ultimo-pedido-repeat`
+- **Tags:** pedidos
+
+Resolves last pedido lines against the current catalog (#253). Inactive, parent, missing, or service lines are omitted. Requires `orders.create` or `customers.manage`.
+
+#### Responses
+
+##### Status: 200 Prefill payload
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`lines` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`condIva` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precio` (required)**
+
+      `number`
+
+    - **`stock` (required)**
+
+      `number`
+
+  - **`omitted` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`reason` (required)**
+
+      `string`, possible values: `"inactive", "parent", "missing", "service"`
+
+  - **`omittedCount` (required)**
+
+    `integer`
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+  - **`plantillaId` (required)**
+
+    `integer`
+
+  - **`source` (required)**
+
+    `string`, possible values: `"last_pedido", "plantilla"`
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "source": "last_pedido",
+    "pedidoId": 1,
+    "plantillaId": 1,
+    "total": "",
+    "createdAt": "",
+    "lines": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "precio": 1,
+        "stock": 1,
+        "cantidad": 1,
+        "condIva": ""
+      }
+    ],
+    "omitted": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "reason": "inactive"
+      }
+    ],
+    "omittedCount": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/clientes/{id}/plantillas-pedido
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/plantillas-pedido`
+
+### List order templates for a customer
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/plantillas-pedido`
+- **Tags:** pedidos
+
+Requires `orders.create` or `customers.manage`.
+
+#### Responses
+
+##### Status: 200 Templates
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "vendedorId": 1,
+      "nombre": "",
+      "activa": true,
+      "createdAt": "",
+      "updatedAt": "",
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "cantidad": 1,
+          "activo": true,
+          "orden": 1,
+          "descripcion": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Create an order template for a customer
+
+- **Method:** `POST`
+- **Path:** `/api/clientes/{id}/plantillas-pedido`
+- **Tags:** pedidos
+
+Requires `orders.create` or `customers.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`orden`**
+
+    `integer`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`activa`**
+
+  `boolean`
+
+- **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "activa": true,
+  "vendedorId": 1,
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "activo": true,
+      "orden": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Template created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "nombre": "",
+    "activa": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "activo": true,
+        "orden": 1,
+        "descripcion": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/plantillas-pedido/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/plantillas-pedido/{id}`
+
+### Get an order template
+
+- **Method:** `GET`
+- **Path:** `/api/plantillas-pedido/{id}`
+- **Tags:** pedidos
+
+Requires `orders.create` or `customers.manage`.
+
+#### Responses
+
+##### Status: 200 Template
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "nombre": "",
+    "activa": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "activo": true,
+        "orden": 1,
+        "descripcion": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Update an order template
+
+- **Method:** `PATCH`
+- **Path:** `/api/plantillas-pedido/{id}`
+- **Tags:** pedidos
+
+Requires `orders.create` or `customers.manage`. Replacing `items` deletes previous rows.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activa`**
+
+  `boolean`
+
+- **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`orden`**
+
+    `integer`
+
+- **`nombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "activa": true,
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "activo": true,
+      "orden": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated template
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "nombre": "",
+    "activa": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "activo": true,
+        "orden": 1,
+        "descripcion": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Delete an order template
+
+- **Method:** `DELETE`
+- **Path:** `/api/plantillas-pedido/{id}`
+- **Tags:** pedidos
+
+Requires `orders.create` or `customers.manage`.
+
+#### Responses
+
+##### Status: 200 Deleted id
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/plantillas-pedido/{id}/cargar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/plantillas-pedido/{id}/cargar`
+
+### Prefill cart from an order template
+
+- **Method:** `GET`
+- **Path:** `/api/plantillas-pedido/{id}/cargar`
+- **Tags:** pedidos
+
+Resolves active template items against the current catalog (#253). Requires `orders.create` or `customers.manage`.
+
+#### Responses
+
+##### Status: 200 Prefill payload
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`lines` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`condIva` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precio` (required)**
+
+      `number`
+
+    - **`stock` (required)**
+
+      `number`
+
+  - **`omitted` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`reason` (required)**
+
+      `string`, possible values: `"inactive", "parent", "missing", "service"`
+
+  - **`omittedCount` (required)**
+
+    `integer`
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+  - **`plantillaId` (required)**
+
+    `integer`
+
+  - **`source` (required)**
+
+    `string`, possible values: `"last_pedido", "plantilla"`
+
+  - **`total` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "source": "last_pedido",
+    "pedidoId": 1,
+    "plantillaId": 1,
+    "total": "",
+    "createdAt": "",
+    "lines": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "precio": 1,
+        "stock": 1,
+        "cantidad": 1,
+        "condIva": ""
+      }
+    ],
+    "omitted": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "reason": "inactive"
+      }
+    ],
+    "omittedCount": 0
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/clientes/{id}/recibos
 
 - **Method:** `PARAMETERS`
@@ -121804,6 +123409,807 @@ Originating invoice header (selected columns)
 - **Type:**
 
 **Example:**
+
+### RepeatOmitReason
+
+- **Type:**`string`
+
+**Example:**
+
+### PedidoPrefillLine
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`condIva` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`precio` (required)**
+
+  `number`
+
+* **`stock` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "descripcion": "",
+  "precio": 1,
+  "stock": 1,
+  "cantidad": 1,
+  "condIva": ""
+}
+```
+
+### PedidoPrefillOmitted
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`reason` (required)**
+
+  `string`, possible values: `"inactive", "parent", "missing", "service"`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "descripcion": "",
+  "reason": "inactive"
+}
+```
+
+### PedidoPrefill
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`lines` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`condIva` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`stock` (required)**
+
+    `number`
+
+* **`omitted` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`reason` (required)**
+
+    `string`, possible values: `"inactive", "parent", "missing", "service"`
+
+* **`omittedCount` (required)**
+
+  `integer`
+
+* **`pedidoId` (required)**
+
+  `integer`
+
+* **`plantillaId` (required)**
+
+  `integer`
+
+* **`source` (required)**
+
+  `string`, possible values: `"last_pedido", "plantilla"`
+
+* **`total` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "source": "last_pedido",
+  "pedidoId": 1,
+  "plantillaId": 1,
+  "total": "",
+  "createdAt": "",
+  "lines": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "precio": 1,
+      "stock": 1,
+      "cantidad": 1,
+      "condIva": ""
+    }
+  ],
+  "omitted": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "reason": "inactive"
+    }
+  ],
+  "omittedCount": 0
+}
+```
+
+### PedidoPrefillEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`lines` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`condIva` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`precio` (required)**
+
+      `number`
+
+    - **`stock` (required)**
+
+      `number`
+
+  - **`omitted` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`reason` (required)**
+
+      `string`, possible values: `"inactive", "parent", "missing", "service"`
+
+  - **`omittedCount` (required)**
+
+    `integer`
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+  - **`plantillaId` (required)**
+
+    `integer`
+
+  - **`source` (required)**
+
+    `string`, possible values: `"last_pedido", "plantilla"`
+
+  - **`total` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "source": "last_pedido",
+    "pedidoId": 1,
+    "plantillaId": 1,
+    "total": "",
+    "createdAt": "",
+    "lines": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "precio": 1,
+        "stock": 1,
+        "cantidad": 1,
+        "condIva": ""
+      }
+    ],
+    "omitted": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "reason": "inactive"
+      }
+    ],
+    "omittedCount": 0
+  }
+}
+```
+
+### PlantillaPedidoItem
+
+- **Type:**`object`
+
+* **`activo` (required)**
+
+  `boolean`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`orden` (required)**
+
+  `integer`
+
+* **`descripcion`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "cantidad": 1,
+  "activo": true,
+  "orden": 1,
+  "descripcion": ""
+}
+```
+
+### PlantillaPedido
+
+- **Type:**`object`
+
+* **`activa` (required)**
+
+  `boolean`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activo` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`orden` (required)**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`vendedorId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "clienteId": 1,
+  "vendedorId": 1,
+  "nombre": "",
+  "activa": true,
+  "createdAt": "",
+  "updatedAt": "",
+  "items": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "cantidad": 1,
+      "activo": true,
+      "orden": 1,
+      "descripcion": ""
+    }
+  ]
+}
+```
+
+### PlantillaPedidoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "clienteId": 1,
+    "vendedorId": 1,
+    "nombre": "",
+    "activa": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "items": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "cantidad": 1,
+        "activo": true,
+        "orden": 1,
+        "descripcion": ""
+      }
+    ]
+  }
+}
+```
+
+### PlantillaPedidoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`activo` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`orden` (required)**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`vendedorId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "clienteId": 1,
+      "vendedorId": 1,
+      "nombre": "",
+      "activa": true,
+      "createdAt": "",
+      "updatedAt": "",
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "cantidad": 1,
+          "activo": true,
+          "orden": 1,
+          "descripcion": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+### PlantillaPedidoItemInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`activo`**
+
+  `boolean`
+
+* **`orden`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "cantidad": 1,
+  "activo": true,
+  "orden": 0
+}
+```
+
+### PlantillaPedidoCreateBody
+
+- **Type:**`object`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`orden`**
+
+    `integer`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`activa`**
+
+  `boolean`
+
+* **`vendedorId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "activa": true,
+  "vendedorId": 1,
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "activo": true,
+      "orden": 0
+    }
+  ]
+}
+```
+
+### PlantillaPedidoPatchBody
+
+- **Type:**`object`
+
+* **`activa`**
+
+  `boolean`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`activo`**
+
+    `boolean`
+
+  - **`orden`**
+
+    `integer`
+
+* **`nombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "activa": true,
+  "items": [
+    {
+      "articuloId": 1,
+      "cantidad": 1,
+      "activo": true,
+      "orden": 0
+    }
+  ]
+}
+```
+
+### PlantillaPedidoDeleteEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1
+  }
+}
+```
 
 ### VisitaEstadoPlan
 
