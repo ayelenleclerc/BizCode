@@ -52,6 +52,7 @@ import { registerVendedorZonasRoutes } from './routes/registerVendedorZonasRoute
 import { registerRutasRoutes } from './routes/registerRutasRoutes'
 import { registerSellerAlertRoutes } from './routes/registerSellerAlertRoutes'
 import { registerPlantillaPedidoRoutes } from './routes/registerPlantillaPedidoRoutes'
+import { registerSugerenciasPedidoRoutes } from './routes/registerSugerenciasPedidoRoutes'
 import { registerRemitosRoutes } from './routes/registerRemitosRoutes'
 import { registerChequesRoutes } from './routes/registerChequesRoutes'
 import { registerBancosRoutes } from './routes/registerBancosRoutes'
@@ -137,6 +138,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerClienteCuentaCorrienteRoutes(app, ctx)
   registerSellerAlertRoutes(app, ctx)
   registerPlantillaPedidoRoutes(app, ctx)
+  registerSugerenciasPedidoRoutes(app, ctx)
   registerArticuloVariantesRoutes(app, ctx)
   registerArticulosRoutes(app, ctx)
   registerRubrosRoutes(app, ctx)

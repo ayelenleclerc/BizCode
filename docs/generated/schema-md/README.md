@@ -1238,6 +1238,18 @@
 
 * [StockMultipleResult](./stockmultipleresult.md) – `-`
 
+* [SugerenciaHabitual](./sugerenciahabitual.md) – `-`
+
+* [SugerenciaOferta](./sugerenciaoferta.md) – `-`
+
+* [SugerenciaOrigenPrecio](./sugerenciaorigenprecio.md) – `-`
+
+* [SugerenciasPedido](./sugerenciaspedido.md) – `-`
+
+* [SugerenciasPedidoEnvelope](./sugerenciaspedidoenvelope.md) – `-`
+
+* [SugerenciasPedidoSource](./sugerenciaspedidosource.md) – `-`
+
 * [SuperadminGlobalStats](./superadminglobalstats.md) – `-`
 
 * [SuperadminGlobalStatsEnvelope](./superadminglobalstatsenvelope.md) – `-`
@@ -2175,6 +2187,10 @@
 * [Untitled array in StockCriticoListEnvelope](./stockcriticolistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in StockMultipleResult](./stockmultipleresult-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in SugerenciasPedido](./sugerenciaspedido-properties-habituales.md) – `undefined#/properties/habituales`
+
+* [Untitled array in SugerenciasPedido](./sugerenciaspedido-properties-ofertas.md) – `undefined#/properties/ofertas`
 
 * [Untitled array in SuperadminSecurityEventsEnvelope](./superadminsecurityeventsenvelope-properties-data.md) – `undefined#/properties/data`
 

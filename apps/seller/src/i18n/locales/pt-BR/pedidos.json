@@ -47,5 +47,16 @@
   "omittedItems": "{{count}} artigos indisponíveis foram omitidos.",
   "saveAsTemplate": "Salvar carrinho como modelo",
   "templateName": "Nome do modelo",
-  "saveTemplate": "Salvar"
+  "saveTemplate": "Salvar",
+  "suggestions": {
+    "habitualesTitle": "Habituais",
+    "ofertasTitle": "Ofertas ativas",
+    "empty": "Ainda não há sugestões para este cliente.",
+    "agoDays": "há {{count}} d",
+    "anomaly": "Mais tempo que o habitual",
+    "suggestedQty": "Qtd. sugerida {{count}}",
+    "discount": "-{{pct}}%",
+    "addSuggested": "Adicionar quantidade sugerida",
+    "searchOthers": "Buscar outros artigos"
+  }
 }

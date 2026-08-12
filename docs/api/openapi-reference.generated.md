@@ -8123,6 +8123,263 @@ Resolves last pedido lines against the current catalog (#253). Inactive, parent,
 }
 ```
 
+### PARAMETERS /api/clientes/{id}/sugerencias-pedido
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/clientes/{id}/sugerencias-pedido`
+
+### Habituales + active offers suggestions for a customer
+
+- **Method:** `GET`
+- **Path:** `/api/clientes/{id}/sugerencias-pedido`
+- **Tags:** pedidos
+
+Ranks the most frequent SKUs from non-cancelled pedidos in the last \~6 months and lists active ArticuloOferta rows not already in habituales (#254). Requires `orders.create` or `customers.manage`. Results may be cached for 1 hour.
+
+#### Responses
+
+##### Status: 200 Suggestions payload
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`habituales` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`anomalia` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadSugerida` (required)**
+
+      `number`
+
+    - **`condIva` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`diasDesdeUltima` (required)**
+
+      `integer`
+
+    - **`frecuenciaDias` (required)**
+
+      `number`
+
+    - **`origenPrecio` (required)**
+
+      `string`, possible values: `"lista", "oferta"`
+
+    - **`precio` (required)**
+
+      `number`
+
+    - **`stock` (required)**
+
+      `number`
+
+  - **`ofertas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`condIva` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`descuentoPct` (required)**
+
+      `number`
+
+    - **`precioLista` (required)**
+
+      `number`
+
+    - **`precioOferta` (required)**
+
+      `number`
+
+    - **`stock` (required)**
+
+      `number`
+
+    - **`vigenciaHasta` (required)**
+
+      `string`, format: `date-time`
+
+  - **`source` (required)**
+
+    `string`, possible values: `"historial", "ultimo_pedido", "vacio"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "source": "historial",
+    "habituales": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "cantidadSugerida": 1,
+        "diasDesdeUltima": 0,
+        "frecuenciaDias": 1,
+        "anomalia": true,
+        "precio": 1,
+        "stock": 1,
+        "condIva": "",
+        "origenPrecio": "lista"
+      }
+    ],
+    "ofertas": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "precioOferta": 1,
+        "precioLista": 1,
+        "descuentoPct": 1,
+        "stock": 1,
+        "condIva": "",
+        "vigenciaHasta": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/clientes/{id}/plantillas-pedido
 
 - **Method:** `PARAMETERS`
@@ -123702,6 +123959,393 @@ Originating invoice header (selected columns)
       }
     ],
     "omittedCount": 0
+  }
+}
+```
+
+### SugerenciasPedidoSource
+
+- **Type:**`string`
+
+**Example:**
+
+### SugerenciaOrigenPrecio
+
+- **Type:**`string`
+
+**Example:**
+
+### SugerenciaHabitual
+
+- **Type:**`object`
+
+* **`anomalia` (required)**
+
+  `boolean`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidadSugerida` (required)**
+
+  `number`
+
+* **`condIva` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`diasDesdeUltima` (required)**
+
+  `integer`
+
+* **`frecuenciaDias` (required)**
+
+  `number`
+
+* **`origenPrecio` (required)**
+
+  `string`, possible values: `"lista", "oferta"`
+
+* **`precio` (required)**
+
+  `number`
+
+* **`stock` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "descripcion": "",
+  "cantidadSugerida": 1,
+  "diasDesdeUltima": 0,
+  "frecuenciaDias": 1,
+  "anomalia": true,
+  "precio": 1,
+  "stock": 1,
+  "condIva": "",
+  "origenPrecio": "lista"
+}
+```
+
+### SugerenciaOferta
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`condIva` (required)**
+
+  `string`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`descuentoPct` (required)**
+
+  `number`
+
+* **`precioLista` (required)**
+
+  `number`
+
+* **`precioOferta` (required)**
+
+  `number`
+
+* **`stock` (required)**
+
+  `number`
+
+* **`vigenciaHasta` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "descripcion": "",
+  "precioOferta": 1,
+  "precioLista": 1,
+  "descuentoPct": 1,
+  "stock": 1,
+  "condIva": "",
+  "vigenciaHasta": ""
+}
+```
+
+### SugerenciasPedido
+
+- **Type:**`object`
+
+* **`habituales` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`anomalia` (required)**
+
+    `boolean`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidadSugerida` (required)**
+
+    `number`
+
+  - **`condIva` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`diasDesdeUltima` (required)**
+
+    `integer`
+
+  - **`frecuenciaDias` (required)**
+
+    `number`
+
+  - **`origenPrecio` (required)**
+
+    `string`, possible values: `"lista", "oferta"`
+
+  - **`precio` (required)**
+
+    `number`
+
+  - **`stock` (required)**
+
+    `number`
+
+* **`ofertas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`condIva` (required)**
+
+    `string`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`descuentoPct` (required)**
+
+    `number`
+
+  - **`precioLista` (required)**
+
+    `number`
+
+  - **`precioOferta` (required)**
+
+    `number`
+
+  - **`stock` (required)**
+
+    `number`
+
+  - **`vigenciaHasta` (required)**
+
+    `string`, format: `date-time`
+
+* **`source` (required)**
+
+  `string`, possible values: `"historial", "ultimo_pedido", "vacio"`
+
+**Example:**
+
+```json
+{
+  "source": "historial",
+  "habituales": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "cantidadSugerida": 1,
+      "diasDesdeUltima": 0,
+      "frecuenciaDias": 1,
+      "anomalia": true,
+      "precio": 1,
+      "stock": 1,
+      "condIva": "",
+      "origenPrecio": "lista"
+    }
+  ],
+  "ofertas": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "precioOferta": 1,
+      "precioLista": 1,
+      "descuentoPct": 1,
+      "stock": 1,
+      "condIva": "",
+      "vigenciaHasta": ""
+    }
+  ]
+}
+```
+
+### SugerenciasPedidoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`habituales` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`anomalia` (required)**
+
+      `boolean`
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidadSugerida` (required)**
+
+      `number`
+
+    - **`condIva` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`diasDesdeUltima` (required)**
+
+      `integer`
+
+    - **`frecuenciaDias` (required)**
+
+      `number`
+
+    - **`origenPrecio` (required)**
+
+      `string`, possible values: `"lista", "oferta"`
+
+    - **`precio` (required)**
+
+      `number`
+
+    - **`stock` (required)**
+
+      `number`
+
+  - **`ofertas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`condIva` (required)**
+
+      `string`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`descuentoPct` (required)**
+
+      `number`
+
+    - **`precioLista` (required)**
+
+      `number`
+
+    - **`precioOferta` (required)**
+
+      `number`
+
+    - **`stock` (required)**
+
+      `number`
+
+    - **`vigenciaHasta` (required)**
+
+      `string`, format: `date-time`
+
+  - **`source` (required)**
+
+    `string`, possible values: `"historial", "ultimo_pedido", "vacio"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "source": "historial",
+    "habituales": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "cantidadSugerida": 1,
+        "diasDesdeUltima": 0,
+        "frecuenciaDias": 1,
+        "anomalia": true,
+        "precio": 1,
+        "stock": 1,
+        "condIva": "",
+        "origenPrecio": "lista"
+      }
+    ],
+    "ofertas": [
+      {
+        "articuloId": 1,
+        "descripcion": "",
+        "precioOferta": 1,
+        "precioLista": 1,
+        "descuentoPct": 1,
+        "stock": 1,
+        "condIva": "",
+        "vigenciaHasta": ""
+      }
+    ]
   }
 }
 ```

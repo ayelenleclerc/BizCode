@@ -15,8 +15,23 @@ import {
   TextInput,
 } from 'react-native-paper'
 import type { ArticuloListItem } from '@bizcode/api-client'
-import type { Rubro, SellerPolicies, SellerStockEstado, StockMultipleItem } from '@bizcode/types'
-import { articulosAPI, clientesAPI, plantillasPedidoAPI, rubrosAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
+import type {
+  Rubro,
+  SellerPolicies,
+  SellerStockEstado,
+  StockMultipleItem,
+  SugerenciaHabitual,
+  SugerenciaOferta,
+  SugerenciasPedido,
+} from '@bizcode/types'
+import {
+  articulosAPI,
+  clientesAPI,
+  plantillasPedidoAPI,
+  rubrosAPI,
+  sellerAlertsAPI,
+  sugerenciasPedidoAPI,
+} from '../../../src/api/sellerApi'
 import { capQtyToStock } from '../../../src/alerts/policyGates'
 import { mapApiErrorToUiState, type UiLoadState } from '../../../src/lib/apiErrors'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
@@ -65,7 +80,11 @@ export default function NuevoPedidoScreen() {
   const [saveDialog, setSaveDialog] = useState(false)
   const [saveNombre, setSaveNombre] = useState('')
   const [saveBusy, setSaveBusy] = useState(false)
+  const [sugerencias, setSugerencias] = useState<SugerenciasPedido | null>(null)
+  const [sugerenciasState, setSugerenciasState] = useState<UiLoadState>('idle')
   const reqId = useRef(0)
+
+  const showSuggestions = query.trim().length === 0
 
   useEffect(() => {
     if (Number.isInteger(parsedClienteId) && parsedClienteId >= 1) {
@@ -120,6 +139,56 @@ export default function NuevoPedidoScreen() {
         if (cancelled) return
         setCliente(null)
         setClienteState(mapApiErrorToUiState(err))
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [cart.clienteId])
+
+  useEffect(() => {
+    let cancelled = false
+    const id = cart.clienteId
+    if (id == null) {
+      setSugerencias(null)
+      setSugerenciasState('idle')
+      return
+    }
+    setSugerenciasState('loading')
+    void (async () => {
+      try {
+        const data = await sugerenciasPedidoAPI.get(id)
+        if (cancelled) return
+        setSugerencias(data)
+        setSugerenciasState('success')
+        try {
+          const { getOfflineDb } = await import('../../../src/offline/db')
+          const { upsertSugerenciasPedido } = await import('../../../src/offline/repos')
+          const db = await getOfflineDb()
+          await upsertSugerenciasPedido(db, id, data as unknown as Record<string, unknown>)
+        } catch {
+          // cache best-effort
+        }
+      } catch {
+        try {
+          const { getOfflineDb } = await import('../../../src/offline/db')
+          const { getSugerenciasPedidoLocal } = await import('../../../src/offline/repos')
+          const db = await getOfflineDb()
+          const cached = (await getSugerenciasPedidoLocal(db, id)) as SugerenciasPedido | null
+          if (cancelled) return
+          if (cached) {
+            setSugerencias(cached)
+            setSugerenciasState('success')
+          } else {
+            setSugerencias(null)
+            setSugerenciasState('empty')
+          }
+        } catch {
+          if (!cancelled) {
+            setSugerencias(null)
+            setSugerenciasState('error')
+          }
+        }
       }
     })()
     return () => {
@@ -191,14 +260,18 @@ export default function NuevoPedidoScreen() {
     const ids = new Set<number>()
     for (const a of filtered) ids.add(a.id)
     for (const l of cart.lines) ids.add(l.articuloId)
+    if (sugerencias) {
+      for (const h of sugerencias.habituales) ids.add(h.articuloId)
+      for (const o of sugerencias.ofertas) ids.add(o.articuloId)
+    }
     return Array.from(ids)
       .filter((n) => Number.isInteger(n) && n >= 1)
       .sort((a, b) => a - b)
       .join(',')
-  }, [filtered, cart.lines])
+  }, [filtered, cart.lines, sugerencias])
 
   useEffect(() => {
-    if (state !== 'success') return
+    if (state !== 'success' && sugerenciasState !== 'success') return
     const ids = stockIdsKey
       ? stockIdsKey.split(',').map((s) => Number.parseInt(s, 10)).filter((n) => Number.isInteger(n) && n >= 1)
       : []
@@ -250,18 +323,21 @@ export default function NuevoPedidoScreen() {
     return () => {
       cancelled = true
     }
-  }, [state, stockIdsKey, cart])
+  }, [state, sugerenciasState, stockIdsKey, cart])
 
   const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt-BR' ? 'pt-BR' : 'es-AR'
   const suspended = Boolean(cliente?.suspended)
   const capEnabled = policies?.sellerStockCapQtyToAvailable ?? true
 
-  const resolveStock = (item: ArticuloListItem) => {
-    const fromMulti = stockById[item.id]
-    const stock = fromMulti?.stock ?? Number(item.stock ?? 0)
+  const resolveStockByArticuloId = (articuloId: number, fallbackStock: number) => {
+    const fromMulti = stockById[articuloId]
+    const stock = fromMulti?.stock ?? fallbackStock
     const estado = fromMulti?.estado || deriveStockEstado(stock)
     return { stock, estado }
   }
+
+  const resolveStock = (item: ArticuloListItem) =>
+    resolveStockByArticuloId(item.id, Number(item.stock ?? 0))
 
   const tryAddOrInc = (item: ArticuloListItem, currentQty: number) => {
     const { stock } = resolveStock(item)
@@ -285,6 +361,53 @@ export default function NuevoPedidoScreen() {
     })
   }
 
+  const tryAddHabitual = (h: SugerenciaHabitual) => {
+    const { stock } = resolveStockByArticuloId(h.articuloId, h.stock)
+    const inCart = cart.lines.find((l) => l.articuloId === h.articuloId)
+    if (inCart) {
+      const desired = inCart.cantidad + 1
+      const capped = capQtyToStock(desired, stock, capEnabled)
+      if (capped === 0 && policies?.sellerStockZeroAction === 'block') return
+      if (capped <= 0 || capped === inCart.cantidad) return
+      cart.setCantidad(h.articuloId, capped)
+      return
+    }
+    const capped = capQtyToStock(h.cantidadSugerida, stock, capEnabled)
+    if (capped === 0 && policies?.sellerStockZeroAction === 'block') return
+    if (capped <= 0) return
+    cart.addOrIncrement({
+      articuloId: h.articuloId,
+      descripcion: h.descripcion,
+      precio: h.precio,
+      stock,
+      condIva: h.condIva,
+      cantidad: capped,
+    })
+  }
+
+  const tryAddOferta = (o: SugerenciaOferta) => {
+    const { stock } = resolveStockByArticuloId(o.articuloId, o.stock)
+    const inCart = cart.lines.find((l) => l.articuloId === o.articuloId)
+    const currentQty = inCart?.cantidad ?? 0
+    const desired = currentQty + 1
+    const capped = capQtyToStock(desired, stock, capEnabled)
+    if (capped === 0 && policies?.sellerStockZeroAction === 'block') return
+    if (capped <= 0) return
+    if (inCart) {
+      if (capped === currentQty) return
+      cart.setCantidad(o.articuloId, capped)
+      return
+    }
+    cart.addOrIncrement({
+      articuloId: o.articuloId,
+      descripcion: o.descripcion,
+      precio: o.precioOferta,
+      stock,
+      condIva: o.condIva,
+      cantidad: capped,
+    })
+  }
+
   if (cart.clienteId == null || clienteState === 'not_found') {
     return (
       <View style={styles.root} testID="seller-pedido-nuevo">
@@ -295,6 +418,181 @@ export default function NuevoPedidoScreen() {
       </View>
     )
   }
+
+  const renderQtyControls = (
+    articuloId: number,
+    onDec: () => void,
+    onInc: () => void,
+    testPrefix: string,
+  ) => {
+    const inCart = cart.lines.find((l) => l.articuloId === articuloId)
+    if (inCart) {
+      return (
+        <View style={styles.qtyRow}>
+          <Button
+            compact
+            mode="outlined"
+            onPress={onDec}
+            disabled={suspended}
+            testID={`${testPrefix}-qty-dec-${articuloId}`}
+            accessibilityLabel="-"
+          >
+            −
+          </Button>
+          <View testID={`${testPrefix}-qty-${articuloId}`}>
+            <Text>{inCart.cantidad}</Text>
+          </View>
+          <Button
+            compact
+            mode="outlined"
+            onPress={onInc}
+            disabled={suspended}
+            testID={`${testPrefix}-qty-inc-${articuloId}`}
+            accessibilityLabel="+"
+          >
+            +
+          </Button>
+        </View>
+      )
+    }
+    return null
+  }
+
+  const suggestionsHeader = showSuggestions ? (
+    <View testID="seller-pedido-suggestions" style={styles.suggestionsBlock}>
+      {sugerenciasState === 'loading' && (
+        <View style={styles.centered} testID="seller-pedido-suggestions-loading">
+          <ActivityIndicator />
+        </View>
+      )}
+      {sugerencias &&
+      sugerencias.habituales.length === 0 &&
+      sugerencias.ofertas.length === 0 &&
+      sugerenciasState === 'success' ? (
+        <Text style={styles.hint} testID="seller-pedido-suggestions-empty">
+          {t('pedidos:suggestions.empty')}
+        </Text>
+      ) : null}
+      {sugerencias && sugerencias.habituales.length > 0 ? (
+        <View testID="seller-pedido-habituales">
+          <Text variant="titleMedium" style={styles.sectionTitle}>
+            {t('pedidos:suggestions.habitualesTitle')}
+          </Text>
+          {sugerencias.habituales.map((h) => {
+            const { stock, estado } = resolveStockByArticuloId(h.articuloId, h.stock)
+            const inCart = cart.lines.find((l) => l.articuloId === h.articuloId)
+            const stockColor = STOCK_COLOR[estado]
+            return (
+              <View key={h.articuloId} style={styles.row} testID={`seller-pedido-habitual-${h.articuloId}`}>
+                <View style={styles.rowMain}>
+                  <Text variant="titleSmall">{h.descripcion}</Text>
+                  <Text style={styles.meta}>
+                    {formatMoney(h.precio, locale)} ·{' '}
+                    {t('pedidos:suggestions.agoDays', { count: h.diasDesdeUltima })} ·{' '}
+                    {t('pedidos:suggestions.suggestedQty', { count: h.cantidadSugerida })}
+                  </Text>
+                  {h.anomalia ? (
+                    <Chip
+                      compact
+                      icon="alert"
+                      style={styles.anomalyChip}
+                      testID={`seller-pedido-habitual-anomalia-${h.articuloId}`}
+                      accessibilityLabel={t('pedidos:suggestions.anomaly')}
+                    >
+                      {t('pedidos:suggestions.anomaly')}
+                    </Chip>
+                  ) : null}
+                  <View style={styles.stockRow} testID={`seller-pedido-habitual-stock-${h.articuloId}`}>
+                    <Chip
+                      compact
+                      style={[styles.stockChip, { borderColor: stockColor }]}
+                      textStyle={{ color: stockColor, fontSize: 12 }}
+                    >
+                      {t(`pedidos:stockStatus.${estado}`)} · {t('pedidos:stock', { count: stock })}
+                    </Chip>
+                  </View>
+                </View>
+                {inCart
+                  ? renderQtyControls(
+                      h.articuloId,
+                      () => cart.setCantidad(h.articuloId, inCart.cantidad - 1),
+                      () => tryAddHabitual(h),
+                      'seller-pedido-habitual',
+                    )
+                  : (
+                      <Button
+                        mode="contained-tonal"
+                        compact
+                        disabled={suspended}
+                        onPress={() => tryAddHabitual(h)}
+                        testID={`seller-pedido-habitual-add-${h.articuloId}`}
+                        accessibilityLabel={t('pedidos:suggestions.addSuggested')}
+                      >
+                        {t('pedidos:add')}
+                      </Button>
+                    )}
+              </View>
+            )
+          })}
+        </View>
+      ) : null}
+      {sugerencias && sugerencias.ofertas.length > 0 ? (
+        <View testID="seller-pedido-ofertas">
+          <Text variant="titleMedium" style={styles.sectionTitle}>
+            {t('pedidos:suggestions.ofertasTitle')}
+          </Text>
+          {sugerencias.ofertas.map((o: SugerenciaOferta) => {
+            const { stock, estado } = resolveStockByArticuloId(o.articuloId, o.stock)
+            const inCart = cart.lines.find((l) => l.articuloId === o.articuloId)
+            const stockColor = STOCK_COLOR[estado]
+            return (
+              <View key={o.articuloId} style={styles.row} testID={`seller-pedido-oferta-${o.articuloId}`}>
+                <View style={styles.rowMain}>
+                  <Text variant="titleSmall">{o.descripcion}</Text>
+                  <Text style={styles.meta}>
+                    {formatMoney(o.precioOferta, locale)}{' '}
+                    <Text style={styles.strike}>{formatMoney(o.precioLista, locale)}</Text>{' '}
+                    {t('pedidos:suggestions.discount', { pct: o.descuentoPct })}
+                  </Text>
+                  <View style={styles.stockRow}>
+                    <Chip
+                      compact
+                      style={[styles.stockChip, { borderColor: stockColor }]}
+                      textStyle={{ color: stockColor, fontSize: 12 }}
+                    >
+                      {t(`pedidos:stockStatus.${estado}`)} · {t('pedidos:stock', { count: stock })}
+                    </Chip>
+                  </View>
+                </View>
+                {inCart
+                  ? renderQtyControls(
+                      o.articuloId,
+                      () => cart.setCantidad(o.articuloId, inCart.cantidad - 1),
+                      () => tryAddOferta(o),
+                      'seller-pedido-oferta',
+                    )
+                  : (
+                      <Button
+                        mode="contained-tonal"
+                        compact
+                        disabled={suspended}
+                        onPress={() => tryAddOferta(o)}
+                        testID={`seller-pedido-oferta-add-${o.articuloId}`}
+                        accessibilityLabel={t('pedidos:add')}
+                      >
+                        {t('pedidos:add')}
+                      </Button>
+                    )}
+              </View>
+            )
+          })}
+        </View>
+      ) : null}
+      <Text variant="titleSmall" style={styles.sectionTitle}>
+        {t('pedidos:suggestions.searchOthers')}
+      </Text>
+    </View>
+  ) : null
 
   return (
     <View style={styles.root} testID="seller-pedido-nuevo">
@@ -357,14 +655,9 @@ export default function NuevoPedidoScreen() {
         )}
       />
 
-      {state === 'loading' && (
+      {state === 'loading' && !showSuggestions && (
         <View style={styles.centered} testID="seller-pedido-catalog-loading">
           <ActivityIndicator />
-        </View>
-      )}
-      {state === 'empty' && (
-        <View testID="seller-pedido-catalog-empty">
-          <Text style={styles.hint}>{t('pedidos:emptyCatalog')}</Text>
         </View>
       )}
       {(state === 'error' || state === 'offline' || state === 'forbidden') && (
@@ -380,14 +673,15 @@ export default function NuevoPedidoScreen() {
         </View>
       )}
 
-      {state === 'success' && (
+      {(state === 'success' || state === 'empty' || showSuggestions) && (
         <FlatList
           data={filtered}
           keyExtractor={(item) => String(item.id)}
           testID="seller-pedido-catalog-list"
           contentContainerStyle={styles.list}
+          ListHeaderComponent={suggestionsHeader}
           ListEmptyComponent={
-            <Text style={styles.hint}>{t('pedidos:emptyCatalog')}</Text>
+            showSuggestions ? null : <Text style={styles.hint}>{t('pedidos:emptyCatalog')}</Text>
           }
           renderItem={({ item }) => {
             const precio = parseMoney(item.precioLista1)
@@ -398,9 +692,7 @@ export default function NuevoPedidoScreen() {
               <View style={styles.row} testID={`seller-pedido-articulo-${item.id}`}>
                 <View style={styles.rowMain}>
                   <Text variant="titleSmall">{item.descripcion}</Text>
-                  <Text style={styles.meta}>
-                    {formatMoney(precio, locale)}
-                  </Text>
+                  <Text style={styles.meta}>{formatMoney(precio, locale)}</Text>
                   <View style={styles.stockRow} testID={`seller-pedido-stock-${item.id}`}>
                     <Chip
                       compact
@@ -538,6 +830,8 @@ const styles = StyleSheet.create({
   rubros: { maxHeight: 44, marginBottom: 4 },
   chip: { marginRight: 8 },
   list: { paddingBottom: 96 },
+  suggestionsBlock: { marginBottom: 8 },
+  sectionTitle: { marginTop: 8, marginBottom: 4 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -548,8 +842,10 @@ const styles = StyleSheet.create({
   },
   rowMain: { flex: 1, gap: 2 },
   meta: { opacity: 0.7, fontSize: 13 },
+  strike: { textDecorationLine: 'line-through', opacity: 0.6 },
   stockRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 2 },
   stockChip: { alignSelf: 'flex-start', backgroundColor: 'transparent', borderWidth: 1 },
+  anomalyChip: { alignSelf: 'flex-start', backgroundColor: '#FFF3E0', marginTop: 2 },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   hint: { opacity: 0.7, padding: 8 },
   saveTpl: { marginHorizontal: 8, marginBottom: 72 },

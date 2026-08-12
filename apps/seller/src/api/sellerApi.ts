@@ -7,6 +7,7 @@ import {
   createRutasAPI,
   createSellerAlertsAPI,
   createPlantillasPedidoAPI,
+  createSugerenciasPedidoAPI,
   createVisitasAPI,
 } from '@bizcode/api-client'
 import type { DeliveryZone } from '@bizcode/types'
@@ -20,6 +21,7 @@ export const visitasAPI = createVisitasAPI(sellerHttp)
 export const rutasAPI = createRutasAPI(sellerHttp)
 export const sellerAlertsAPI = createSellerAlertsAPI(sellerHttp)
 export const plantillasPedidoAPI = createPlantillasPedidoAPI(sellerHttp)
+export const sugerenciasPedidoAPI = createSugerenciasPedidoAPI(sellerHttp)
 export const pushNotificationsAPI = createPushNotificationsAPI(sellerHttp)
 
 /**
