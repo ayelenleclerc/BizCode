@@ -41,6 +41,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
         sellerCreditOverdueAction: 'warn',
         sellerStockZeroAction: 'warn',
         sellerStockCapQtyToAvailable: true,
+        sellerWhatsappTemplate: null,
       }),
       create: vi.fn(),
       update: vi.fn().mockResolvedValue({}),
@@ -131,6 +132,12 @@ describe('seller alert APIs (#256)', () => {
       .send({ sellerStockZeroAction: 'block' })
     expect(ok.status).toBe(200)
     assertMatchesOpenApi('/api/tenant-config/seller-policies', 'patch', '200', ok.body)
+
+    const template = await request(app)
+      .patch('/api/tenant-config/seller-policies')
+      .send({ sellerWhatsappTemplate: 'Hola {{numero}} {{total}}' })
+    expect(template.status).toBe(200)
+    assertMatchesOpenApi('/api/tenant-config/seller-policies', 'patch', '200', template.body)
   })
 
   it('rejects invalid stock-multiple ids', async () => {

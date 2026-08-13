@@ -5,6 +5,9 @@ import type {
   PedidoListResponse,
   PedidoRow,
   PedidoTransitionInput,
+  WhatsAppSendInput,
+  WhatsAppSendResult,
+  WhatsAppSharePreview,
 } from '@bizcode/types'
 import { api } from '../default-client'
 import { handleError } from '../errors'
@@ -55,6 +58,38 @@ export function createPedidosAPI(http: AxiosInstance) {
     confirm: async (id: number): Promise<PedidoRow> => {
       try {
         const response = await http.post<{ success: boolean; data: PedidoRow }>(`/pedidos/${id}/confirm`)
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    getWhatsAppShare: async (
+      id: number,
+      locale?: string,
+    ): Promise<WhatsAppSharePreview> => {
+      try {
+        const response = await http.get<{ success: boolean; data: WhatsAppSharePreview }>(
+          `/pedidos/${id}/whatsapp-share`,
+          locale ? { params: { locale } } : undefined,
+        )
+        return response.data.data
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    sendWhatsApp: async (
+      id: number,
+      body: WhatsAppSendInput,
+      locale?: string,
+    ): Promise<WhatsAppSendResult> => {
+      try {
+        const response = await http.post<{ success: boolean; data: WhatsAppSendResult }>(
+          `/pedidos/${id}/whatsapp`,
+          body,
+          locale ? { params: { locale } } : undefined,
+        )
         return response.data.data
       } catch (error) {
         return handleError(error as AxiosError<ApiErrorPayload>)

@@ -60,6 +60,8 @@ const envSchema = z.object({
       .optional(),
   ),
   TWILIO_ACCOUNT_SID: optionalNonEmptyString,
+  TWILIO_AUTH_TOKEN: optionalNonEmptyString,
+  TWILIO_WHATSAPP_FROM: optionalNonEmptyString,
   LOG_LEVEL: optionalNonEmptyString,
   CORS_ORIGINS: optionalNonEmptyString,
   HTTP_RATE_LIMIT_PER_MINUTE: optionalPositiveInt,

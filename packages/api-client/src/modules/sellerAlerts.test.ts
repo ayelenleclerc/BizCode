@@ -40,6 +40,7 @@ describe('createSellerAlertsAPI', () => {
           sellerCreditOverdueAction: 'warn',
           sellerStockZeroAction: 'warn',
           sellerStockCapQtyToAvailable: true,
+          sellerWhatsappTemplate: null,
         },
       },
     })

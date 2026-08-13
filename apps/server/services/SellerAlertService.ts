@@ -18,6 +18,16 @@ const DEFAULT_POLICIES: SellerPolicies = {
   sellerCreditOverdueAction: 'warn',
   sellerStockZeroAction: 'warn',
   sellerStockCapQtyToAvailable: true,
+  sellerWhatsappTemplate: null,
+}
+
+const WHATSAPP_TEMPLATE_MAX = 1024
+
+function parseWhatsappTemplate(value: string | null | undefined): string | null {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  return trimmed.length > WHATSAPP_TEMPLATE_MAX ? trimmed.slice(0, WHATSAPP_TEMPLATE_MAX) : trimmed
 }
 
 const ACTIONS = new Set<SellerAlertAction>(['warn', 'block'])
@@ -92,6 +102,7 @@ export class SellerAlertService {
         sellerCreditOverdueAction: true,
         sellerStockZeroAction: true,
         sellerStockCapQtyToAvailable: true,
+        sellerWhatsappTemplate: true,
       },
     })
     if (!row) {
@@ -111,6 +122,7 @@ export class SellerAlertService {
         DEFAULT_POLICIES.sellerStockZeroAction,
       ),
       sellerStockCapQtyToAvailable: row.sellerStockCapQtyToAvailable,
+      sellerWhatsappTemplate: parseWhatsappTemplate(row.sellerWhatsappTemplate),
     }
   }
 
@@ -124,6 +136,7 @@ export class SellerAlertService {
       sellerCreditOverdueAction?: string
       sellerStockZeroAction?: string
       sellerStockCapQtyToAvailable?: boolean
+      sellerWhatsappTemplate?: string | null
       updatedById: number
     } = { updatedById: changedById }
 
@@ -148,6 +161,9 @@ export class SellerAlertService {
     if (input.sellerStockCapQtyToAvailable !== undefined) {
       patch.sellerStockCapQtyToAvailable = Boolean(input.sellerStockCapQtyToAvailable)
     }
+    if (input.sellerWhatsappTemplate !== undefined) {
+      patch.sellerWhatsappTemplate = parseWhatsappTemplate(input.sellerWhatsappTemplate)
+    }
 
     const existing = await this.prisma.tenantConfig.findUnique({ where: { tenantId } })
     if (!existing) {
@@ -167,6 +183,10 @@ export class SellerAlertService {
             patch.sellerStockZeroAction ?? DEFAULT_POLICIES.sellerStockZeroAction,
           sellerStockCapQtyToAvailable:
             patch.sellerStockCapQtyToAvailable ?? DEFAULT_POLICIES.sellerStockCapQtyToAvailable,
+          sellerWhatsappTemplate:
+            patch.sellerWhatsappTemplate !== undefined
+              ? patch.sellerWhatsappTemplate
+              : DEFAULT_POLICIES.sellerWhatsappTemplate,
           updatedById: changedById,
         },
       })

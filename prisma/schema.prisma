@@ -2493,6 +2493,10 @@ model TenantConfig {
   /// @es Limitar cantidad del pedido al stock disponible en Seller (#256).
   /// @pt-BR Limitar a quantidade do pedido ao estoque disponível no Seller (#256).
   sellerStockCapQtyToAvailable Boolean @default(true)
+  /// @en Optional Seller WhatsApp order-confirmation template (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
+  /// @es Plantilla opcional WhatsApp de confirmación Seller (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
+  /// @pt-BR Modelo opcional WhatsApp de confirmação Seller (#265). Variáveis {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
+  sellerWhatsappTemplate String? @db.VarChar(1024)
   updatedById           Int?
   updatedBy             AppUser? @relation("TenantConfigUpdatedBy", fields: [updatedById], references: [id])
   updatedAt             DateTime @updatedAt

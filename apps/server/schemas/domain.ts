@@ -2887,15 +2887,22 @@ export const sellerPoliciesPatchBodySchema = z
     sellerCreditOverdueAction: sellerAlertActionSchema.optional(),
     sellerStockZeroAction: sellerAlertActionSchema.optional(),
     sellerStockCapQtyToAvailable: z.boolean().optional(),
+    sellerWhatsappTemplate: z.union([z.string().max(1024), z.null()]).optional(),
   })
   .refine(
     (data) =>
       data.sellerCreditOverLimitAction !== undefined ||
       data.sellerCreditOverdueAction !== undefined ||
       data.sellerStockZeroAction !== undefined ||
-      data.sellerStockCapQtyToAvailable !== undefined,
+      data.sellerStockCapQtyToAvailable !== undefined ||
+      data.sellerWhatsappTemplate !== undefined,
     { message: 'At least one seller policy field is required' },
   )
+
+/** @en Body for POST /api/pedidos/{id}/whatsapp (#265). */
+export const pedidoWhatsAppBodySchema = z.object({
+  canal: z.enum(['link', 'twilio']),
+})
 
 const plantillaPedidoItemInputSchema = z.object({
   articuloId: z.number().int().min(1),

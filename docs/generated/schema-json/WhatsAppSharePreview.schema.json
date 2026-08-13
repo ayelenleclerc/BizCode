@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "phone": {
+      "description": "Digits-only Cliente.telef; empty when missing.",
+      "type": "string"
+    },
+    "reason": {
+      "enum": [
+        "no_phone"
+      ],
+      "type": "string"
+    },
+    "text": {
+      "maxLength": 1024,
+      "type": "string"
+    },
+    "twilioAvailable": {
+      "type": "boolean"
+    },
+    "waMeUrl": {
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "phone",
+    "text",
+    "waMeUrl",
+    "twilioAvailable"
+  ],
+  "title": "WhatsAppSharePreview",
+  "type": "object"
+}

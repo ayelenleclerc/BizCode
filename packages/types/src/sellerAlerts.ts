@@ -18,6 +18,8 @@ export type SellerPolicies = {
   sellerCreditOverdueAction: SellerAlertAction
   sellerStockZeroAction: SellerAlertAction
   sellerStockCapQtyToAvailable: boolean
+  /** @en Optional WhatsApp confirmation template (#265). @es Plantilla opcional WhatsApp (#265). @pt-BR Modelo opcional WhatsApp (#265). */
+  sellerWhatsappTemplate: string | null
 }
 
 export type SellerPoliciesPatchInput = Partial<SellerPolicies>

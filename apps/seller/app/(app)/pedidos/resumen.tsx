@@ -11,7 +11,7 @@ import {
   Text,
   TextInput,
 } from 'react-native-paper'
-import type { EstadoCredito, SellerPolicies } from '@bizcode/types'
+import type { EstadoCredito, PedidoWhatsAppItem, SellerPolicies } from '@bizcode/types'
 import { clientesAPI, pedidosAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
 import { capQtyToStock, isCreditBlocked, shouldBlockConfirmForStock } from '../../../src/alerts/policyGates'
 import { useAuth } from '../../../src/auth/AuthContext'
@@ -28,6 +28,7 @@ import {
   lineSubtotal,
 } from '../../../src/pedidos/cartMath'
 import type { PedidoCondicionCobroUi, SellerCartLine } from '../../../src/pedidos/cartTypes'
+import { PedidoWhatsAppButton } from '../../../src/pedidos/PedidoWhatsAppButton'
 
 export default function PedidoResumenScreen() {
   const { t, i18n } = useTranslation(['pedidos', 'common'])
@@ -44,6 +45,13 @@ export default function PedidoResumenScreen() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmedId, setConfirmedId] = useState<number | null>(null)
+  const [clienteTelef, setClienteTelef] = useState<string | null>(null)
+  const [waSnapshot, setWaSnapshot] = useState<{
+    telef?: string | null
+    items: PedidoWhatsAppItem[]
+    total: number
+    template?: string | null
+  } | null>(null)
   const [numpad, setNumpad] = useState<
     | { mode: 'cantidad'; line: SellerCartLine }
     | { mode: 'dscto'; line: SellerCartLine }
@@ -57,12 +65,16 @@ export default function PedidoResumenScreen() {
     void (async () => {
       try {
         const [clienteRaw, saldoRes] = await Promise.all([
-          clientesAPI.get(id) as Promise<{ creditLimit?: number | string | null } | null>,
+          clientesAPI.get(id) as Promise<{
+            creditLimit?: number | string | null
+            telef?: string | null
+          } | null>,
           clientesAPI.cuentaCorrienteSaldo(id).catch(() => null),
         ])
         setCreditLimit(
           clienteRaw?.creditLimit == null ? null : parseMoney(clienteRaw.creditLimit),
         )
+        setClienteTelef(typeof clienteRaw?.telef === 'string' ? clienteRaw.telef : null)
         setSaldo(saldoRes ? parseMoney(saldoRes.saldo) : null)
       } catch {
         try {
@@ -71,14 +83,17 @@ export default function PedidoResumenScreen() {
           const db = await getOfflineDb()
           const cached = (await getClienteLocal(db, id)) as {
             creditLimit?: number | string | null
+            telef?: string | null
           } | null
           setCreditLimit(
             cached?.creditLimit == null ? null : parseMoney(cached.creditLimit),
           )
+          setClienteTelef(typeof cached?.telef === 'string' ? cached.telef : null)
           setSaldo(null)
         } catch {
           setSaldo(null)
           setCreditLimit(null)
+          setClienteTelef(null)
         }
       }
 
@@ -150,6 +165,18 @@ export default function PedidoResumenScreen() {
         plazoDias,
         vendedorId: claims?.userId ?? null,
       })
+      const snapshot = {
+        telef: clienteTelef,
+        items: cart.lines.map((line) => ({
+          descripcion: line.descripcion,
+          cantidad: line.cantidad,
+          precio: line.precio,
+          dscto: line.dscto,
+          subtotal: lineSubtotal(line),
+        })),
+        total: cart.total,
+        template: policies?.sellerWhatsappTemplate ?? null,
+      }
       const { isOnline } = await import('../../../src/offline/network')
       const online = await isOnline()
       if (!online) {
@@ -158,6 +185,7 @@ export default function PedidoResumenScreen() {
           body: body as unknown as Record<string, unknown>,
           clienteId: cart.clienteId,
         })
+        setWaSnapshot(snapshot)
         setConfirmedId(localId)
         cart.clear()
         await refreshMeta()
@@ -165,6 +193,7 @@ export default function PedidoResumenScreen() {
       }
       const created = await pedidosAPI.create(body as unknown as Record<string, unknown>)
       const confirmed = await pedidosAPI.confirm(created.id)
+      setWaSnapshot(snapshot)
       setConfirmedId(confirmed.id)
       cart.clear()
     } catch (err) {
@@ -186,6 +215,18 @@ export default function PedidoResumenScreen() {
             body: body as unknown as Record<string, unknown>,
             clienteId: cart.clienteId!,
           })
+          setWaSnapshot({
+            telef: clienteTelef,
+            items: cart.lines.map((line) => ({
+              descripcion: line.descripcion,
+              cantidad: line.cantidad,
+              precio: line.precio,
+              dscto: line.dscto,
+              subtotal: lineSubtotal(line),
+            })),
+            total: cart.total,
+            template: policies?.sellerWhatsappTemplate ?? null,
+          })
           setConfirmedId(localId)
           cart.clear()
           await refreshMeta()
@@ -198,7 +239,7 @@ export default function PedidoResumenScreen() {
     } finally {
       setSubmitting(false)
     }
-  }, [cart, t, claims?.userId, refreshMeta])
+  }, [cart, t, claims?.userId, refreshMeta, clienteTelef, policies?.sellerWhatsappTemplate])
 
   if (cart.clienteId == null) {
     return (
@@ -217,6 +258,12 @@ export default function PedidoResumenScreen() {
             ? t('common:offline.queuedOrder', { id: confirmedId })
             : t('pedidos:successTitle', { id: confirmedId })}
         </Text>
+        <PedidoWhatsAppButton
+          pedidoId={confirmedId}
+          locale={i18n.language}
+          snapshot={pending ? waSnapshot : null}
+          policies={policies}
+        />
         {!pending ? (
           <Button
             mode="contained"

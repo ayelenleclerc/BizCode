@@ -130,5 +130,31 @@ describe('createPedidosAPI', () => {
     await expect(api.transition(1, { to: 'packed' })).rejects.toBeTruthy()
     await expect(api.invoice(1, {})).rejects.toBeTruthy()
     await expect(api.cancel(1)).rejects.toBeTruthy()
+    await expect(api.getWhatsAppShare(1)).rejects.toBeTruthy()
+    await expect(api.sendWhatsApp(1, { canal: 'link' })).rejects.toBeTruthy()
+  })
+
+  it('previews and sends WhatsApp confirmation (#265)', async () => {
+    const share = {
+      phone: '5491112345678',
+      text: 'Pedido #1',
+      waMeUrl: 'https://wa.me/5491112345678?text=Pedido%20%231',
+      twilioAvailable: false,
+    }
+    const http = mockHttp()
+    vi.mocked(http.get).mockResolvedValue({ data: { success: true, data: share } })
+    vi.mocked(http.post).mockResolvedValue({
+      data: { success: true, data: { canal: 'link', sent: false } },
+    })
+    const api = createPedidosAPI(http)
+
+    await expect(api.getWhatsAppShare(1, 'es')).resolves.toEqual(share)
+    expect(http.get).toHaveBeenCalledWith('/pedidos/1/whatsapp-share', { params: { locale: 'es' } })
+
+    await expect(api.sendWhatsApp(1, { canal: 'link' })).resolves.toEqual({
+      canal: 'link',
+      sent: false,
+    })
+    expect(http.post).toHaveBeenCalledWith('/pedidos/1/whatsapp', { canal: 'link' }, undefined)
   })
 })
