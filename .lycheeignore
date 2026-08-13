@@ -8,6 +8,9 @@ https://www\.npmjs\.com/package/@scalar/openapi-to-markdown
 https://regexr\.com/
 # argentina.gob.ar (AAIP): timeouts intermitentes desde runners de GitHub Actions.
 https://www\.argentina\.gob\.ar/aaip
+# GitHub issue/PR pages: intermittent HTTP/2 protocol errors from Actions runners (issues exist; gh is source of truth).
+https://github\.com/ayelenleclerc/BizCode/issues/
+https://github\.com/ayelenleclerc/BizCode/pull/
 http://localhost
 http://127\.0\.0\.1
 https://localhost

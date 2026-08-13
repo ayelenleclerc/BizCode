@@ -31,7 +31,9 @@ jobs:
             --verbose
             --scheme https
             --scheme http
-            --max-concurrency 8
+            --max-concurrency 4
+            --retry 3
+            --retry-wait-time 2
             './docs/**/*.md'
           token: ${{ secrets.GITHUB_TOKEN }}
           fail: true

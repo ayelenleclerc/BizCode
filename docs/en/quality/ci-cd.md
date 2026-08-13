@@ -105,7 +105,7 @@ Workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.
 | i18n key parity | All locales aligned to source `es` | `npm run check:i18n` |
 | Human docs structure | Locale map completeness | `check:docs-map` |
 | Human docs localization policy | Controlled roots (quality, ISO, specs, **user manuals**, changelogs, ADR, OpenAPI) must stay trilingual EN/ES/PT-BR | `docs-governance.yml` (**PR to `main` and `develop`**) |
-| External links in Markdown (under `docs/`) | HTTP(S) targets alive (**Lychee**; loopback en `.lycheeignore`). Enlaces relativos entre `.md` no se validan aquí (mapa + revisión). | `docs-links.yml` |
+| External links in Markdown (under `docs/`) | HTTP(S) targets alive (**Lychee**; loopback, flaky npm/AAIP, and GitHub issue/PR URLs in `.lycheeignore`). Relative `.md` cross-links are not validated here. | `docs-links.yml` |
 
 ## Services
 

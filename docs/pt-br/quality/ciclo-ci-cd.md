@@ -83,7 +83,7 @@ O workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleak
 | i18n | Paridade de namespaces vs. fonte `es` | `check:i18n` |
 | Estrutura de docs humanos | Paths do mapa (`DOCUMENT_LOCALE_MAP.md`) | `check:docs-map` |
 | Política de localização docs | Roots controlados trilingues (qualidade, ISO, specs, **manuais de usuário**, changelogs, ADR, OpenAPI) | `docs-governance.yml` (**PR para `main` e `develop`**) |
-| Links externos em Markdown (`docs/**`) | Destinos HTTP(S) ativos (**Lychee**; loopback em `.lycheeignore`). Links relativos entre `.md` ficam fora deste job. | `docs-links.yml` |
+| Links externos em Markdown (`docs/**`) | Destinos HTTP(S) ativos (**Lychee**; loopback, npm/AAIP instáveis e URLs de issues/PR do GitHub em `.lycheeignore`). Links relativos entre `.md` ficam fora deste job. | `docs-links.yml` |
 
 ## Serviços
 
