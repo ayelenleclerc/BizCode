@@ -31767,6 +31767,341 @@ Requires `orders.create`.
 }
 ```
 
+### PARAMETERS /api/pedidos/{id}/whatsapp-share
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/whatsapp-share`
+
+### Preview WhatsApp confirmation text for a pedido (#265)
+
+- **Method:** `GET`
+- **Path:** `/api/pedidos/{id}/whatsapp-share`
+- **Tags:** pedidos
+
+Requires `billing.orders` and `orders.create` or `reports.operational.read`. Phone comes from `Cliente.telef` (digits only). `twilioAvailable` is true only when module `comms.whatsapp` is enabled and Twilio env vars are configured. Does not send a message.
+
+#### Responses
+
+##### Status: 200 WhatsApp share preview
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`phone` (required)**
+
+    `string` — Digits-only Cliente.telef; empty when missing.
+
+  - **`text` (required)**
+
+    `string`
+
+  - **`twilioAvailable` (required)**
+
+    `boolean`
+
+  - **`waMeUrl` (required)**
+
+    `string`
+
+  - **`reason`**
+
+    `string`, possible values: `"no_phone"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "phone": "",
+    "text": "",
+    "waMeUrl": "",
+    "twilioAvailable": true,
+    "reason": "no_phone"
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/whatsapp
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/whatsapp`
+
+### Audit WhatsApp link open or send via Twilio (#265)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/whatsapp`
+- **Tags:** pedidos
+
+Requires `billing.orders` and `orders.create`. `canal=link` only writes `AuditEvent` `whatsapp_enviado` (does not require `comms.whatsapp`). `canal=twilio` requires module `comms.whatsapp` and configured Twilio; failures do not change pedido state.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`canal` (required)**
+
+  `string`, possible values: `"link", "twilio"`
+
+**Example:**
+
+```json
+{
+  "canal": "link"
+}
+```
+
+#### Responses
+
+##### Status: 200 WhatsApp action recorded / sent
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`canal` (required)**
+
+    `string`, possible values: `"link", "twilio"`
+
+  - **`sent` (required)**
+
+    `boolean`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "canal": "link",
+    "sent": true
+  }
+}
+```
+
+##### Status: 400 Missing phone or Twilio not configured
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 Twilio send failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/pedidos/{id}/pack
 
 - **Method:** `PARAMETERS`
@@ -68372,7 +68707,7 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 - **Path:** `/api/tenant-config/seller-policies`
 - **Tags:** settings
 
-Read-only seller subset of TenantConfig policies (#256). Requires `orders.create`.
+Read-only seller subset of TenantConfig policies (#256/#265). Requires `orders.create`. Includes optional `sellerWhatsappTemplate` for App Seller WhatsApp confirmation.
 
 #### Responses
 
@@ -68400,6 +68735,10 @@ Read-only seller subset of TenantConfig policies (#256). Requires `orders.create
 
     `string`, possible values: `"warn", "block"`
 
+  - **`sellerWhatsappTemplate` (required)**
+
+    `string` — Optional WhatsApp confirmation template (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
+
 - **`success` (required)**
 
   `boolean`
@@ -68413,7 +68752,8 @@ Read-only seller subset of TenantConfig policies (#256). Requires `orders.create
     "sellerCreditOverLimitAction": "warn",
     "sellerCreditOverdueAction": "warn",
     "sellerStockZeroAction": "warn",
-    "sellerStockCapQtyToAvailable": true
+    "sellerStockCapQtyToAvailable": true,
+    "sellerWhatsappTemplate": ""
   }
 }
 ```
@@ -68487,7 +68827,7 @@ Read-only seller subset of TenantConfig policies (#256). Requires `orders.create
 - **Path:** `/api/tenant-config/seller-policies`
 - **Tags:** settings
 
-Partial update of seller alert policies (#256). Requires `settings.business.manage` or `users.manage`.
+Partial update of seller alert policies (#256/#265). Requires `settings.business.manage` or `users.manage`.
 
 #### Request Body
 
@@ -68509,6 +68849,10 @@ Partial update of seller alert policies (#256). Requires `settings.business.mana
 
   `string`, possible values: `"warn", "block"`
 
+- **`sellerWhatsappTemplate`**
+
+  `string`
+
 **Example:**
 
 ```json
@@ -68516,7 +68860,8 @@ Partial update of seller alert policies (#256). Requires `settings.business.mana
   "sellerCreditOverLimitAction": "warn",
   "sellerCreditOverdueAction": "warn",
   "sellerStockZeroAction": "warn",
-  "sellerStockCapQtyToAvailable": true
+  "sellerStockCapQtyToAvailable": true,
+  "sellerWhatsappTemplate": ""
 }
 ```
 
@@ -68546,6 +68891,10 @@ Partial update of seller alert policies (#256). Requires `settings.business.mana
 
     `string`, possible values: `"warn", "block"`
 
+  - **`sellerWhatsappTemplate` (required)**
+
+    `string` — Optional WhatsApp confirmation template (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
+
 - **`success` (required)**
 
   `boolean`
@@ -68559,7 +68908,8 @@ Partial update of seller alert policies (#256). Requires `settings.business.mana
     "sellerCreditOverLimitAction": "warn",
     "sellerCreditOverdueAction": "warn",
     "sellerStockZeroAction": "warn",
-    "sellerStockCapQtyToAvailable": true
+    "sellerStockCapQtyToAvailable": true,
+    "sellerWhatsappTemplate": ""
   }
 }
 ```
@@ -138842,6 +139192,10 @@ Originating invoice header (selected columns)
 
   `string`, possible values: `"warn", "block"`
 
+* **`sellerWhatsappTemplate` (required)**
+
+  `string` — Optional WhatsApp confirmation template (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
+
 **Example:**
 
 ```json
@@ -138849,7 +139203,8 @@ Originating invoice header (selected columns)
   "sellerCreditOverLimitAction": "warn",
   "sellerCreditOverdueAction": "warn",
   "sellerStockZeroAction": "warn",
-  "sellerStockCapQtyToAvailable": true
+  "sellerStockCapQtyToAvailable": true,
+  "sellerWhatsappTemplate": ""
 }
 ```
 
@@ -138877,6 +139232,10 @@ Originating invoice header (selected columns)
 
     `string`, possible values: `"warn", "block"`
 
+  - **`sellerWhatsappTemplate` (required)**
+
+    `string` — Optional WhatsApp confirmation template (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
+
 * **`success` (required)**
 
   `boolean`
@@ -138890,7 +139249,8 @@ Originating invoice header (selected columns)
     "sellerCreditOverLimitAction": "warn",
     "sellerCreditOverdueAction": "warn",
     "sellerStockZeroAction": "warn",
-    "sellerStockCapQtyToAvailable": true
+    "sellerStockCapQtyToAvailable": true,
+    "sellerWhatsappTemplate": ""
   }
 }
 ```
@@ -138915,6 +139275,10 @@ Originating invoice header (selected columns)
 
   `string`, possible values: `"warn", "block"`
 
+* **`sellerWhatsappTemplate`**
+
+  `string`
+
 **Example:**
 
 ```json
@@ -138922,7 +139286,160 @@ Originating invoice header (selected columns)
   "sellerCreditOverLimitAction": "warn",
   "sellerCreditOverdueAction": "warn",
   "sellerStockZeroAction": "warn",
-  "sellerStockCapQtyToAvailable": true
+  "sellerStockCapQtyToAvailable": true,
+  "sellerWhatsappTemplate": ""
+}
+```
+
+### WhatsAppSharePreview
+
+- **Type:**`object`
+
+* **`phone` (required)**
+
+  `string` — Digits-only Cliente.telef; empty when missing.
+
+* **`text` (required)**
+
+  `string`
+
+* **`twilioAvailable` (required)**
+
+  `boolean`
+
+* **`waMeUrl` (required)**
+
+  `string`
+
+* **`reason`**
+
+  `string`, possible values: `"no_phone"`
+
+**Example:**
+
+```json
+{
+  "phone": "",
+  "text": "",
+  "waMeUrl": "",
+  "twilioAvailable": true,
+  "reason": "no_phone"
+}
+```
+
+### WhatsAppShareEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`phone` (required)**
+
+    `string` — Digits-only Cliente.telef; empty when missing.
+
+  - **`text` (required)**
+
+    `string`
+
+  - **`twilioAvailable` (required)**
+
+    `boolean`
+
+  - **`waMeUrl` (required)**
+
+    `string`
+
+  - **`reason`**
+
+    `string`, possible values: `"no_phone"`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "phone": "",
+    "text": "",
+    "waMeUrl": "",
+    "twilioAvailable": true,
+    "reason": "no_phone"
+  }
+}
+```
+
+### WhatsAppSendBody
+
+- **Type:**`object`
+
+* **`canal` (required)**
+
+  `string`, possible values: `"link", "twilio"`
+
+**Example:**
+
+```json
+{
+  "canal": "link"
+}
+```
+
+### WhatsAppSendResult
+
+- **Type:**`object`
+
+* **`canal` (required)**
+
+  `string`, possible values: `"link", "twilio"`
+
+* **`sent` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "canal": "link",
+  "sent": true
+}
+```
+
+### WhatsAppSendEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`canal` (required)**
+
+    `string`, possible values: `"link", "twilio"`
+
+  - **`sent` (required)**
+
+    `boolean`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "canal": "link",
+    "sent": true
+  }
 }
 ```
 

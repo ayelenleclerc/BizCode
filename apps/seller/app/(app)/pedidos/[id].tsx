@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, Button, List, Text } from 'react-native-paper'
 import type { PedidoRow } from '@bizcode/types'
 import { pedidosAPI } from '../../../src/api/sellerApi'
+import { PedidoWhatsAppButton } from '../../../src/pedidos/PedidoWhatsAppButton'
 import { mapApiErrorToUiState, type UiLoadState } from '../../../src/lib/apiErrors'
 import { formatMoney } from '../../../src/lib/money'
 
@@ -16,7 +17,7 @@ import { formatMoney } from '../../../src/lib/money'
 export default function PedidoDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const pedidoId = Number.parseInt(String(id), 10)
-  const { t, i18n } = useTranslation(['clientes', 'common'])
+  const { t, i18n } = useTranslation(['clientes', 'pedidos', 'common'])
   const [state, setState] = useState<UiLoadState>('loading')
   const [pedido, setPedido] = useState<PedidoRow | null>(null)
 
@@ -126,6 +127,9 @@ export default function PedidoDetailScreen() {
           )
         })
       )}
+      <View style={styles.mt}>
+        <PedidoWhatsAppButton pedidoId={pedido.id} locale={i18n.language} />
+      </View>
     </ScrollView>
   )
 }

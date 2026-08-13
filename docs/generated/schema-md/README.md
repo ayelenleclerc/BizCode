@@ -1404,6 +1404,16 @@
 
 * [VoidInput](./voidinput.md) – `-`
 
+* [WhatsAppSendBody](./whatsappsendbody.md) – `-`
+
+* [WhatsAppSendEnvelope](./whatsappsendenvelope.md) – `-`
+
+* [WhatsAppSendResult](./whatsappsendresult.md) – `-`
+
+* [WhatsAppShareEnvelope](./whatsappshareenvelope.md) – `-`
+
+* [WhatsAppSharePreview](./whatsappsharepreview.md) – `-`
+
 * [WooCommerceConfigStatus](./woocommerceconfigstatus.md) – `-`
 
 * [WooCommerceConfigStatusEnvelope](./woocommerceconfigstatusenvelope.md) – `-`

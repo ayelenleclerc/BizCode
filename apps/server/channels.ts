@@ -401,8 +401,8 @@ export function isTwilioConfigured(): boolean {
 async function sendWhatsApp(
   to: string[],
   body: string,
-): Promise<void> {
-  if (!isTwilioConfigured() || to.length === 0) return
+): Promise<boolean> {
+  if (!isTwilioConfigured() || to.length === 0) return false
   try {
     // Dynamic import to avoid loading Twilio SDK in environments where it is not needed.
     const twilio = await import('twilio')
@@ -419,12 +419,29 @@ async function sendWhatsApp(
         }),
       ),
     )
+    return true
   } catch (err) {
     logger.warn(
       { err: err instanceof Error ? { name: err.name, message: err.message } : String(err) },
       '[channels] Twilio send failed',
     )
+    return false
   }
+}
+
+/**
+ * @en Public WhatsApp send for Seller order confirmation (#265). Soft-fail; never throws.
+ * @es Envío WhatsApp público para confirmación Seller (#265). Soft-fail; nunca lanza.
+ * @pt-BR Envio WhatsApp público para confirmação Seller (#265). Soft-fail; nunca lança.
+ */
+export async function sendWhatsAppMessage(
+  to: string,
+  body: string,
+): Promise<{ sent: boolean }> {
+  const digits = to.replace(/\D/g, '')
+  if (!digits) return { sent: false }
+  const sent = await sendWhatsApp([digits], body)
+  return { sent }
 }
 
 function parseCsvEnv(name: string): string[] {

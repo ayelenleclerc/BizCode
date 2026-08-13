@@ -4,8 +4,17 @@ import { requireModule } from '../middleware/requireModule'
 import { verifyOwnership } from '../middleware/verifyOwnership'
 import { mapRemitoPublic } from '../services/RemitoService'
 import { validateBody } from '../middleware/validateBody'
-import { pedidoBodySchema, pedidoInvoiceBodySchema } from '../schemas/domain'
-import type { PedidoEstado, PedidoInput, PedidoInvoiceInput } from '@bizcode/types'
+import { pedidoBodySchema, pedidoInvoiceBodySchema, pedidoWhatsAppBodySchema } from '../schemas/domain'
+import type {
+  PedidoEstado,
+  PedidoInput,
+  PedidoInvoiceInput,
+  PedidoWhatsAppItem,
+  WhatsAppSendInput,
+} from '@bizcode/types'
+import { buildPedidoWhatsAppShare } from '../lib/pedidoWhatsAppMessage'
+import { isTwilioConfigured, sendWhatsAppMessage } from '../channels'
+import { modulesInclude } from '../services/TenantConfigService'
 import { isPedidoEstado } from '../lib/pedidoStateMachine'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
@@ -51,6 +60,23 @@ const pedidoTransitionBodySchema = z
     }
   })
 
+function pedidoItemsForWhatsApp(items: unknown): PedidoWhatsAppItem[] {
+  if (!Array.isArray(items)) return []
+  return items.map((raw) => {
+    const it = raw as Record<string, unknown>
+    const articulo = it.articulo as Record<string, unknown> | undefined
+    const fromLine = typeof it.descripcion === 'string' ? it.descripcion.trim() : ''
+    const fromArticulo = typeof articulo?.descripcion === 'string' ? articulo.descripcion.trim() : ''
+    return {
+      descripcion: fromLine || fromArticulo || '—',
+      cantidad: Number(it.cantidad ?? 0),
+      precio: Number(it.precio ?? 0),
+      dscto: Number(it.dscto ?? 0),
+      subtotal: Number(it.subtotal ?? 0),
+    }
+  })
+}
+
 /**
  * @en Commercial orders REST API with BP1-1 logistics transitions (#391).
  * @es API REST de pedidos con transiciones logísticas BP1-1 (#391).
@@ -58,7 +84,7 @@ const pedidoTransitionBodySchema = z
  */
 export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma, services, writeAudit } = ctx
-  const { pedido, remito } = services
+  const { pedido, remito, sellerAlert } = services
   const ordersModule = requireModule('billing.orders')
   const remitoModule = requireModule('fiscal.remito')
   const ownership = verifyOwnership(prisma, 'pedido')
@@ -176,6 +202,131 @@ export function registerPedidosRoutes(app: Application, ctx: RestRouteContext): 
         }
         await writeAudit(req as AuthenticatedRequest, 'pedido_confirm', 'pedido', String(id))
         res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/pedidos/:id/whatsapp-share',
+    ordersModule,
+    requireAnyPermission('orders.create', 'reports.operational.read'),
+    ownership,
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = parseInt(String(req.params.id), 10)
+        const result = await pedido.getById(tenantId, id)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        const authReq = req as AuthenticatedRequest
+        const [cliente, tenant, policies] = await Promise.all([
+          prisma.cliente.findFirst({
+            where: { id: result.data.clienteId, tenantId },
+            select: { telef: true },
+          }),
+          prisma.tenant.findUnique({
+            where: { id: tenantId },
+            select: { name: true },
+          }),
+          sellerAlert.getSellerPolicies(tenantId),
+        ])
+        const localeRaw = req.query.locale
+        const locale = typeof localeRaw === 'string' ? localeRaw : null
+        const preview = buildPedidoWhatsAppShare({
+          numero: result.data.id,
+          fecha: result.data.createdAt,
+          total: String(result.data.total),
+          empresa: tenant?.name ?? '',
+          items: pedidoItemsForWhatsApp(result.data.items),
+          telef: cliente?.telef,
+          template: policies.sellerWhatsappTemplate,
+          locale,
+          twilioAvailable:
+            modulesInclude(authReq.tenantModules, 'comms.whatsapp') && isTwilioConfigured(),
+        })
+        res.json({ success: true, data: preview })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/pedidos/:id/whatsapp',
+    ordersModule,
+    requirePermission('orders.create'),
+    ownership,
+    validateBody(pedidoWhatsAppBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const tenantId = getTenantId(req)
+        const id = parseInt(String(req.params.id), 10)
+        const { canal } = req.body as WhatsAppSendInput
+        const result = await pedido.getById(tenantId, id)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        const authReq = req as AuthenticatedRequest
+
+        if (canal === 'link') {
+          await writeAudit(authReq, 'whatsapp_enviado', 'pedido', String(id), { canal: 'link' })
+          res.json({ success: true, data: { canal: 'link', sent: false } })
+          return
+        }
+
+        if (!modulesInclude(authReq.tenantModules, 'comms.whatsapp')) {
+          res.status(403).json({
+            success: false,
+            error: 'module_not_enabled',
+            module: 'comms.whatsapp',
+          })
+          return
+        }
+        if (!isTwilioConfigured()) {
+          res.status(400).json({ success: false, error: 'twilio_not_configured' })
+          return
+        }
+
+        const [cliente, tenant, policies] = await Promise.all([
+          prisma.cliente.findFirst({
+            where: { id: result.data.clienteId, tenantId },
+            select: { telef: true },
+          }),
+          prisma.tenant.findUnique({
+            where: { id: tenantId },
+            select: { name: true },
+          }),
+          sellerAlert.getSellerPolicies(tenantId),
+        ])
+        const localeRaw = req.query.locale
+        const locale = typeof localeRaw === 'string' ? localeRaw : null
+        const preview = buildPedidoWhatsAppShare({
+          numero: result.data.id,
+          fecha: result.data.createdAt,
+          total: String(result.data.total),
+          empresa: tenant?.name ?? '',
+          items: pedidoItemsForWhatsApp(result.data.items),
+          telef: cliente?.telef,
+          template: policies.sellerWhatsappTemplate,
+          locale,
+          twilioAvailable: true,
+        })
+        if (!preview.phone) {
+          res.status(400).json({ success: false, error: 'no_phone' })
+          return
+        }
+        const { sent } = await sendWhatsAppMessage(preview.phone, preview.text)
+        if (!sent) {
+          res.status(502).json({ success: false, error: 'twilio_send_failed' })
+          return
+        }
+        await writeAudit(authReq, 'whatsapp_enviado', 'pedido', String(id), { canal: 'twilio' })
+        res.json({ success: true, data: { canal: 'twilio', sent: true } })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

@@ -80,6 +80,12 @@
     "codigo": "Code {{codigo}}",
     "noImage": "No image"
   },
+  "whatsapp": {
+    "send": "Send via WhatsApp",
+    "sending": "Sending…",
+    "noPhone": "The customer has no registered phone",
+    "twilioError": "WhatsApp could not be sent. The order is already confirmed."
+  },
   "scan": {
     "title": "Scan",
     "open": "Scan barcode",

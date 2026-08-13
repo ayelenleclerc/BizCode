@@ -12,13 +12,20 @@
     },
     "sellerStockZeroAction": {
       "$ref": "./SellerAlertAction.schema.json"
+    },
+    "sellerWhatsappTemplate": {
+      "description": "Optional WhatsApp confirmation template (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.",
+      "maxLength": 1024,
+      "nullable": true,
+      "type": "string"
     }
   },
   "required": [
     "sellerCreditOverLimitAction",
     "sellerCreditOverdueAction",
     "sellerStockZeroAction",
-    "sellerStockCapQtyToAvailable"
+    "sellerStockCapQtyToAvailable",
+    "sellerWhatsappTemplate"
   ],
   "title": "SellerPolicies",
   "type": "object"

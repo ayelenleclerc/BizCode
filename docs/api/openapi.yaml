@@ -5172,6 +5172,102 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/pedidos/{id}/whatsapp-share:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: locale
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [en, es, pt-BR]
+        description: Default message template locale when TenantConfig.sellerWhatsappTemplate is null.
+    get:
+      tags: [pedidos]
+      summary: Preview WhatsApp confirmation text for a pedido (#265)
+      description: |
+        Requires `billing.orders` and `orders.create` or `reports.operational.read`.
+        Phone comes from `Cliente.telef` (digits only). `twilioAvailable` is true only when
+        module `comms.whatsapp` is enabled and Twilio env vars are configured.
+        Does not send a message.
+      responses:
+        '200':
+          description: WhatsApp share preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsAppShareEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/whatsapp:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: locale
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [en, es, pt-BR]
+    post:
+      tags: [pedidos]
+      summary: Audit WhatsApp link open or send via Twilio (#265)
+      description: |
+        Requires `billing.orders` and `orders.create`.
+        `canal=link` only writes `AuditEvent` `whatsapp_enviado` (does not require `comms.whatsapp`).
+        `canal=twilio` requires module `comms.whatsapp` and configured Twilio; failures do not change pedido state.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhatsAppSendBody'
+      responses:
+        '200':
+          description: WhatsApp action recorded / sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsAppSendEnvelope'
+        '400':
+          description: Missing phone or Twilio not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '502':
+          description: Twilio send failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/pedidos/{id}/pack:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -11573,7 +11669,8 @@ paths:
       tags: [settings]
       summary: Seller credit/stock alert policies
       description: |
-        Read-only seller subset of TenantConfig policies (#256). Requires `orders.create`.
+        Read-only seller subset of TenantConfig policies (#256/#265). Requires `orders.create`.
+        Includes optional `sellerWhatsappTemplate` for App Seller WhatsApp confirmation.
       responses:
         '200':
           description: Seller policies
@@ -11591,7 +11688,7 @@ paths:
       tags: [settings]
       summary: Update seller credit/stock alert policies
       description: |
-        Partial update of seller alert policies (#256). Requires `settings.business.manage` or `users.manage`.
+        Partial update of seller alert policies (#256/#265). Requires `settings.business.manage` or `users.manage`.
       requestBody:
         required: true
         content:
@@ -28509,6 +28606,7 @@ components:
         - sellerCreditOverdueAction
         - sellerStockZeroAction
         - sellerStockCapQtyToAvailable
+        - sellerWhatsappTemplate
       properties:
         sellerCreditOverLimitAction:
           $ref: '#/components/schemas/SellerAlertAction'
@@ -28518,6 +28616,11 @@ components:
           $ref: '#/components/schemas/SellerAlertAction'
         sellerStockCapQtyToAvailable:
           type: boolean
+        sellerWhatsappTemplate:
+          type: string
+          nullable: true
+          maxLength: 1024
+          description: Optional WhatsApp confirmation template (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
 
     SellerPoliciesEnvelope:
       type: object
@@ -28540,7 +28643,69 @@ components:
           $ref: '#/components/schemas/SellerAlertAction'
         sellerStockCapQtyToAvailable:
           type: boolean
+        sellerWhatsappTemplate:
+          type: string
+          nullable: true
+          maxLength: 1024
       additionalProperties: false
+
+    WhatsAppSharePreview:
+      type: object
+      required: [phone, text, waMeUrl, twilioAvailable]
+      properties:
+        phone:
+          type: string
+          description: Digits-only Cliente.telef; empty when missing.
+        text:
+          type: string
+          maxLength: 1024
+        waMeUrl:
+          type: string
+          nullable: true
+        twilioAvailable:
+          type: boolean
+        reason:
+          type: string
+          enum: [no_phone]
+
+    WhatsAppShareEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/WhatsAppSharePreview'
+
+    WhatsAppSendBody:
+      type: object
+      additionalProperties: false
+      required: [canal]
+      properties:
+        canal:
+          type: string
+          enum: [link, twilio]
+
+    WhatsAppSendResult:
+      type: object
+      required: [canal, sent]
+      properties:
+        canal:
+          type: string
+          enum: [link, twilio]
+        sent:
+          type: boolean
+
+    WhatsAppSendEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/WhatsAppSendResult'
 
     SellerCreditNivel:
       type: string

@@ -80,6 +80,12 @@
     "codigo": "Código {{codigo}}",
     "noImage": "Sin imagen"
   },
+  "whatsapp": {
+    "send": "Enviar por WhatsApp",
+    "sending": "Enviando…",
+    "noPhone": "El cliente no tiene teléfono registrado",
+    "twilioError": "No se pudo enviar por WhatsApp. El pedido ya está confirmado."
+  },
   "scan": {
     "title": "Escanear",
     "open": "Escanear código",

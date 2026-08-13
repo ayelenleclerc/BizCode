@@ -71,12 +71,16 @@ describe('server/config/env', () => {
       ...validEnv,
       SMTP_URL: 'smtp://mail.example.test:587',
       TWILIO_ACCOUNT_SID: 'AC123',
+      TWILIO_AUTH_TOKEN: 'token',
+      TWILIO_WHATSAPP_FROM: '+5491100000000',
       LOG_LEVEL: 'debug',
       CORS_ORIGINS: 'https://app.example',
     })
 
     expect(parsed.SMTP_URL).toBe('smtp://mail.example.test:587')
     expect(parsed.TWILIO_ACCOUNT_SID).toBe('AC123')
+    expect(parsed.TWILIO_AUTH_TOKEN).toBe('token')
+    expect(parsed.TWILIO_WHATSAPP_FROM).toBe('+5491100000000')
     expect(parsed.LOG_LEVEL).toBe('debug')
     expect(parsed.CORS_ORIGINS).toBe('https://app.example')
   })

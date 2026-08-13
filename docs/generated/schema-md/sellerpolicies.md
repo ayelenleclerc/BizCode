@@ -22,6 +22,7 @@ undefined#/properties/data
 | [sellerCreditOverdueAction](#sellercreditoverdueaction)       | `string`  | Required | cannot be null | [SellerPolicies](selleralertaction.md "undefined#/properties/sellerCreditOverdueAction")                                         |
 | [sellerStockCapQtyToAvailable](#sellerstockcapqtytoavailable) | `boolean` | Required | cannot be null | [SellerPolicies](sellerpolicies-properties-sellerstockcapqtytoavailable.md "undefined#/properties/sellerStockCapQtyToAvailable") |
 | [sellerStockZeroAction](#sellerstockzeroaction)               | `string`  | Required | cannot be null | [SellerPolicies](selleralertaction.md "undefined#/properties/sellerStockZeroAction")                                             |
+| [sellerWhatsappTemplate](#sellerwhatsapptemplate)             | `string`  | Required | cannot be null | [SellerPolicies](sellerpolicies-properties-sellerwhatsapptemplate.md "undefined#/properties/sellerWhatsappTemplate")             |
 
 ## sellerCreditOverLimitAction
 
@@ -121,3 +122,25 @@ undefined#/properties/data
 | :-------- | :---------- |
 | `"warn"`  |             |
 | `"block"` |             |
+
+## sellerWhatsappTemplate
+
+Optional WhatsApp confirmation template (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
+
+`sellerWhatsappTemplate`
+
+* is required
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [SellerPolicies](sellerpolicies-properties-sellerwhatsapptemplate.md "undefined#/properties/sellerWhatsappTemplate")
+
+### sellerWhatsappTemplate Type
+
+`string`
+
+### sellerWhatsappTemplate Constraints
+
+**maximum length**: the maximum number of characters for this string is: `1024`

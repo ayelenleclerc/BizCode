@@ -13,6 +13,11 @@
     },
     "sellerStockZeroAction": {
       "$ref": "./SellerAlertAction.schema.json"
+    },
+    "sellerWhatsappTemplate": {
+      "maxLength": 1024,
+      "nullable": true,
+      "type": "string"
     }
   },
   "title": "SellerPoliciesPatchBody",
