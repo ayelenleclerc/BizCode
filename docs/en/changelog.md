@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **App Seller native numpad + quick line discount (#264):** `NumpadSheet` (slide modal, keys ≥48dp) for qty and line `dscto` (existing PedidoItem field; no new Prisma/OpenAPI); locale decimal separator (`,` ES/pt-BR, `.` EN); live unit price + subtotal; haptic confirm; swipe-to-reveal % disc / delete on summary; global dscto applies the same percent to all cart lines; tap qty on catalog/suggestions/scanner/summary; stock caps from #256; i18n EN/ES/pt-BR.
 - **App Seller barcode scanner (#255):** Prisma `Articulo.codigoBarras` (unique per tenant, nullable); `GET /api/articulos?codigoBarras=` exact sellable lookup; OpenAPI + web article form field; offline SQLite `codigo_barras` + local lookup; `/pedidos/escanear` with `expo-camera` (EAN-13/8, CODE-128, QR), continuous mode, haptics, qty dialog or add-1 preference; stock caps from #256; i18n EN/ES/pt-BR.
 
 ### Fixed

@@ -59,6 +59,19 @@
     "addSuggested": "Adicionar quantidade sugerida",
     "searchOthers": "Buscar outros artigos"
   },
+  "numpad": {
+    "qtyTitle": "Quantidade",
+    "dsctoTitle": "Desconto da linha %",
+    "confirm": "Confirmar",
+    "backspace": "Apagar",
+    "unitPrice": "Unitário {{price}}",
+    "subtotal": "Subtotal {{amount}}",
+    "discountActive": "Desconto {{pct}}%",
+    "errorRange": "O desconto deve estar entre 0 e 100.",
+    "errorQty": "Informe uma quantidade maior que 0.",
+    "swipeDiscount": "% Desc",
+    "globalDiscount": "Desconto em todas as linhas"
+  },
   "scan": {
     "title": "Escanear",
     "open": "Escanear código",

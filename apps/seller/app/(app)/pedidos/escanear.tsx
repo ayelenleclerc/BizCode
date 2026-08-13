@@ -11,7 +11,6 @@ import {
   Portal,
   Switch,
   Text,
-  TextInput,
 } from 'react-native-paper'
 import type { ArticuloListItem } from '@bizcode/api-client'
 import type { SellerPolicies, StockMultipleItem } from '@bizcode/types'
@@ -19,6 +18,8 @@ import { articulosAPI, sellerAlertsAPI, sugerenciasPedidoAPI } from '../../../sr
 import { capQtyToStock } from '../../../src/alerts/policyGates'
 import { parseMoney } from '../../../src/lib/money'
 import { usePedidoCart } from '../../../src/pedidos/CartContext'
+import { NumpadSheet } from '../../../src/pedidos/NumpadSheet'
+import { roundQtyToMultiplo } from '../../../src/pedidos/numpadParse'
 import { getScanQtyPreference, setScanQtyPreference } from '../../../src/scan/scanPrefs'
 
 const CONFIRM_MS = 2000
@@ -46,7 +47,6 @@ export default function EscanearPedidoScreen() {
   const [busy, setBusy] = useState(false)
   const [missCode, setMissCode] = useState<string | null>(null)
   const [hit, setHit] = useState<HitState | null>(null)
-  const [qtyDraft, setQtyDraft] = useState('1')
   const [flash, setFlash] = useState<string | null>(null)
   const [addOne, setAddOne] = useState(getScanQtyPreference() === 'addOne')
   const [policies, setPolicies] = useState<SellerPolicies | null>(null)
@@ -203,7 +203,6 @@ export default function EscanearPedidoScreen() {
         return
       }
       setHit({ articulo, stock, suggestedQty: suggested })
-      setQtyDraft(String(suggested))
       setBusy(false)
     },
     [
@@ -219,10 +218,14 @@ export default function EscanearPedidoScreen() {
     ],
   )
 
-  const confirmHit = async () => {
+  const confirmHitQty = async (rawQty: number) => {
     if (!hit) return
-    const qty = Number.parseFloat(qtyDraft.replace(',', '.'))
-    if (!Number.isFinite(qty) || qty <= 0) return
+    const multiplo =
+      hit.articulo.multiploVenta != null && Number(hit.articulo.multiploVenta) > 0
+        ? Number(hit.articulo.multiploVenta)
+        : null
+    const qty = roundQtyToMultiplo(rawQty, multiplo)
+    if (qty <= 0) return
     const ok = await addToCart(hit.articulo, qty, hit.stock)
     if (ok) {
       setFlash(hit.articulo.descripcion)
@@ -232,7 +235,6 @@ export default function EscanearPedidoScreen() {
   }
 
   const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt-BR' ? 'pt-BR' : 'es-AR'
-  void locale
 
   if (!permission) {
     return (
@@ -320,46 +322,24 @@ export default function EscanearPedidoScreen() {
           </Dialog.Actions>
         </Dialog>
 
-        <Dialog
-          visible={hit != null}
-          onDismiss={() => {
-            setHit(null)
-            setLocked(false)
-          }}
-          testID={hit ? `seller-pedido-scan-hit-${hit.articulo.id}` : 'seller-pedido-scan-hit'}
-        >
-          <Dialog.Title>{hit?.articulo.descripcion}</Dialog.Title>
-          <Dialog.Content>
-            <Text>
-              {t('pedidos:price')}: {String(hit?.articulo.precioLista1 ?? '')}
-            </Text>
-            <Text>
-              {t('pedidos:stock', { count: hit?.stock ?? 0 })}
-            </Text>
-            <TextInput
-              label={t('pedidos:qty')}
-              value={qtyDraft}
-              onChangeText={setQtyDraft}
-              keyboardType="decimal-pad"
-              style={styles.qtyInput}
-              testID="seller-pedido-scan-qty"
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button
-              onPress={() => {
-                setHit(null)
-                setLocked(false)
-              }}
-            >
-              {t('common:cancel')}
-            </Button>
-            <Button mode="contained" onPress={() => void confirmHit()} testID="seller-pedido-scan-confirm">
-              {t('pedidos:add')}
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
       </Portal>
+
+      <NumpadSheet
+        visible={hit != null}
+        mode="cantidad"
+        initialValue={hit?.suggestedQty ?? 1}
+        precio={hit ? parseMoney(hit.articulo.precioLista1) : 0}
+        cantidadForSubtotal={hit?.suggestedQty ?? 0}
+        dsctoForSubtotal={0}
+        title={hit?.articulo.descripcion}
+        subtitle={hit ? t('pedidos:stock', { count: hit.stock }) : undefined}
+        locale={locale}
+        onDismiss={() => {
+          setHit(null)
+          setLocked(false)
+        }}
+        onConfirm={(value) => void confirmHitQty(value)}
+      />
     </View>
   )
 }
@@ -392,5 +372,4 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   done: { marginBottom: 24 },
-  qtyInput: { marginTop: 12 },
 })
