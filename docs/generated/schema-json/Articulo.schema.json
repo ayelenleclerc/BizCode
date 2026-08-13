@@ -8,6 +8,12 @@
     "codigo": {
       "type": "integer"
     },
+    "codigoBarras": {
+      "description": "Optional retail/logistics barcode for seller scan (#255).",
+      "maxLength": 32,
+      "nullable": true,
+      "type": "string"
+    },
     "condIva": {
       "type": "string"
     },

@@ -33,6 +33,10 @@ import ArticuloWooCommerceSection from './ArticuloWooCommerceSection'
 const articuloSchema = z
   .object({
     codigo: z.coerce.number().int().positive('Código debe ser positivo'),
+    codigoBarras: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return null
+      return String(val).trim()
+    }, z.string().max(32).nullable().optional()),
     descripcion: z.string().min(3, 'Mínimo 3 caracteres').max(120),
     // Rubro — HTML <select value=""> must not coerce to 0 (would fail .positive() and block submit).
     rubroId: z.preprocess((val) => {
@@ -189,6 +193,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       umedida: 'UN',
       tipo: 'articulo',
       unidadServicio: null,
+      codigoBarras: null,
       minimo: 0,
       stock: 0,
       mesesGarantia: null,
@@ -223,6 +228,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   useEffect(() => {
     if (articulo) {
       setValue('codigo', articulo.codigo)
+      setValue('codigoBarras', articulo.codigoBarras ?? null)
       setValue('descripcion', articulo.descripcion)
       setValue('rubroId', articulo.rubroId)
       setValue('categoriaId', articulo.categoriaId ?? null)
@@ -462,6 +468,29 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
             />
             {errors.codigo && (
               <p id="articulo-codigo-error" className="text-red-400 text-sm mt-1">{errors.codigo.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="articulo-codigoBarras" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+              {t('form.codigoBarras')}
+            </label>
+            <input
+              id="articulo-codigoBarras"
+              type="text"
+              inputMode="numeric"
+              data-testid="articulo-form-codigo-barras"
+              {...register('codigoBarras')}
+              maxLength={32}
+              placeholder={t('form.codigoBarrasPlaceholder')}
+              aria-describedby="articulo-codigoBarras-hint"
+              className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+            />
+            <p id="articulo-codigoBarras-hint" className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              {t('form.codigoBarrasHint')}
+            </p>
+            {errors.codigoBarras && (
+              <p id="articulo-codigoBarras-error" className="text-red-400 text-sm mt-1">{errors.codigoBarras.message}</p>
             )}
           </div>
 

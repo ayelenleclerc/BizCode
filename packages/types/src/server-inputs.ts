@@ -65,6 +65,8 @@ export type UnidadServicio = 'hora' | 'dia' | 'mes' | 'proyecto' | 'km' | 'unida
 
 export type ArticuloInput = {
   codigo: number
+  /** @en Optional barcode (#255). @es Código de barras opcional (#255). @pt-BR Código de barras opcional (#255). */
+  codigoBarras?: string | null
   descripcion: string
   rubroId: number
   /** @en Optional hierarchical category (#235). @es Categoría jerárquica opcional (#235). @pt-BR Categoria hierárquica opcional (#235). */

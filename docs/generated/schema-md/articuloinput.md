@@ -20,6 +20,7 @@ undefined
 | :-------------------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------- |
 | [activo](#activo)                             | `boolean` | Required | cannot be null | [ArticuloInput](articuloinput-properties-activo.md "undefined#/properties/activo")                             |
 | [codigo](#codigo)                             | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-codigo.md "undefined#/properties/codigo")                             |
+| [codigoBarras](#codigobarras)                 | `string`  | Optional | cannot be null | [ArticuloInput](articuloinput-properties-codigobarras.md "undefined#/properties/codigoBarras")                 |
 | [condIva](#condiva)                           | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-condiva.md "undefined#/properties/condIva")                           |
 | [controlLote](#controllote)                   | `boolean` | Optional | cannot be null | [ArticuloInput](articuloinput-properties-controllote.md "undefined#/properties/controlLote")                   |
 | [costo](#costo)                               | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-costo.md "undefined#/properties/costo")                               |
@@ -81,6 +82,28 @@ undefined
 ### codigo Constraints
 
 **minimum**: the value of this number must greater than or equal to: `1`
+
+## codigoBarras
+
+Optional barcode; empty string stored as null (#255).
+
+`codigoBarras`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [ArticuloInput](articuloinput-properties-codigobarras.md "undefined#/properties/codigoBarras")
+
+### codigoBarras Type
+
+`string`
+
+### codigoBarras Constraints
+
+**maximum length**: the maximum number of characters for this string is: `32`
 
 ## condIva
 

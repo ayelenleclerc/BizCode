@@ -58,5 +58,19 @@
     "discount": "-{{pct}}%",
     "addSuggested": "Adicionar quantidade sugerida",
     "searchOthers": "Buscar outros artigos"
+  },
+  "scan": {
+    "title": "Escanear",
+    "open": "Escanear código",
+    "hint": "Aponte para o código de barras do produto",
+    "permission": "É necessária permissão da câmera para escanear.",
+    "grantPermission": "Permitir câmera",
+    "done": "Pronto",
+    "notFoundTitle": "Código não encontrado",
+    "notFound": "O código {{code}} não está no catálogo",
+    "searchManual": "Buscar manualmente",
+    "scanAnother": "Escanear outro",
+    "added": "Adicionado: {{name}}",
+    "addOnePref": "Somar 1 a cada leitura"
   }
 }

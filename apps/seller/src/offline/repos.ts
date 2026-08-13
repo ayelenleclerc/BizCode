@@ -54,15 +54,38 @@ export async function getClienteLocal(
 export async function upsertArticulo(db: SQLiteDatabase, articulo: Record<string, unknown>): Promise<void> {
   const id = Number(articulo.id)
   if (!Number.isInteger(id)) return
+  const barcode =
+    typeof articulo.codigoBarras === 'string' && articulo.codigoBarras.trim()
+      ? articulo.codigoBarras.trim()
+      : null
   await db.runAsync(
-    `INSERT INTO articulos (id, json, descripcion, codigo, updated_at) VALUES (?, ?, ?, ?, ?)
-     ON CONFLICT(id) DO UPDATE SET json=excluded.json, descripcion=excluded.descripcion, codigo=excluded.codigo, updated_at=excluded.updated_at`,
+    `INSERT INTO articulos (id, json, descripcion, codigo, codigo_barras, updated_at) VALUES (?, ?, ?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET json=excluded.json, descripcion=excluded.descripcion, codigo=excluded.codigo, codigo_barras=excluded.codigo_barras, updated_at=excluded.updated_at`,
     id,
     JSON.stringify(articulo),
     String(articulo.descripcion ?? ''),
     Number(articulo.codigo ?? 0),
+    barcode,
     now(),
   )
+}
+
+export async function getArticuloByBarcodeLocal(
+  db: SQLiteDatabase,
+  codigoBarras: string,
+): Promise<Record<string, unknown> | null> {
+  const code = codigoBarras.trim()
+  if (!code) return null
+  const row = await db.getFirstAsync<{ json: string }>(
+    'SELECT json FROM articulos WHERE codigo_barras = ? LIMIT 1',
+    code,
+  )
+  if (!row) return null
+  const articulo = JSON.parse(row.json) as Record<string, unknown>
+  if (articulo.activo === false || articulo.esPadre === true || articulo.tipo === 'servicio') {
+    return null
+  }
+  return articulo
 }
 
 export async function searchArticulosLocal(
@@ -79,10 +102,13 @@ export async function searchArticulosLocal(
   const like = `%${trimmed}%`
   const rows = await db.getAllAsync<{ json: string }>(
     `SELECT json FROM articulos
-     WHERE descripcion LIKE ? COLLATE NOCASE OR CAST(codigo AS TEXT) LIKE ?
+     WHERE descripcion LIKE ? COLLATE NOCASE
+        OR CAST(codigo AS TEXT) LIKE ?
+        OR codigo_barras = ?
      ORDER BY descripcion COLLATE NOCASE LIMIT 200`,
     like,
     like,
+    trimmed,
   )
   return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
 }

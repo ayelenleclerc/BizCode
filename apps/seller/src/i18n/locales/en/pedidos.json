@@ -58,5 +58,19 @@
     "discount": "-{{pct}}%",
     "addSuggested": "Add suggested quantity",
     "searchOthers": "Search other articles"
+  },
+  "scan": {
+    "title": "Scan",
+    "open": "Scan barcode",
+    "hint": "Point at the product barcode",
+    "permission": "Camera permission is required to scan.",
+    "grantPermission": "Allow camera",
+    "done": "Done",
+    "notFoundTitle": "Code not found",
+    "notFound": "Code {{code}} is not in the catalog",
+    "searchManual": "Search manually",
+    "scanAnother": "Scan another",
+    "added": "Added: {{name}}",
+    "addOnePref": "Add 1 on each scan"
   }
 }

@@ -637,6 +637,23 @@ export default function NuevoPedidoScreen() {
         } as object)}
       />
 
+      <Button
+        mode="outlined"
+        icon="barcode-scan"
+        disabled={suspended}
+        onPress={() =>
+          router.push({
+            pathname: '/(app)/pedidos/escanear',
+            params: { clienteId: String(cart.clienteId) },
+          })
+        }
+        style={styles.scanBtn}
+        testID="seller-pedido-scan-btn"
+        accessibilityLabel={t('pedidos:scan.open')}
+      >
+        {t('pedidos:scan.open')}
+      </Button>
+
       <FlatList
         horizontal
         data={[{ id: null as number | null, nombre: t('common:tabs.catalogo') }, ...rubros]}
@@ -826,6 +843,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, padding: 12, gap: 8 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
   search: { marginBottom: 4 },
+  scanBtn: { marginHorizontal: 8, marginBottom: 8 },
   cliente: { fontWeight: '600', marginBottom: 4 },
   rubros: { maxHeight: 44, marginBottom: 4 },
   chip: { marginRight: 8 },

@@ -261,6 +261,10 @@ model Articulo {
   tenantId             Int
   tenant               Tenant             @relation(fields: [tenantId], references: [id])
   codigo               Int
+  /// @en Optional retail/logistics barcode (EAN/CODE-128/QR payload) for seller scan (#255).
+  /// @es Código de barras opcional (EAN/CODE-128/QR) para escaneo en App Seller (#255).
+  /// @pt-BR Código de barras opcional (EAN/CODE-128/QR) para leitura no App Seller (#255).
+  codigoBarras         String?            @db.VarChar(32)
   /// @en Widened for variant labels such as "Remera - Roja - S" (#235).
   /// @es Ampliado para etiquetas de variante como "Remera - Roja - S" (#235).
   /// @pt-BR Ampliado para rótulos de variante como "Camiseta - Vermelha - P" (#235).
@@ -372,8 +376,10 @@ model Articulo {
   lotes                  Lote[]
 
   @@unique([tenantId, codigo])
+  @@unique([tenantId, codigoBarras])
   @@index([tenantId])
   @@index([tenantId, codigo])
+  @@index([tenantId, codigoBarras])
   @@index([tenantId, rubroId])
   @@index([tenantId, tipo])
   @@index([tenantId, padreId])

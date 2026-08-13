@@ -38,8 +38,14 @@ export function registerArticulosRoutes(app: Application, ctx: RestRouteContext)
   app.get('/api/articulos', requirePermission('products.read'), async (req: Request, res: Response) => {
     try {
       const tenantId = getTenantId(req)
-      const filtro = (req.query.q as string) || ''
       const { take, skip } = parseListPagination(req)
+      const barcodeRaw = typeof req.query.codigoBarras === 'string' ? req.query.codigoBarras : ''
+      if (barcodeRaw.trim()) {
+        const hit = await articulo.findByBarcode(tenantId, barcodeRaw)
+        res.json(paginatedListJson(hit ? [hit] : [], hit ? 1 : 0, take, skip))
+        return
+      }
+      const filtro = (req.query.q as string) || ''
       const { total, articulos } = await articulo.list(tenantId, filtro, take, skip)
       res.json(paginatedListJson(articulos, total, take, skip))
     } catch (err: unknown) {

@@ -85,7 +85,7 @@ Un paso bloquea el pipeline (código de salida ≠ 0) cuando:
 | Paridad i18n | Claves coherentes entre locales respecto de `es` | `npm run check:i18n` |
 | Estructura docs humanos | Existencia de rutas del mapa (`DOCUMENT_LOCALE_MAP.md`) | `check:docs-map` |
 | Política de localización docs | Áreas controladas trilingües (calidad, ISO, specs, **manuales de usuario**, changelogs, ADR, OpenAPI) | `docs-governance.yml` (**PR a `main` y `develop`**) |
-| Enlaces externos en Markdown (`docs/**`) | Destinos HTTP(S) vivos (**Lychee**; loopback en `.lycheeignore`). Los enlaces relativos entre `.md` no entran en este job. | `docs-links.yml` |
+| Enlaces externos en Markdown (`docs/**`) | Destinos HTTP(S) vivos (**Lychee**; loopback, npm/AAIP inestables y URLs de issues/PR de GitHub en `.lycheeignore`). Los enlaces relativos entre `.md` no entran en este job. | `docs-links.yml` |
 
 ## Servicios
 

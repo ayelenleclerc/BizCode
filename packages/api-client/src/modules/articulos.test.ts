@@ -26,6 +26,19 @@ describe('createArticulosAPI', () => {
     await expect(api.get(5)).resolves.toEqual({ id: 5, descripcion: 'Te' })
     expect(get).toHaveBeenCalledWith('/articulos/5')
   })
+
+  it('gets artículo by barcode (#255)', async () => {
+    const get = vi.fn().mockResolvedValue({
+      data: { success: true, data: [{ id: 10, codigoBarras: '7791234099876', descripcion: 'Leche' }] },
+    })
+    const api = createArticulosAPI(mockHttp(get))
+    await expect(api.getByBarcode('7791234099876')).resolves.toEqual({
+      id: 10,
+      codigoBarras: '7791234099876',
+      descripcion: 'Leche',
+    })
+    expect(get).toHaveBeenCalledWith('/articulos', { params: { codigoBarras: '7791234099876' } })
+  })
 })
 
 describe('createRubrosAPI', () => {
