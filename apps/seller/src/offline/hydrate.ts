@@ -53,6 +53,7 @@ export async function hydrateOfflineCache(opts?: {
     stockItems: 0,
     plantillas: 0,
     sugerencias: 0,
+    thumbs: 0,
   }
 
   for (let page = 0; page < MAX_CLIENT_PAGES; page++) {
@@ -68,15 +69,25 @@ export async function hydrateOfflineCache(opts?: {
   }
 
   const articuloIds: number[] = []
+  const thumbSources: Array<{ id: number; urlThumb?: string | null }> = []
   for (let page = 0; page < MAX_ARTICULO_PAGES; page++) {
     const rows = await articulosAPI.list('', { limit: PAGE, offset: page * PAGE })
     const list = Array.isArray(rows) ? rows : []
     for (const a of list) {
       await upsertArticulo(db, a as unknown as Record<string, unknown>)
       stats.articulos += 1
-      if (typeof a.id === 'number') articuloIds.push(a.id)
+      if (typeof a.id === 'number') {
+        articuloIds.push(a.id)
+        thumbSources.push({ id: a.id, urlThumb: a.urlThumb ?? null })
+      }
     }
     if (list.length < PAGE) break
+  }
+  try {
+    const { prefetchArticuloThumbs } = await import('../catalog/thumbCache')
+    stats.thumbs = await prefetchArticuloThumbs(thumbSources)
+  } catch {
+    stats.thumbs = 0
   }
 
   const rubros = await rubrosAPI.list({ limit: 200 })

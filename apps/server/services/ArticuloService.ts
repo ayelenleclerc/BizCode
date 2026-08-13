@@ -3,13 +3,40 @@ import type { ArticuloInput } from '@bizcode/types'
 import type { ServiceResult } from './serviceResults'
 import { arsFromFx, TipoCambioService } from './TipoCambioService'
 import { umedidaFromUnidadBase } from '../lib/uom'
+import { articuloImagePublicUrl } from '../lib/articuloImageUrl'
 import { MeliCatalogService } from './MeliCatalogService'
 
+const articuloReadInclude = {
+  rubro: true,
+  imagenes: {
+    orderBy: [{ esPrincipal: 'desc' as const }, { orden: 'asc' as const }],
+    take: 1,
+    select: { pathThumb: true },
+  },
+} satisfies Prisma.ArticuloInclude
+
 type ArticuloWithRubro = Prisma.ArticuloGetPayload<{ include: { rubro: true } }>
+type ArticuloWithPrincipalImage = Prisma.ArticuloGetPayload<{ include: typeof articuloReadInclude }>
+
+export type ArticuloListRow = ArticuloWithRubro & { urlThumb: string | null }
 
 export type ArticuloListResult = {
   total: number
-  articulos: ArticuloWithRubro[]
+  articulos: ArticuloListRow[]
+}
+
+/**
+ * @en Maps principal thumb path to public urlThumb (#257); omits imagenes from the payload.
+ * @es Mapea el thumb principal a urlThumb público (#257); omite imagenes del payload.
+ * @pt-BR Mapeia o thumb principal para urlThumb público (#257); omite imagenes do payload.
+ */
+export function attachArticuloUrlThumb(row: ArticuloWithPrincipalImage): ArticuloListRow {
+  const thumbPath = row.imagenes?.[0]?.pathThumb
+  const { imagenes: _omit, ...rest } = row
+  return {
+    ...(rest as ArticuloWithRubro),
+    urlThumb: thumbPath ? articuloImagePublicUrl(thumbPath) : null,
+  }
 }
 
 /**
@@ -41,13 +68,13 @@ export class ArticuloService {
       this.prisma.articulo.count({ where }),
       this.prisma.articulo.findMany({
         where,
-        include: { rubro: true },
+        include: articuloReadInclude,
         orderBy: { codigo: 'asc' },
         take,
         skip,
       }),
     ])
-    return { total, articulos }
+    return { total, articulos: articulos.map(attachArticuloUrlThumb) }
   }
 
   /**
@@ -55,10 +82,10 @@ export class ArticuloService {
    * @es Búsqueda exacta por código de barras de SKUs vendibles (escaneo seller #255).
    * @pt-BR Busca exata por código de barras de SKUs vendáveis (leitura seller #255).
    */
-  async findByBarcode(tenantId: number, codigoBarras: string): Promise<ArticuloWithRubro | null> {
+  async findByBarcode(tenantId: number, codigoBarras: string): Promise<ArticuloListRow | null> {
     const code = ArticuloService.normalizeCodigoBarras(codigoBarras)
     if (!code) return null
-    return this.prisma.articulo.findFirst({
+    const row = await this.prisma.articulo.findFirst({
       where: {
         tenantId,
         codigoBarras: code,
@@ -66,15 +93,17 @@ export class ArticuloService {
         esPadre: false,
         NOT: { tipo: 'servicio' },
       },
-      include: { rubro: true },
+      include: articuloReadInclude,
     })
+    return row ? attachArticuloUrlThumb(row) : null
   }
 
-  async getById(tenantId: number, id: number): Promise<ArticuloWithRubro | null> {
-    return this.prisma.articulo.findFirst({
+  async getById(tenantId: number, id: number): Promise<ArticuloListRow | null> {
+    const row = await this.prisma.articulo.findFirst({
       where: { id, tenantId },
-      include: { rubro: true },
+      include: articuloReadInclude,
     })
+    return row ? attachArticuloUrlThumb(row) : null
   }
 
   async create(tenantId: number, body: ArticuloInput): Promise<ServiceResult<Articulo>> {

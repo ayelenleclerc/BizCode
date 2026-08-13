@@ -39,6 +39,8 @@ export interface Articulo {
   codigo: number
   /** @en Optional barcode for seller scan (#255). @es Código de barras opcional para escaneo seller (#255). @pt-BR Código de barras opcional para leitura seller (#255). */
   codigoBarras?: string | null
+  /** @en Principal thumb public path (#257). @es Path público del thumb principal (#257). @pt-BR Path público do thumb principal (#257). */
+  urlThumb?: string | null
   descripcion: string
   rubroId: number
   rubro?: Rubro

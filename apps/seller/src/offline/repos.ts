@@ -95,7 +95,7 @@ export async function searchArticulosLocal(
   const trimmed = q.trim()
   if (!trimmed) {
     const rows = await db.getAllAsync<{ json: string }>(
-      'SELECT json FROM articulos ORDER BY descripcion COLLATE NOCASE LIMIT 200',
+      'SELECT json FROM articulos ORDER BY descripcion COLLATE NOCASE LIMIT 500',
     )
     return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
   }
@@ -105,7 +105,7 @@ export async function searchArticulosLocal(
      WHERE descripcion LIKE ? COLLATE NOCASE
         OR CAST(codigo AS TEXT) LIKE ?
         OR codigo_barras = ?
-     ORDER BY descripcion COLLATE NOCASE LIMIT 200`,
+     ORDER BY descripcion COLLATE NOCASE LIMIT 500`,
     like,
     like,
     trimmed,

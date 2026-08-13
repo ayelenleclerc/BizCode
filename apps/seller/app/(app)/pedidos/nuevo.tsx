@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FlatList, Pressable, StyleSheet, View } from 'react-native'
+import { FlatList, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
+import { FlashList } from '@shopify/flash-list'
 import {
   ActivityIndicator,
   Banner,
@@ -33,6 +34,14 @@ import {
   sugerenciasPedidoAPI,
 } from '../../../src/api/sellerApi'
 import { capQtyToStock } from '../../../src/alerts/policyGates'
+import { ArticuloThumb } from '../../../src/catalog/ArticuloThumb'
+import {
+  getCatalogViewPreference,
+  setCatalogViewPreference,
+  type CatalogViewMode,
+} from '../../../src/catalog/catalogViewPrefs'
+import { filterSellableArticulos, offerPctByArticuloId } from '../../../src/catalog/filterSellable'
+import { buildCatalogGridRows } from '../../../src/catalog/groupByRubro'
 import { mapApiErrorToUiState, type UiLoadState } from '../../../src/lib/apiErrors'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
 import { usePedidoCart } from '../../../src/pedidos/CartContext'
@@ -40,7 +49,7 @@ import { NumpadSheet } from '../../../src/pedidos/NumpadSheet'
 import { roundQtyToMultiplo } from '../../../src/pedidos/numpadParse'
 
 const DEBOUNCE_MS = 300
-const CATALOG_LIMIT = 80
+const CATALOG_LIMIT = 500
 
 const STOCK_COLOR: Record<SellerStockEstado, string> = {
   ok: '#1B5E20',
@@ -62,6 +71,7 @@ type QtySheetTarget = {
   cantidad: number
   dscto: number
   multiploVenta: number | null
+  condIva?: string
 }
 
 function deriveStockEstado(stock: number): SellerStockEstado {
@@ -95,6 +105,10 @@ export default function NuevoPedidoScreen() {
   const [sugerencias, setSugerencias] = useState<SugerenciasPedido | null>(null)
   const [sugerenciasState, setSugerenciasState] = useState<UiLoadState>('idle')
   const [qtySheet, setQtySheet] = useState<QtySheetTarget | null>(null)
+  const [viewMode, setViewMode] = useState<CatalogViewMode>(() => getCatalogViewPreference())
+  const [detailItem, setDetailItem] = useState<ArticuloListItem | null>(null)
+  const { width: windowWidth } = useWindowDimensions()
+  const gridCols = windowWidth >= 600 ? 3 : 2
   const reqId = useRef(0)
 
   const showSuggestions = query.trim().length === 0
@@ -230,30 +244,52 @@ export default function NuevoPedidoScreen() {
 
   const search = useCallback(async (q: string) => {
     const id = ++reqId.current
-    setState('loading')
-    try {
-      const data = await articulosAPI.list(q.trim() || undefined, { limit: CATALOG_LIMIT })
-      if (id !== reqId.current) return
-      const list = (Array.isArray(data) ? data : []).filter((a) => a.activo !== false && !a.esPadre)
-      setItems(list)
-      setState(list.length === 0 ? 'empty' : 'success')
-    } catch (err) {
-      if (id !== reqId.current) return
+    const trimmed = q.trim()
+    const localFirst = trimmed.length >= 2
+
+    const readLocal = async (): Promise<ArticuloListItem[] | null> => {
       try {
         const { getOfflineDb } = await import('../../../src/offline/db')
         const { searchArticulosLocal } = await import('../../../src/offline/repos')
         const db = await getOfflineDb()
-        const cached = await searchArticulosLocal(db, q.trim())
-        if (id !== reqId.current) return
-        const list = cached
-          .map((a) => a as unknown as ArticuloListItem)
-          .filter((a) => a.activo !== false && !a.esPadre)
-        setItems(list)
-        setState(list.length === 0 ? 'empty' : 'success')
+        const cached = await searchArticulosLocal(db, trimmed)
+        return filterSellableArticulos(cached.map((a) => a as unknown as ArticuloListItem))
       } catch {
-        setItems([])
-        setState(mapApiErrorToUiState(err))
+        return null
       }
+    }
+
+    if (localFirst) {
+      const local = await readLocal()
+      if (id !== reqId.current) return
+      if (local) {
+        setItems(local)
+        setState(local.length === 0 ? 'empty' : 'success')
+      } else {
+        setState('loading')
+      }
+    } else {
+      setState('loading')
+    }
+
+    try {
+      const data = await articulosAPI.list(trimmed || undefined, { limit: CATALOG_LIMIT })
+      if (id !== reqId.current) return
+      const list = filterSellableArticulos(Array.isArray(data) ? data : [])
+      setItems(list)
+      setState(list.length === 0 ? 'empty' : 'success')
+    } catch (err) {
+      if (id !== reqId.current) return
+      if (localFirst) return
+      const local = await readLocal()
+      if (id !== reqId.current) return
+      if (local) {
+        setItems(local)
+        setState(local.length === 0 ? 'empty' : 'success')
+        return
+      }
+      setItems([])
+      setState(mapApiErrorToUiState(err))
     }
   }, [])
 
@@ -268,6 +304,13 @@ export default function NuevoPedidoScreen() {
     if (rubroId == null) return items
     return items.filter((a) => a.rubroId === rubroId || a.rubro?.id === rubroId)
   }, [items, rubroId])
+
+  const offerPct = useMemo(() => offerPctByArticuloId(sugerencias?.ofertas), [sugerencias])
+
+  const gridRows = useMemo(
+    () => buildCatalogGridRows(filtered, rubroId, t('common:tabs.catalogo'), gridCols),
+    [filtered, rubroId, t, gridCols],
+  )
 
   const stockIdsKey = useMemo(() => {
     const ids = new Set<number>()
@@ -441,17 +484,53 @@ export default function NuevoPedidoScreen() {
     if (!qtySheet) return
     const rounded = roundQtyToMultiplo(value, qtySheet.multiploVenta)
     const capped = capQtyToStock(rounded, qtySheet.stock, capEnabled)
+    const existing = cart.lines.find((l) => l.articuloId === qtySheet.articuloId)
     if (capped <= 0) {
       if (policies?.sellerStockZeroAction === 'block') {
         setQtySheet(null)
         return
       }
-      cart.setCantidad(qtySheet.articuloId, 0)
+      if (existing) cart.setCantidad(qtySheet.articuloId, 0)
       setQtySheet(null)
       return
     }
-    cart.setCantidad(qtySheet.articuloId, capped)
+    if (existing) {
+      cart.setCantidad(qtySheet.articuloId, capped)
+    } else {
+      cart.addOrIncrement({
+        articuloId: qtySheet.articuloId,
+        descripcion: qtySheet.descripcion,
+        precio: qtySheet.precio,
+        stock: qtySheet.stock,
+        condIva: qtySheet.condIva ?? '1',
+        cantidad: capped,
+      })
+    }
     setQtySheet(null)
+  }
+
+  const changeViewMode = (mode: CatalogViewMode) => {
+    setViewMode(mode)
+    setCatalogViewPreference(mode)
+  }
+
+  const openQtyForArticulo = (item: ArticuloListItem) => {
+    if (suspended) return
+    const { stock } = resolveStock(item)
+    const inCart = cart.lines.find((l) => l.articuloId === item.id)
+    const precio = inCart?.precio ?? parseMoney(item.precioLista1)
+    const multiplo =
+      item.multiploVenta != null && Number(item.multiploVenta) > 0 ? Number(item.multiploVenta) : null
+    openQtySheet({
+      articuloId: item.id,
+      descripcion: item.descripcion,
+      precio,
+      stock,
+      cantidad: inCart?.cantidad ?? (multiplo ?? 1),
+      dscto: inCart?.dscto ?? 0,
+      multiploVenta: multiplo,
+      condIva: item.condIva ?? '1',
+    })
   }
 
   const renderQtyControls = (
@@ -734,6 +813,27 @@ export default function NuevoPedidoScreen() {
         )}
       />
 
+      <View style={styles.viewToggle} accessibilityRole="tablist">
+        <Chip
+          selected={viewMode === 'list'}
+          onPress={() => changeViewMode('list')}
+          style={styles.chip}
+          testID="seller-pedido-view-list"
+          accessibilityLabel={t('pedidos:catalog.viewList')}
+        >
+          {t('pedidos:catalog.viewList')}
+        </Chip>
+        <Chip
+          selected={viewMode === 'grid'}
+          onPress={() => changeViewMode('grid')}
+          style={styles.chip}
+          testID="seller-pedido-view-grid"
+          accessibilityLabel={t('pedidos:catalog.viewGrid')}
+        >
+          {t('pedidos:catalog.viewGrid')}
+        </Chip>
+      </View>
+
       {state === 'loading' && !showSuggestions && (
         <View style={styles.centered} testID="seller-pedido-catalog-loading">
           <ActivityIndicator />
@@ -752,11 +852,12 @@ export default function NuevoPedidoScreen() {
         </View>
       )}
 
-      {(state === 'success' || state === 'empty' || showSuggestions) && (
+      {(state === 'success' || state === 'empty' || showSuggestions) && viewMode === 'list' && (
         <FlatList
           data={filtered}
           keyExtractor={(item) => String(item.id)}
           testID="seller-pedido-catalog-list"
+          style={styles.catalogList}
           contentContainerStyle={styles.list}
           ListHeaderComponent={suggestionsHeader}
           ListEmptyComponent={
@@ -767,21 +868,50 @@ export default function NuevoPedidoScreen() {
             const { stock, estado } = resolveStock(item)
             const inCart = cart.lines.find((l) => l.articuloId === item.id)
             const stockColor = STOCK_COLOR[estado]
+            const offer = offerPct.get(item.id)
             return (
               <View style={styles.row} testID={`seller-pedido-articulo-${item.id}`}>
-                <View style={styles.rowMain}>
-                  <Text variant="titleSmall">{item.descripcion}</Text>
-                  <Text style={styles.meta}>{formatMoney(precio, locale)}</Text>
-                  <View style={styles.stockRow} testID={`seller-pedido-stock-${item.id}`}>
-                    <Chip
-                      compact
-                      style={[styles.stockChip, { borderColor: stockColor }]}
-                      textStyle={{ color: stockColor, fontSize: 12 }}
-                    >
-                      {t(`pedidos:stockStatus.${estado}`)} · {t('pedidos:stock', { count: stock })}
-                    </Chip>
+                <Pressable
+                  style={styles.rowMainPress}
+                  onPress={() => openQtyForArticulo(item)}
+                  onLongPress={() => setDetailItem(item)}
+                  delayLongPress={400}
+                  disabled={suspended}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.descripcion}
+                  testID={`seller-pedido-articulo-tap-${item.id}`}
+                >
+                  <ArticuloThumb
+                    articuloId={item.id}
+                    descripcion={item.descripcion}
+                    urlThumb={item.urlThumb}
+                    grayscale={stock <= 0}
+                    size={48}
+                  />
+                  <View style={styles.rowMain}>
+                    <Text variant="titleSmall">{item.descripcion}</Text>
+                    <Text style={styles.meta}>{formatMoney(precio, locale)}</Text>
+                    <View style={styles.stockRow} testID={`seller-pedido-stock-${item.id}`}>
+                      <Chip
+                        compact
+                        style={[styles.stockChip, { borderColor: stockColor }]}
+                        textStyle={{ color: stockColor, fontSize: 12 }}
+                      >
+                        {t(`pedidos:stockStatus.${estado}`)} · {t('pedidos:stock', { count: stock })}
+                      </Chip>
+                      {offer != null ? (
+                        <Chip
+                          compact
+                          style={styles.offerBadge}
+                          testID={`seller-pedido-offer-${item.id}`}
+                          accessibilityLabel={t('pedidos:catalog.offerBadge', { pct: offer })}
+                        >
+                          {t('pedidos:catalog.offerBadge', { pct: offer })}
+                        </Chip>
+                      ) : null}
+                    </View>
                   </View>
-                </View>
+                </Pressable>
                 {inCart ? (
                   <View style={styles.qtyRow}>
                     <Button
@@ -795,20 +925,7 @@ export default function NuevoPedidoScreen() {
                       −
                     </Button>
                     <Pressable
-                      onPress={() =>
-                        openQtySheet({
-                          articuloId: item.id,
-                          descripcion: item.descripcion,
-                          precio,
-                          stock,
-                          cantidad: inCart.cantidad,
-                          dscto: inCart.dscto,
-                          multiploVenta:
-                            item.multiploVenta != null && Number(item.multiploVenta) > 0
-                              ? Number(item.multiploVenta)
-                              : null,
-                        })
-                      }
+                      onPress={() => openQtyForArticulo(item)}
                       disabled={suspended}
                       accessibilityRole="button"
                       accessibilityLabel={t('pedidos:qty')}
@@ -839,6 +956,117 @@ export default function NuevoPedidoScreen() {
                     {t('pedidos:add')}
                   </Button>
                 )}
+              </View>
+            )
+          }}
+        />
+      )}
+
+      {(state === 'success' || state === 'empty' || showSuggestions) && viewMode === 'grid' && (
+        <FlashList
+          data={gridRows}
+          extraData={`${cart.lines.length}-${stockAsOf ?? ''}-${offerPct.size}`}
+          keyExtractor={(row) => row.key}
+          getItemType={(row) => row.kind}
+          testID="seller-pedido-catalog-grid"
+          style={styles.catalogList}
+          contentContainerStyle={styles.list}
+          ListHeaderComponent={suggestionsHeader}
+          ListEmptyComponent={
+            showSuggestions ? null : <Text style={styles.hint}>{t('pedidos:emptyCatalog')}</Text>
+          }
+          renderItem={({ item: row }) => {
+            if (row.kind === 'header') {
+              return (
+                <Text
+                  variant="titleSmall"
+                  style={styles.sectionTitle}
+                  {...({ testID: `seller-pedido-rubro-header-${row.title}` } as object)}
+                >
+                  {row.title}
+                </Text>
+              )
+            }
+            return (
+              <View style={styles.gridRow}>
+                {row.items.map((item) => {
+                  const precio = parseMoney(item.precioLista1)
+                  const { stock, estado } = resolveStock(item)
+                  const inCart = cart.lines.find((l) => l.articuloId === item.id)
+                  const stockColor = STOCK_COLOR[estado]
+                  const offer = offerPct.get(item.id)
+                  return (
+                    <Pressable
+                      key={item.id}
+                      style={styles.gridCard}
+                      onPress={() => openQtyForArticulo(item)}
+                      onLongPress={() => setDetailItem(item)}
+                      delayLongPress={400}
+                      disabled={suspended}
+                      accessibilityRole="button"
+                      accessibilityLabel={item.descripcion}
+                      testID={`seller-pedido-articulo-${item.id}`}
+                    >
+                      <ArticuloThumb
+                        articuloId={item.id}
+                        descripcion={item.descripcion}
+                        urlThumb={item.urlThumb}
+                        grayscale={stock <= 0}
+                        size={96}
+                      />
+                      <Text variant="titleSmall">{item.descripcion}</Text>
+                      <Text style={styles.meta}>{formatMoney(precio, locale)}</Text>
+                      <View style={styles.stockRow} testID={`seller-pedido-stock-${item.id}`}>
+                        <Chip
+                          compact
+                          style={[styles.stockChip, { borderColor: stockColor }]}
+                          textStyle={{ color: stockColor, fontSize: 12 }}
+                        >
+                          {t(`pedidos:stockStatus.${estado}`)}
+                        </Chip>
+                        {stock <= 0 ? (
+                          <Chip compact style={styles.stockChip} testID={`seller-pedido-out-${item.id}`}>
+                            {t('pedidos:stockStatus.cero')}
+                          </Chip>
+                        ) : null}
+                        {offer != null ? (
+                          <Chip
+                            compact
+                            style={styles.offerBadge}
+                            testID={`seller-pedido-offer-${item.id}`}
+                          >
+                            {t('pedidos:catalog.offerBadge', { pct: offer })}
+                          </Chip>
+                        ) : null}
+                      </View>
+                      {inCart
+                        ? renderQtyControls(
+                            item.id,
+                            () => cart.setCantidad(item.id, inCart.cantidad - 1),
+                            () => tryAddOrInc(item, inCart.cantidad),
+                            'seller-pedido',
+                            () => openQtyForArticulo(item),
+                          )
+                        : (
+                            <Button
+                              mode="contained-tonal"
+                              compact
+                              disabled={suspended}
+                              onPress={() => tryAddOrInc(item, 0)}
+                              testID={`seller-pedido-add-${item.id}`}
+                              accessibilityLabel={t('pedidos:add')}
+                            >
+                              {t('pedidos:add')}
+                            </Button>
+                          )}
+                    </Pressable>
+                  )
+                })}
+                {row.items.length < gridCols
+                  ? Array.from({ length: gridCols - row.items.length }, (_, i) => (
+                      <View key={`pad-${i}`} style={styles.gridCardSpacer} />
+                    ))
+                  : null}
               </View>
             )
           }}
@@ -884,6 +1112,38 @@ export default function NuevoPedidoScreen() {
         onConfirm={confirmQtySheet}
         onDismiss={() => setQtySheet(null)}
       />
+
+      <Portal>
+        <Dialog
+          visible={detailItem != null}
+          onDismiss={() => setDetailItem(null)}
+          testID="seller-pedido-articulo-detail"
+        >
+          <Dialog.Title>{t('pedidos:catalog.detailTitle')}</Dialog.Title>
+          <Dialog.Content>
+            {detailItem ? (
+              <View style={styles.detailBody}>
+                <ArticuloThumb
+                  articuloId={detailItem.id}
+                  descripcion={detailItem.descripcion}
+                  urlThumb={detailItem.urlThumb}
+                  grayscale={resolveStock(detailItem).stock <= 0}
+                  size={96}
+                />
+                <Text variant="titleMedium">{detailItem.descripcion}</Text>
+                <Text>{t('pedidos:catalog.codigo', { codigo: detailItem.codigo })}</Text>
+                <Text>{formatMoney(parseMoney(detailItem.precioLista1), locale)}</Text>
+                <Text>{t('pedidos:stock', { count: resolveStock(detailItem).stock })}</Text>
+              </View>
+            ) : null}
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setDetailItem(null)} testID="seller-pedido-articulo-detail-close">
+              {t('common:cancel')}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
 
       <Portal>
         <Dialog visible={saveDialog} onDismiss={() => setSaveDialog(false)} testID="seller-pedido-save-plantilla-dialog">
@@ -944,7 +1204,22 @@ const styles = StyleSheet.create({
   cliente: { fontWeight: '600', marginBottom: 4 },
   rubros: { maxHeight: 44, marginBottom: 4 },
   chip: { marginRight: 8 },
+  viewToggle: { flexDirection: 'row', gap: 8, marginBottom: 4 },
+  catalogList: { flex: 1 },
   list: { paddingBottom: 96 },
+  rowMainPress: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  gridRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
+  gridCard: {
+    flex: 1,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 8,
+    gap: 4,
+  },
+  gridCardSpacer: { flex: 1 },
+  offerBadge: { alignSelf: 'flex-start', backgroundColor: '#FFF3E0' },
+  detailBody: { gap: 8, alignItems: 'flex-start' },
   suggestionsBlock: { marginBottom: 8 },
   sectionTitle: { marginTop: 8, marginBottom: 4 },
   row: {
