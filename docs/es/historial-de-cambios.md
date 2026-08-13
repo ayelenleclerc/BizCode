@@ -10,6 +10,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Numpad nativo + descuento rápido App Seller (#264):** `NumpadSheet` (modal slide, teclas ≥48 dp) para cantidad y `dscto` de línea (campo existente de PedidoItem; sin Prisma/OpenAPI nuevos); separador decimal por locale (`,` ES/pt-BR, `.` EN); precio unitario + subtotal en vivo; háptica al confirmar; swipe en resumen (% desc / eliminar); dto. global aplica el mismo % a todas las líneas; tap en cantidad en catálogo/sugerencias/escáner/resumen; topes de stock #256; i18n EN/ES/pt-BR.
 - **Escáner de código de barras App Seller (#255):** Prisma `Articulo.codigoBarras` (único por tenant, nullable); `GET /api/articulos?codigoBarras=` lookup exacto de SKUs vendibles; OpenAPI + campo en ficha web; SQLite offline `codigo_barras` + lookup local; `/pedidos/escanear` con `expo-camera` (EAN-13/8, CODE-128, QR), modo continuo, háptica, diálogo de cantidad o preferencia sumar-1; topes de stock #256; i18n EN/ES/pt-BR.
 
 ### Corregido

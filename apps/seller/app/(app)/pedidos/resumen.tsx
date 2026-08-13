@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Swipeable } from 'react-native-gesture-handler'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import {
@@ -12,19 +13,21 @@ import {
 } from 'react-native-paper'
 import type { EstadoCredito, SellerPolicies } from '@bizcode/types'
 import { clientesAPI, pedidosAPI, sellerAlertsAPI } from '../../../src/api/sellerApi'
-import { isCreditBlocked, shouldBlockConfirmForStock } from '../../../src/alerts/policyGates'
+import { capQtyToStock, isCreditBlocked, shouldBlockConfirmForStock } from '../../../src/alerts/policyGates'
 import { useAuth } from '../../../src/auth/AuthContext'
 import { mapApiErrorToUiState } from '../../../src/lib/apiErrors'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
 import { useOffline } from '../../../src/offline/OfflineContext'
 import { usePedidoCart } from '../../../src/pedidos/CartContext'
+import { NumpadSheet } from '../../../src/pedidos/NumpadSheet'
+import { roundQtyToMultiplo } from '../../../src/pedidos/numpadParse'
 import {
   availableCredit,
   buildPedidoBody,
   hasStockWarnings,
   lineSubtotal,
 } from '../../../src/pedidos/cartMath'
-import type { PedidoCondicionCobroUi } from '../../../src/pedidos/cartTypes'
+import type { PedidoCondicionCobroUi, SellerCartLine } from '../../../src/pedidos/cartTypes'
 
 export default function PedidoResumenScreen() {
   const { t, i18n } = useTranslation(['pedidos', 'common'])
@@ -41,6 +44,12 @@ export default function PedidoResumenScreen() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmedId, setConfirmedId] = useState<number | null>(null)
+  const [numpad, setNumpad] = useState<
+    | { mode: 'cantidad'; line: SellerCartLine }
+    | { mode: 'dscto'; line: SellerCartLine }
+    | { mode: 'dscto'; scope: 'all' }
+    | null
+  >(null)
 
   useEffect(() => {
     const id = cart.clienteId
@@ -266,32 +275,51 @@ export default function PedidoResumenScreen() {
       )}
 
       {cart.lines.map((line) => (
-        <View key={line.articuloId} style={styles.line} testID={`seller-pedido-summary-line-${line.articuloId}`}>
-          <View style={styles.lineMain}>
-            <Text variant="titleSmall">{line.descripcion}</Text>
-            <Text style={styles.meta}>
-              {line.cantidad} × {formatMoney(line.precio, locale)}
-              {line.dscto > 0 ? ` (−${line.dscto}%)` : ''}
-              {line.cantidad > line.stock ? ` · ${t('pedidos:lineStockWarn')}` : ''}
-            </Text>
+        <Swipeable
+          key={line.articuloId}
+          overshootRight={false}
+          renderRightActions={() => (
+            <View style={styles.swipeActions}>
+              <Pressable
+                onPress={() => setNumpad({ mode: 'dscto', line })}
+                style={[styles.swipeBtn, styles.swipeDscto]}
+                accessibilityRole="button"
+                accessibilityLabel={t('pedidos:numpad.swipeDiscount')}
+                testID={`seller-pedido-swipe-dscto-${line.articuloId}`}
+              >
+                <Text style={styles.swipeLabel}>{t('pedidos:numpad.swipeDiscount')}</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => cart.removeLine(line.articuloId)}
+                style={[styles.swipeBtn, styles.swipeRemove]}
+                accessibilityRole="button"
+                accessibilityLabel={t('pedidos:remove')}
+                testID={`seller-pedido-swipe-remove-${line.articuloId}`}
+              >
+                <Text style={styles.swipeLabel}>{t('pedidos:remove')}</Text>
+              </Pressable>
+            </View>
+          )}
+        >
+          <View style={styles.line} testID={`seller-pedido-summary-line-${line.articuloId}`}>
+            <View style={styles.lineMain}>
+              <Text variant="titleSmall">{line.descripcion}</Text>
+              <Pressable
+                onPress={() => setNumpad({ mode: 'cantidad', line })}
+                accessibilityRole="button"
+                accessibilityLabel={t('pedidos:qty')}
+                testID={`seller-pedido-summary-qty-${line.articuloId}`}
+              >
+                <Text style={styles.meta}>
+                  {line.cantidad} × {formatMoney(line.precio, locale)}
+                  {line.dscto > 0 ? ` (−${line.dscto}%)` : ''}
+                  {line.cantidad > line.stock ? ` · ${t('pedidos:lineStockWarn')}` : ''}
+                </Text>
+              </Pressable>
+            </View>
+            <Text>{formatMoney(lineSubtotal(line), locale)}</Text>
           </View>
-          <Text>{formatMoney(lineSubtotal(line), locale)}</Text>
-          <TextInput
-            mode="outlined"
-            dense
-            label={t('pedidos:discount')}
-            value={String(line.dscto)}
-            onChangeText={(v: string) => {
-              const n = Number.parseFloat(v.replace(',', '.'))
-              cart.setDscto(line.articuloId, Number.isFinite(n) ? n : 0)
-            }}
-            style={styles.dscto}
-            {...({
-              testID: `seller-pedido-dscto-${line.articuloId}`,
-              keyboardType: 'numeric',
-            } as object)}
-          />
-        </View>
+        </Swipeable>
       ))}
 
       <View testID="seller-pedido-total">
@@ -299,6 +327,15 @@ export default function PedidoResumenScreen() {
           {t('pedidos:total')}: {formatMoney(cart.total, locale)}
         </Text>
       </View>
+
+      <Button
+        mode="outlined"
+        onPress={() => setNumpad({ mode: 'dscto', scope: 'all' })}
+        testID="seller-pedido-dscto-global"
+        accessibilityLabel={t('pedidos:numpad.globalDiscount')}
+      >
+        {t('pedidos:numpad.globalDiscount')}
+      </Button>
 
       <Text style={styles.label}>{t('pedidos:condicion')}</Text>
       <SegmentedButtons
@@ -354,18 +391,82 @@ export default function PedidoResumenScreen() {
         {submitting ? t('pedidos:confirming') : t('pedidos:confirm')}
       </Button>
       {submitting && <ActivityIndicator />}
+
+      <NumpadSheet
+        visible={numpad != null}
+        mode={numpad?.mode === 'cantidad' ? 'cantidad' : 'dscto'}
+        initialValue={
+          numpad == null
+            ? 0
+            : numpad.mode === 'cantidad'
+              ? numpad.line.cantidad
+              : 'line' in numpad
+                ? numpad.line.dscto
+                : 0
+        }
+        precio={numpad != null && 'line' in numpad ? numpad.line.precio : 0}
+        cantidadForSubtotal={numpad != null && 'line' in numpad ? numpad.line.cantidad : 1}
+        dsctoForSubtotal={numpad != null && 'line' in numpad ? numpad.line.dscto : 0}
+        title={
+          numpad != null && 'line' in numpad
+            ? numpad.line.descripcion
+            : t('pedidos:numpad.globalDiscount')
+        }
+        locale={locale}
+        onDismiss={() => setNumpad(null)}
+        onConfirm={(value) => {
+          if (!numpad) return
+          if (numpad.mode === 'cantidad') {
+            const capEnabled = policies?.sellerStockCapQtyToAvailable ?? true
+            const capped = capQtyToStock(
+              roundQtyToMultiplo(value, null),
+              numpad.line.stock,
+              capEnabled,
+            )
+            if (capped <= 0) {
+              if (policies?.sellerStockZeroAction === 'block') {
+                setNumpad(null)
+                return
+              }
+              cart.setCantidad(numpad.line.articuloId, 0)
+              setNumpad(null)
+              return
+            }
+            cart.setCantidad(numpad.line.articuloId, capped)
+            setNumpad(null)
+            return
+          }
+          if ('scope' in numpad) {
+            cart.setDsctoAll(value)
+            setNumpad(null)
+            return
+          }
+          cart.setDscto(numpad.line.articuloId, value)
+          setNumpad(null)
+        }}
+      />
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   root: { padding: 16, gap: 12 },
-  line: { gap: 4, paddingBottom: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#ccc' },
+  line: {
+    gap: 4,
+    paddingBottom: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#ccc',
+    backgroundColor: '#fff',
+  },
   lineMain: { gap: 2 },
   meta: { opacity: 0.7, fontSize: 13 },
-  dscto: { maxWidth: 120 },
   total: { marginTop: 8 },
   label: { marginTop: 4 },
   segment: { marginBottom: 4 },
   error: { color: '#b91c1c' },
+  swipeActions: { flexDirection: 'row', marginBottom: 8 },
+  swipeBtn: { justifyContent: 'center', minWidth: 88, paddingHorizontal: 12 },
+  swipeDscto: { backgroundColor: '#E65100' },
+  swipeRemove: { backgroundColor: '#B71C1C' },
+  swipeLabel: { color: '#fff', fontWeight: '700' },
 })

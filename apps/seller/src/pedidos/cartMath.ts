@@ -23,6 +23,16 @@ export function cartTotal(lines: SellerCartLine[]): number {
 }
 
 /**
+ * @en Applies the same line discount percent to every cart line (#264).
+ * @es Aplica el mismo descuento porcentual a todas las líneas del carrito (#264).
+ * @pt-BR Aplica o mesmo desconto percentual a todas as linhas do carrinho (#264).
+ */
+export function applyDsctoToAll<T extends { dscto: number }>(lines: T[], pct: number): T[] {
+  const clamped = Math.min(100, Math.max(0, pct))
+  return lines.map((line) => ({ ...line, dscto: clamped }))
+}
+
+/**
  * @en Maps cart lines to PedidoItemInput[] for POST /api/pedidos.
  * @es Mapea líneas del carrito a PedidoItemInput[] para POST /api/pedidos.
  * @pt-BR Mapeia linhas do carrinho para PedidoItemInput[] no POST /api/pedidos.

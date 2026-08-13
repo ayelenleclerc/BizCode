@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { FlatList, StyleSheet, View } from 'react-native'
+import { FlatList, Pressable, StyleSheet, View } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import {
@@ -36,6 +36,8 @@ import { capQtyToStock } from '../../../src/alerts/policyGates'
 import { mapApiErrorToUiState, type UiLoadState } from '../../../src/lib/apiErrors'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
 import { usePedidoCart } from '../../../src/pedidos/CartContext'
+import { NumpadSheet } from '../../../src/pedidos/NumpadSheet'
+import { roundQtyToMultiplo } from '../../../src/pedidos/numpadParse'
 
 const DEBOUNCE_MS = 300
 const CATALOG_LIMIT = 80
@@ -50,6 +52,16 @@ type ClienteMini = {
   id: number
   rsocial: string
   suspended?: boolean
+}
+
+type QtySheetTarget = {
+  articuloId: number
+  descripcion: string
+  precio: number
+  stock: number
+  cantidad: number
+  dscto: number
+  multiploVenta: number | null
 }
 
 function deriveStockEstado(stock: number): SellerStockEstado {
@@ -82,6 +94,7 @@ export default function NuevoPedidoScreen() {
   const [saveBusy, setSaveBusy] = useState(false)
   const [sugerencias, setSugerencias] = useState<SugerenciasPedido | null>(null)
   const [sugerenciasState, setSugerenciasState] = useState<UiLoadState>('idle')
+  const [qtySheet, setQtySheet] = useState<QtySheetTarget | null>(null)
   const reqId = useRef(0)
 
   const showSuggestions = query.trim().length === 0
@@ -419,11 +432,34 @@ export default function NuevoPedidoScreen() {
     )
   }
 
+  const openQtySheet = (target: QtySheetTarget) => {
+    if (suspended) return
+    setQtySheet(target)
+  }
+
+  const confirmQtySheet = (value: number) => {
+    if (!qtySheet) return
+    const rounded = roundQtyToMultiplo(value, qtySheet.multiploVenta)
+    const capped = capQtyToStock(rounded, qtySheet.stock, capEnabled)
+    if (capped <= 0) {
+      if (policies?.sellerStockZeroAction === 'block') {
+        setQtySheet(null)
+        return
+      }
+      cart.setCantidad(qtySheet.articuloId, 0)
+      setQtySheet(null)
+      return
+    }
+    cart.setCantidad(qtySheet.articuloId, capped)
+    setQtySheet(null)
+  }
+
   const renderQtyControls = (
     articuloId: number,
     onDec: () => void,
     onInc: () => void,
     testPrefix: string,
+    onOpenQty: () => void,
   ) => {
     const inCart = cart.lines.find((l) => l.articuloId === articuloId)
     if (inCart) {
@@ -439,9 +475,15 @@ export default function NuevoPedidoScreen() {
           >
             −
           </Button>
-          <View testID={`${testPrefix}-qty-${articuloId}`}>
+          <Pressable
+            onPress={onOpenQty}
+            disabled={suspended}
+            accessibilityRole="button"
+            accessibilityLabel={t('pedidos:qty')}
+            testID={`${testPrefix}-qty-${articuloId}`}
+          >
             <Text>{inCart.cantidad}</Text>
-          </View>
+          </Pressable>
           <Button
             compact
             mode="outlined"
@@ -518,6 +560,16 @@ export default function NuevoPedidoScreen() {
                       () => cart.setCantidad(h.articuloId, inCart.cantidad - 1),
                       () => tryAddHabitual(h),
                       'seller-pedido-habitual',
+                      () =>
+                        openQtySheet({
+                          articuloId: h.articuloId,
+                          descripcion: h.descripcion,
+                          precio: h.precio,
+                          stock,
+                          cantidad: inCart.cantidad,
+                          dscto: inCart.dscto,
+                          multiploVenta: null,
+                        }),
                     )
                   : (
                       <Button
@@ -570,6 +622,16 @@ export default function NuevoPedidoScreen() {
                       () => cart.setCantidad(o.articuloId, inCart.cantidad - 1),
                       () => tryAddOferta(o),
                       'seller-pedido-oferta',
+                      () =>
+                        openQtySheet({
+                          articuloId: o.articuloId,
+                          descripcion: o.descripcion,
+                          precio: o.precioOferta,
+                          stock,
+                          cantidad: inCart.cantidad,
+                          dscto: inCart.dscto,
+                          multiploVenta: null,
+                        }),
                     )
                   : (
                       <Button
@@ -732,9 +794,28 @@ export default function NuevoPedidoScreen() {
                     >
                       −
                     </Button>
-                    <View testID={`seller-pedido-qty-${item.id}`}>
+                    <Pressable
+                      onPress={() =>
+                        openQtySheet({
+                          articuloId: item.id,
+                          descripcion: item.descripcion,
+                          precio,
+                          stock,
+                          cantidad: inCart.cantidad,
+                          dscto: inCart.dscto,
+                          multiploVenta:
+                            item.multiploVenta != null && Number(item.multiploVenta) > 0
+                              ? Number(item.multiploVenta)
+                              : null,
+                        })
+                      }
+                      disabled={suspended}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('pedidos:qty')}
+                      testID={`seller-pedido-qty-${item.id}`}
+                    >
                       <Text>{inCart.cantidad}</Text>
-                    </View>
+                    </Pressable>
                     <Button
                       compact
                       mode="outlined"
@@ -787,6 +868,22 @@ export default function NuevoPedidoScreen() {
           />
         </>
       )}
+
+      <NumpadSheet
+        visible={qtySheet != null}
+        mode="cantidad"
+        initialValue={qtySheet?.cantidad ?? 1}
+        precio={qtySheet?.precio ?? 0}
+        cantidadForSubtotal={qtySheet?.cantidad ?? 0}
+        dsctoForSubtotal={qtySheet?.dscto ?? 0}
+        title={qtySheet?.descripcion}
+        subtitle={
+          qtySheet != null ? t('pedidos:stock', { count: qtySheet.stock }) : undefined
+        }
+        locale={locale}
+        onConfirm={confirmQtySheet}
+        onDismiss={() => setQtySheet(null)}
+      />
 
       <Portal>
         <Dialog visible={saveDialog} onDismiss={() => setSaveDialog(false)} testID="seller-pedido-save-plantilla-dialog">

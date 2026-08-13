@@ -59,6 +59,19 @@
     "addSuggested": "Add suggested quantity",
     "searchOthers": "Search other articles"
   },
+  "numpad": {
+    "qtyTitle": "Quantity",
+    "dsctoTitle": "Line discount %",
+    "confirm": "Confirm",
+    "backspace": "Backspace",
+    "unitPrice": "Unit {{price}}",
+    "subtotal": "Subtotal {{amount}}",
+    "discountActive": "Discount {{pct}}%",
+    "errorRange": "Discount must be between 0 and 100.",
+    "errorQty": "Enter a quantity greater than 0.",
+    "swipeDiscount": "% Disc",
+    "globalDiscount": "Discount all lines"
+  },
   "scan": {
     "title": "Scan",
     "open": "Scan barcode",

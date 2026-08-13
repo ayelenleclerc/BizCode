@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { PedidoCondicionCobroUi, SellerCartLine } from './cartTypes'
-import { cartTotal } from './cartMath'
+import { applyDsctoToAll, cartTotal } from './cartMath'
 
 type CartContextValue = {
   clienteId: number | null
@@ -16,6 +16,8 @@ type CartContextValue = {
   addOrIncrement: (line: Omit<SellerCartLine, 'cantidad' | 'dscto'> & { cantidad?: number }) => void
   setCantidad: (articuloId: number, cantidad: number) => void
   setDscto: (articuloId: number, dscto: number) => void
+  /** @en Apply the same dscto to every line (#264). @es Aplica el mismo dscto a todas las líneas (#264). @pt-BR Aplica o mesmo dscto a todas as linhas (#264). */
+  setDsctoAll: (dscto: number) => void
   /** @en Sync line.stock from stock-multiple (#256). @es Sincroniza line.stock desde stock-multiple (#256). @pt-BR Sincroniza line.stock a partir de stock-multiple (#256). */
   updateLineStocks: (stockByArticuloId: Record<number, number>) => void
   /** @en Replace cart lines (repeat last order / load template) (#253). @es Reemplaza líneas del carrito (#253). @pt-BR Substitui linhas do carrinho (#253). */
@@ -87,6 +89,10 @@ export function PedidoCartProvider({ children }: { children: ReactNode }) {
     setLines((prev) => prev.map((l) => (l.articuloId === articuloId ? { ...l, dscto: clamped } : l)))
   }, [])
 
+  const setDsctoAll = useCallback((dscto: number) => {
+    setLines((prev) => applyDsctoToAll(prev, dscto))
+  }, [])
+
   const updateLineStocks = useCallback((stockByArticuloId: Record<number, number>) => {
     setLines((prev) => {
       let changed = false
@@ -135,6 +141,7 @@ export function PedidoCartProvider({ children }: { children: ReactNode }) {
       addOrIncrement,
       setCantidad,
       setDscto,
+      setDsctoAll,
       updateLineStocks,
       replaceLines,
       removeLine,
@@ -153,6 +160,7 @@ export function PedidoCartProvider({ children }: { children: ReactNode }) {
       addOrIncrement,
       setCantidad,
       setDscto,
+      setDsctoAll,
       updateLineStocks,
       replaceLines,
       removeLine,

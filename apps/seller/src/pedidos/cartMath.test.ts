@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  applyDsctoToAll,
   availableCredit,
   buildPedidoBody,
   cartTotal,
@@ -22,6 +23,16 @@ const baseLine = (over: Partial<SellerCartLine> = {}): SellerCartLine => ({
 describe('cartMath', () => {
   it('computes line subtotal with discount', () => {
     expect(lineSubtotal(baseLine({ cantidad: 2, precio: 100, dscto: 10 }))).toBe(180)
+  })
+
+  it('applies the same dscto to all lines (#264)', () => {
+    const next = applyDsctoToAll(
+      [baseLine(), baseLine({ articuloId: 2, dscto: 5 })],
+      15,
+    )
+    expect(next.map((l) => l.dscto)).toEqual([15, 15])
+    expect(applyDsctoToAll([baseLine()], 150)[0]?.dscto).toBe(100)
+    expect(applyDsctoToAll([baseLine({ dscto: 20 })], -4)[0]?.dscto).toBe(0)
   })
 
   it('sums cart total', () => {
