@@ -72,6 +72,14 @@
     "swipeDiscount": "% Desc",
     "globalDiscount": "Desconto em todas as linhas"
   },
+  "catalog": {
+    "viewList": "Lista",
+    "viewGrid": "Grade",
+    "offerBadge": "OFERTA -{{pct}}%",
+    "detailTitle": "Artigo",
+    "codigo": "Código {{codigo}}",
+    "noImage": "Sem imagem"
+  },
   "scan": {
     "title": "Escanear",
     "open": "Escanear código",

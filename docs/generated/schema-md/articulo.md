@@ -43,6 +43,7 @@ undefined#/properties/articulo
 | [unidadBase](#unidadbase)                     | `string`  | Optional | cannot be null | [Articulo](articulo-properties-unidadbase.md "undefined#/properties/unidadBase")                     |
 | [unidadCompra](#unidadcompra)                 | `string`  | Optional | cannot be null | [Articulo](articulo-properties-unidadcompra.md "undefined#/properties/unidadCompra")                 |
 | [unidadServicio](#unidadservicio)             | `string`  | Optional | cannot be null | [Articulo](articulo-properties-unidadservicio.md "undefined#/properties/unidadServicio")             |
+| [urlThumb](#urlthumb)                         | `string`  | Optional | cannot be null | [Articulo](articulo-properties-urlthumb.md "undefined#/properties/urlThumb")                         |
 | [volumenM3](#volumenm3)                       | `number`  | Optional | cannot be null | [Articulo](articulo-properties-volumenm3.md "undefined#/properties/volumenM3")                       |
 | Additional Properties                         | Any       | Optional | can be null    |                                                                                                      |
 
@@ -560,6 +561,24 @@ Required when tipo is servicio (#244).
 | `"km"`       |             |
 | `"unidad"`   |             |
 | `"otro"`     |             |
+
+## urlThumb
+
+Principal thumbnail public path (`/uploads/articulos/...`) for seller catalog grid (#257). Null when the article has no image.
+
+`urlThumb`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [Articulo](articulo-properties-urlthumb.md "undefined#/properties/urlThumb")
+
+### urlThumb Type
+
+`string`
 
 ## volumenM3
 

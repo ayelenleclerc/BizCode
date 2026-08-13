@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
-import { ArticuloService } from '../../../apps/server/services/ArticuloService'
+import { ArticuloService, attachArticuloUrlThumb } from '../../../apps/server/services/ArticuloService'
 
 describe('ArticuloService', () => {
   let prisma: PrismaClient
@@ -43,6 +43,40 @@ describe('ArticuloService', () => {
       expect(result.error).toContain('rubroId')
     }
     expect(prisma.articulo.create).not.toHaveBeenCalled()
+  })
+
+  it('attaches urlThumb from principal image (#257)', () => {
+    const withImage = attachArticuloUrlThumb({
+      id: 20,
+      descripcion: 'Leche',
+      rubro: { id: 1, nombre: 'Lacteos' },
+      imagenes: [{ pathThumb: '1/20/a-thumb.webp' }],
+    } as never)
+    expect(withImage.urlThumb).toBe('/uploads/articulos/1/20/a-thumb.webp')
+    expect('imagenes' in withImage).toBe(false)
+
+    const without = attachArticuloUrlThumb({
+      id: 21,
+      descripcion: 'Sin foto',
+      rubro: { id: 1, nombre: 'Lacteos' },
+      imagenes: [],
+    } as never)
+    expect(without.urlThumb).toBeNull()
+  })
+
+  it('list maps urlThumb (#257)', async () => {
+    vi.mocked(prisma.articulo.count).mockResolvedValue(1)
+    vi.mocked(prisma.articulo.findMany).mockResolvedValue([
+      {
+        id: 20,
+        descripcion: 'Leche',
+        rubro: { id: 1, nombre: 'Lacteos' },
+        imagenes: [{ pathThumb: '1/20/a-thumb.webp' }],
+      },
+    ] as never)
+    const result = await service.list(1, '', 50, 0)
+    expect(result.total).toBe(1)
+    expect(result.articulos[0]?.urlThumb).toBe('/uploads/articulos/1/20/a-thumb.webp')
   })
 
   it('materializes precioLista1 from FX origin × current rate (#243)', async () => {

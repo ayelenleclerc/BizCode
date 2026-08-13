@@ -16,6 +16,7 @@ import type {
   PrecioCatalogoOrigen,
 } from '@bizcode/types'
 import type { ServiceResult } from './serviceResults'
+import { articuloImagePublicUrl } from '../lib/articuloImageUrl'
 
 const MAX_IMAGES_PER_ARTICLE = 8
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -45,10 +46,6 @@ function imagesRoot(): string {
   return process.env.BIZCODE_ARTICULO_IMAGES_DIR?.trim() || path.join(process.cwd(), 'uploads', 'articulos')
 }
 
-function publicUrl(relativePath: string): string {
-  const normalized = relativePath.replace(/\\/g, '/')
-  return `/uploads/articulos/${normalized}`
-}
 
 function mapVariante(row: VarianteDb): ArticuloVarianteRow {
   return {
@@ -117,9 +114,9 @@ function mapImagen(row: {
     pathOriginal: row.pathOriginal,
     pathMedium: row.pathMedium,
     pathThumb: row.pathThumb,
-    urlOriginal: publicUrl(row.pathOriginal),
-    urlMedium: publicUrl(row.pathMedium),
-    urlThumb: publicUrl(row.pathThumb),
+    urlOriginal: articuloImagePublicUrl(row.pathOriginal),
+    urlMedium: articuloImagePublicUrl(row.pathMedium),
+    urlThumb: articuloImagePublicUrl(row.pathThumb),
     orden: row.orden,
     esPrincipal: row.esPrincipal,
     createdAt: row.createdAt.toISOString(),

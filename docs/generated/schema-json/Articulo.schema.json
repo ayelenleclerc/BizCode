@@ -128,6 +128,11 @@
       "nullable": true,
       "type": "string"
     },
+    "urlThumb": {
+      "description": "Principal thumbnail public path (`/uploads/articulos/...`) for seller catalog grid (#257). Null when the article has no image.",
+      "nullable": true,
+      "type": "string"
+    },
     "volumenM3": {
       "description": "Unit volume in m3 for logistics (#203).",
       "nullable": true,

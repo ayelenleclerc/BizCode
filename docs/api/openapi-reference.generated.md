@@ -11458,6 +11458,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+  - **`urlThumb`**
+
+    `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
   - **`volumenM3`**
 
     `number` — Unit volume in m3 for logistics (#203).
@@ -11488,6 +11492,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
       "id": 1,
       "codigo": 1,
       "codigoBarras": "",
+      "urlThumb": "",
       "descripcion": "",
       "rubroId": 1,
       "rubro": {
@@ -11847,6 +11852,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+  - **`urlThumb`**
+
+    `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
   - **`volumenM3`**
 
     `number` — Unit volume in m3 for logistics (#203).
@@ -11864,6 +11873,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
     "id": 1,
     "codigo": 1,
     "codigoBarras": "",
+    "urlThumb": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -12015,6 +12025,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
     "id": 1,
     "codigo": 1,
     "codigoBarras": "",
+    "urlThumb": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -12370,6 +12381,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+  - **`urlThumb`**
+
+    `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
   - **`volumenM3`**
 
     `number` — Unit volume in m3 for logistics (#203).
@@ -12387,6 +12402,7 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
     "id": 1,
     "codigo": 1,
     "codigoBarras": "",
+    "urlThumb": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -23858,6 +23874,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+      - **`urlThumb`**
+
+        `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
       - **`volumenM3`**
 
         `number` — Unit volume in m3 for logistics (#203).
@@ -23993,6 +24013,7 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
             "id": 1,
             "codigo": 1,
             "codigoBarras": "",
+            "urlThumb": "",
             "descripcion": "",
             "rubroId": 1,
             "rubro": {
@@ -24430,6 +24451,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+      - **`urlThumb`**
+
+        `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
       - **`volumenM3`**
 
         `number` — Unit volume in m3 for logistics (#203).
@@ -24552,6 +24577,7 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
           "id": 1,
           "codigo": 1,
           "codigoBarras": "",
+          "urlThumb": "",
           "descripcion": "",
           "rubroId": 1,
           "rubro": {
@@ -52794,6 +52820,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
           `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+        - **`urlThumb`**
+
+          `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
         - **`volumenM3`**
 
           `number` — Unit volume in m3 for logistics (#203).
@@ -52981,6 +53011,7 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
             "id": 1,
             "codigo": 1,
             "codigoBarras": "",
+            "urlThumb": "",
             "descripcion": "",
             "rubroId": 1,
             "rubro": {
@@ -104732,6 +104763,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+* **`urlThumb`**
+
+  `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
 * **`volumenM3`**
 
   `number` — Unit volume in m3 for logistics (#203).
@@ -104743,6 +104778,7 @@ Rate-limited mutation; requires products.manage. USD only.
   "id": 1,
   "codigo": 1,
   "codigoBarras": "",
+  "urlThumb": "",
   "descripcion": "",
   "rubroId": 1,
   "rubro": {
@@ -105032,6 +105068,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+  - **`urlThumb`**
+
+    `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
   - **`volumenM3`**
 
     `number` — Unit volume in m3 for logistics (#203).
@@ -105049,6 +105089,7 @@ Rate-limited mutation; requires products.manage. USD only.
     "id": 1,
     "codigo": 1,
     "codigoBarras": "",
+    "urlThumb": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -105103,6 +105144,7 @@ Rate-limited mutation; requires products.manage. USD only.
     "id": 1,
     "codigo": 1,
     "codigoBarras": "",
+    "urlThumb": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -109269,6 +109311,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
       `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+    - **`urlThumb`**
+
+      `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
     - **`volumenM3`**
 
       `number` — Unit volume in m3 for logistics (#203).
@@ -109385,6 +109431,7 @@ Rate-limited mutation; requires products.manage. USD only.
         "id": 1,
         "codigo": 1,
         "codigoBarras": "",
+        "urlThumb": "",
         "descripcion": "",
         "rubroId": 1,
         "rubro": {
@@ -109548,6 +109595,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+  - **`urlThumb`**
+
+    `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
   - **`volumenM3`**
 
     `number` — Unit volume in m3 for logistics (#203).
@@ -109609,6 +109660,7 @@ Rate-limited mutation; requires products.manage. USD only.
     "id": 1,
     "codigo": 1,
     "codigoBarras": "",
+    "urlThumb": "",
     "descripcion": "",
     "rubroId": 1,
     "rubro": {
@@ -112528,6 +112580,10 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
 
         `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+      - **`urlThumb`**
+
+        `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
       - **`volumenM3`**
 
         `number` — Unit volume in m3 for logistics (#203).
@@ -112650,6 +112706,7 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
           "id": 1,
           "codigo": 1,
           "codigoBarras": "",
+          "urlThumb": "",
           "descripcion": "",
           "rubroId": 1,
           "rubro": {
@@ -117352,6 +117409,10 @@ Originating invoice header (selected columns)
 
         `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+      - **`urlThumb`**
+
+        `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
       - **`volumenM3`**
 
         `number` — Unit volume in m3 for logistics (#203).
@@ -117533,6 +117594,7 @@ Originating invoice header (selected columns)
           "id": 1,
           "codigo": 1,
           "codigoBarras": "",
+          "urlThumb": "",
           "descripcion": "",
           "rubroId": 1,
           "rubro": {
@@ -117762,6 +117824,10 @@ Originating invoice header (selected columns)
 
           `string`, possible values: `"hora", "dia", "mes", "proyecto", "km", "unidad", "otro"` — Required when tipo is servicio (#244).
 
+        - **`urlThumb`**
+
+          `string` — Principal thumbnail public path (\`/uploads/articulos/...\`) for seller catalog grid (#257). Null when the article has no image.
+
         - **`volumenM3`**
 
           `number` — Unit volume in m3 for logistics (#203).
@@ -117949,6 +118015,7 @@ Originating invoice header (selected columns)
             "id": 1,
             "codigo": 1,
             "codigoBarras": "",
+            "urlThumb": "",
             "descripcion": "",
             "rubroId": 1,
             "rubro": {

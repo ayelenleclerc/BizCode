@@ -72,6 +72,14 @@
     "swipeDiscount": "% Disc",
     "globalDiscount": "Discount all lines"
   },
+  "catalog": {
+    "viewList": "List",
+    "viewGrid": "Grid",
+    "offerBadge": "OFFER -{{pct}}%",
+    "detailTitle": "Article",
+    "codigo": "Code {{codigo}}",
+    "noImage": "No image"
+  },
   "scan": {
     "title": "Scan",
     "open": "Scan barcode",

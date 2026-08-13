@@ -18702,6 +18702,10 @@ components:
           maxLength: 32
           nullable: true
           description: Optional retail/logistics barcode for seller scan (#255).
+        urlThumb:
+          type: string
+          nullable: true
+          description: Principal thumbnail public path (`/uploads/articulos/...`) for seller catalog grid (#257). Null when the article has no image.
         descripcion:
           type: string
         rubroId:
