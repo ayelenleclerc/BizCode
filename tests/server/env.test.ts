@@ -73,6 +73,7 @@ describe('server/config/env', () => {
       TWILIO_ACCOUNT_SID: 'AC123',
       TWILIO_AUTH_TOKEN: 'token',
       TWILIO_WHATSAPP_FROM: '+5491100000000',
+      OPENAI_API_KEY: 'sk-test',
       LOG_LEVEL: 'debug',
       CORS_ORIGINS: 'https://app.example',
     })
@@ -81,6 +82,7 @@ describe('server/config/env', () => {
     expect(parsed.TWILIO_ACCOUNT_SID).toBe('AC123')
     expect(parsed.TWILIO_AUTH_TOKEN).toBe('token')
     expect(parsed.TWILIO_WHATSAPP_FROM).toBe('+5491100000000')
+    expect(parsed.OPENAI_API_KEY).toBe('sk-test')
     expect(parsed.LOG_LEVEL).toBe('debug')
     expect(parsed.CORS_ORIGINS).toBe('https://app.example')
   })

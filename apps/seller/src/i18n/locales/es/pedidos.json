@@ -99,5 +99,18 @@
     "scanAnother": "Escanear otro",
     "added": "Agregado: {{name}}",
     "addOnePref": "Sumar 1 por cada escaneo"
+  },
+  "voice": {
+    "open": "Dictar pedido",
+    "hint": "Decí los artículos y cantidades. Nada se agrega al carrito hasta que confirmes.",
+    "listening": "Escuchando…",
+    "denied": "Sin permiso de micrófono. El dictado está deshabilitado.",
+    "empty": "No entendí el pedido, intente de nuevo",
+    "error": "No se pudo reconocer la voz. Probá de nuevo o buscá en el catálogo.",
+    "confirmTitle": "Confirmar ítems dictados",
+    "noMatch": "Sin coincidencia en el catálogo. Descartá o buscá a mano.",
+    "discard": "Descartar",
+    "cancel": "Cancelar",
+    "addConfirmed": "Agregar confirmados"
   }
 }

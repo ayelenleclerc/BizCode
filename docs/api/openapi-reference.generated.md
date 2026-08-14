@@ -30137,6 +30137,195 @@ Requires `finance.retenciones`, `reports.financial.read`.
 }
 ```
 
+### PARAMETERS /api/voice/transcribe
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/voice/transcribe`
+
+### Transcribe spoken order audio with Whisper (returns text only)
+
+- **Method:** `POST`
+- **Path:** `/api/voice/transcribe`
+- **Tags:** voice
+
+Multipart audio for App Seller speech-to-order (#266). Requires `orders.create`. Returns `{ text }` only — catalog matching stays on the client. HTTP 503 when `OPENAI_API_KEY` is unset.
+
+#### Request Body
+
+##### Content-Type: multipart/form-data
+
+- **`file` (required)**
+
+  `string`, format: `binary`
+
+- **`locale`**
+
+  `string` — Optional BCP-47 hint (es, en, pt) forwarded to Whisper
+
+**Example:**
+
+```json
+{
+  "file": {},
+  "locale": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Transcript
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`text` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "text": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 502 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 503 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/pedidos
 
 - **Method:** `PARAMETERS`

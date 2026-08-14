@@ -39,12 +39,22 @@ const config = {
       },
     ],
     'expo-updates',
+    'expo-av',
+    [
+      'expo-speech-recognition',
+      {
+        microphonePermission: 'Allow BizCode Seller to use the microphone to dictate order items.',
+        speechRecognitionPermission: 'Allow BizCode Seller to recognize speech for order taking.',
+      },
+    ],
   ],
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.bizcode.seller',
     infoPlist: {
       UIBackgroundModes: ['remote-notification'],
+      NSMicrophoneUsageDescription: 'BizCode Seller uses the microphone so you can dictate order items.',
+      NSSpeechRecognitionUsageDescription: 'BizCode Seller uses speech recognition to turn dictation into catalog lines.',
     },
   },
   android: {
@@ -56,6 +66,7 @@ const config = {
     },
     package: 'com.bizcode.seller',
     predictiveBackGestureEnabled: false,
+    permissions: ['RECORD_AUDIO', 'android.permission.RECORD_AUDIO'],
   },
   web: {
     favicon: './assets/favicon.png',

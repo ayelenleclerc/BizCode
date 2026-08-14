@@ -9,6 +9,7 @@ import {
   createPlantillasPedidoAPI,
   createSugerenciasPedidoAPI,
   createVisitasAPI,
+  createVoiceAPI,
 } from '@bizcode/api-client'
 import type { DeliveryZone } from '@bizcode/types'
 import { sellerHttp } from './http'
@@ -23,6 +24,7 @@ export const sellerAlertsAPI = createSellerAlertsAPI(sellerHttp)
 export const plantillasPedidoAPI = createPlantillasPedidoAPI(sellerHttp)
 export const sugerenciasPedidoAPI = createSugerenciasPedidoAPI(sellerHttp)
 export const pushNotificationsAPI = createPushNotificationsAPI(sellerHttp)
+export const voiceAPI = createVoiceAPI(sellerHttp)
 
 /**
  * @en Lists delivery zones for the authenticated tenant.

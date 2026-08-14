@@ -47,6 +47,9 @@ import { formatMoney, parseMoney } from '../../../src/lib/money'
 import { usePedidoCart } from '../../../src/pedidos/CartContext'
 import { NumpadSheet } from '../../../src/pedidos/NumpadSheet'
 import { roundQtyToMultiplo } from '../../../src/pedidos/numpadParse'
+import { VoiceConfirmDialog } from '../../../src/voice/VoiceConfirmDialog'
+import { useVoiceOrder } from '../../../src/voice/useVoiceOrder'
+import type { SpokenLocale } from '../../../src/voice/parseSpokenOrder'
 
 const DEBOUNCE_MS = 300
 const CATALOG_LIMIT = 500
@@ -382,8 +385,29 @@ export default function NuevoPedidoScreen() {
   }, [state, sugerenciasState, stockIdsKey, cart])
 
   const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt-BR' ? 'pt-BR' : 'es-AR'
+  const spokenLocale: SpokenLocale = i18n.language === 'en' ? 'en' : i18n.language === 'pt-BR' ? 'pt-BR' : 'es'
   const suspended = Boolean(cliente?.suspended)
   const capEnabled = policies?.sellerStockCapQtyToAvailable ?? true
+
+  const loadVoiceCatalog = useCallback(async (): Promise<ArticuloListItem[]> => {
+    try {
+      const rows = await articulosAPI.list('', { limit: CATALOG_LIMIT })
+      if (Array.isArray(rows) && rows.length > 0) return filterSellableArticulos(rows)
+    } catch {
+      // use SQLite hydrate
+    }
+    try {
+      const { getOfflineDb } = await import('../../../src/offline/db')
+      const { searchArticulosLocal } = await import('../../../src/offline/repos')
+      const db = await getOfflineDb()
+      const cached = await searchArticulosLocal(db, '')
+      return filterSellableArticulos(cached.map((a) => a as unknown as ArticuloListItem))
+    } catch {
+      return []
+    }
+  }, [])
+
+  const voice = useVoiceOrder({ locale: spokenLocale, loadCatalog: loadVoiceCatalog })
 
   const resolveStockByArticuloId = (articuloId: number, fallbackStock: number) => {
     const fromMulti = stockById[articuloId]
@@ -507,6 +531,36 @@ export default function NuevoPedidoScreen() {
       })
     }
     setQtySheet(null)
+  }
+
+  const confirmVoiceLines = () => {
+    for (const draft of voice.drafts) {
+      if (draft.selectedId == null) continue
+      const item = draft.matches.find((m) => m.id === draft.selectedId)
+      if (!item) continue
+      const { stock } = resolveStock(item)
+      const multiplo =
+        item.multiploVenta != null && Number(item.multiploVenta) > 0 ? Number(item.multiploVenta) : null
+      const rounded = roundQtyToMultiplo(draft.qty, multiplo)
+      const capped = capQtyToStock(rounded, stock, capEnabled)
+      if (capped === 0 && policies?.sellerStockZeroAction === 'block') continue
+      if (capped <= 0) continue
+      const inCart = cart.lines.find((l) => l.articuloId === item.id)
+      if (inCart) {
+        const next = capQtyToStock(inCart.cantidad + capped, stock, capEnabled)
+        if (next > 0) cart.setCantidad(item.id, next)
+      } else {
+        cart.addOrIncrement({
+          articuloId: item.id,
+          descripcion: item.descripcion,
+          precio: parseMoney(item.precioLista1),
+          stock,
+          condIva: item.condIva ?? '1',
+          cantidad: capped,
+        })
+      }
+    }
+    voice.close()
   }
 
   const changeViewMode = (mode: CatalogViewMode) => {
@@ -794,6 +848,39 @@ export default function NuevoPedidoScreen() {
       >
         {t('pedidos:scan.open')}
       </Button>
+
+      <Button
+        mode="outlined"
+        icon="microphone"
+        disabled={suspended || voice.permission === 'denied' || voice.state === 'recording'}
+        onPress={() => {
+          void voice.ensurePermission().then((perm) => {
+            if (perm === 'denied' || perm === 'unavailable') return
+            void voice.capture()
+          })
+        }}
+        style={styles.scanBtn}
+        testID="seller-pedido-voice-btn"
+        accessibilityLabel={t('pedidos:voice.open')}
+        accessibilityHint={t('pedidos:voice.hint')}
+      >
+        {voice.state === 'recording' ? t('pedidos:voice.listening') : t('pedidos:voice.open')}
+      </Button>
+      {voice.permission === 'denied' ? (
+        <Banner visible icon="microphone-off" testID="seller-voice-denied">
+          {t('pedidos:voice.denied')}
+        </Banner>
+      ) : null}
+      {voice.state === 'empty' ? (
+        <Banner visible icon="alert" testID="seller-voice-empty">
+          {t('pedidos:voice.empty')}
+        </Banner>
+      ) : null}
+      {voice.state === 'error' ? (
+        <Banner visible icon="alert" testID="seller-voice-error">
+          {t('pedidos:voice.error')}
+        </Banner>
+      ) : null}
 
       <FlatList
         horizontal
@@ -1114,6 +1201,15 @@ export default function NuevoPedidoScreen() {
       />
 
       <Portal>
+        <VoiceConfirmDialog
+          visible={voice.state === 'confirm'}
+          drafts={voice.drafts}
+          onSelect={voice.selectMatch}
+          onDiscard={voice.discard}
+          onQty={voice.setQty}
+          onConfirmAll={confirmVoiceLines}
+          onDismiss={voice.close}
+        />
         <Dialog
           visible={detailItem != null}
           onDismiss={() => setDetailItem(null)}
