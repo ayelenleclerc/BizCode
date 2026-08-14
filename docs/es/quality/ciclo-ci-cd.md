@@ -109,6 +109,15 @@ El job inicia **PostgreSQL 16** (`DATABASE_URL` configurada). Tras `prisma migra
 
 **Gate manual de escritorio:** una vez **`main`** verde, ejecutar **Actions → build Tauri self-hosted** (`tauri-selfhosted.yml`) antes de publicar instaladores; también puede usarse **Actions → Tauri release** (`tauri-release.yml` en tags `v*.*.*`). Detalle: [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
 
+**EAS App Seller (#173)** **no** forma parte del Quality Gate (minutos de cloud + credenciales Expo). Workflow [`.github/workflows/seller-eas.yml`](../../../.github/workflows/seller-eas.yml):
+
+| Disparador | Qué corre |
+|---|---|
+| Tag `seller-v*` | Android `production` (AAB) + `internal` (APK), luego `eas update --channel production` |
+| `workflow_dispatch` | Plataforma (`android` / `ios`) y perfil elegidos; OTA opcional |
+
+Secrets (falla si faltan, sin skip silencioso): `EXPO_TOKEN`, `EAS_PROJECT_ID`. Opcional: `EXPO_PUBLIC_API_BASE_URL`. CLI: `pnpm dlx eas-cli@16` (`--non-interactive`). Distinto de tags desktop `v*.*.*`. El primer AAB a Play Console lo sube el operador; `eas submit` iOS no está en este workflow.
+
 ## Rama huérfana `documentacion`
 
 La rama **huérfana** `documentacion` **no** contiene código de aplicación: solo una instantánea documental para publicación estática (p. ej. GitHub Pages).
@@ -204,6 +213,7 @@ Archivo: `.github/workflows/deploy.yml`.
 - [x] Build Tauri en runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] Enlaces HTTP(S) en `docs/` — `docs-links.yml` + `.lycheeignore` (Lychee; no enlaces relativos `.md`)
+- [x] EAS App Seller en tags `seller-v*` — `.github/workflows/seller-eas.yml` (`EXPO_TOKEN` / `EAS_PROJECT_ID`; no Quality Gate) — #173
 
 ## Flujo automático de Project (GitHub)
 

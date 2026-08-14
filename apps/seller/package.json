@@ -9,7 +9,10 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "type-check": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint app src --ext .ts,.tsx --max-warnings 0"
+    "lint": "eslint app src --ext .ts,.tsx --max-warnings 0",
+    "eas:build:production": "pnpm dlx eas-cli@16 build --profile production --non-interactive",
+    "eas:build:internal": "pnpm dlx eas-cli@16 build --profile internal --non-interactive",
+    "eas:update": "pnpm dlx eas-cli@16 update --channel production --non-interactive"
   },
   "turbo": {
     "type-check": {
@@ -35,6 +38,7 @@
     "expo-secure-store": "~57.0.1",
     "expo-sqlite": "^57.0.1",
     "expo-status-bar": "~57.0.1",
+    "expo-updates": "~29.0.16",
     "i18next": "^26.0.3",
     "react": "19.2.3",
     "react-i18next": "^17.0.2",

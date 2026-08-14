@@ -99,6 +99,15 @@ Build desktop Tauri (WebKit nativo, display, Rust). Build local: `npm run tauri 
 
 **Gate manual (desktop):** após **`main`** verde, executar **Actions → Tauri self-hosted** (`tauri-selfhosted.yml`) antes de distribuir instaladores; releases por tag podem usar **Actions → Tauri release** (`tauri-release.yml` em tags `v*.*.*`). Referência [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md).
 
+**EAS App Seller (#173)** **não** faz parte do Quality Gate (minutos de cloud + credenciais Expo). Workflow [`.github/workflows/seller-eas.yml`](../../../.github/workflows/seller-eas.yml):
+
+| Gatilho | O que executa |
+|---|---|
+| Tag `seller-v*` | Android `production` (AAB) + `internal` (APK), depois `eas update --channel production` |
+| `workflow_dispatch` | Plataforma (`android` / `ios`) e perfil escolhidos; OTA opcional |
+
+Secrets (falha se faltarem, sem skip silencioso): `EXPO_TOKEN`, `EAS_PROJECT_ID`. Opcional: `EXPO_PUBLIC_API_BASE_URL`. CLI: `pnpm dlx eas-cli@16` (`--non-interactive`). Distinto das tags desktop `v*.*.*`. O primeiro AAB na Play Console é upload manual do operador; `eas submit` iOS não está neste workflow.
+
 ## Branch órfão `documentacion`
 
 O branch **órfão** `documentacion` **não** contém código da aplicação — apenas um snapshot de documentação para hospedagem estática (ex.: GitHub Pages).
@@ -194,6 +203,7 @@ Arquivo: `.github/workflows/deploy.yml`.
 - [x] Build Tauri em runner self-hosted — `.github/workflows/tauri-selfhosted.yml` (`workflow_dispatch`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] Links HTTP(S) em `docs/` — `docs-links.yml` + `.lycheeignore` (Lychee; sem checagem de links relativos `.md`)
+- [x] EAS App Seller em tags `seller-v*` — `.github/workflows/seller-eas.yml` (`EXPO_TOKEN` / `EAS_PROJECT_ID`; fora do Quality Gate) — #173
 
 ## Automação de status do Project (GitHub)
 
