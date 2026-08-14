@@ -1,0 +1,130 @@
+# App Seller EAS build + OTA. Not part of Quality Gate (cost / Expo credentials).
+# eas-cli is invoked via pnpm dlx (not a production dependency). Pin: eas-cli@16
+name: Seller EAS
+
+on:
+  push:
+    tags:
+      - 'seller-v*'
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'EAS build profile'
+        type: choice
+        options:
+          - production
+          - internal
+        default: production
+      platform:
+        description: 'Target platform'
+        type: choice
+        options:
+          - android
+          - ios
+        default: android
+      run_update:
+        description: 'Also run eas update on the production channel'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  EAS_CLI: eas-cli@16
+
+jobs:
+  eas:
+    name: EAS build / update
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    defaults:
+      run:
+        working-directory: apps/seller
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        working-directory: .
+        run: pnpm install --frozen-lockfile
+
+      - name: Require Expo secrets
+        working-directory: .
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPO_TOKEN:-}" ]; then
+            echo "::error::GitHub secret EXPO_TOKEN is not set. Create an Expo access token and add it as a repository secret. Do not skip this job."
+            exit 1
+          fi
+          if [ -z "${EAS_PROJECT_ID:-}" ]; then
+            echo "::error::GitHub secret EAS_PROJECT_ID is not set. Run eas init as the operator, then store the Expo project UUID as EAS_PROJECT_ID."
+            exit 1
+          fi
+
+      - name: Tag release notes
+        working-directory: .
+        run: |
+          set -euo pipefail
+          {
+            echo "## App Seller EAS (${GITHUB_REF_NAME})"
+            echo
+            echo "### Commits since previous seller-v* tag"
+            echo
+            PREV="$(git describe --tags --abbrev=0 --match 'seller-v*' HEAD^ 2>/dev/null || true)"
+            if [ -n "${PREV}" ]; then
+              git log --pretty=format:'- %s (%h)' "${PREV}"..HEAD
+            else
+              echo "_No previous seller-v* tag; last 30 commits:_"
+              echo
+              git log --pretty=format:'- %s (%h)' -30
+            fi
+            echo
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: EAS build (tag Android production + internal)
+        if: github.event_name == 'push'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+          EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          pnpm dlx ${EAS_CLI} build --platform android --profile production --non-interactive
+          pnpm dlx ${EAS_CLI} build --platform android --profile internal --non-interactive
+
+      - name: EAS build (workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+          EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          pnpm dlx ${EAS_CLI} build --platform "${{ inputs.platform }}" --profile "${{ inputs.profile }}" --non-interactive
+
+      - name: EAS update (OTA production channel)
+        if: github.event_name == 'push' || inputs.run_update == true
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+          EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          pnpm dlx ${EAS_CLI} update --channel production --message "${GITHUB_REF_NAME}" --non-interactive

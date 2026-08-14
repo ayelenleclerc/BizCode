@@ -81,6 +81,49 @@ pnpm --filter @bizcode/seller type-check
 
 **Dispositivo físico:** aponte `EXPO_PUBLIC_API_BASE_URL` para o IP LAN da máquina (ex.: `http://192.168.x.x:3001/api`), não `localhost`.
 
+### Build EAS e OTA (#173)
+
+Workflow Expo managed (`apps/seller`). Pastas nativas `android/` / `ios/` continuam no gitignore. **Não** há `projectId` Expo commitado.
+
+Operador (uma vez):
+
+1. Em `apps/seller`, `eas init` com uma conta Expo (grava o UUID real).
+2. Guardar secrets do GitHub `EXPO_TOKEN` e `EAS_PROJECT_ID` (comentários em `.env.example`). Secret opcional `EXPO_PUBLIC_API_BASE_URL` entra no build nativo.
+3. **Não** commitar o UUID; `app.config.ts` define `extra.eas.projectId` e `updates.url` só se `EAS_PROJECT_ID` existir. Push (#172) já lê esse extra.
+
+Perfis em `apps/seller/eas.json`:
+
+| Perfil | Android | iOS | Distribuição |
+|---|---|---|---|
+| `production` | AAB (`app-bundle`) | IPA (`simulator: false`) | `store` |
+| `internal` | APK | IPA | `internal` |
+
+OTA: `expo-updates` com `runtimeVersion.policy: appVersion` (versão `0.1.0`). CI executa `eas update --channel production` na tag `seller-v*`. Esta mudança **não** mede a latência OTA em dispositivo.
+
+Wrappers locais (`EXPO_TOKEN` / login Expo; `eas-cli@16` via `pnpm dlx`):
+
+```bash
+pnpm --filter @bizcode/seller eas:build:production
+pnpm --filter @bizcode/seller eas:build:internal
+pnpm --filter @bizcode/seller eas:update
+```
+
+O primeiro upload à Play Console / App Store e Apple Developer / `eas submit` são **manuais**. O Quality Gate **não** executa EAS.
+
+### Copy da ficha Google Play (#173)
+
+Reutilizar ícone e splash de `apps/seller/assets/`. **Não** há screenshots de store no repositório.
+
+URL de privacidade: `{PUBLIC_WEB_ORIGIN}/privacidad` (página pública #195; o operador indica a origem implantada).
+
+**EN — short:** Field sales for BizCode: customers, orders, catalog, and daily route.
+
+**EN — full:** BizCode Seller is the field-sales app for the BizCode ERP. Sellers sign in with their company account, look up customers, take orders (catalog, scanner, suggestions), confirm visits on the daily route, and work offline with later sync. Push notifications and WhatsApp confirmation use the company BizCode server. This listing does not collect store screenshots in the repository; use device captures from a signed build.
+
+**ES — corta:** Ventas de campo para BizCode: clientes, pedidos, catálogo y ruta del día.
+
+**ES — completa:** BizCode Seller es la app de vendedor de campo del ERP BizCode. El vendedor inicia sesión con la cuenta de la empresa, consulta clientes, toma pedidos (catálogo, escáner, sugerencias), confirma visitas en la ruta del día y trabaja sin conexión con sincronización posterior. Las notificaciones push y la confirmación por WhatsApp usan el servidor BizCode de la empresa. No hay capturas de Play Store en el repositorio; usar capturas de un build firmado.
+
 **Nota:** `@bizcode/ui` (#157) está fora do escopo de #167/#168; não bloquear type-check nem login por esse pacote.
 
 ## Requisitos

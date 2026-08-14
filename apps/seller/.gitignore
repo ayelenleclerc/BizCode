@@ -39,3 +39,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# EAS / store credentials (never commit)
+credentials.json
+google-services.json
+GoogleService-Info.plist
