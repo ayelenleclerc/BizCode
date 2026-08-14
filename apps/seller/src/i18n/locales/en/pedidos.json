@@ -99,5 +99,18 @@
     "scanAnother": "Scan another",
     "added": "Added: {{name}}",
     "addOnePref": "Add 1 on each scan"
+  },
+  "voice": {
+    "open": "Dictate order",
+    "hint": "Say products and quantities. Nothing is added to the cart until you confirm.",
+    "listening": "Listening…",
+    "denied": "Microphone permission denied. Dictation is disabled.",
+    "empty": "I didn't understand the order, please try again",
+    "error": "Could not recognize speech. Try again or search the catalog.",
+    "confirmTitle": "Confirm spoken items",
+    "noMatch": "No catalog match. Discard or search manually.",
+    "discard": "Discard",
+    "cancel": "Cancel",
+    "addConfirmed": "Add confirmed"
   }
 }

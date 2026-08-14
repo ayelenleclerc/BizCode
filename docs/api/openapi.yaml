@@ -50,6 +50,8 @@ tags:
     description: Multi-provider online payments — provider config, capabilities and checkout (#377, ADR-0019); Mercado Pago is the only live adapter today
   - name: pedidos
     description: Commercial orders and quotes (ADR-0009)
+  - name: voice
+    description: App Seller speech-to-order Whisper transcription (#266, ADR-0020)
   - name: visitas
     description: Field seller daily visit agenda (#170)
   - name: feriados
@@ -4966,6 +4968,62 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/voice/transcribe:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [voice]
+      summary: Transcribe spoken order audio with Whisper (returns text only)
+      description: |
+        Multipart audio for App Seller speech-to-order (#266). Requires `orders.create`.
+        Returns `{ text }` only — catalog matching stays on the client. HTTP 503 when `OPENAI_API_KEY` is unset.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                locale:
+                  type: string
+                  description: Optional BCP-47 hint (es, en, pt) forwarded to Whisper
+      responses:
+        '200':
+          description: Transcript
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    required: [text]
+                    properties:
+                      text:
+                        type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '502':
+          $ref: '#/components/responses/ServerError'
+        '503':
+          $ref: '#/components/responses/ServerError'
         '500':
           $ref: '#/components/responses/ServerError'
 
