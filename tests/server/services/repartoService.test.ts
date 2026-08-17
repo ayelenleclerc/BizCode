@@ -60,6 +60,8 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
       findMany: vi.fn().mockResolvedValue([ordenPending]),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
+    factura: { findMany: vi.fn().mockResolvedValue([]) },
+    reciboCobroImputacion: { groupBy: vi.fn().mockResolvedValue([]) },
     repartoItem: {
       findFirst: vi.fn().mockResolvedValue(null),
       update: vi.fn(),
@@ -308,5 +310,40 @@ describe('RepartoService.getItemPod', () => {
     if (result.ok) {
       expect(result.data.podMedia?.firmaBase64).toBe(TEST_FIRMA)
     }
+  })
+})
+
+describe('RepartoService.getMine (#160)', () => {
+  it('prefers on_route over planned for the same day', async () => {
+    const onRoute = { ...repartoRow, id: 2, estado: 'on_route' }
+    const findFirst = vi.fn().mockResolvedValueOnce(onRoute)
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst,
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.getMine(1, 5, new Date('2026-05-20'))
+    expect(result?.id).toBe(2)
+    expect(findFirst).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns null when the driver has no planned or on_route row', async () => {
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.getMine(1, 5, new Date('2026-05-20'))
+    expect(result).toBeNull()
   })
 })

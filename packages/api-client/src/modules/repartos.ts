@@ -45,6 +45,15 @@ export function createRepartosAPI(http: AxiosInstance) {
       }
     },
 
+    getMiReparto: async (params?: { fecha?: string }) => {
+      try {
+        const response = await http.get('/repartos/mi-reparto', { params })
+        return response.data.data as Reparto
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
     create: async (body: {
       fecha: string
       choferId: number

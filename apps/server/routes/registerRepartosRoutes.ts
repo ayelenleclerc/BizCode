@@ -1,5 +1,5 @@
 import type { Application, Request, Response } from 'express'
-import { requirePermission } from '../auth'
+import { requireAnyPermission, requirePermission } from '../auth'
 import type { AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { hasPermission, type Permission } from '@bizcode/types'
@@ -36,6 +36,7 @@ export function registerRepartosRoutes(app: Application, ctx: RestRouteContext):
   const repartos: RepartoService = services.repartos
   const repartoUbicacion: RepartoUbicacionService = services.repartoUbicacion
   const gpsModule = requireModule('logistics.gps')
+  const dispatchesModule = requireModule('logistics.dispatches')
 
   app.get(
     '/api/repartos',
@@ -113,10 +114,43 @@ export function registerRepartosRoutes(app: Application, ctx: RestRouteContext):
   )
 
   app.get(
-    '/api/repartos/:id',
-    requirePermission('logistics.read'),
+    '/api/repartos/mi-reparto',
+    dispatchesModule,
+    requirePermission('orders.deliver.confirm'),
     async (req: Request, res: Response) => {
       try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        let fecha: Date
+        const fechaRaw = req.query.fecha
+        if (typeof fechaRaw === 'string' && fechaRaw.trim().length > 0) {
+          try {
+            fecha = facturaFechaToPrismaDate(fechaRaw.trim())
+          } catch {
+            res.status(400).json({ success: false, error: 'fecha must be YYYY-MM-DD' })
+            return
+          }
+        } else {
+          fecha = new Date()
+        }
+        const row = await repartos.getMine(tenantId, authReq.auth!.claims.userId, fecha)
+        if (!row) {
+          res.status(404).json({ success: false, error: 'REPARTO_NOT_FOUND' })
+          return
+        }
+        res.json({ success: true, data: row })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/repartos/:id',
+    requireAnyPermission('logistics.read', 'orders.deliver.confirm'),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
         const tenantId = getTenantId(req)
         const id = Number.parseInt(String(req.params.id), 10)
         if (!Number.isFinite(id) || id < 1) {
@@ -126,6 +160,12 @@ export function registerRepartosRoutes(app: Application, ctx: RestRouteContext):
         const row = await repartos.getById(tenantId, id)
         if (!row) {
           res.status(404).json({ success: false, error: 'REPARTO_NOT_FOUND' })
+          return
+        }
+        const role = authReq.auth!.claims.role
+        const canReadAll = hasPermission(role, 'logistics.read' as Permission)
+        if (!canReadAll && row.choferId !== authReq.auth!.claims.userId) {
+          res.status(403).json({ success: false, error: 'Forbidden' })
           return
         }
         res.json({ success: true, data: row })

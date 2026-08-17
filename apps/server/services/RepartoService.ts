@@ -30,9 +30,35 @@ const repartoInclude = {
     include: {
       ordenEntrega: {
         include: {
-          cliente: { select: { id: true, codigo: true, rsocial: true } },
+          cliente: {
+            select: {
+              id: true,
+              codigo: true,
+              rsocial: true,
+              domicilio: true,
+              localidad: true,
+              telef: true,
+              latitud: true,
+              longitud: true,
+              balance: true,
+            },
+          },
           zona: { select: { id: true, nombre: true } },
-          factura: { select: { id: true, tipo: true, prefijo: true, numero: true } },
+          factura: {
+            select: {
+              id: true,
+              tipo: true,
+              prefijo: true,
+              numero: true,
+              items: {
+                select: {
+                  id: true,
+                  cantidad: true,
+                  articulo: { select: { id: true, codigo: true, descripcion: true } },
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -43,8 +69,40 @@ export type RepartoRow = Prisma.RepartoGetPayload<{ include: typeof repartoInclu
 
 export type RepartoItemRow = RepartoRow['items'][number]
 
-export type RepartoItemPublicRow = Omit<RepartoItemRow, 'podMedia'> & {
+export type RepartoClienteDeudaSnapshot = {
+  saldo: string
+  facturasPendientes: {
+    facturaId: number
+    facturaRef: string
+    fecha: string
+    total: string
+    pagado: string
+    pendiente: string
+  }[]
+}
+
+export type RepartoClientePublic = {
+  id: number
+  codigo: number
+  rsocial: string
+  domicilio: string | null
+  localidad: string | null
+  telef: string | null
+  latitud: number | null
+  longitud: number | null
+  balance: string
+  deuda: RepartoClienteDeudaSnapshot | null
+}
+
+export type RepartoOrdenEntregaPublic = Omit<RepartoItemRow['ordenEntrega'], 'cliente' | 'factura'> & {
+  items: { id: number; cantidad: number; articulo: { id: number; codigo: number; descripcion: string } }[]
+  cliente: RepartoClientePublic
+  factura: { id: number; tipo: string; prefijo: string; numero: number } | null
+}
+
+export type RepartoItemPublicRow = Omit<RepartoItemRow, 'podMedia' | 'ordenEntrega'> & {
   hasPod: boolean
+  ordenEntrega: RepartoOrdenEntregaPublic
 }
 
 export type RepartoListRow = Omit<RepartoRow, 'items'> & {
@@ -56,9 +114,83 @@ export type RepartoItemPodDetail = RepartoItemPublicRow & {
   podMedia: PodMediaPayload | null
 }
 
+function dayBounds(fecha: Date): { start: Date; end: Date } {
+  const start = new Date(fecha)
+  start.setHours(0, 0, 0, 0)
+  const end = new Date(fecha)
+  end.setHours(23, 59, 59, 999)
+  return { start, end }
+}
+
+function toCoord(value: unknown): number | null {
+  if (value == null) return null
+  if (typeof value === 'object' && value !== null && 'toNumber' in value) {
+    const n = (value as { toNumber: () => number }).toNumber()
+    return Number.isFinite(n) ? n : null
+  }
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
+function toMoneyString(value: unknown): string {
+  if (value == null) return '0.00'
+  if (typeof value === 'object' && value !== null && 'toFixed' in value) {
+    return (value as { toFixed: (digits: number) => string }).toFixed(2)
+  }
+  const n = Number(value)
+  return Number.isFinite(n) ? n.toFixed(2) : '0.00'
+}
+
+function formatFacturaRef(factura: { tipo: string; prefijo: string; numero: number }): string {
+  return `${factura.tipo} ${factura.prefijo}-${factura.numero}`
+}
+
+function mapLineItems(
+  factura: RepartoItemRow['ordenEntrega']['factura'],
+): { id: number; cantidad: number; articulo: { id: number; codigo: number; descripcion: string } }[] {
+  const facturaItems = factura && 'items' in factura ? factura.items : undefined
+  if (!facturaItems?.length) return []
+  return facturaItems
+    .filter(
+      (item): item is typeof item & { articulo: NonNullable<typeof item.articulo> } => item.articulo != null,
+    )
+    .map((item) => ({
+      id: item.id,
+      cantidad: Number(item.cantidad),
+      articulo: item.articulo,
+    }))
+}
+
+function mapCliente(cliente: RepartoItemRow['ordenEntrega']['cliente']): RepartoClientePublic {
+  return {
+    id: cliente.id,
+    codigo: cliente.codigo,
+    rsocial: cliente.rsocial,
+    domicilio: cliente.domicilio ?? null,
+    localidad: cliente.localidad ?? null,
+    telef: cliente.telef ?? null,
+    latitud: toCoord(cliente.latitud),
+    longitud: toCoord(cliente.longitud),
+    balance: toMoneyString(cliente.balance),
+    deuda: null,
+  }
+}
+
+function mapOrdenEntrega(oe: RepartoItemRow['ordenEntrega']): RepartoOrdenEntregaPublic {
+  const { cliente: _cliente, factura, ...rest } = oe
+  return {
+    ...rest,
+    items: mapLineItems(factura),
+    cliente: mapCliente(oe.cliente),
+    factura: factura
+      ? { id: factura.id, tipo: factura.tipo, prefijo: factura.prefijo, numero: factura.numero }
+      : null,
+  }
+}
+
 function sanitizeItem(item: RepartoItemRow): RepartoItemPublicRow {
   const { podMedia: _pod, ...rest } = item
-  return { ...rest, hasPod: itemHasPod(item) }
+  return { ...rest, hasPod: itemHasPod(item), ordenEntrega: mapOrdenEntrega(item.ordenEntrega) }
 }
 
 function sanitizeReparto(row: RepartoRow): Omit<RepartoListRow, 'progress'> & { items: RepartoItemPublicRow[] } {
@@ -127,7 +259,118 @@ export class RepartoService {
       where: { id, tenantId },
       include: repartoInclude,
     })
-    return row ? withProgress(row) : null
+    if (!row) return null
+    return this.withDebtSnapshot(withProgress(row))
+  }
+
+  /**
+   * @en Driver's own route for a calendar day: prefer `on_route`, else latest `planned` (#160).
+   * @es Ruta del chofer en un día: prioriza `on_route`; si no, el `planned` más reciente (#160).
+   * @pt-BR Rota do motorista no dia: prefere `on_route`; senão o `planned` mais recente (#160).
+   */
+  async getMine(tenantId: number, choferId: number, fecha: Date): Promise<RepartoListRow | null> {
+    const { start, end } = dayBounds(fecha)
+    const dateWhere = { tenantId, choferId, fecha: { gte: start, lte: end } }
+    const onRoute = await this.prisma.reparto.findFirst({
+      where: { ...dateWhere, estado: 'on_route' },
+      include: repartoInclude,
+      orderBy: { id: 'desc' },
+    })
+    const row =
+      onRoute ??
+      (await this.prisma.reparto.findFirst({
+        where: { ...dateWhere, estado: 'planned' },
+        include: repartoInclude,
+        orderBy: { id: 'desc' },
+      }))
+    if (!row) return null
+    return this.withDebtSnapshot(withProgress(row))
+  }
+
+  private async withDebtSnapshot(reparto: RepartoListRow): Promise<RepartoListRow> {
+    const clienteIds = [
+      ...new Set(
+        reparto.items
+          .map((item) => item.ordenEntrega.clienteId)
+          .filter((id): id is number => typeof id === 'number' && id > 0),
+      ),
+    ]
+    if (clienteIds.length === 0) return reparto
+
+    const facturas = await this.prisma.factura.findMany({
+      where: { tenantId: reparto.tenantId, clienteId: { in: clienteIds }, estado: 'A' },
+      orderBy: { fecha: 'asc' },
+      select: { id: true, clienteId: true, tipo: true, prefijo: true, numero: true, fecha: true, total: true },
+    })
+    const facturaIds = facturas.map((f) => f.id)
+    const allocations =
+      facturaIds.length === 0
+        ? []
+        : await this.prisma.reciboCobroImputacion.groupBy({
+            by: ['facturaId'],
+            where: {
+              facturaId: { in: facturaIds },
+              reciboCobro: { tenantId: reparto.tenantId, estado: 'emitido' },
+            },
+            _sum: { importe: true },
+          })
+    const paidMap = new Map<number, string>()
+    for (const row of allocations) {
+      if (row._sum.importe != null) {
+        paidMap.set(row.facturaId, toMoneyString(row._sum.importe))
+      }
+    }
+
+    const pendientesByCliente = new Map<
+      number,
+      {
+        facturaId: number
+        facturaRef: string
+        fecha: string
+        total: string
+        pagado: string
+        pendiente: string
+      }[]
+    >()
+    for (const f of facturas) {
+      const pagadoRaw = paidMap.get(f.id)
+      const totalN = Number(toMoneyString(f.total))
+      const pagadoN = pagadoRaw != null ? Number(pagadoRaw) : 0
+      const pendienteN = totalN - pagadoN
+      if (pendienteN <= 0) continue
+      const list = pendientesByCliente.get(f.clienteId) ?? []
+      list.push({
+        facturaId: f.id,
+        facturaRef: formatFacturaRef(f),
+        fecha: f.fecha.toISOString(),
+        total: toMoneyString(f.total),
+        pagado: toMoneyString(pagadoN),
+        pendiente: toMoneyString(pendienteN),
+      })
+      pendientesByCliente.set(f.clienteId, list)
+    }
+
+    return {
+      ...reparto,
+      items: reparto.items.map((item) => {
+        const cliente = item.ordenEntrega.cliente
+        if (!cliente) return item
+        const facturasPendientes = pendientesByCliente.get(item.ordenEntrega.clienteId) ?? []
+        return {
+          ...item,
+          ordenEntrega: {
+            ...item.ordenEntrega,
+            cliente: {
+              ...cliente,
+              deuda: {
+                saldo: cliente.balance ?? '0.00',
+                facturasPendientes,
+              },
+            },
+          },
+        }
+      }),
+    }
   }
 
   async create(tenantId: number, input: RepartoCreateInput): Promise<ServiceResult<RepartoListRow>> {

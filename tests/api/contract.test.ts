@@ -3247,6 +3247,17 @@ describe('API — contrato OpenAPI', () => {
     await assertMatchesOpenApi('/api/repartos/activos', 'get', '200', res.body)
   })
 
+  it('GET /api/repartos/mi-reparto', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const p = buildPrisma()
+    vi.mocked(p.reparto.findFirst).mockResolvedValueOnce(repartoContractRow as never)
+    const app = createApp(p)
+    const res = await request(app).get('/api/repartos/mi-reparto').query({ fecha: '2026-05-20' }).expect(200)
+    await assertMatchesOpenApi('/api/repartos/mi-reparto', 'get', '200', res.body)
+  })
+
   it('POST /api/repartos/{id}/ubicacion', async () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'driver'
