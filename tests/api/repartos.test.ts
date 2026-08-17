@@ -27,7 +27,8 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     rubro: { findMany: vi.fn() },
     formaPago: { findMany: vi.fn() },
     proveedor: { findFirst: vi.fn() },
-    factura: { findMany: vi.fn(), findFirst: vi.fn(), aggregate: vi.fn() },
+    factura: { findMany: vi.fn().mockResolvedValue([]), findFirst: vi.fn(), aggregate: vi.fn() },
+    reciboCobroImputacion: { groupBy: vi.fn().mockResolvedValue([]) },
     cobro: { count: vi.fn(), findMany: vi.fn(), findFirst: vi.fn(), aggregate: vi.fn() },
     ordenCompra: { count: vi.fn(), findMany: vi.fn(), findFirst: vi.fn() },
     recuento: { count: vi.fn(), findMany: vi.fn(), findFirst: vi.fn() },
@@ -115,6 +116,53 @@ describe('API /api/repartos', () => {
     const res = await request(app).get('/api/repartos').expect(200)
     expect(res.body.success).toBe(true)
     expect(Array.isArray(res.body.data)).toBe(true)
+  })
+
+  it('GET /api/repartos/mi-reparto returns 403 without orders.deliver.confirm', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'billing'
+    const app = createApp(buildPrismaMock())
+    await request(app).get('/api/repartos/mi-reparto').expect(403)
+  })
+
+  it('GET /api/repartos/mi-reparto returns 404 when the driver has no route', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const prisma = buildPrismaMock({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    await request(app).get('/api/repartos/mi-reparto').expect(404)
+  })
+
+  it('GET /api/repartos/mi-reparto returns 200 for the authenticated driver', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/repartos/mi-reparto').query({ fecha: '2026-05-20' }).expect(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.choferId).toBe(2)
+  })
+
+  it('GET /api/repartos/:id returns 200 for driver on own route', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/repartos/1').expect(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.id).toBe(1)
+  })
+
+  it('GET /api/repartos/:id returns 403 for driver on another chofer route', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '9'
+    const app = createApp(buildPrismaMock())
+    await request(app).get('/api/repartos/1').expect(403)
   })
 
   it('POST /api/repartos returns 403 without orders.dispatch', async () => {

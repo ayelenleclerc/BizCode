@@ -1,8 +1,44 @@
 {
-  "stub": {
-    "listTitle": "Paradas do dia",
-    "listBody": "Sua rota de entrega aparecerá aqui (#160).",
-    "detailTitle": "Detalhe da parada",
-    "detailBody": "Os detalhes da parada {{id}} serão implementados em #160."
+  "title": "Rota de hoje",
+  "progress": "{{delivered}}/{{total}} entregas",
+  "plannedBanner": "Esta rota ainda não foi iniciada. Peça ao depósito para iniciá-la antes de confirmar paradas.",
+  "empty": "Não há rota de entrega para hoje.",
+  "loadError": "Não foi possível carregar a rota de hoje.",
+  "offline": "Sem conexão. Verifique o sinal e tente novamente.",
+  "forbidden": "Você não pode ver esta rota.",
+  "bultos": "{{count}} artigos",
+  "debtBadge": "Saldo em aberto",
+  "estado": {
+    "pending": "Pendente",
+    "delivered": "Entregue",
+    "not_delivered": "Não entregue",
+    "returned": "Devolvido"
+  },
+  "detail": {
+    "title": "Parada {{secuencia}}",
+    "address": "Endereço",
+    "phone": "Telefone",
+    "call": "Ligar para o cliente",
+    "maps": "Abrir no mapa",
+    "articles": "Itens a entregar",
+    "noArticles": "Este pedido não tem linhas de fatura.",
+    "debt": "Faturas em aberto",
+    "saldo": "Saldo {{saldo}}",
+    "noDebt": "Sem saldo em aberto.",
+    "deliver": "Entregar",
+    "deliverHint": "O comprovante de entrega (assinatura e foto) será adicionado em uma atualização posterior.",
+    "notDelivered": "Não consegui entregar",
+    "collect": "Cobrar",
+    "motivoTitle": "Motivo da não entrega",
+    "motivo": {
+      "ausente": "Ausente",
+      "rechazo": "Recusa",
+      "domicilio_incorrecto": "Endereço incorreto",
+      "producto_dañado": "Produto danificado",
+      "otro": "Outro"
+    },
+    "confirmMotivo": "Confirmar",
+    "notDeliveredError": "Não foi possível atualizar esta parada.",
+    "plannedBlock": "As paradas só podem ser atualizadas depois que o depósito iniciar a rota."
   }
 }

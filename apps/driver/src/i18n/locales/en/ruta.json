@@ -1,8 +1,44 @@
 {
-  "stub": {
-    "listTitle": "Today's stops",
-    "listBody": "Your delivery route will appear here (#160).",
-    "detailTitle": "Stop detail",
-    "detailBody": "Stop {{id}} details will be implemented in #160."
+  "title": "Today's route",
+  "progress": "{{delivered}}/{{total}} delivered",
+  "plannedBanner": "This route has not been started yet. Ask dispatch to start it before confirming stops.",
+  "empty": "No delivery route for today.",
+  "loadError": "Could not load today's route.",
+  "offline": "No network connection. Check your signal and retry.",
+  "forbidden": "You cannot view this route.",
+  "bultos": "{{count}} items",
+  "debtBadge": "Balance due",
+  "estado": {
+    "pending": "Pending",
+    "delivered": "Delivered",
+    "not_delivered": "Not delivered",
+    "returned": "Returned"
+  },
+  "detail": {
+    "title": "Stop {{secuencia}}",
+    "address": "Address",
+    "phone": "Phone",
+    "call": "Call customer",
+    "maps": "Open in maps",
+    "articles": "Items to deliver",
+    "noArticles": "No invoice lines on this order.",
+    "debt": "Outstanding invoices",
+    "saldo": "Balance {{saldo}}",
+    "noDebt": "No outstanding balance.",
+    "deliver": "Deliver",
+    "deliverHint": "Proof of delivery (signature and photo) will be added in a later update.",
+    "notDelivered": "Could not deliver",
+    "collect": "Collect payment",
+    "motivoTitle": "Reason for non-delivery",
+    "motivo": {
+      "ausente": "Customer absent",
+      "rechazo": "Rejected",
+      "domicilio_incorrecto": "Wrong address",
+      "producto_dañado": "Damaged goods",
+      "otro": "Other"
+    },
+    "confirmMotivo": "Confirm",
+    "notDeliveredError": "Could not update this stop.",
+    "plannedBlock": "Stops can be updated only after dispatch starts the route."
   }
 }

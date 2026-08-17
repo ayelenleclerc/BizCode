@@ -129,13 +129,13 @@ Privacy policy URL: `{PUBLIC_WEB_ORIGIN}/privacidad` (public page from #195; ope
 
 **Note:** `@bizcode/ui` (#157) is out of scope for #167/#168; do not block type-check or login on that package.
 
-### App Driver (`apps/driver`, #159)
+### App Driver (`apps/driver`, #159–#160)
 
 Expo SDK app with Expo Router (same stack as Seller). Auth uses **Bearer dual** mode with tokens in **expo-secure-store** and `Authorization: Bearer` plus `x-bizcode-channel: field`.
 
 Allowed role: **`driver`** only. Other roles see an accessible “driver-only” denial screen.
 
-Navigation tabs (stubs until #160/#162): **Route | Collections | Profile**. Route list/detail and collections are placeholders; push (#165), offline (#164), and EAS (#166) are out of scope for #159. No Prisma migration.
+**Day route (#160):** tab `/ruta` loads `GET /api/repartos/mi-reparto` (`orders.deliver.confirm` + module `logistics.dispatches`; `choferId` is always the authenticated user). Prefers today’s `on_route` reparto, else the latest `planned`. List shows sequence, customer, address, item qty, status chips, and a debt badge. Detail opens maps via `Linking` (no Google Static API key) and `tel:` for `Cliente.telef`. **Could not deliver** calls existing `PUT /api/repartos/:id/items/:itemId` with `not_delivered` + motivo (route must be `on_route`). **Deliver** is visible but disabled until POD (#161). **Collect** goes to the cobros stub (#162). No Prisma migration. `GET /api/repartos/:id` also allows the assigned driver.
 
 ```bash
 # Terminal 1 — API
@@ -155,9 +155,7 @@ Type-check:
 pnpm --filter @bizcode/driver type-check
 ```
 
-**Manual smoke test:** create or assign a user with role `driver` in the local tenant (Docker Postgres `:5432`). Seller/manager/owner accounts must land on access-denied.
-
-**API note for #160:** there is no `GET /api/repartos/mi-reparto` yet; existing repartos routes require `logistics.read` while `driver` only has `orders.deliver.confirm` — #160 must add a scoped endpoint or extend RBAC.
+**Manual smoke test:** create or assign a user with role `driver` in the local tenant (Docker Postgres `:5432`) and a `Reparto` for today. Seller/manager/owner accounts must land on access-denied. If the route is still `planned`, the driver can view stops but cannot mark not-delivered until a planner starts the route (`POST /api/repartos/:id/iniciar`).
 
 ## Requirements
 

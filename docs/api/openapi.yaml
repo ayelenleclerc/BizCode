@@ -14124,13 +14124,57 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/repartos/mi-reparto:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [repartos]
+      summary: Get the authenticated driver's route for a day
+      description: |
+        Requires tenant module `logistics.dispatches` and permission `orders.deliver.confirm`.
+        `choferId` is always the authenticated user (cannot query another driver).
+        Optional `fecha` (YYYY-MM-DD) defaults to today. Prefers a route in `on_route`,
+        otherwise the latest `planned` route that day. 404 when none exists.
+        Items include customer address/phone/coords, invoice line items, and a pending-AR snapshot
+        for customers on this route only (#160). Does not grant `logistics.read` or `customers.read`.
+      parameters:
+        - name: fecha
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Driver's day route with ordered stops
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: No route for this driver on that day
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/repartos/{id}:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
     get:
       tags: [repartos]
       summary: Get delivery route by id
-      description: Requires `logistics.read`.
+      description: |
+        Requires `logistics.read`, or `orders.deliver.confirm` when the route's `choferId`
+        matches the authenticated user (#160).
       parameters:
         - name: id
           in: path

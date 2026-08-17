@@ -129,13 +129,13 @@ URL de privacidade: `{PUBLIC_WEB_ORIGIN}/privacidad` (página pública #195; o o
 
 **Nota:** `@bizcode/ui` (#157) está fora do escopo de #167/#168; não bloquear type-check nem login por esse pacote.
 
-### App Entregador (`apps/driver`, #159)
+### App Entregador (`apps/driver`, #159–#160)
 
 App Expo SDK com Expo Router (mesmo stack do Seller). Auth em modo **Bearer dual** com tokens no **expo-secure-store** e `Authorization: Bearer` mais `x-bizcode-channel: field`.
 
 Papel permitido: apenas **`driver`**. Outros papéis veem tela de acesso negado.
 
-Abas (stubs até #160/#162): **Rota | Cobranças | Perfil**. Lista/detalhe de rota e cobranças são placeholders; push (#165), offline (#164) e EAS (#166) ficam fora de #159. Sem migração Prisma.
+**Rota do dia (#160):** a aba `/ruta` carrega `GET /api/repartos/mi-reparto` (`orders.deliver.confirm` + módulo `logistics.dispatches`; `choferId` é sempre o usuário autenticado). Prefere o reparto `on_route` de hoje; senão o `planned` mais recente. A lista mostra sequência, cliente, endereço, qtde de itens, chips de status e badge de dívida. O detalhe abre mapas com `Linking` (sem API key do Google Static) e `tel:` para `Cliente.telef`. **Não consegui entregar** chama o `PUT /api/repartos/:id/items/:itemId` existente com `not_delivered` + motivo (a rota deve estar `on_route`). **Entregar** fica visível mas desabilitado até o POD (#161). **Cobrar** vai ao stub de cobranças (#162). Sem migration Prisma. `GET /api/repartos/:id` também permite o motorista atribuído.
 
 ```bash
 # Terminal 1 — API
@@ -155,9 +155,7 @@ Type-check:
 pnpm --filter @bizcode/driver type-check
 ```
 
-**Smoke manual:** criar ou atribuir usuário com papel `driver` no tenant local (Postgres Docker `:5432`). Contas seller/manager/owner devem ir para access-denied.
-
-**Nota de API para #160:** ainda não existe `GET /api/repartos/mi-reparto`; rotas repartos atuais exigem `logistics.read` enquanto `driver` só tem `orders.deliver.confirm` — #160 deve adicionar endpoint escopado ou estender RBAC.
+**Smoke manual:** criar ou atribuir usuário com papel `driver` no tenant local (Postgres Docker `:5432`) e um `Reparto` de hoje. Contas seller/manager/owner devem ir para access-denied. Se a rota ainda estiver `planned`, o motorista vê paradas mas não pode marcar não-entrega até um planner iniciar a rota (`POST /api/repartos/:id/iniciar`).
 
 ## Requisitos
 

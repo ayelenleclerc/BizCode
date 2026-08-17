@@ -83053,6 +83053,493 @@ Requires tenant module `logistics.gps`, permission `logistics.read`, and role `o
 }
 ```
 
+### PARAMETERS /api/repartos/mi-reparto
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/mi-reparto`
+
+### Get the authenticated driver's route for a day
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/mi-reparto`
+- **Tags:** repartos
+
+Requires tenant module `logistics.dispatches` and permission `orders.deliver.confirm`. `choferId` is always the authenticated user (cannot query another driver). Optional `fecha` (YYYY-MM-DD) defaults to today. Prefers a route in `on_route`, otherwise the latest `planned` route that day. 404 when none exists. Items include customer address/phone/coords, invoice line items, and a pending-AR snapshot for customers on this route only (#160). Does not grant `logistics.read` or `customers.read`.
+
+#### Responses
+
+##### Status: 200 Driver's day route with ordered stops
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`choferId` (required)**
+
+    `integer`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"planned", "on_route", "completed", "cancelled"`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`items` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"pending", "delivered", "not_delivered", "returned"`
+
+    - **`hasPod` (required)**
+
+      `boolean`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`ordenEntrega` (required)**
+
+      `object`
+
+      - **`cliente`**
+
+        `object`
+
+      - **`clienteId`**
+
+        `integer`
+
+      - **`dispatchedAt`**
+
+        `string`, format: `date-time` — When the order entered in\_transit (ADR-0011).
+
+      - **`dispatchTimestampSource`**
+
+        `string`, possible values: `"event", "estimated"` — How dispatchedAt was derived (audit event vs estimated from updatedAt).
+
+      - **`driver`**
+
+        `object`
+
+      - **`driverId`**
+
+        `integer`
+
+      - **`estado`**
+
+        `string`, possible values: `"pending", "picking", "ready", "assigned", "in_transit", "delivered", "failed", "cancelled"`
+
+      - **`estadoEnvio`**
+
+        `string`, possible values: `"pending", "in_transit", "delivered", "returned"` — Carrier shipment status (#193), independent of OE estado.
+
+      - **`factura`**
+
+        `object`
+
+      - **`facturaId`**
+
+        `integer`
+
+      - **`fecha`**
+
+        `string`, format: `date-time`
+
+      - **`id`**
+
+        `integer`
+
+      - **`items`**
+
+        `array`
+
+        **Items:**
+
+        - **`articulo` (required)**
+
+          `object`
+
+          - **`codigo` (required)**
+
+            `integer`
+
+          - **`descripcion` (required)**
+
+            `string`
+
+          - **`id` (required)**
+
+            `integer`
+
+        - **`cantidad` (required)**
+
+          `integer`
+
+        - **`id` (required)**
+
+          `integer`
+
+      - **`nota`**
+
+        `string`
+
+      - **`nroSeguimiento`**
+
+        `string` — Carrier tracking number (#193).
+
+      - **`picker`**
+
+        `object`
+
+      - **`pickerUserId`**
+
+        `integer`
+
+      - **`pickingIniciadoAt`**
+
+        `string`, format: `date-time`
+
+      - **`pickingListoAt`**
+
+        `string`, format: `date-time`
+
+      - **`tenantId`**
+
+        `integer`
+
+      - **`trackingEventos`**
+
+        `array`
+
+        **Items:**
+
+        - **`at` (required)**
+
+          `string`
+
+        - **`status` (required)**
+
+          `string`
+
+        - **`description`**
+
+          `string`
+
+        - **`location`**
+
+          `string`
+
+      - **`transportista`**
+
+        `string`, possible values: `"correo_argentino", "andreani", "propio", "meli_full"` — Carrier for parcel shipping (#193).
+
+      - **`ultimoEventoAt`**
+
+        `string`, format: `date-time`
+
+      - **`zona`**
+
+        `object`
+
+      - **`zonaId`**
+
+        `integer`
+
+    - **`ordenEntregaId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`entregadoAt`**
+
+      `string`, format: `date-time`
+
+    - **`motivoNoEntrega`**
+
+      `string`
+
+    - **`notasEntrega`**
+
+      `string`
+
+    - **`receptorDni`**
+
+      `string`
+
+    - **`receptorNombre`**
+
+      `string`
+
+  - **`progress` (required)**
+
+    `object`
+
+    - **`delivered` (required)**
+
+      `integer`
+
+    - **`pending` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`chofer`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`role`**
+
+      `string`
+
+    - **`username`**
+
+      `string`
+
+  - **`closedAt`**
+
+    `string`, format: `date-time`
+
+  - **`observaciones`**
+
+    `string`
+
+  - **`vehiculo`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "transportista": "correo_argentino",
+          "nroSeguimiento": "",
+          "estadoEnvio": "pending",
+          "ultimoEventoAt": "",
+          "trackingEventos": [
+            {
+              "at": "",
+              "status": "",
+              "description": "",
+              "location": ""
+            }
+          ],
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 No route for this driver on that day
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/repartos/{id}
 
 - **Method:** `PARAMETERS`
@@ -83064,7 +83551,7 @@ Requires tenant module `logistics.gps`, permission `logistics.read`, and role `o
 - **Path:** `/api/repartos/{id}`
 - **Tags:** repartos
 
-Requires `logistics.read`.
+Requires `logistics.read`, or `orders.deliver.confirm` when the route's `choferId` matches the authenticated user (#160).
 
 #### Responses
 

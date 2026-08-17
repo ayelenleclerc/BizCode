@@ -46,7 +46,18 @@ export type OrdenEntrega = {
   ultimoEventoAt: string | null
   trackingEventos: ShippingTrackingEvent[] | null
   items: OrdenEntregaLineItem[]
-  cliente?: { id: number; codigo: number; rsocial: string }
+  cliente?: {
+    id: number
+    codigo: number
+    rsocial: string
+    domicilio?: string | null
+    localidad?: string | null
+    telef?: string | null
+    latitud?: number | null
+    longitud?: number | null
+    balance?: string | null
+    deuda?: RepartoClienteDeuda | null
+  }
   zona?: { id: number; nombre: string; horario?: string | null } | null
   driver?: { id: number; username: string; role: string } | null
   picker?: { id: number; username: string; role: string } | null
@@ -93,6 +104,21 @@ export type OrdenEntregaListParams = {
   fecha?: string
   limit?: number
   offset?: number
+}
+
+/** Pending AR snapshot for a stop on the driver's day route (#160). */
+export type RepartoFacturaPendiente = {
+  facturaId: number
+  facturaRef: string
+  fecha: string
+  total: string
+  pagado: string
+  pendiente: string
+}
+
+export type RepartoClienteDeuda = {
+  saldo: string
+  facturasPendientes: RepartoFacturaPendiente[]
 }
 
 export type RepartoEstado = 'planned' | 'on_route' | 'completed' | 'cancelled'

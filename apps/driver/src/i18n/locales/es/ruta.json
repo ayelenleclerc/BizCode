@@ -1,8 +1,44 @@
 {
-  "stub": {
-    "listTitle": "Paradas del día",
-    "listBody": "Tu ruta de reparto aparecerá acá (#160).",
-    "detailTitle": "Detalle de parada",
-    "detailBody": "El detalle de la parada {{id}} se implementará en #160."
+  "title": "Ruta de hoy",
+  "progress": "{{delivered}}/{{total}} entregas",
+  "plannedBanner": "Esta ruta todavía no fue iniciada. Pedí al depósito que la inicie antes de confirmar paradas.",
+  "empty": "No hay ruta de reparto para hoy.",
+  "loadError": "No se pudo cargar la ruta de hoy.",
+  "offline": "Sin conexión. Revisá la señal e intentá de nuevo.",
+  "forbidden": "No podés ver esta ruta.",
+  "bultos": "{{count}} artículos",
+  "debtBadge": "Deuda",
+  "estado": {
+    "pending": "Pendiente",
+    "delivered": "Entregado",
+    "not_delivered": "No entregado",
+    "returned": "Devuelto"
+  },
+  "detail": {
+    "title": "Parada {{secuencia}}",
+    "address": "Domicilio",
+    "phone": "Teléfono",
+    "call": "Llamar al cliente",
+    "maps": "Abrir en mapas",
+    "articles": "Artículos a entregar",
+    "noArticles": "Esta orden no tiene renglones de factura.",
+    "debt": "Facturas pendientes",
+    "saldo": "Saldo {{saldo}}",
+    "noDebt": "Sin saldo pendiente.",
+    "deliver": "Entregar",
+    "deliverHint": "El comprobante de entrega (firma y foto) se agregará en una actualización posterior.",
+    "notDelivered": "No pude entregar",
+    "collect": "Cobrar",
+    "motivoTitle": "Motivo de no entrega",
+    "motivo": {
+      "ausente": "Ausente",
+      "rechazo": "Rechazo",
+      "domicilio_incorrecto": "Domicilio incorrecto",
+      "producto_dañado": "Producto dañado",
+      "otro": "Otro"
+    },
+    "confirmMotivo": "Confirmar",
+    "notDeliveredError": "No se pudo actualizar esta parada.",
+    "plannedBlock": "Las paradas se actualizan solo después de que el depósito inicie la ruta."
   }
 }

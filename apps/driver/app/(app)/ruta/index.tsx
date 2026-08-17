@@ -1,30 +1,127 @@
+import { useRouter } from 'expo-router'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
-import { Text, Title } from 'react-native-paper'
+import { FlatList, Pressable, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Button, Chip, Text, Title } from 'react-native-paper'
+import { useRuta } from '../../../src/ruta/RutaContext'
+import { countBultos, hasDebt } from '../../../src/ruta/stopView'
+import type { RepartoItemEstado, RepartoItemRow } from '@bizcode/types'
 
 /**
- * @en Route list stub (#159); data in #160.
- * @es Stub lista de ruta (#159); datos en #160.
- * @pt-BR Stub lista de rota (#159); dados em #160.
+ * @en Driver day-route list ordered by RepartoItem.secuencia (#160).
+ * @es Lista de ruta del día ordenada por RepartoItem.secuencia (#160).
+ * @pt-BR Lista da rota do dia ordenada por RepartoItem.secuencia (#160).
  */
 export default function RutaIndexScreen() {
-  const { t } = useTranslation('ruta')
+  const { t } = useTranslation(['ruta', 'common'])
+  const router = useRouter()
+  const { status, reparto, load } = useRuta()
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  if (status === 'loading' || status === 'idle') {
+    return (
+      <View style={styles.centered} testID="driver-ruta-loading" accessibilityLabel={t('common:loading')}>
+        <ActivityIndicator />
+      </View>
+    )
+  }
+
+  if (status === 'offline' || status === 'error' || status === 'forbidden') {
+    const messageKey =
+      status === 'offline' ? 'offline' : status === 'forbidden' ? 'forbidden' : 'loadError'
+    return (
+      <View style={styles.centered} testID="driver-ruta-error">
+        <Text>{t(`ruta:${messageKey}`)}</Text>
+        <Button mode="contained" onPress={() => void load()} accessibilityLabel={t('common:retry')}>
+          {t('common:retry')}
+        </Button>
+      </View>
+    )
+  }
+
+  const items = reparto?.items ?? []
+  const progress = reparto?.progress ?? { delivered: 0, total: items.length }
 
   return (
     <View style={styles.root} testID="driver-ruta-list">
-      <Title>{t('stub.listTitle')}</Title>
-      <Text style={styles.body}>{t('stub.listBody')}</Text>
+      <View testID="driver-ruta-title">
+        <Title>{t('ruta:title')}</Title>
+      </View>
+      {reparto ? (
+        <View testID="driver-ruta-progress">
+          <Text>
+            {t('ruta:progress', { delivered: progress.delivered, total: progress.total })}
+          </Text>
+        </View>
+      ) : null}
+      {reparto?.estado === 'planned' ? <Text>{t('ruta:plannedBanner')}</Text> : null}
+      <FlatList
+        data={items}
+        keyExtractor={(item) => String(item.id)}
+        initialNumToRender={12}
+        windowSize={8}
+        ListEmptyComponent={
+          <View testID="driver-ruta-empty">
+            <Text style={styles.empty}>{t('ruta:empty')}</Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <StopRow
+            item={item}
+            onPress={() => router.push(`/(app)/ruta/${item.id}`)}
+          />
+        )}
+      />
     </View>
   )
 }
 
+function StopRow({ item, onPress }: { item: RepartoItemRow; onPress: () => void }) {
+  const { t } = useTranslation('ruta')
+  const cliente = item.ordenEntrega.cliente
+  const bultos = countBultos(item)
+  const debt = hasDebt(cliente?.balance ?? cliente?.deuda?.saldo)
+  const estado = item.estado as RepartoItemEstado
+
+  return (
+    <Pressable
+      onPress={onPress}
+      testID={`driver-ruta-parada-${item.id}`}
+      accessibilityRole="button"
+      accessibilityLabel={`${item.secuencia} ${cliente?.rsocial ?? ''}`}
+      style={styles.row}
+    >
+      <Text variant="headlineMedium" style={styles.seq}>
+        {item.secuencia}
+      </Text>
+      <View style={styles.rowBody}>
+        <Text variant="titleMedium">{cliente?.rsocial ?? '—'}</Text>
+        <Text>{cliente?.domicilio ?? ''}</Text>
+        <Text>{t('bultos', { count: bultos })}</Text>
+        <View style={styles.chips}>
+          <Chip compact testID={`driver-ruta-estado-${item.id}`}>
+            {t(`estado.${estado}`)}
+          </Chip>
+          {debt ? (
+            <Chip compact selected testID={`driver-ruta-deuda-${item.id}`}>
+              {t('debtBadge')}
+            </Chip>
+          ) : null}
+        </View>
+      </View>
+    </Pressable>
+  )
+}
+
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    padding: 24,
-    gap: 12,
-  },
-  body: {
-    lineHeight: 22,
-  },
+  root: { flex: 1, padding: 16, gap: 8 },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 12 },
+  empty: { padding: 24, textAlign: 'center' },
+  row: { flexDirection: 'row', gap: 12, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth },
+  seq: { minWidth: 36, textAlign: 'center' },
+  rowBody: { flex: 1, gap: 4 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
 })
