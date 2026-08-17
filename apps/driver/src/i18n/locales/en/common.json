@@ -1,0 +1,35 @@
+{
+  "loading": "Loading",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "errorOffline": "No network connection. Check your signal and retry.",
+  "errorForbidden": "You do not have permission for this action.",
+  "errorNotFound": "Not found.",
+  "tabs": {
+    "ruta": "Route",
+    "cobros": "Collections",
+    "perfil": "Profile"
+  },
+  "perfil": {
+    "title": "Profile",
+    "username": "Username",
+    "role": "Role"
+  },
+  "logout": "Sign out",
+  "login": {
+    "title": "BizCode Driver",
+    "tenant": "Tenant",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "mfaHint": "This account requires MFA. Complete setup in the web app and try again.",
+    "failed": "Could not sign in. Check tenant, username and password.",
+    "roleDenied": "Access is limited to drivers."
+  },
+  "accessDenied": {
+    "title": "Access denied",
+    "body": "Your role cannot use the Driver app.",
+    "back": "Back to login"
+  }
+}

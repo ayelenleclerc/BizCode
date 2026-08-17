@@ -1,0 +1,13 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@bizcode/types": ["../../packages/types/src/index.ts"],
+      "@bizcode/api-client": ["../../packages/api-client/src/index.ts"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", ".expo/types/**/*.ts", "expo-env.d.ts"]
+}

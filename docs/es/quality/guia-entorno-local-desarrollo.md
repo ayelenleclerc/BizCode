@@ -11,6 +11,7 @@ BizCode usa **pnpm workspaces** y **Turborepo** (#154):
 | `apps/web/` | Frontend React + Vite |
 | `apps/server/` | API Express |
 | `apps/seller/` | Expo (React Native) App Vendedor — ventas en campo (#167–#172) |
+| `apps/driver/` | Expo (React Native) App Repartidor — entregas (#159–#166) |
 
 | `packages/types/` | Tipos TypeScript y contratos RBAC compartidos |
 | `packages/api-client/` | Cliente HTTP de la API |
@@ -128,6 +129,36 @@ URL de privacidad: `{PUBLIC_WEB_ORIGIN}/privacidad` (página pública #195; el o
 
 **Nota:** `@bizcode/ui` (#157) está fuera de alcance de #167/#168; no bloquear type-check ni login por ese paquete.
 
+### App Repartidor (`apps/driver`, #159)
+
+App Expo SDK con Expo Router (mismo stack que Seller). Auth en modo **Bearer dual** con tokens en **expo-secure-store** y `Authorization: Bearer` más `x-bizcode-channel: field`.
+
+Rol permitido: solo **`driver`**. Otros roles ven pantalla de acceso denegado.
+
+Pestañas (stubs hasta #160/#162): **Ruta | Cobros | Perfil**. Lista/detalle de ruta y cobros son placeholders; push (#165), offline (#164) y EAS (#166) quedan fuera de #159. Sin migración Prisma.
+
+```bash
+# Terminal 1 — API
+pnpm run server
+
+# Terminal 2 — Expo
+pnpm --filter @bizcode/driver start
+```
+
+Env opcional:
+
+- `EXPO_PUBLIC_API_BASE_URL` — por defecto `http://localhost:3001/api`
+
+Type-check:
+
+```bash
+pnpm --filter @bizcode/driver type-check
+```
+
+**Smoke manual:** crear o asignar un usuario con rol `driver` en el tenant local (Postgres Docker `:5432`). Cuentas seller/manager/owner deben caer en access-denied.
+
+**Nota API para #160:** aún no existe `GET /api/repartos/mi-reparto`; las rutas repartos actuales exigen `logistics.read` mientras `driver` solo tiene `orders.deliver.confirm` — #160 debe agregar endpoint acotado o ampliar RBAC.
+
 ## Requisitos
 
 - **Node.js** ≥ 22 (`package.json` `engines`, [`.nvmrc`](../../../.nvmrc))
@@ -194,6 +225,7 @@ npx prisma db seed
 | `pnpm run server` | Solo API (`http://localhost:3001`) |
 | `pnpm run dev:vite` | Solo Vite (`http://localhost:5173`) |
 | `pnpm --filter @bizcode/seller start` | Expo App Vendedor (Expo Go / simulador) |
+| `pnpm --filter @bizcode/driver start` | Expo App Repartidor (Expo Go / simulador) |
 | `pnpm run dev` | Tauri (requiere Rust) |
 
 Swagger UI con API en marcha: `http://localhost:3001/api-docs/`.

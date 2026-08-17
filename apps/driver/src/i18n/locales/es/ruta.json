@@ -1,0 +1,8 @@
+{
+  "stub": {
+    "listTitle": "Paradas del día",
+    "listBody": "Tu ruta de reparto aparecerá acá (#160).",
+    "detailTitle": "Detalle de parada",
+    "detailBody": "El detalle de la parada {{id}} se implementará en #160."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "stub": {
+    "listTitle": "Today's stops",
+    "listBody": "Your delivery route will appear here (#160).",
+    "detailTitle": "Stop detail",
+    "detailBody": "Stop {{id}} details will be implemented in #160."
+  }
+}

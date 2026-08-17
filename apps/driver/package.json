@@ -1,0 +1,47 @@
+{
+  "name": "@bizcode/driver",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "type-check": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint app src --ext .ts,.tsx --max-warnings 0",
+    "eas:build:production": "pnpm dlx eas-cli@16 build --profile production --non-interactive",
+    "eas:build:internal": "pnpm dlx eas-cli@16 build --profile internal --non-interactive",
+    "eas:update": "pnpm dlx eas-cli@16 update --channel production --non-interactive"
+  },
+  "turbo": {
+    "type-check": {
+      "outputs": []
+    }
+  },
+  "dependencies": {
+    "@bizcode/api-client": "workspace:*",
+    "@bizcode/types": "workspace:*",
+    "@expo/vector-icons": "^15.1.1",
+    "expo": "~57.0.11",
+    "expo-constants": "~57.0.9",
+    "expo-linking": "~57.0.5",
+    "expo-localization": "~17.0.8",
+    "expo-router": "~57.0.11",
+    "expo-secure-store": "~57.0.1",
+    "expo-status-bar": "~57.0.1",
+    "expo-updates": "~29.0.16",
+    "i18next": "^26.0.3",
+    "react": "19.2.3",
+    "react-i18next": "^17.0.2",
+    "react-native": "0.86.2",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-paper": "^5.15.3",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.2"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2"
+  }
+}
