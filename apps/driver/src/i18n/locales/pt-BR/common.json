@@ -1,0 +1,35 @@
+{
+  "loading": "Carregando",
+  "retry": "Tentar novamente",
+  "cancel": "Cancelar",
+  "errorGeneric": "Ocorreu um erro. Tente novamente.",
+  "errorOffline": "Sem conexão. Verifique o sinal e tente novamente.",
+  "errorForbidden": "Você não tem permissão para esta ação.",
+  "errorNotFound": "Não encontrado.",
+  "tabs": {
+    "ruta": "Rota",
+    "cobros": "Cobranças",
+    "perfil": "Perfil"
+  },
+  "perfil": {
+    "title": "Perfil",
+    "username": "Usuário",
+    "role": "Função"
+  },
+  "logout": "Sair",
+  "login": {
+    "title": "BizCode Entregador",
+    "tenant": "Tenant",
+    "username": "Usuário",
+    "password": "Senha",
+    "submit": "Entrar",
+    "mfaHint": "Esta conta exige MFA. Conclua no app web e tente novamente.",
+    "failed": "Não foi possível entrar. Verifique tenant, usuário e senha.",
+    "roleDenied": "Acesso apenas para entregadores."
+  },
+  "accessDenied": {
+    "title": "Acesso negado",
+    "body": "Seu perfil não pode usar o App Entregador.",
+    "back": "Voltar ao login"
+  }
+}

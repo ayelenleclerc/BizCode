@@ -1,0 +1,35 @@
+{
+  "loading": "Cargando",
+  "retry": "Reintentar",
+  "cancel": "Cancelar",
+  "errorGeneric": "Ocurrió un error. Intentá de nuevo.",
+  "errorOffline": "Sin conexión. Revisá la señal e intentá de nuevo.",
+  "errorForbidden": "No tenés permiso para esta acción.",
+  "errorNotFound": "No encontrado.",
+  "tabs": {
+    "ruta": "Ruta",
+    "cobros": "Cobros",
+    "perfil": "Perfil"
+  },
+  "perfil": {
+    "title": "Perfil",
+    "username": "Usuario",
+    "role": "Rol"
+  },
+  "logout": "Cerrar sesión",
+  "login": {
+    "title": "BizCode Repartidor",
+    "tenant": "Tenant",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "submit": "Ingresar",
+    "mfaHint": "Esta cuenta requiere MFA. Completá el flujo en la app web y volvé a intentar.",
+    "failed": "No se pudo iniciar sesión. Verificá tenant, usuario y contraseña.",
+    "roleDenied": "Acceso solo para repartidores."
+  },
+  "accessDenied": {
+    "title": "Acceso denegado",
+    "body": "Tu rol no puede usar la App Repartidor.",
+    "back": "Volver al login"
+  }
+}
