@@ -1,6 +1,51 @@
 {
-  "stub": {
-    "title": "Cobranças do dia",
-    "body": "As cobranças na entrega serão registradas aqui (#162)."
-  }
+  "title": "Cobrar",
+  "empty": {
+    "title": "Escolha um cliente da rota",
+    "body": "Abra uma parada com dívida e toque em Cobrar.",
+    "goRoute": "Ir para a rota"
+  },
+  "notFound": "Este cliente não está na sua rota de hoje.",
+  "loadError": "Não foi possível carregar a cobrança.",
+  "headerCliente": "Cliente",
+  "saldo": "Saldo {{saldo}}",
+  "invoices": "Faturas em aberto",
+  "invoiceLabel": "{{ref}} pendente {{pendiente}}",
+  "noInvoices": "Não há faturas em aberto. O valor continua editável.",
+  "amount": "Valor",
+  "forma": "Forma de pagamento",
+  "referencia": "Referência",
+  "nota": "Observações",
+  "cheque": {
+    "banco": "Banco",
+    "numero": "Número do cheque",
+    "vencimiento": "Vencimento",
+    "required": "Preencha banco, número e vencimento do cheque."
+  },
+  "transfer": {
+    "title": "Dados para transferência",
+    "banco": "Banco {{banco}}",
+    "cbu": "CBU {{cbu}}",
+    "alias": "Alias {{alias}}",
+    "missing": "Não há conta bancária ativa da empresa. Peça o CBU ao depósito."
+  },
+  "submit": "Registrar cobrança",
+  "submitting": "Registrando",
+  "success": "Cobrança registrada. Nº {{numero}}",
+  "overSaldo": {
+    "title": "Valor maior que o saldo",
+    "body": "O valor {{monto}} supera o saldo {{saldo}}. Confirmar a cobrança?",
+    "confirm": "Cobrar mesmo assim"
+  },
+  "whatsapp": {
+    "label": "Mensagem do recibo",
+    "send": "Enviar pelo WhatsApp",
+    "share": "Compartilhar",
+    "noPhone": "O cliente não tem telefone para WhatsApp.",
+    "template": "{{empresa}}\n{{cliente}}\n{{fecha}}\n{{importe}}\n{{forma}}\nNº {{numero}}"
+  },
+  "empresaName": "BizCode",
+  "error": "Não foi possível registrar a cobrança.",
+  "forbidden": "Você não tem permissão para cobrar.",
+  "offline": "Sem conexão. Verifique o sinal e tente novamente."
 }

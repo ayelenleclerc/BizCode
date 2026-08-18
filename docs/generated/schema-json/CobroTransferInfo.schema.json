@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "alias": {
+      "nullable": true,
+      "type": "string"
+    },
+    "banco": {
+      "type": "string"
+    },
+    "cbu": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "banco",
+    "cbu"
+  ],
+  "title": "CobroTransferInfo",
+  "type": "object"
+}

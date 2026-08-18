@@ -103,10 +103,12 @@ jobs:
           echo "TypeDoc footer patch OK"
 
       - name: Verify generated docs match committed files
+        id: docs_drift
         run: |
           set -euo pipefail
 
           # Deterministic drift check for generated docs and OpenAPI markdown.
+          git diff --stat -- docs/generated docs/api/openapi-reference.generated.md
           git diff --exit-code -- docs/generated docs/api/openapi-reference.generated.md
 
           # SBOM includes volatile fields (serialNumber/timestamp) that change every run.
@@ -157,6 +159,16 @@ jobs:
             process.exit(1)
           }
           NODE
+
+      - name: Upload generated docs on drift
+        if: failure() && steps.docs_drift.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-docs-linux
+          path: |
+            docs/generated
+            docs/api/openapi-reference.generated.md
+          retention-days: 3
 
       - name: ESLint (jsx-a11y y TypeScript — cero advertencias)
         run: pnpm exec turbo run lint

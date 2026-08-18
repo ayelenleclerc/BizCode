@@ -1,6 +1,51 @@
 {
-  "stub": {
-    "title": "Today's collections",
-    "body": "Delivery collections will be recorded here (#162)."
-  }
+  "title": "Collect",
+  "empty": {
+    "title": "Pick a customer from the route",
+    "body": "Open a stop with debt and tap Collect.",
+    "goRoute": "Go to route"
+  },
+  "notFound": "This customer is not on your route today.",
+  "loadError": "Could not load the collection form.",
+  "headerCliente": "Customer",
+  "saldo": "Balance {{saldo}}",
+  "invoices": "Open invoices",
+  "invoiceLabel": "{{ref}} outstanding {{pendiente}}",
+  "noInvoices": "No open invoices. You can still edit the amount.",
+  "amount": "Amount",
+  "forma": "Payment method",
+  "referencia": "Reference",
+  "nota": "Notes",
+  "cheque": {
+    "banco": "Bank",
+    "numero": "Cheque number",
+    "vencimiento": "Due date",
+    "required": "Fill in bank, number and due date for the cheque."
+  },
+  "transfer": {
+    "title": "Transfer details",
+    "banco": "Bank {{banco}}",
+    "cbu": "CBU {{cbu}}",
+    "alias": "Alias {{alias}}",
+    "missing": "The company has no active bank account. Ask the warehouse for the CBU."
+  },
+  "submit": "Record collection",
+  "submitting": "Saving",
+  "success": "Collection recorded. No. {{numero}}",
+  "overSaldo": {
+    "title": "Amount greater than balance",
+    "body": "Amount {{monto}} is greater than balance {{saldo}}. Confirm this collection?",
+    "confirm": "Collect anyway"
+  },
+  "whatsapp": {
+    "label": "Receipt message",
+    "send": "Send via WhatsApp",
+    "share": "Share",
+    "noPhone": "This customer has no phone number for WhatsApp.",
+    "template": "{{empresa}}\n{{cliente}}\n{{fecha}}\n{{importe}}\n{{forma}}\nNo. {{numero}}"
+  },
+  "empresaName": "BizCode",
+  "error": "Could not record the collection.",
+  "forbidden": "You do not have permission to collect.",
+  "offline": "No network connection. Check your signal and retry."
 }

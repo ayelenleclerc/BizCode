@@ -2,6 +2,7 @@
   "loading": "Carregando",
   "retry": "Tentar novamente",
   "cancel": "Cancelar",
+  "confirm": "Confirmar",
   "errorGeneric": "Ocorreu um erro. Tente novamente.",
   "errorOffline": "Sem conexão. Verifique o sinal e tente novamente.",
   "errorForbidden": "Você não tem permissão para esta ação.",

@@ -35,6 +35,10 @@ On success the customer balance decreases by the payment amount. If the customer
 | Missing permission | Control hidden or API 403 |
 | Invalid amount | Validation before submit |
 
+## App Driver collections (#162)
+
+Drivers do **not** receive `sales.create`. From App Driver, **Collect** on a route stop opens `/cobros?clienteId=` and calls the same `POST /api/cobros` with `orders.deliver.confirm`, header `x-bizcode-channel: field`, and a customer on today's `mi-reparto`. Invoice checkboxes only set the default amount (no ReciboCobro imputation). WhatsApp is a local `wa.me` link with editable text (no Twilio, no PDF). The payment appears in this web list immediately (`reports.operational.read`).
+
 ## API reference
 
 Contract: [`docs/api/openapi.yaml`](../../api/openapi.yaml) — tag `cobros`. Swagger UI: `/api-docs` when the API is running.

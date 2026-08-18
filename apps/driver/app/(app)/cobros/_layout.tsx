@@ -6,7 +6,7 @@ export default function CobrosLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ title: t('stub.title') }} />
+      <Stack.Screen name="index" options={{ title: t('title') }} />
     </Stack>
   )
 }

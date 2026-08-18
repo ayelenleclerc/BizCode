@@ -2,6 +2,7 @@
   "loading": "Loading",
   "retry": "Retry",
   "cancel": "Cancel",
+  "confirm": "Confirm",
   "errorGeneric": "Something went wrong. Please try again.",
   "errorOffline": "No network connection. Check your signal and retry.",
   "errorForbidden": "You do not have permission for this action.",

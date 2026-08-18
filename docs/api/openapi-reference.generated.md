@@ -51142,7 +51142,7 @@ Requires module `catalog.variants`.
 - **Path:** `/api/cobros`
 - **Tags:** cobros
 
-Decrements `Cliente.balance` by bruto (`monto` neto + sum of `retenciones[]` when present) in the same transaction (#229). When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15. No score change when there is no active invoice (on-account payment). Audit metadata includes `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
+Decrements `Cliente.balance` by bruto (`monto` neto + sum of `retenciones[]` when present) in the same transaction (#229). When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15. No score change when there is no active invoice (on-account payment). Audit metadata includes `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create` **or** `orders.deliver.confirm` (#162). Actors without `sales.create` (App Driver) must send `x-bizcode-channel: field`, may not include `retenciones`, and `clienteId` must be a stop on the driver's `GET /api/repartos/mi-reparto` route for today (`on_route` preferred, else latest `planned`). Otherwise `422` with `CLIENTE_NOT_ON_ROUTE` or `DRIVER_RETENCIONES_NOT_ALLOWED`, or `403` `FIELD_CHANNEL_REQUIRED`. Actors with `sales.create` keep the previous unscoped behaviour.
 
 #### Request Body
 
@@ -51544,7 +51544,122 @@ Decrements `Cliente.balance` by bruto (`monto` neto + sum of `retenciones[]` whe
 }
 ```
 
-##### Status: 422 Client suspended or inactive
+##### Status: 422 Client suspended/inactive, App Driver customer not on today's route (\`CLIENTE\_NOT\_ON\_ROUTE\`), or driver sent \`retenciones\` (\`DRIVER\_RETENCIONES\_NOT\_ALLOWED\`).
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/cobros/transfer-info
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/cobros/transfer-info`
+
+### Tenant bank CBU/alias for App Driver transfer collection
+
+- **Method:** `GET`
+- **Path:** `/api/cobros/transfer-info`
+- **Tags:** cobros
+
+Returns `{ banco, cbu, alias }` from the first active `CuentaBancaria` of the tenant, or `data: null` when none exists. Requires `orders.deliver.confirm` and `x-bizcode-channel: field`. Does not list movements and does not require `finance.bank_reconcile` (#162).
+
+#### Responses
+
+##### Status: 200 Transfer destination or null
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`cbu` (required)**
+
+    `string`
+
+  - **`alias`**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "banco": "",
+    "cbu": "",
+    "alias": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
 
 ###### Content-Type: application/json
 
@@ -64783,6 +64898,8 @@ Returns the stored PDF/image bytes. Requires `finance.ledger`, `logistics.purcha
 - **Path:** `/api/formas-pago`
 - **Tags:** formasPago
 
+Requires `sales.create` or `orders.deliver.confirm` (#162). PATCH remains `sales.create` only.
+
 #### Responses
 
 ##### Status: 200 List of payment methods
@@ -64834,6 +64951,48 @@ Returns the stored PDF/image bytes. Requires `finance.ledger`, `logistics.purcha
       "additionalProperty": "anything"
     }
   ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
 }
 ```
 
@@ -130964,6 +131123,69 @@ Originating invoice header (selected columns)
     "vto_dias": 1,
     "esEfectivo": true,
     "additionalProperty": "anything"
+  }
+}
+```
+
+### CobroTransferInfo
+
+- **Type:**`object`
+
+* **`banco` (required)**
+
+  `string`
+
+* **`cbu` (required)**
+
+  `string`
+
+* **`alias`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "banco": "",
+  "cbu": "",
+  "alias": ""
+}
+```
+
+### CobroTransferInfoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`banco` (required)**
+
+    `string`
+
+  - **`cbu` (required)**
+
+    `string`
+
+  - **`alias`**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "banco": "",
+    "cbu": "",
+    "alias": ""
   }
 }
 ```

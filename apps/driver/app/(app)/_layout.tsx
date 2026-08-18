@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, View } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthContext'
+import { RutaProvider } from '../../src/ruta/RutaContext'
 
 export default function AppLayout() {
   const { t } = useTranslation('common')
@@ -41,14 +42,16 @@ export default function AppLayout() {
   )
 
   return (
-    <Tabs
-      screenOptions={{
-        headerRight: logoutButton,
-      }}
-    >
-      <Tabs.Screen name="ruta" options={{ title: t('tabs.ruta') }} />
-      <Tabs.Screen name="cobros" options={{ title: t('tabs.cobros') }} />
-      <Tabs.Screen name="perfil" options={{ title: t('tabs.perfil') }} />
-    </Tabs>
+    <RutaProvider>
+      <Tabs
+        screenOptions={{
+          headerRight: logoutButton,
+        }}
+      >
+        <Tabs.Screen name="ruta" options={{ title: t('tabs.ruta') }} />
+        <Tabs.Screen name="cobros" options={{ title: t('tabs.cobros') }} />
+        <Tabs.Screen name="perfil" options={{ title: t('tabs.perfil') }} />
+      </Tabs>
+    </RutaProvider>
   )
 }

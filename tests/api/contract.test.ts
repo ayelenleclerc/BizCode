@@ -904,6 +904,9 @@ function buildPrisma(): PrismaClient {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
     },
+    cuentaBancaria: {
+      findFirst: vi.fn().mockResolvedValue(null),
+    },
     remito: {
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn().mockResolvedValue([
@@ -2208,6 +2211,16 @@ describe('API — contrato OpenAPI', () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/cobros/1/retenciones').expect(200)
     await assertMatchesOpenApi('/api/cobros/{id}/retenciones', 'get', '200', res.body)
+  })
+
+  it('GET /api/cobros/transfer-info', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/cobros/transfer-info')
+      .set('x-bizcode-channel', 'field')
+      .expect(200)
+    await assertMatchesOpenApi('/api/cobros/transfer-info', 'get', '200', res.body)
+    expect(res.body).toEqual({ success: true, data: null })
   })
 
   it('GET /api/fiscal/retenciones/export returns text/plain', async () => {
@@ -3696,6 +3709,16 @@ describe('API — errores 500 (cobertura de ramas catch)', () => {
     vi.mocked(p.formaPago.findMany).mockRejectedValueOnce(err)
     const res = await request(createApp(p)).get('/api/formas-pago').expect(500)
     await assertMatchesOpenApi('/api/formas-pago', 'get', '500', res.body)
+  })
+
+  it('GET /api/cobros/transfer-info', async () => {
+    const p = buildPrisma()
+    vi.mocked(p.cuentaBancaria.findFirst).mockRejectedValueOnce(err)
+    const res = await request(createApp(p))
+      .get('/api/cobros/transfer-info')
+      .set('x-bizcode-channel', 'field')
+      .expect(500)
+    await assertMatchesOpenApi('/api/cobros/transfer-info', 'get', '500', res.body)
   })
 
   it('GET /api/facturas', async () => {

@@ -1010,24 +1010,7 @@ export const proveedoresAPI = {
 
 // ============ FORMAS DE PAGO ============
 
-export const formasPagoAPI = {
-  list: async () => {
-    try {
-      const response = await api.get('/formas-pago')
-      return response.data.data
-    } catch (error) {
-      handleError(error as AxiosError<ApiErrorPayload>)
-    }
-  },
-  patch: async (id: number, body: { esEfectivo: boolean }) => {
-    try {
-      const response = await api.patch(`/formas-pago/${id}`, body)
-      return response.data.data
-    } catch (error) {
-      handleError(error as AxiosError<ApiErrorPayload>)
-    }
-  },
-}
+export { createFormasPagoAPI, formasPagoAPI, type FormaPagoDTO } from './formasPago'
 
 // ============ REPORTES ============
 

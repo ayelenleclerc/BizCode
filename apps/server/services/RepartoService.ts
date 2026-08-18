@@ -263,12 +263,7 @@ export class RepartoService {
     return this.withDebtSnapshot(withProgress(row))
   }
 
-  /**
-   * @en Driver's own route for a calendar day: prefer `on_route`, else latest `planned` (#160).
-   * @es Ruta del chofer en un día: prioriza `on_route`; si no, el `planned` más reciente (#160).
-   * @pt-BR Rota do motorista no dia: prefere `on_route`; senão o `planned` mais recente (#160).
-   */
-  async getMine(tenantId: number, choferId: number, fecha: Date): Promise<RepartoListRow | null> {
+  private async findMineRow(tenantId: number, choferId: number, fecha: Date): Promise<RepartoRow | null> {
     const { start, end } = dayBounds(fecha)
     const dateWhere = { tenantId, choferId, fecha: { gte: start, lte: end } }
     const onRoute = await this.prisma.reparto.findFirst({
@@ -276,15 +271,36 @@ export class RepartoService {
       include: repartoInclude,
       orderBy: { id: 'desc' },
     })
-    const row =
+    return (
       onRoute ??
       (await this.prisma.reparto.findFirst({
         where: { ...dateWhere, estado: 'planned' },
         include: repartoInclude,
         orderBy: { id: 'desc' },
       }))
+    )
+  }
+
+  /**
+   * @en Driver's own route for a calendar day: prefer `on_route`, else latest `planned` (#160).
+   * @es Ruta del chofer en un día: prioriza `on_route`; si no, el `planned` más reciente (#160).
+   * @pt-BR Rota do motorista no dia: prefere `on_route`; senão o `planned` mais recente (#160).
+   */
+  async getMine(tenantId: number, choferId: number, fecha: Date): Promise<RepartoListRow | null> {
+    const row = await this.findMineRow(tenantId, choferId, fecha)
     if (!row) return null
     return this.withDebtSnapshot(withProgress(row))
+  }
+
+  /**
+   * @en True when `clienteId` is a stop on the driver's `getMine` route for that day (#162).
+   * @es True si `clienteId` es una parada de la ruta `getMine` del chofer ese día (#162).
+   * @pt-BR True se `clienteId` é uma parada da rota `getMine` do motorista nesse dia (#162).
+   */
+  async clienteOnMine(tenantId: number, choferId: number, clienteId: number, fecha: Date): Promise<boolean> {
+    const row = await this.findMineRow(tenantId, choferId, fecha)
+    if (!row) return false
+    return row.items.some((item) => item.ordenEntrega.clienteId === clienteId)
   }
 
   private async withDebtSnapshot(reparto: RepartoListRow): Promise<RepartoListRow> {
