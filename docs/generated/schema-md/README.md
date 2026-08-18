@@ -194,6 +194,10 @@
 
 * [CobroRetencion](./cobroretencion.md) – `-`
 
+* [CobroTransferInfo](./cobrotransferinfo.md) – `-`
+
+* [CobroTransferInfoEnvelope](./cobrotransferinfoenvelope.md) – `-`
+
 * [ComisionRankingEnvelope](./comisionrankingenvelope.md) – `-`
 
 * [ComisionRankingRow](./comisionrankingrow.md) – `-`
@@ -1487,6 +1491,8 @@
 * [Untitled object in CobroCreateData](./cobrocreatedata-properties-updatedcliente.md) – `undefined#/properties/updatedCliente`
 
 * [Untitled object in CobroListEnvelope](./cobrolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in CobroTransferInfoEnvelope](./cobrotransferinfoenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in ConciliacionSummary](./conciliacionsummary-properties-opencandidates.md) – `undefined#/properties/openCandidates`
 
