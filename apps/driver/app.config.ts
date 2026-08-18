@@ -19,7 +19,18 @@ const config = {
   runtimeVersion: {
     policy: 'appVersion',
   },
-  plugins: ['expo-router', 'expo-secure-store', 'expo-updates'],
+  plugins: [
+    'expo-router',
+    'expo-secure-store',
+    'expo-updates',
+    [
+      'expo-image-picker',
+      {
+        cameraPermission: 'Allow BizCode Driver to take a photo for proof of delivery.',
+        photosPermission: 'Allow BizCode Driver to choose a photo for proof of delivery.',
+      },
+    ],
+  ],
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.bizcode.driver',

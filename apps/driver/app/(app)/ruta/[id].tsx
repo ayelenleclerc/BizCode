@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Linking, ScrollView, StyleSheet, View } from 'react-native'
 import { Button, Dialog, HelperText, List, Portal, RadioButton, Text, Title } from 'react-native-paper'
 import { useRuta } from '../../../src/ruta/RutaContext'
+import PodDeliveryWizard from '../../../src/ruta/pod/PodDeliveryWizard'
 import { digitsOnly, hasDebt, mapsUrl } from '../../../src/ruta/stopView'
 
 const MOTIVOS: MotivoNoEntrega[] = [
@@ -16,18 +17,19 @@ const MOTIVOS: MotivoNoEntrega[] = [
 ]
 
 /**
- * @en Stop detail: customer, lines, debt, native maps/dialer, not-delivered (#160).
- * @es Detalle de parada: cliente, renglones, deuda, mapas/llamada, no entrega (#160).
- * @pt-BR Detalhe da parada: cliente, linhas, dívida, mapas/ligação, não entrega (#160).
+ * @en Stop detail: customer, lines, debt, maps/dialer, POD deliver (#161), not-delivered (#160).
+ * @es Detalle de parada: cliente, renglones, deuda, mapas/llamada, POD entregar (#161), no entrega (#160).
+ * @pt-BR Detalhe da parada: cliente, linhas, dívida, mapas/ligação, POD entregar (#161), não entrega (#160).
  */
 export default function RutaDetailScreen() {
   const { t } = useTranslation(['ruta', 'common'])
   const router = useRouter()
   const { id } = useLocalSearchParams<{ id: string }>()
-  const { reparto, markNotDelivered } = useRuta()
+  const { reparto, markNotDelivered, markDelivered } = useRuta()
   const itemId = Number.parseInt(typeof id === 'string' ? id : '', 10)
   const item = reparto?.items.find((row) => row.id === itemId)
   const [motivoOpen, setMotivoOpen] = useState(false)
+  const [wizardOpen, setWizardOpen] = useState(false)
   const [motivo, setMotivo] = useState<MotivoNoEntrega>('ausente')
   const [saving, setSaving] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -122,12 +124,18 @@ export default function RutaDetailScreen() {
       {reparto?.estado === 'planned' ? <HelperText type="info" visible>{t('ruta:detail.plannedBlock')}</HelperText> : null}
       {actionError ? <HelperText type="error" visible>{actionError}</HelperText> : null}
 
-      <Button mode="contained" disabled testID="driver-ruta-entregar" accessibilityLabel={t('ruta:detail.deliver')}>
+      <Button
+        mode="contained"
+        testID="driver-ruta-entregar"
+        disabled={!canMutate || saving}
+        accessibilityLabel={t('ruta:detail.deliver')}
+        onPress={() => {
+          setActionError(null)
+          setWizardOpen(true)
+        }}
+      >
         {t('ruta:detail.deliver')}
       </Button>
-      <HelperText type="info" visible>
-        {t('ruta:detail.deliverHint')}
-      </HelperText>
 
       <Button
         mode="outlined"
@@ -149,6 +157,17 @@ export default function RutaDetailScreen() {
           {t('ruta:detail.collect')}
         </Button>
       ) : null}
+
+      <PodDeliveryWizard
+        visible={wizardOpen}
+        clienteName={cliente?.rsocial ?? '—'}
+        onClose={() => setWizardOpen(false)}
+        onSubmit={async (input) => {
+          await markDelivered(item.id, input)
+          setWizardOpen(false)
+          router.back()
+        }}
+      />
 
       <Portal>
         <Dialog visible={motivoOpen} onDismiss={() => setMotivoOpen(false)} testID="driver-ruta-motivo-dialog">

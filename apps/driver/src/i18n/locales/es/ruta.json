@@ -26,7 +26,6 @@
     "saldo": "Saldo {{saldo}}",
     "noDebt": "Sin saldo pendiente.",
     "deliver": "Entregar",
-    "deliverHint": "El comprobante de entrega (firma y foto) se agregará en una actualización posterior.",
     "notDelivered": "No pude entregar",
     "collect": "Cobrar",
     "motivoTitle": "Motivo de no entrega",
