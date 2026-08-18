@@ -26,7 +26,6 @@
     "saldo": "Balance {{saldo}}",
     "noDebt": "No outstanding balance.",
     "deliver": "Deliver",
-    "deliverHint": "Proof of delivery (signature and photo) will be added in a later update.",
     "notDelivered": "Could not deliver",
     "collect": "Collect payment",
     "motivoTitle": "Reason for non-delivery",

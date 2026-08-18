@@ -9,6 +9,7 @@ import {
 import type { MotivoNoEntrega, Reparto, RepartoItemRow } from '@bizcode/types'
 import { driverRepartosApi } from '../api/driverApi'
 import { mapApiErrorToUiState, type UiLoadState } from '../lib/apiErrors'
+import type { DeliveredPodFields } from './pod/podValidation'
 
 type RutaContextValue = {
   status: UiLoadState
@@ -17,6 +18,7 @@ type RutaContextValue = {
   load: () => Promise<void>
   patchItem: (itemId: number, next: RepartoItemRow) => void
   markNotDelivered: (itemId: number, motivo: MotivoNoEntrega) => Promise<void>
+  markDelivered: (itemId: number, input: DeliveredPodFields) => Promise<void>
 }
 
 const RutaContext = createContext<RutaContextValue | null>(null)
@@ -29,6 +31,11 @@ function todayYmd(): string {
   return `${y}-${m}-${day}`
 }
 
+/**
+ * @en Day-route state for App Driver: load mi-reparto, patch stops, POD deliver/not-delivered (#160/#161).
+ * @es Estado de ruta del día: carga mi-reparto, parches de parada, POD entregar/no entregar (#160/#161).
+ * @pt-BR Estado da rota do dia: carrega mi-reparto, patches de parada, POD entregar/não entregar (#160/#161).
+ */
 export function RutaProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<UiLoadState>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -78,9 +85,23 @@ export function RutaProvider({ children }: { children: ReactNode }) {
     [patchItem, reparto],
   )
 
+  const markDelivered = useCallback(
+    async (itemId: number, input: DeliveredPodFields) => {
+      if (!reparto) return
+      const updated = await driverRepartosApi.updateItemPod(reparto.id, itemId, {
+        outcome: 'delivered',
+        ...input,
+      })
+      if (updated) {
+        patchItem(itemId, updated)
+      }
+    },
+    [patchItem, reparto],
+  )
+
   const value = useMemo(
-    () => ({ status, error, reparto, load, patchItem, markNotDelivered }),
-    [status, error, reparto, load, patchItem, markNotDelivered],
+    () => ({ status, error, reparto, load, patchItem, markNotDelivered, markDelivered }),
+    [status, error, reparto, load, patchItem, markNotDelivered, markDelivered],
   )
 
   return <RutaContext.Provider value={value}>{children}</RutaContext.Provider>

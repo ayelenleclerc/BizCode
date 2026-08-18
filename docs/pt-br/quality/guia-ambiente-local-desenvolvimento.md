@@ -129,13 +129,15 @@ URL de privacidade: `{PUBLIC_WEB_ORIGIN}/privacidad` (página pública #195; o o
 
 **Nota:** `@bizcode/ui` (#157) está fora do escopo de #167/#168; não bloquear type-check nem login por esse pacote.
 
-### App Entregador (`apps/driver`, #159–#160)
+### App Entregador (`apps/driver`, #159–#161)
 
 App Expo SDK com Expo Router (mesmo stack do Seller). Auth em modo **Bearer dual** com tokens no **expo-secure-store** e `Authorization: Bearer` mais `x-bizcode-channel: field`.
 
 Papel permitido: apenas **`driver`**. Outros papéis veem tela de acesso negado.
 
-**Rota do dia (#160):** a aba `/ruta` carrega `GET /api/repartos/mi-reparto` (`orders.deliver.confirm` + módulo `logistics.dispatches`; `choferId` é sempre o usuário autenticado). Prefere o reparto `on_route` de hoje; senão o `planned` mais recente. A lista mostra sequência, cliente, endereço, qtde de itens, chips de status e badge de dívida. O detalhe abre mapas com `Linking` (sem API key do Google Static) e `tel:` para `Cliente.telef`. **Não consegui entregar** chama o `PUT /api/repartos/:id/items/:itemId` existente com `not_delivered` + motivo (a rota deve estar `on_route`). **Entregar** fica visível mas desabilitado até o POD (#161). **Cobrar** vai ao stub de cobranças (#162). Sem migration Prisma. `GET /api/repartos/:id` também permite o motorista atribuído.
+**Rota do dia (#160):** a aba `/ruta` carrega `GET /api/repartos/mi-reparto` (`orders.deliver.confirm` + módulo `logistics.dispatches`; `choferId` é sempre o usuário autenticado). Prefere o reparto `on_route` de hoje; senão o `planned` mais recente. A lista mostra sequência, cliente, endereço, qtde de itens, chips de status e badge de dívida. O detalhe abre mapas com `Linking` (sem API key do Google Static) e `tel:` para `Cliente.telef`. **Não consegui entregar** chama o `PUT /api/repartos/:id/items/:itemId` existente com `not_delivered` + motivo (a rota deve estar `on_route`). **Cobrar** vai ao stub de cobranças (#162). Sem migration Prisma. `GET /api/repartos/:id` também permite o motorista atribuído.
+
+**Comprovante de entrega (#161):** **Entregar** em uma parada `pending` de um reparto `on_route` abre um assistente de 4 passos (nome do receptor + documento/notas opcionais, tela de assinatura, foto opcional, resumo). Confirmar chama o mesmo `PUT /api/repartos/:id/items/:itemId` com `outcome: delivered`, `receptorNombre` e `firmaBase64` obrigatórios, `fotoBase64` opcional. A compressão do cliente alinha servidor/OpenAPI: assinatura **50 KB**, foto JPEG **200 KB**. Assinatura vazia desabilita confirmar. Erro de upload mantém os dados para nova tentativa. O sucesso atualiza a parada no `RutaContext` e volta à lista. Permissões de câmera e galeria via plugin `expo-image-picker`. Sem mudança Prisma/OpenAPI. O smoke local precisa de um reparto `on_route` de hoje para o usuário `driver` (criar na logística web + **Iniciar**).
 
 ```bash
 # Terminal 1 — API
