@@ -153,7 +153,7 @@ Para cobrar en mostrador (web) con Mercado Pago configurado (#174) y activo:
 4. La confirmación usa el mismo webhook que #176 (`external_reference` = `{tenantId}:{facturaId}`).
 5. Opcional en **Configuración → Empresa**: **ID de POS** (`externalPosId`) y **payload QR estático** (`staticQrData`); staff con `settings.business.manage` puede leer el QR estático vía `GET /api/configuracion/mercadopago/qr-estatico`.
 
-La extensión en App Repartidor queda para el issue #162 (cobros en entrega).
+El QR de Mercado Pago en App Repartidor sigue fuera de alcance después del issue #162 (los cobros en entrega usan `POST /api/cobros` y texto WhatsApp `wa.me`, no QR MP).
 
 ## Reconciliación de pagos Mercado Pago (#178)
 

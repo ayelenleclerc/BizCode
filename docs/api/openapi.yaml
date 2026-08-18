@@ -8428,7 +8428,11 @@ paths:
         When the customer has at least one active invoice (`estado: A`), adjusts `Cliente.score` from the oldest active invoice due date
         (`factura.fecha + creditDays`) vs payment date: on-time +5; 1–10 days late −3; 11–30 −7; >30 −15.
         No score change when there is no active invoice (on-account payment). Audit metadata includes
-        `scoreBefore`, `scoreAfter`, `delta`. Requires `sales.create`.
+        `scoreBefore`, `scoreAfter`, `delta`.
+        Requires `sales.create` **or** `orders.deliver.confirm` (#162). Actors without `sales.create` (App Driver) must send
+        `x-bizcode-channel: field`, may not include `retenciones`, and `clienteId` must be a stop on the driver's `GET /api/repartos/mi-reparto`
+        route for today (`on_route` preferred, else latest `planned`). Otherwise `422` with `CLIENTE_NOT_ON_ROUTE` or
+        `DRIVER_RETENCIONES_NOT_ALLOWED`, or `403` `FIELD_CHANNEL_REQUIRED`. Actors with `sales.create` keep the previous unscoped behaviour.
       requestBody:
         required: true
         content:
@@ -8449,11 +8453,37 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '422':
-          description: Client suspended or inactive
+          description: |
+            Client suspended/inactive, App Driver customer not on today's route (`CLIENTE_NOT_ON_ROUTE`),
+            or driver sent `retenciones` (`DRIVER_RETENCIONES_NOT_ALLOWED`).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/cobros/transfer-info:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [cobros]
+      summary: Tenant bank CBU/alias for App Driver transfer collection
+      description: |
+        Returns `{ banco, cbu, alias }` from the first active `CuentaBancaria` of the tenant, or `data: null` when none exists.
+        Requires `orders.deliver.confirm` and `x-bizcode-channel: field`. Does not list movements and does not require
+        `finance.bank_reconcile` (#162).
+      responses:
+        '200':
+          description: Transfer destination or null
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CobroTransferInfoEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -10834,6 +10864,8 @@ paths:
     get:
       tags: [formasPago]
       summary: List payment methods
+      description: |
+        Requires `sales.create` or `orders.deliver.confirm` (#162). PATCH remains `sales.create` only.
       responses:
         '200':
           description: List of payment methods
@@ -10841,6 +10873,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormaPagoListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -25534,6 +25570,38 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/FormaPago'
+
+    CobroTransferInfo:
+      type: object
+      required: [banco, cbu]
+      properties:
+        banco:
+          type: string
+        cbu:
+          type: string
+        alias:
+          type: string
+          nullable: true
+
+    CobroTransferInfoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          nullable: true
+          required: [banco, cbu]
+          properties:
+            banco:
+              type: string
+            cbu:
+              type: string
+            alias:
+              type: string
+              nullable: true
 
     Caja:
       type: object

@@ -347,3 +347,50 @@ describe('RepartoService.getMine (#160)', () => {
     expect(result).toBeNull()
   })
 })
+
+describe('RepartoService.clienteOnMine (#162)', () => {
+  it('returns true when clienteId is on the preferred on_route row', async () => {
+    const findFirst = vi.fn().mockResolvedValueOnce(repartoRow)
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst,
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    await expect(svc.clienteOnMine(1, 5, 1, new Date('2026-05-20'))).resolves.toBe(true)
+    expect(findFirst).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns false when the stop is not on the mine route', async () => {
+    const findFirst = vi.fn().mockResolvedValueOnce(repartoRow)
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst,
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    await expect(svc.clienteOnMine(1, 5, 99, new Date('2026-05-20'))).resolves.toBe(false)
+  })
+
+  it('returns false when the driver has no route', async () => {
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(null),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    await expect(svc.clienteOnMine(1, 5, 1, new Date('2026-05-20'))).resolves.toBe(false)
+  })
+})

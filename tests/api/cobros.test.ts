@@ -74,6 +74,7 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     articulo: { findMany: vi.fn().mockResolvedValue([]) },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
     formaPago: { findMany: vi.fn().mockResolvedValue([]), findUnique: vi.fn().mockResolvedValue({ id: 1 }) },
+    cuentaBancaria: { findFirst: vi.fn().mockResolvedValue(null) },
     factura: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
@@ -86,6 +87,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findFirst: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue(COBRO_RESULT),
       aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { monto: null } }),
+    },
+    reparto: {
+      findFirst: vi.fn().mockResolvedValue(null),
     },
     notification: {
       findMany: vi.fn().mockResolvedValue([]),
@@ -364,6 +368,190 @@ describe('POST /api/cobros', () => {
     const app = createApp(buildPrismaMock())
     await request(app).post('/api/cobros').send(COBRO_BODY).expect(403)
     delete process.env.BIZCODE_TEST_ROLE
+  })
+})
+
+const MINE_REPARTO = {
+  id: 1,
+  tenantId: 1,
+  choferId: 5,
+  estado: 'on_route',
+  fecha: new Date(),
+  chofer: { id: 5, username: 'driver1', role: 'driver' },
+  items: [
+    {
+      id: 10,
+      secuencia: 1,
+      estado: 'pending',
+      ordenEntrega: {
+        clienteId: 1,
+        cliente: {
+          id: 1,
+          codigo: 1001,
+          rsocial: 'ACME SA',
+          domicilio: null,
+          localidad: null,
+          telef: null,
+          latitud: null,
+          longitud: null,
+          balance: '1000.00',
+        },
+        zona: null,
+        factura: null,
+        items: [],
+      },
+    },
+  ],
+}
+
+function driverCreatePrisma() {
+  const clienteUpdate = vi.fn().mockResolvedValue({
+    id: 1,
+    rsocial: 'ACME SA',
+    balance: '749.50',
+    creditLimit: null,
+    score: 50,
+  })
+  const cobroCreate = vi.fn().mockResolvedValue(COBRO_RESULT)
+  const txPrisma = createCcTxLayer({
+    cliente: extendClientePrismaForCc({
+      findFirst: vi.fn().mockResolvedValue(CLIENTE_BASE),
+      update: clienteUpdate,
+    }),
+    cobro: { create: cobroCreate },
+  }) as unknown as PrismaClient
+  return buildPrismaMock({
+    reparto: { findFirst: vi.fn().mockResolvedValue(MINE_REPARTO) },
+    $transaction: vi.fn(async (fn: unknown) => {
+      if (typeof fn === 'function') return fn(txPrisma)
+      return fn
+    }),
+  })
+}
+
+describe('POST /api/cobros App Driver scope (#162)', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '5'
+  })
+
+  it('returns 403 without field channel', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).post('/api/cobros').send(COBRO_BODY).expect(403)
+    expect(res.body.error).toBe('FIELD_CHANNEL_REQUIRED')
+  })
+
+  it('returns 422 CLIENTE_NOT_ON_ROUTE when the customer is not on mi-reparto', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .post('/api/cobros')
+      .set('x-bizcode-channel', 'field')
+      .send(COBRO_BODY)
+      .expect(422)
+    expect(res.body.error).toBe('CLIENTE_NOT_ON_ROUTE')
+  })
+
+  it('returns 422 DRIVER_RETENCIONES_NOT_ALLOWED when the driver sends retenciones', async () => {
+    const prisma = buildPrismaMock({
+      reparto: { findFirst: vi.fn().mockResolvedValue(MINE_REPARTO) },
+    })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/cobros')
+      .set('x-bizcode-channel', 'field')
+      .send({
+        ...COBRO_BODY,
+        retenciones: [
+          { regimenId: 1, baseImponible: 100, alicuota: 3, importe: 3 },
+        ],
+      })
+      .expect(422)
+    expect(res.body.error).toBe('DRIVER_RETENCIONES_NOT_ALLOWED')
+  })
+
+  it('creates cobro when the customer is on the driver route and channel is field', async () => {
+    const prisma = driverCreatePrisma()
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/cobros')
+      .set('x-bizcode-channel', 'field')
+      .send(COBRO_BODY)
+      .expect(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.cobro.id).toBe(10)
+  })
+})
+
+describe('GET /api/cobros/transfer-info (#162)', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '5'
+  })
+
+  it('returns 403 without field channel', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/cobros/transfer-info').expect(403)
+    expect(res.body.error).toBe('FIELD_CHANNEL_REQUIRED')
+  })
+
+  it('returns 403 without orders.deliver.confirm', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'billing'
+    const app = createApp(buildPrismaMock())
+    await request(app).get('/api/cobros/transfer-info').set('x-bizcode-channel', 'field').expect(403)
+  })
+
+  it('returns data null when the tenant has no active bank account', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .get('/api/cobros/transfer-info')
+      .set('x-bizcode-channel', 'field')
+      .expect(200)
+    expect(res.body).toEqual({ success: true, data: null })
+  })
+
+  it('returns banco/cbu/alias of the first active account', async () => {
+    const prisma = buildPrismaMock({
+      cuentaBancaria: {
+        findFirst: vi.fn().mockResolvedValue({ banco: 'Galicia', cbu: '1234567890123456789012', alias: 'biz.gal' }),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app)
+      .get('/api/cobros/transfer-info')
+      .set('x-bizcode-channel', 'field')
+      .expect(200)
+    expect(res.body.data).toEqual({ banco: 'Galicia', cbu: '1234567890123456789012', alias: 'biz.gal' })
+  })
+})
+
+describe('GET /api/formas-pago App Driver (#162)', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test'
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+  })
+
+  it('lists formas de pago with orders.deliver.confirm', async () => {
+    const prisma = buildPrismaMock({
+      formaPago: {
+        findMany: vi.fn().mockResolvedValue([{ id: 1, codigo: 1, descripcion: 'Efectivo', esEfectivo: true }]),
+        findUnique: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/formas-pago').set('x-bizcode-channel', 'field').expect(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data).toHaveLength(1)
+  })
+
+  it('returns 403 for collections without sales.create or orders.deliver.confirm', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'collections'
+    const app = createApp(buildPrismaMock())
+    await request(app).get('/api/formas-pago').expect(403)
   })
 })
 

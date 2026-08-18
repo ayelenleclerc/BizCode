@@ -106,6 +106,12 @@ export type CobroCreateBody = {
   retenciones?: CobroRetencionInputDTO[]
 }
 
+export type CobroTransferInfo = {
+  banco: string
+  cbu: string
+  alias: string | null
+}
+
 export function createChequesAPI(http: AxiosInstance) {
   return {
     list: async (params?: {
@@ -252,6 +258,15 @@ export function createCobrosAPI(http: AxiosInstance) {
         }
       } catch (error) {
         handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    getTransferInfo: async (): Promise<CobroTransferInfo | null> => {
+      try {
+        const response = await http.get('/cobros/transfer-info')
+        return (response.data.data ?? null) as CobroTransferInfo | null
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
       }
     },
 

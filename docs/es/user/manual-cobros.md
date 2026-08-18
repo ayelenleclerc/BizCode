@@ -35,6 +35,10 @@ Si la operación es exitosa, el saldo del cliente disminuye por el importe del c
 | Sin permiso | Control oculto o API 403 |
 | Importe inválido | Validación antes de enviar |
 
+## Cobros App Repartidor (#162)
+
+El chofer **no** recibe `sales.create`. Desde App Driver, **Cobrar** en una parada abre `/cobros?clienteId=` y llama el mismo `POST /api/cobros` con `orders.deliver.confirm`, header `x-bizcode-channel: field` y un cliente de `mi-reparto` de hoy. Los checkboxes de facturas solo arman el monto default (sin imputación ReciboCobro). WhatsApp es un enlace local `wa.me` con texto editable (sin Twilio, sin PDF). El cobro aparece en este listado web de inmediato (`reports.operational.read`).
+
 ## Referencia API
 
 Contrato: [`docs/api/openapi.yaml`](../../api/openapi.yaml) — etiqueta `cobros`. Swagger UI: `/api-docs` cuando la API está en ejecución.

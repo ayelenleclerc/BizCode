@@ -1,17 +1,22 @@
 import type { Application, Request, Response } from 'express'
-import { requirePermission } from '../auth'
+import { requireAnyPermission, requirePermission } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { formaPagoPatchBodySchema } from '../schemas/domain'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage } from './restDomainShared'
 
 /**
- * @en Payment method lookup for sales flows.
+ * @en Payment method lookup for sales and App Driver collection (#162).
+ * @es Catálogo de formas de pago para ventas y cobro App Driver (#162).
+ * @pt-BR Catálogo de formas de pagamento para vendas e cobrança App Driver (#162).
  */
 export function registerFormasPagoRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma } = ctx
 
-  app.get('/api/formas-pago', requirePermission('sales.create'), async (_req: Request, res: Response) => {
+  app.get(
+    '/api/formas-pago',
+    requireAnyPermission('sales.create', 'orders.deliver.confirm'),
+    async (_req: Request, res: Response) => {
     try {
       const formas = await prisma.formaPago.findMany({
         orderBy: { codigo: 'asc' },

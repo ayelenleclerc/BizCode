@@ -86,7 +86,7 @@ function normalizeChannel(value: string): UserChannel | null {
   return USER_CHANNELS.includes(value as UserChannel) ? (value as UserChannel) : null
 }
 
-function getRequestedChannel(req: Request): UserChannel | null | 'invalid' {
+export function getRequestedChannel(req: Request): UserChannel | null | 'invalid' {
   const rawHeader = req.headers['x-bizcode-channel']
   if (!rawHeader) {
     return null

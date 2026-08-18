@@ -52,6 +52,10 @@ UI `/logistica/repartos` is gated by module **`logistics.dispatches`**. API: lis
 
 Module **`logistics.pod`**. Driver UI `/logistica/repartos/chofer` requires **`orders.deliver.confirm`** (role `driver` on own route). `PUT /api/repartos/{id}/items/{itemId}` uses the same permission; service enforces `choferId === actor.userId` for `driver`. `GET /api/repartos/{id}/items/{itemId}/pod` requires **`logistics.read`** and role ∈ `owner`, `manager`, `logistics_planner` (excludes `driver`).
 
+## App Driver collections at delivery (#162)
+
+`POST /api/cobros` and `GET /api/formas-pago` accept **`sales.create` or `orders.deliver.confirm`**. Role `driver` still has only `orders.deliver.confirm` in `ROLE_PERMISSIONS` (no `sales.create`). Actors without `sales.create` must send **`x-bizcode-channel: field`**, `clienteId` must be on the driver's `GET /api/repartos/mi-reparto` for today, and `retenciones` are rejected. `GET /api/cobros/transfer-info` requires **`orders.deliver.confirm` + field** and does not require `finance.bank_reconcile`. Web `GET /api/cobros` remains **`reports.operational.read`**. PATCH `/api/formas-pago/{id}` remains **`sales.create`** only.
+
 ## Logistics KPIs and reports (#145)
 
 Module **`logistics.dispatches`**. Endpoints `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`: **`logistics.read`**; roles `owner`, `manager`, `logistics_planner` (UI tab on `/logistica`; drivers excluded). CSV via `Accept: text/csv` on driver/zone reports.

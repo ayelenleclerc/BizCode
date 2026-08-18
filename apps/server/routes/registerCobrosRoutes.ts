@@ -1,9 +1,15 @@
 import type { Application, Request, Response } from 'express'
-import { requirePermission, type AuthenticatedRequest } from '../auth'
+import { hasPermission } from '@bizcode/types'
+import type { CobroInput } from '@bizcode/types'
+import {
+  getRequestedChannel,
+  requireAnyPermission,
+  requirePermission,
+  type AuthenticatedRequest,
+} from '../auth'
 import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
 import { cobroBodySchema } from '../schemas/domain'
-import type { CobroInput } from '@bizcode/types'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, facturaFechaToPrismaDate, getTenantId } from './restDomainShared'
@@ -22,13 +28,13 @@ function parseOptionalDateQuery(value: unknown): Date | undefined {
 }
 
 /**
- * @en Customer payment REST routes (`/api/cobros`).
- * @es Rutas REST de cobros de clientes (`/api/cobros`).
- * @pt-BR Rotas REST de recebimentos de clientes (`/api/cobros`).
+ * @en Customer payment REST routes (`/api/cobros`), including App Driver scoped POST (#162).
+ * @es Rutas REST de cobros de clientes (`/api/cobros`), incluido POST acotado App Driver (#162).
+ * @pt-BR Rotas REST de recebimentos de clientes (`/api/cobros`), incluindo POST restrito App Driver (#162).
  */
 export function registerCobrosRoutes(app: Application, ctx: RestRouteContext): void {
-  const { services, writeAudit } = ctx
-  const { cobro } = services
+  const { prisma, services, writeAudit } = ctx
+  const { cobro, repartos } = services
 
   app.get('/api/cobros', requirePermission('reports.operational.read'), async (req: Request, res: Response) => {
     try {
@@ -59,6 +65,33 @@ export function registerCobrosRoutes(app: Application, ctx: RestRouteContext): v
     }
   })
 
+  app.get(
+    '/api/cobros/transfer-info',
+    requirePermission('orders.deliver.confirm'),
+    async (req: Request, res: Response) => {
+      if (getRequestedChannel(req) !== 'field') {
+        res.status(403).json({ success: false, error: 'FIELD_CHANNEL_REQUIRED' })
+        return
+      }
+      try {
+        const tenantId = getTenantId(req)
+        const cuenta = await prisma.cuentaBancaria.findFirst({
+          where: { tenantId, activo: true },
+          orderBy: { id: 'asc' },
+          select: { banco: true, cbu: true, alias: true },
+        })
+        res.json({
+          success: true,
+          data: cuenta
+            ? { banco: cuenta.banco, cbu: cuenta.cbu, alias: cuenta.alias ?? null }
+            : null,
+        })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
   app.get('/api/cobros/:id', requirePermission('reports.operational.read'), async (req: Request, res: Response) => {
     try {
       const tenantId = getTenantId(req)
@@ -80,7 +113,7 @@ export function registerCobrosRoutes(app: Application, ctx: RestRouteContext): v
 
   app.post(
     '/api/cobros',
-    requirePermission('sales.create'),
+    requireAnyPermission('sales.create', 'orders.deliver.confirm'),
     validateBody(cobroBodySchema),
     async (req: Request, res: Response) => {
       const authReq = req as AuthenticatedRequest
@@ -91,6 +124,27 @@ export function registerCobrosRoutes(app: Application, ctx: RestRouteContext): v
       try {
         const tenantId = getTenantId(req)
         const parsedValue = req.body as CobroInput
+        const role = authReq.auth.claims.role
+        if (!hasPermission(role, 'sales.create')) {
+          if (getRequestedChannel(req) !== 'field') {
+            res.status(403).json({ success: false, error: 'FIELD_CHANNEL_REQUIRED' })
+            return
+          }
+          if (parsedValue.retenciones != null && parsedValue.retenciones.length > 0) {
+            res.status(422).json({ success: false, error: 'DRIVER_RETENCIONES_NOT_ALLOWED' })
+            return
+          }
+          const onMine = await repartos.clienteOnMine(
+            tenantId,
+            authReq.auth.claims.userId,
+            parsedValue.clienteId,
+            new Date(),
+          )
+          if (!onMine) {
+            res.status(422).json({ success: false, error: 'CLIENTE_NOT_ON_ROUTE' })
+            return
+          }
+        }
         const result = await cobro.create(tenantId, authReq.auth.claims.userId, parsedValue)
         if (!result.ok) {
           res.status(result.status).json({ success: false, error: result.error })

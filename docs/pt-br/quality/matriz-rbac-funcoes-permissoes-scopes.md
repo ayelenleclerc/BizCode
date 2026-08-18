@@ -52,6 +52,10 @@ A UI `/logistica/repartos` depende do módulo **`logistics.dispatches`**. API: l
 
 Módulo **`logistics.pod`**. UI motorista `/logistica/repartos/chofer` exige **`orders.deliver.confirm`** (papel `driver` na própria rota). `PUT /api/repartos/{id}/items/{itemId}` usa a mesma permissão; o serviço exige `choferId === actor.userId` para `driver`. `GET /api/repartos/{id}/items/{itemId}/pod` exige **`logistics.read`** e papel ∈ `owner`, `manager`, `logistics_planner` (exclui `driver`).
 
+## Cobranças na entrega App Entregador (#162)
+
+`POST /api/cobros` e `GET /api/formas-pago` aceitam **`sales.create` ou `orders.deliver.confirm`**. O papel `driver` continua só com `orders.deliver.confirm` em `ROLE_PERMISSIONS` (sem `sales.create`). Quem não tem `sales.create` deve enviar **`x-bizcode-channel: field`**, `clienteId` deve estar em `GET /api/repartos/mi-reparto` de hoje, e `retenciones` são recusadas. `GET /api/cobros/transfer-info` exige **`orders.deliver.confirm` + field** e não requer `finance.bank_reconcile`. O `GET /api/cobros` web segue com **`reports.operational.read`**. PATCH `/api/formas-pago/{id}` continua só **`sales.create`**.
+
 ## KPIs e relatórios logísticos (#145)
 
 Módulo **`logistics.dispatches`**. `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`: **`logistics.read`**; papéis `owner`, `manager`, `logistics_planner` (aba em `/logistica`; motorista excluído). CSV com `Accept: text/csv`.

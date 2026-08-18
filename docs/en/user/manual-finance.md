@@ -153,7 +153,7 @@ For counter (web app) collection with Mercado Pago configured (#174) and active:
 4. Payment confirmation uses the same webhook as #176 (`external_reference` = `{tenantId}:{facturaId}`).
 5. Optional **Settings → Company**: set **POS ID** (`externalPosId`) and **static QR payload** (`staticQrData`); staff with `settings.business.manage` can read the static QR via `GET /api/configuracion/mercadopago/qr-estatico`.
 
-App Repartidor QR collection is deferred until issue #162 (driver collections).
+App Driver Mercado Pago QR collection remains out of scope after issue #162 (delivery collections use `POST /api/cobros` with WhatsApp `wa.me` text, not MP QR).
 
 ## Mercado Pago payment reconciliation (#178)
 

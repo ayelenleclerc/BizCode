@@ -32,9 +32,9 @@ function todayYmd(): string {
 }
 
 /**
- * @en Day-route state for App Driver: load mi-reparto, patch stops, POD deliver/not-delivered (#160/#161).
- * @es Estado de ruta del día: carga mi-reparto, parches de parada, POD entregar/no entregar (#160/#161).
- * @pt-BR Estado da rota do dia: carrega mi-reparto, patches de parada, POD entregar/não entregar (#160/#161).
+ * @en Day-route state for App Driver: load mi-reparto, patch stops, POD deliver/not-delivered, collections (#160/#161/#162).
+ * @es Estado de ruta del día: carga mi-reparto, parches de parada, POD entregar/no entregar, cobros (#160/#161/#162).
+ * @pt-BR Estado da rota do dia: carrega mi-reparto, patches de parada, POD entregar/não entregar, cobranças (#160/#161/#162).
  */
 export function RutaProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<UiLoadState>('idle')

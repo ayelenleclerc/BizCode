@@ -1,6 +1,51 @@
 {
-  "stub": {
-    "title": "Cobros del día",
-    "body": "Los cobros en entrega se registrarán acá (#162)."
-  }
+  "title": "Cobrar",
+  "empty": {
+    "title": "Elegí un cliente de la ruta",
+    "body": "Abrí una parada con deuda y tocá Cobrar.",
+    "goRoute": "Ir a la ruta"
+  },
+  "notFound": "Este cliente no está en tu ruta de hoy.",
+  "loadError": "No se pudo cargar el cobro.",
+  "headerCliente": "Cliente",
+  "saldo": "Saldo {{saldo}}",
+  "invoices": "Facturas pendientes",
+  "invoiceLabel": "{{ref}} pendiente {{pendiente}}",
+  "noInvoices": "No hay facturas pendientes. El importe queda editable.",
+  "amount": "Importe",
+  "forma": "Forma de pago",
+  "referencia": "Referencia",
+  "nota": "Observaciones",
+  "cheque": {
+    "banco": "Banco",
+    "numero": "Número de cheque",
+    "vencimiento": "Vencimiento",
+    "required": "Completá banco, número y vencimiento del cheque."
+  },
+  "transfer": {
+    "title": "Datos para transferir",
+    "banco": "Banco {{banco}}",
+    "cbu": "CBU {{cbu}}",
+    "alias": "Alias {{alias}}",
+    "missing": "No hay cuenta bancaria activa de la empresa. Pedí el CBU al depósito."
+  },
+  "submit": "Registrar cobro",
+  "submitting": "Registrando",
+  "success": "Cobro registrado. Nº {{numero}}",
+  "overSaldo": {
+    "title": "Importe mayor al saldo",
+    "body": "El importe {{monto}} supera el saldo {{saldo}}. ¿Confirmás el cobro?",
+    "confirm": "Cobrar igual"
+  },
+  "whatsapp": {
+    "label": "Mensaje de recibo",
+    "send": "Enviar por WhatsApp",
+    "share": "Compartir",
+    "noPhone": "El cliente no tiene teléfono para WhatsApp.",
+    "template": "{{empresa}}\n{{cliente}}\n{{fecha}}\n{{importe}}\n{{forma}}\nNº {{numero}}"
+  },
+  "empresaName": "BizCode",
+  "error": "No se pudo registrar el cobro.",
+  "forbidden": "No tenés permiso para cobrar.",
+  "offline": "Sin conexión. Revisá la señal e intentá de nuevo."
 }

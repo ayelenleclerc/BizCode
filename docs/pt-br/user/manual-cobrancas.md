@@ -35,6 +35,10 @@ Em caso de sucesso, o saldo do cliente diminui pelo valor da cobrança. Se o cli
 | Sem permissão | Controle oculto ou API 403 |
 | Valor inválido | Validação antes do envio |
 
+## Cobranças App Entregador (#162)
+
+O motorista **não** recebe `sales.create`. No App Driver, **Cobrar** em uma parada abre `/cobros?clienteId=` e chama o mesmo `POST /api/cobros` com `orders.deliver.confirm`, header `x-bizcode-channel: field` e um cliente de `mi-reparto` de hoje. Os checkboxes de faturas só montam o valor padrão (sem imputação ReciboCobro). WhatsApp é um link local `wa.me` com texto editável (sem Twilio, sem PDF). A cobrança aparece nesta lista web na hora (`reports.operational.read`).
+
 ## Referência API
 
 Contrato: [`docs/api/openapi.yaml`](../../api/openapi.yaml) — tag `cobros`. Swagger UI: `/api-docs` com a API em execução.
