@@ -1,0 +1,26 @@
+{
+  "formTitle": "Register return",
+  "confirm": "Confirm return",
+  "qtyLabel": "Quantity (max {{max}})",
+  "detalle": "Notes (optional)",
+  "photoRequired": "A photo is required for damaged goods.",
+  "photoRequiredHint": "A photo of the damaged goods is required.",
+  "invalidQty": "Each line quantity must be greater than 0 and not exceed the invoice line.",
+  "saveError": "Could not register this return.",
+  "motivo": {
+    "rechazo": "Rejected",
+    "producto_dañado": "Damaged goods"
+  },
+  "rendicion": {
+    "title": "Return remittance",
+    "open": "Remit returns",
+    "empty": "No pending returns to remit.",
+    "confirm": "Confirm remittance",
+    "loadError": "Could not load returns.",
+    "saveError": "Could not remit returns.",
+    "loteRequired": "A lot is required for an article. Leave the return pending and ask the warehouse to assign the lot.",
+    "registered": "Pending remittance",
+    "remitted": "Remitted",
+    "success": "Remittance complete. Stock and credit notes were applied on the server."
+  }
+}

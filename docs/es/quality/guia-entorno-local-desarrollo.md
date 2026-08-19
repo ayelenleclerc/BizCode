@@ -129,7 +129,7 @@ URL de privacidad: `{PUBLIC_WEB_ORIGIN}/privacidad` (página pública #195; el o
 
 **Nota:** `@bizcode/ui` (#157) está fuera de alcance de #167/#168; no bloquear type-check ni login por ese paquete.
 
-### App Repartidor (`apps/driver`, #159–#162)
+### App Repartidor (`apps/driver`, #159–#163)
 
 App Expo SDK con Expo Router (mismo stack que Seller). Auth en modo **Bearer dual** con tokens en **expo-secure-store** y `Authorization: Bearer` más `x-bizcode-channel: field`.
 
@@ -140,6 +140,8 @@ Rol permitido: solo **`driver`**. Otros roles ven pantalla de acceso denegado.
 **Cobros en entrega (#162):** la pestaña `/cobros` sin `clienteId` queda vacía (ir a Ruta). Con un `clienteId` de `mi-reparto` de hoy, el formulario muestra `rsocial` + saldo, checkboxes de facturas (solo arman el monto default; `POST /api/cobros` no imputa ReciboCobro), importe editable, formas de `GET /api/formas-pago`, CBU/alias de `GET /api/cobros/transfer-info` (o mensaje i18n si no hay cuenta), campos de cheque como `CobroForm` web y observaciones. Si el importe supera el saldo, hay diálogo de confirmación. El éxito recarga el snapshot de ruta y ofrece recibo WhatsApp editable (`Linking` a `wa.me/{Cliente.telef}` solo dígitos) más `Share` nativo del mismo texto — sin Twilio y sin PDF. Diferido: rendición de efectivo, `origenApp` / `repartoId`, PDF de servidor. El QR Mercado Pago en App Driver sigue fuera de alcance. El smoke necesita una parada de hoy `on_route` (o `planned`) con deuda para el usuario `driver`.
 
 **Comprobante de entrega (#161):** **Entregar** en una parada `pending` de un reparto `on_route` abre un wizard de 4 pasos (nombre del receptor + DNI/notas opcionales, lienzo de firma, foto opcional, resumen). Confirmar llama el mismo `PUT /api/repartos/:id/items/:itemId` con `outcome: delivered`, `receptorNombre` y `firmaBase64` obligatorios, `fotoBase64` opcional. La compresión del cliente alinea servidor/OpenAPI: firma **50 KB**, foto JPEG **200 KB**. Firma vacía deshabilita confirmar. Un error de subida conserva los datos para reintentar. El éxito actualiza la parada en `RutaContext` y vuelve a la lista. Permisos de cámara y galería vía plugin `expo-image-picker`. Sin cambio Prisma/OpenAPI. El smoke local necesita un reparto `on_route` de hoy para el usuario `driver` (crearlo en logística web + **Iniciar**).
+
+**Devoluciones en entrega (#163):** **No pude entregar** con motivo `rechazo` o `producto_dañado` (si hay renglones de factura) abre el formulario (cantidades 0 < qty ≤ línea, notas, foto obligatoria si dañado) y `POST /api/repartos/:id/items/:itemId/devolucion`. Ese POST **no** mueve stock ni emite NC. Ausente / domicilio incorrecto / otro siguen el `PUT` `not_delivered`. **Rendir devoluciones** (`/ruta/rendicion`) lista pendientes y `POST .../devoluciones/rendir`: `StockAjuste` motivo `devolucion_entrega` y NC parcial si hay factura. Sin factura: stock sí, NC no. FEFO + `controlLote` → `422 LOTE_REQUIRED` (queda pendiente; no inventar lote). El rol `driver` no recibe `inventory.adjust`. Aplicar migración Prisma `20260819120000_devolucion_entrega_163`. Smoke: parada `on_route` con líneas de factura; rechazo parcial; stock sin cambio hasta rendir.
 
 ```bash
 # Terminal 1 — API

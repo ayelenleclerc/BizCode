@@ -320,6 +320,20 @@
 
 * [DepositoPatchInput](./depositopatchinput.md) – `-`
 
+* [DevolucionEntrega](./devolucionentrega.md) – `-`
+
+* [DevolucionEntregaEnvelope](./devolucionentregaenvelope.md) – `-`
+
+* [DevolucionEntregaLinea](./devolucionentregalinea.md) – `-`
+
+* [DevolucionEntregaListEnvelope](./devolucionentregalistenvelope.md) – `-`
+
+* [DevolucionEntregaRegisterInput](./devolucionentregaregisterinput.md) – `-`
+
+* [DevolucionEntregaRemitEnvelope](./devolucionentregaremitenvelope.md) – `-`
+
+* [DevolucionEntregaRemitSummary](./devolucionentregaremitsummary.md) – `-`
+
 * [DocumentoCompraColaEnvelope](./documentocompracolaenvelope.md) – `-`
 
 * [DocumentoCompraColaEstado](./documentocompracolaestado.md) – `-`
@@ -1522,6 +1536,8 @@
 
 * [Untitled object in DepositoListEnvelope](./depositolistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in DevolucionEntregaRegisterInput](./devolucionentregaregisterinput-properties-lineas-items.md) – `undefined#/properties/lineas/items`
+
 * [Untitled object in DocumentoCompraConfirmInput](./documentocompraconfirminput-allof-1.md) – `undefined#/allOf/1`
 
 * [Untitled object in DocumentoCompraImportado](./documentocompraimportado-properties-errores.md) – `undefined#/properties/errores`
@@ -1911,6 +1927,14 @@
 * [Untitled array in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in DepositoListEnvelope](./depositolistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in DevolucionEntrega](./devolucionentrega-properties-lineas.md) – `undefined#/properties/lineas`
+
+* [Untitled array in DevolucionEntregaListEnvelope](./devolucionentregalistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in DevolucionEntregaRegisterInput](./devolucionentregaregisterinput-properties-lineas.md) – `undefined#/properties/lineas`
+
+* [Untitled array in DevolucionEntregaRemitEnvelope](./devolucionentregaremitenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in DocumentoCompraColaEstado](./documentocompracolaestado-properties-documentos.md) – `undefined#/properties/documentos`
 

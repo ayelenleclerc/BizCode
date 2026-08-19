@@ -1,10 +1,10 @@
 import type { Application, Request, Response } from 'express'
-import { requireAnyPermission, requirePermission } from '../auth'
+import { getRequestedChannel, requireAnyPermission, requirePermission } from '../auth'
 import type { AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { hasPermission, type Permission } from '@bizcode/types'
 import { requireModule } from '../middleware/requireModule'
-import { repartoCreateBodySchema, repartoItemPodBodySchema, repartoUbicacionBodySchema } from '../schemas/domain'
+import { devolucionEntregaRegisterBodySchema, repartoCreateBodySchema, repartoItemPodBodySchema, repartoUbicacionBodySchema } from '../schemas/domain'
 import { GPS_VIEW_ROLES, POD_VIEW_ROLES } from '../services/RepartoService'
 import type { RepartoUbicacionService } from '../services/RepartoUbicacionService'
 import type { RepartoService, RepartoEstado } from '../services/RepartoService'
@@ -34,6 +34,7 @@ function parseOptionalPositiveInt(value: unknown): number | undefined {
 export function registerRepartosRoutes(app: Application, ctx: RestRouteContext): void {
   const { services, writeAudit } = ctx
   const repartos: RepartoService = services.repartos
+  const devolucionEntrega = services.devolucionEntrega
   const repartoUbicacion: RepartoUbicacionService = services.repartoUbicacion
   const gpsModule = requireModule('logistics.gps')
   const dispatchesModule = requireModule('logistics.dispatches')
@@ -380,6 +381,113 @@ export function registerRepartosRoutes(app: Application, ctx: RestRouteContext):
           return
         }
         res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/repartos/:id/items/:itemId/devolucion',
+    requirePermission('orders.deliver.confirm'),
+    validateBody(devolucionEntregaRegisterBodySchema),
+    async (req: Request, res: Response) => {
+      if (getRequestedChannel(req) !== 'field') {
+        res.status(403).json({ success: false, error: 'FIELD_CHANNEL_REQUIRED' })
+        return
+      }
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const repartoId = Number.parseInt(String(req.params.id), 10)
+        const itemId = Number.parseInt(String(req.params.itemId), 10)
+        if (!Number.isFinite(repartoId) || repartoId < 1 || !Number.isFinite(itemId) || itemId < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const result = await devolucionEntrega.register(tenantId, repartoId, itemId, req.body, {
+          userId: authReq.auth!.claims.userId,
+          role: authReq.auth!.claims.role,
+        })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'devolucion_entrega_registered', 'devolucion_entrega', String(result.data.devolucion.id), {
+          repartoId,
+          itemId,
+        })
+        res.status(201).json({ success: true, data: result.data.devolucion })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.get(
+    '/api/repartos/:id/devoluciones',
+    requirePermission('orders.deliver.confirm'),
+    async (req: Request, res: Response) => {
+      if (getRequestedChannel(req) !== 'field') {
+        res.status(403).json({ success: false, error: 'FIELD_CHANNEL_REQUIRED' })
+        return
+      }
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const repartoId = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(repartoId) || repartoId < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const result = await devolucionEntrega.listForReparto(tenantId, repartoId, {
+          userId: authReq.auth!.claims.userId,
+          role: authReq.auth!.claims.role,
+        })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        res.json({ success: true, data: result.data.devoluciones })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/repartos/:id/devoluciones/rendir',
+    requirePermission('orders.deliver.confirm'),
+    async (req: Request, res: Response) => {
+      if (getRequestedChannel(req) !== 'field') {
+        res.status(403).json({ success: false, error: 'FIELD_CHANNEL_REQUIRED' })
+        return
+      }
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const repartoId = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(repartoId) || repartoId < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const result = await devolucionEntrega.remit(tenantId, repartoId, {
+          userId: authReq.auth!.claims.userId,
+          role: authReq.auth!.claims.role,
+          ipAddress: req.ip ?? null,
+        })
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'devolucion_entrega_remitted', 'reparto', String(repartoId), {
+          summary: result.data.summary,
+        })
+        res.json({
+          success: true,
+          data: result.data.devoluciones,
+          summary: result.data.summary,
+        })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

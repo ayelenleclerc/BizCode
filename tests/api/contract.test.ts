@@ -318,6 +318,7 @@ function buildPrisma(): PrismaClient {
         return Promise.resolve([articuloRow])
       }),
       findFirst: vi.fn().mockResolvedValue(articuloRow),
+      findFirstOrThrow: vi.fn().mockResolvedValue(articuloRow),
       findUnique: vi.fn().mockResolvedValue(articuloRow),
       create: vi.fn().mockResolvedValue(articuloRow),
       update: vi.fn().mockResolvedValue(articuloRow),
@@ -1059,6 +1060,15 @@ function buildPrisma(): PrismaClient {
       deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
       findFirst: vi.fn().mockResolvedValue(null),
       findMany: vi.fn().mockResolvedValue([]),
+    },
+    devolucionEntrega: {
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    devolucionEntregaLinea: {
+      create: vi.fn(),
     },
     repartoItem: {
       findFirst: vi.fn().mockResolvedValue(null),
@@ -3433,6 +3443,123 @@ describe('API — contrato OpenAPI', () => {
     const res = await request(app).get('/api/repartos/1/items/10/pod').expect(200)
     await assertMatchesOpenApi('/api/repartos/{id}/items/{itemId}/pod', 'get', '200', res.body)
     expect(res.body.data.podMedia?.firmaBase64).toBe(TEST_FIRMA)
+  })
+
+  const devolucionContractRow = {
+    id: 1,
+    tenantId: 1,
+    repartoId: 1,
+    repartoItemId: 10,
+    motivo: 'rechazo',
+    motivoDetalle: null,
+    fotoBase64: null,
+    estado: 'registered',
+    registeredById: 2,
+    remittedAt: null,
+    remittedById: null,
+    notaCreditoId: null,
+    createdAt: new Date('2026-08-19T12:00:00.000Z'),
+    updatedAt: new Date('2026-08-19T12:00:00.000Z'),
+    lineas: [{ id: 1, articuloId: 1, facturaItemId: 3, cantidad: new Decimal(1) }],
+  }
+
+  it('POST /api/repartos/{id}/items/{itemId}/devolucion', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const p = buildPrisma()
+    vi.mocked(p.reparto.findFirst).mockResolvedValueOnce({
+      id: 1,
+      estado: 'on_route',
+      choferId: 2,
+      tenantId: 1,
+    } as never)
+    vi.mocked(p.repartoItem.findFirst).mockResolvedValueOnce({
+      id: 10,
+      estado: 'pending',
+      devolucionEntrega: null,
+      ordenEntrega: {
+        id: 1,
+        facturaId: 9,
+        factura: {
+          id: 9,
+          items: [{ id: 3, articuloId: 1, cantidad: new Decimal(2) }],
+        },
+      },
+    } as never)
+    vi.mocked(p.devolucionEntrega.create).mockResolvedValueOnce(devolucionContractRow as never)
+    p.$transaction = vi.fn(async (fn: unknown) => {
+      if (typeof fn === 'function') {
+        return (fn as (tx: PrismaClient) => Promise<unknown>)(p)
+      }
+      return fn
+    }) as PrismaClient['$transaction']
+    const app = createApp(p)
+    const res = await request(app)
+      .post('/api/repartos/1/items/10/devolucion')
+      .set('x-bizcode-channel', 'field')
+      .send({ motivo: 'rechazo', lineas: [{ articuloId: 1, facturaItemId: 3, cantidad: 1 }] })
+      .expect(201)
+    await assertMatchesOpenApi('/api/repartos/{id}/items/{itemId}/devolucion', 'post', '201', res.body)
+  })
+
+  it('GET /api/repartos/{id}/devoluciones', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const p = buildPrisma()
+    vi.mocked(p.reparto.findFirst).mockResolvedValueOnce({
+      id: 1,
+      estado: 'on_route',
+      choferId: 2,
+      tenantId: 1,
+    } as never)
+    vi.mocked(p.devolucionEntrega.findMany).mockResolvedValueOnce([devolucionContractRow] as never)
+    const app = createApp(p)
+    const res = await request(app)
+      .get('/api/repartos/1/devoluciones')
+      .set('x-bizcode-channel', 'field')
+      .expect(200)
+    await assertMatchesOpenApi('/api/repartos/{id}/devoluciones', 'get', '200', res.body)
+  })
+
+  it('POST /api/repartos/{id}/devoluciones/rendir', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+    const p = buildPrisma()
+    vi.mocked(p.reparto.findFirst).mockResolvedValueOnce({
+      id: 1,
+      estado: 'on_route',
+      choferId: 2,
+      tenantId: 1,
+    } as never)
+    const pendingRow = {
+      ...devolucionContractRow,
+      repartoItem: { ordenEntrega: { depositoId: null, facturaId: null } },
+    }
+    vi.mocked(p.devolucionEntrega.findMany).mockResolvedValueOnce([pendingRow] as never)
+    vi.mocked(p.articulo.findMany).mockResolvedValueOnce([
+      { id: 1, tipo: 'servicio', controlLote: false, stock: new Decimal(0) },
+    ] as never)
+    vi.mocked(p.devolucionEntrega.update).mockResolvedValueOnce({
+      ...devolucionContractRow,
+      estado: 'remitted',
+      remittedAt: new Date('2026-08-19T18:00:00.000Z'),
+      remittedById: 2,
+    } as never)
+    p.$transaction = vi.fn(async (fn: unknown) => {
+      if (typeof fn === 'function') {
+        return (fn as (tx: PrismaClient) => Promise<unknown>)(p)
+      }
+      return fn
+    }) as PrismaClient['$transaction']
+    const app = createApp(p)
+    const res = await request(app)
+      .post('/api/repartos/1/devoluciones/rendir')
+      .set('x-bizcode-channel', 'field')
+      .expect(200)
+    await assertMatchesOpenApi('/api/repartos/{id}/devoluciones/rendir', 'post', '200', res.body)
   })
 
   it('GET /api/dashboard/ventas-historico', async () => {

@@ -1,6 +1,9 @@
 import type { AxiosError, AxiosInstance } from 'axios'
 import type {
   ApiErrorPayload,
+  DevolucionEntregaPublic,
+  DevolucionEntregaRegisterInput,
+  DevolucionEntregaRemitSummary,
   Reparto,
   RepartoActivo,
   RepartoCloseSummary,
@@ -112,6 +115,40 @@ export function createRepartosAPI(http: AxiosInstance) {
       try {
         const response = await http.post(`/repartos/${repartoId}/ubicacion`, body)
         return response.data.data as RepartoUbicacionPoint
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    registerDevolucion: async (
+      repartoId: number,
+      itemId: number,
+      body: DevolucionEntregaRegisterInput,
+    ) => {
+      try {
+        const response = await http.post(`/repartos/${repartoId}/items/${itemId}/devolucion`, body)
+        return response.data.data as DevolucionEntregaPublic
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    listDevoluciones: async (repartoId: number) => {
+      try {
+        const response = await http.get(`/repartos/${repartoId}/devoluciones`)
+        return response.data.data as DevolucionEntregaPublic[]
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    remitDevoluciones: async (repartoId: number) => {
+      try {
+        const response = await http.post(`/repartos/${repartoId}/devoluciones/rendir`)
+        return {
+          devoluciones: response.data.data as DevolucionEntregaPublic[],
+          summary: response.data.summary as DevolucionEntregaRemitSummary,
+        }
       } catch (error) {
         handleError(error as AxiosError<ApiErrorPayload>)
       }

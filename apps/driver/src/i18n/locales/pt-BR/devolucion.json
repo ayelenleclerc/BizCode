@@ -1,0 +1,26 @@
+{
+  "formTitle": "Registrar devolução",
+  "confirm": "Confirmar devolução",
+  "qtyLabel": "Quantidade (máx. {{max}})",
+  "detalle": "Notas (opcional)",
+  "photoRequired": "A foto é obrigatória quando o produto está danificado.",
+  "photoRequiredHint": "É necessária uma foto do produto danificado.",
+  "invalidQty": "Cada quantidade deve ser maior que 0 e não ultrapassar a linha da fatura.",
+  "saveError": "Não foi possível registrar esta devolução.",
+  "motivo": {
+    "rechazo": "Recusa",
+    "producto_dañado": "Produto danificado"
+  },
+  "rendicion": {
+    "title": "Prestação de devoluções",
+    "open": "Prestar devoluções",
+    "empty": "Não há devoluções pendentes de prestar.",
+    "confirm": "Confirmar prestação",
+    "loadError": "Não foi possível carregar as devoluções.",
+    "saveError": "Não foi possível prestar as devoluções.",
+    "loteRequired": "Um artigo exige lote. A devolução fica pendente; o depósito deve atribuir o lote.",
+    "registered": "Pendente de prestar",
+    "remitted": "Prestada",
+    "success": "Prestação concluída. O servidor aplicou estoque e notas de crédito."
+  }
+}

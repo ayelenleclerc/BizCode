@@ -86245,6 +86245,814 @@ Requires `logistics.read` and role `owner`, `manager`, or `logistics_planner` (n
 }
 ```
 
+### PARAMETERS /api/repartos/{id}/items/{itemId}/devolucion
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/items/{itemId}/devolucion`
+
+### Register a delivery-stop return (no stock / credit note yet)
+
+- **Method:** `POST`
+- **Path:** `/api/repartos/{id}/items/{itemId}/devolucion`
+- **Tags:** repartos
+
+Requires `orders.deliver.confirm` and `x-bizcode-channel: field`. Route must be `on_route`; item `pending`. Driver may only register on their own route. Motivos `rechazo` and `producto_dañado` only. Photo is required for `producto_dañado` (JPEG max 200 KB). Does **not** adjust stock or issue a credit note. Item becomes `returned`. Role `driver` is **not** granted `inventory.adjust` or `sales.cancel`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`lineas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`facturaItemId`**
+
+    `integer`
+
+- **`motivo` (required)**
+
+  `string`, possible values: `"rechazo", "producto_dañado"`
+
+- **`fotoBase64`**
+
+  `string` — Data URL or base64 photo; required for producto\_dañado; max \~200KB decoded.
+
+- **`motivoDetalle`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "motivo": "rechazo",
+  "motivoDetalle": "",
+  "fotoBase64": "",
+  "lineas": [
+    {
+      "articuloId": 1,
+      "facturaItemId": 1,
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Return registered (public fields; no photo blob)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"registered", "remitted"`
+
+  - **`hasFoto` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`facturaItemId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`motivo` (required)**
+
+    `string`, possible values: `"rechazo", "producto_dañado"`
+
+  - **`motivoDetalle` (required)**
+
+    `string`
+
+  - **`notaCreditoId` (required)**
+
+    `integer`
+
+  - **`remittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`repartoId` (required)**
+
+    `integer`
+
+  - **`repartoItemId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "repartoId": 1,
+    "repartoItemId": 1,
+    "motivo": "rechazo",
+    "motivoDetalle": "",
+    "hasFoto": true,
+    "estado": "registered",
+    "notaCreditoId": 1,
+    "remittedAt": "",
+    "createdAt": "",
+    "lineas": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "facturaItemId": 1,
+        "cantidad": 1
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route or item not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state, qty, photo, or duplicate return
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/devoluciones
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/devoluciones`
+
+### List delivery returns for a route (rendition screen)
+
+- **Method:** `GET`
+- **Path:** `/api/repartos/{id}/devoluciones`
+- **Tags:** repartos
+
+Requires `orders.deliver.confirm` and `x-bizcode-channel: field`. Driver may only list returns on their own route. Photo blobs are omitted (`hasFoto`).
+
+#### Responses
+
+##### Status: 200 Return rows
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"registered", "remitted"`
+
+  - **`hasFoto` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`facturaItemId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`motivo` (required)**
+
+    `string`, possible values: `"rechazo", "producto_dañado"`
+
+  - **`motivoDetalle` (required)**
+
+    `string`
+
+  - **`notaCreditoId` (required)**
+
+    `integer`
+
+  - **`remittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`repartoId` (required)**
+
+    `integer`
+
+  - **`repartoItemId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "repartoId": 1,
+      "repartoItemId": 1,
+      "motivo": "rechazo",
+      "motivoDetalle": "",
+      "hasFoto": true,
+      "estado": "registered",
+      "notaCreditoId": 1,
+      "remittedAt": "",
+      "createdAt": "",
+      "lineas": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "facturaItemId": 1,
+          "cantidad": 1
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/repartos/{id}/devoluciones/rendir
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/devoluciones/rendir`
+
+### Remit pending delivery returns (stock + partial credit note)
+
+- **Method:** `POST`
+- **Path:** `/api/repartos/{id}/devoluciones/rendir`
+- **Tags:** repartos
+
+Requires `orders.deliver.confirm` and `x-bizcode-channel: field`. Confirms pending `DevolucionEntrega` rows for the route: `StockAjuste` motivo `devolucion_entrega` (via server service, not `POST /api/articulos/:id/stock-ajuste`) and partial credit note when the OE has a factura. Without factura: stock yes, NC no. If an article has `controlLote` and FEFO is enabled, returns `422 LOTE_REQUIRED` and leaves rows `registered`. Role `driver` is **not** granted `inventory.adjust`.
+
+#### Responses
+
+##### Status: 200 Remitted rows plus summary
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"registered", "remitted"`
+
+  - **`hasFoto` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`facturaItemId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`motivo` (required)**
+
+    `string`, possible values: `"rechazo", "producto_dañado"`
+
+  - **`motivoDetalle` (required)**
+
+    `string`
+
+  - **`notaCreditoId` (required)**
+
+    `integer`
+
+  - **`remittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`repartoId` (required)**
+
+    `integer`
+
+  - **`repartoItemId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`summary` (required)**
+
+  `object`
+
+  - **`creditNotes` (required)**
+
+    `integer`
+
+  - **`remitted` (required)**
+
+    `integer`
+
+  - **`skippedNoInvoice` (required)**
+
+    `integer`
+
+  - **`stockAdjustments` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "repartoId": 1,
+      "repartoItemId": 1,
+      "motivo": "rechazo",
+      "motivoDetalle": "",
+      "hasFoto": true,
+      "estado": "registered",
+      "notaCreditoId": 1,
+      "remittedAt": "",
+      "createdAt": "",
+      "lineas": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "facturaItemId": 1,
+          "cantidad": 1
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "remitted": 1,
+    "stockAdjustments": 1,
+    "creditNotes": 1,
+    "skippedNoInvoice": 1
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 None pending, lot required, or credit-note constraint
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/logistica/kpis
 
 - **Method:** `PARAMETERS`
@@ -108545,6 +109353,570 @@ Rate-limited mutation; requires products.manage. USD only.
       },
       "additionalProperty": "anything"
     }
+  }
+}
+```
+
+### DevolucionEntregaRegisterInput
+
+- **Type:**`object`
+
+* **`lineas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`facturaItemId`**
+
+    `integer`
+
+* **`motivo` (required)**
+
+  `string`, possible values: `"rechazo", "producto_dañado"`
+
+* **`fotoBase64`**
+
+  `string` — Data URL or base64 photo; required for producto\_dañado; max \~200KB decoded.
+
+* **`motivoDetalle`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "motivo": "rechazo",
+  "motivoDetalle": "",
+  "fotoBase64": "",
+  "lineas": [
+    {
+      "articuloId": 1,
+      "facturaItemId": 1,
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+### DevolucionEntregaLinea
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`facturaItemId` (required)**
+
+  `integer`
+
+* **`id` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "articuloId": 1,
+  "facturaItemId": 1,
+  "cantidad": 1
+}
+```
+
+### DevolucionEntrega
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"registered", "remitted"`
+
+* **`hasFoto` (required)**
+
+  `boolean`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`lineas` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`facturaItemId` (required)**
+
+    `integer`
+
+  - **`id` (required)**
+
+    `integer`
+
+* **`motivo` (required)**
+
+  `string`, possible values: `"rechazo", "producto_dañado"`
+
+* **`motivoDetalle` (required)**
+
+  `string`
+
+* **`notaCreditoId` (required)**
+
+  `integer`
+
+* **`remittedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`repartoId` (required)**
+
+  `integer`
+
+* **`repartoItemId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "repartoId": 1,
+  "repartoItemId": 1,
+  "motivo": "rechazo",
+  "motivoDetalle": "",
+  "hasFoto": true,
+  "estado": "registered",
+  "notaCreditoId": 1,
+  "remittedAt": "",
+  "createdAt": "",
+  "lineas": [
+    {
+      "id": 1,
+      "articuloId": 1,
+      "facturaItemId": 1,
+      "cantidad": 1
+    }
+  ]
+}
+```
+
+### DevolucionEntregaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"registered", "remitted"`
+
+  - **`hasFoto` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`facturaItemId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`motivo` (required)**
+
+    `string`, possible values: `"rechazo", "producto_dañado"`
+
+  - **`motivoDetalle` (required)**
+
+    `string`
+
+  - **`notaCreditoId` (required)**
+
+    `integer`
+
+  - **`remittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`repartoId` (required)**
+
+    `integer`
+
+  - **`repartoItemId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "repartoId": 1,
+    "repartoItemId": 1,
+    "motivo": "rechazo",
+    "motivoDetalle": "",
+    "hasFoto": true,
+    "estado": "registered",
+    "notaCreditoId": 1,
+    "remittedAt": "",
+    "createdAt": "",
+    "lineas": [
+      {
+        "id": 1,
+        "articuloId": 1,
+        "facturaItemId": 1,
+        "cantidad": 1
+      }
+    ]
+  }
+}
+```
+
+### DevolucionEntregaListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"registered", "remitted"`
+
+  - **`hasFoto` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`facturaItemId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`motivo` (required)**
+
+    `string`, possible values: `"rechazo", "producto_dañado"`
+
+  - **`motivoDetalle` (required)**
+
+    `string`
+
+  - **`notaCreditoId` (required)**
+
+    `integer`
+
+  - **`remittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`repartoId` (required)**
+
+    `integer`
+
+  - **`repartoItemId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "repartoId": 1,
+      "repartoItemId": 1,
+      "motivo": "rechazo",
+      "motivoDetalle": "",
+      "hasFoto": true,
+      "estado": "registered",
+      "notaCreditoId": 1,
+      "remittedAt": "",
+      "createdAt": "",
+      "lineas": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "facturaItemId": 1,
+          "cantidad": 1
+        }
+      ]
+    }
+  ]
+}
+```
+
+### DevolucionEntregaRemitSummary
+
+- **Type:**`object`
+
+* **`creditNotes` (required)**
+
+  `integer`
+
+* **`remitted` (required)**
+
+  `integer`
+
+* **`skippedNoInvoice` (required)**
+
+  `integer`
+
+* **`stockAdjustments` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "remitted": 1,
+  "stockAdjustments": 1,
+  "creditNotes": 1,
+  "skippedNoInvoice": 1
+}
+```
+
+### DevolucionEntregaRemitEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"registered", "remitted"`
+
+  - **`hasFoto` (required)**
+
+    `boolean`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`lineas` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`facturaItemId` (required)**
+
+      `integer`
+
+    - **`id` (required)**
+
+      `integer`
+
+  - **`motivo` (required)**
+
+    `string`, possible values: `"rechazo", "producto_dañado"`
+
+  - **`motivoDetalle` (required)**
+
+    `string`
+
+  - **`notaCreditoId` (required)**
+
+    `integer`
+
+  - **`remittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`repartoId` (required)**
+
+    `integer`
+
+  - **`repartoItemId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`summary` (required)**
+
+  `object`
+
+  - **`creditNotes` (required)**
+
+    `integer`
+
+  - **`remitted` (required)**
+
+    `integer`
+
+  - **`skippedNoInvoice` (required)**
+
+    `integer`
+
+  - **`stockAdjustments` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "repartoId": 1,
+      "repartoItemId": 1,
+      "motivo": "rechazo",
+      "motivoDetalle": "",
+      "hasFoto": true,
+      "estado": "registered",
+      "notaCreditoId": 1,
+      "remittedAt": "",
+      "createdAt": "",
+      "lineas": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "facturaItemId": 1,
+          "cantidad": 1
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "remitted": 1,
+    "stockAdjustments": 1,
+    "creditNotes": 1,
+    "skippedNoInvoice": 1
   }
 }
 ```

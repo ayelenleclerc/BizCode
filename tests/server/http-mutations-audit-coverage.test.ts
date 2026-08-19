@@ -1,7 +1,7 @@
 /**
  * @en Mutation ? AuditEvent.action matrix verification (issue #84). Each successful persistence path must emit an audit row.
- * @es Verificación matriz mutación ? AuditEvent.action (#84).
- * @pt-BR Verificação mutação ? AuditEvent.action (#84).
+ * @es Verificaci˜n matriz mutaci˜n ? AuditEvent.action (#84).
+ * @pt-BR Verifica˜˜o muta˜˜o ? AuditEvent.action (#84).
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
@@ -332,6 +332,15 @@ function basePrismaForMutations(): {
     findFirst: vi.fn().mockResolvedValue(null),
     create: vi.fn().mockResolvedValue(REPARTO_ROW),
     update: vi.fn().mockResolvedValue(REPARTO_ROW),
+  }
+  prisma.devolucionEntrega = {
+    findMany: vi.fn().mockResolvedValue([]),
+    findFirst: vi.fn().mockResolvedValue(null),
+    create: vi.fn(),
+    update: vi.fn(),
+  }
+  prisma.devolucionEntregaLinea = {
+    create: vi.fn(),
   }
   prisma.repartoItem = {
     findFirst: vi.fn().mockResolvedValue(null),
@@ -943,6 +952,60 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
           action: 'reparto_item_pod_signed',
           resource: 'reparto_item',
           resourceId: '10',
+        }),
+      }),
+    )
+  })
+
+  it('POST /api/repartos/:id/items/:itemId/devolucion ? devolucion_entrega_registered', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'driver'
+    process.env.BIZCODE_TEST_USER_ID = '2'
+
+    vi.mocked(prisma.reparto.findFirst).mockResolvedValue({
+      id: 1,
+      estado: 'on_route',
+      choferId: 2,
+      tenantId: 1,
+    } as never)
+    vi.mocked(prisma.repartoItem.findFirst).mockResolvedValue({
+      id: 10,
+      estado: 'pending',
+      devolucionEntrega: null,
+      ordenEntrega: {
+        id: 5,
+        facturaId: 9,
+        factura: { id: 9, items: [{ id: 3, articuloId: 2, cantidad: new Decimal(2) }] },
+      },
+    } as never)
+    vi.mocked(prisma.devolucionEntrega.create).mockResolvedValue({
+      id: 77,
+      tenantId: 1,
+      repartoId: 1,
+      repartoItemId: 10,
+      motivo: 'rechazo',
+      motivoDetalle: null,
+      fotoBase64: null,
+      estado: 'registered',
+      notaCreditoId: null,
+      remittedAt: null,
+      createdAt: new Date('2026-08-19T12:00:00.000Z'),
+      lineas: [{ id: 1, articuloId: 2, facturaItemId: 3, cantidad: new Decimal(1) }],
+    } as never)
+
+    const app = createApp(prisma)
+    await request(app)
+      .post('/api/repartos/1/items/10/devolucion')
+      .set('x-bizcode-channel', 'field')
+      .send({ motivo: 'rechazo', lineas: [{ articuloId: 2, facturaItemId: 3, cantidad: 1 }] })
+      .expect(201)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'devolucion_entrega_registered',
+          resource: 'devolucion_entrega',
+          resourceId: '77',
         }),
       }),
     )

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fotoBase64": {
+      "description": "Data URL or base64 photo; required for producto_dañado; max ~200KB decoded.",
+      "nullable": true,
+      "type": "string"
+    },
+    "lineas": {
+      "items": {
+        "properties": {
+          "articuloId": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "cantidad": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "facturaItemId": {
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "articuloId",
+          "cantidad"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "motivo": {
+      "enum": [
+        "rechazo",
+        "producto_dañado"
+      ],
+      "type": "string"
+    },
+    "motivoDetalle": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "motivo",
+    "lineas"
+  ],
+  "title": "DevolucionEntregaRegisterInput",
+  "type": "object"
+}

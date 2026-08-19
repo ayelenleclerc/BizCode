@@ -129,7 +129,7 @@ Privacy policy URL: `{PUBLIC_WEB_ORIGIN}/privacidad` (public page from #195; ope
 
 **Note:** `@bizcode/ui` (#157) is out of scope for #167/#168; do not block type-check or login on that package.
 
-### App Driver (`apps/driver`, #159–#162)
+### App Driver (`apps/driver`, #159–#163)
 
 Expo SDK app with Expo Router (same stack as Seller). Auth uses **Bearer dual** mode with tokens in **expo-secure-store** and `Authorization: Bearer` plus `x-bizcode-channel: field`.
 
@@ -140,6 +140,8 @@ Allowed role: **`driver`** only. Other roles see an accessible “driver-only”
 **Collections at delivery (#162):** tab `/cobros` without `clienteId` is empty (go to Route). With a `clienteId` on today's `mi-reparto`, the form shows `rsocial` + AR balance, invoice checkboxes (default amount only; `POST /api/cobros` does not impute ReciboCobro), editable amount, payment methods from `GET /api/formas-pago`, transfer CBU/alias from `GET /api/cobros/transfer-info` (or an i18n message if none), cheque fields mapped like web `CobroForm`, and notes. Amount greater than balance requires an explicit confirm dialog. Success reloads the route snapshot and offers an editable WhatsApp receipt (`Linking` to `wa.me/{Cliente.telef}` digits) plus native `Share` of the same text — no Twilio and no PDF. Deferred: cash remittance, `origenApp` / `repartoId`, server PDF. Mercado Pago QR in App Driver remains out of scope. Smoke needs a today `on_route` (or `planned`) stop with debt for user `driver`.
 
 **Proof of delivery (#161):** **Deliver** on a pending `on_route` stop opens a 4-step wizard (recipient name + optional DNI/notes, signature canvas, optional photo, summary). Confirm calls the same `PUT /api/repartos/:id/items/:itemId` with `outcome: delivered`, required `receptorNombre` and `firmaBase64`, optional `fotoBase64`. Client compression matches server/OpenAPI: signature **50 KB**, JPEG photo **200 KB**. Empty signature disables confirm. A failed upload keeps wizard fields for retry. Success patches the stop in `RutaContext` and returns to the list. Camera and library permissions come from the `expo-image-picker` plugin. No Prisma/OpenAPI change. Smoke needs a today `on_route` reparto for user `driver` (create via web logistics planner + **Start**).
+
+**Delivery returns (#163):** **Could not deliver** with motivo `rechazo` or `producto_dañado` (when the stop has invoice lines) opens a return form (qtys 0 < qty ≤ line, notes, photo required if damaged) and `POST /api/repartos/:id/items/:itemId/devolucion`. That call does **not** change stock or issue a credit note. Absent / wrong address / other still use `PUT` `not_delivered`. End-of-day **Remit returns** (`/ruta/rendicion`) lists pending rows and `POST .../devoluciones/rendir`: server `StockAjuste` motivo `devolucion_entrega` and partial NC if the OE has a factura. Without factura: stock yes, NC no. FEFO + `controlLote` → `422 LOTE_REQUIRED` (row stays pending; do not invent a lot). Role `driver` is not given `inventory.adjust`. Apply Prisma migration `20260819120000_devolucion_entrega_163`. Smoke: `on_route` stop with factura lines; register a partial rechazo; confirm stock unchanged until remittance.
 
 ```bash
 # Terminal 1 — API

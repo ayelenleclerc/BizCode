@@ -86,6 +86,10 @@ Listagens/detalhe expõem **`hasPod`** sem blobs. Limites decodificados: assinat
 
 Back-office: em **`/logistica/repartos`**, painel de acompanhamento com badge **POD disponível** e **Ver comprovante** quando `hasPod`.
 
+## Devoluções na entrega (#163)
+
+O App Entregador registra `rechazo` / `producto_dañado` com `POST /api/repartos/{id}/items/{itemId}/devolucion` (`orders.deliver.confirm` + field). Isso não ajusta estoque nem emite NC. A prestação `POST /api/repartos/{id}/devoluciones/rendir` aplica `StockAjuste` motivo `devolucion_entrega` e NC parcial se a OE tiver fatura. Sem fatura: estoque sim, NC não. FEFO + `controlLote` sem lote → `422 LOTE_REQUIRED` (fica pendente). O papel `driver` não recebe `inventory.adjust`.
+
 ## Rastreamento GPS ao vivo (#144)
 
 Módulo **`logistics.gps`** (depende de **`logistics.dispatches`**). Planejadores com papéis **`owner`**, **`manager`** ou **`logistics_planner`** abrem **`/logistica/seguimiento`** (mapa OpenStreetMap + Leaflet, lista de repartos `on_route`, atualização a cada **60 s**).

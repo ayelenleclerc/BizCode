@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "creditNotes": {
+      "type": "integer"
+    },
+    "remitted": {
+      "type": "integer"
+    },
+    "skippedNoInvoice": {
+      "type": "integer"
+    },
+    "stockAdjustments": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "remitted",
+    "stockAdjustments",
+    "creditNotes",
+    "skippedNoInvoice"
+  ],
+  "title": "DevolucionEntregaRemitSummary",
+  "type": "object"
+}

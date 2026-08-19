@@ -1,0 +1,26 @@
+{
+  "formTitle": "Registrar devolución",
+  "confirm": "Confirmar devolución",
+  "qtyLabel": "Cantidad (máx. {{max}})",
+  "detalle": "Notas (opcional)",
+  "photoRequired": "La foto es obligatoria si el producto está dañado.",
+  "photoRequiredHint": "Hace falta una foto del producto dañado.",
+  "invalidQty": "Cada cantidad debe ser mayor que 0 y no superar la línea de factura.",
+  "saveError": "No se pudo registrar esta devolución.",
+  "motivo": {
+    "rechazo": "Rechazo",
+    "producto_dañado": "Producto dañado"
+  },
+  "rendicion": {
+    "title": "Rendición de devoluciones",
+    "open": "Rendir devoluciones",
+    "empty": "No hay devoluciones pendientes de rendir.",
+    "confirm": "Confirmar rendición",
+    "loadError": "No se pudieron cargar las devoluciones.",
+    "saveError": "No se pudieron rendir las devoluciones.",
+    "loteRequired": "Un artículo exige lote. La devolución queda pendiente; el depósito debe asignar el lote.",
+    "registered": "Pendiente de rendir",
+    "remitted": "Rendida",
+    "success": "Rendición completa. El servidor aplicó stock y notas de crédito."
+  }
+}

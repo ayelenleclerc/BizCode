@@ -14514,6 +14514,151 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/repartos/{id}/items/{itemId}/devolucion:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [repartos]
+      summary: Register a delivery-stop return (no stock / credit note yet)
+      description: |
+        Requires `orders.deliver.confirm` and `x-bizcode-channel: field`.
+        Route must be `on_route`; item `pending`. Driver may only register on their own route.
+        Motivos `rechazo` and `producto_dañado` only. Photo is required for `producto_dañado` (JPEG max 200 KB).
+        Does **not** adjust stock or issue a credit note. Item becomes `returned`.
+        Role `driver` is **not** granted `inventory.adjust` or `sales.cancel`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevolucionEntregaRegisterInput'
+      responses:
+        '201':
+          description: Return registered (public fields; no photo blob)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevolucionEntregaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route or item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state, qty, photo, or duplicate return
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/repartos/{id}/devoluciones:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [repartos]
+      summary: List delivery returns for a route (rendition screen)
+      description: |
+        Requires `orders.deliver.confirm` and `x-bizcode-channel: field`.
+        Driver may only list returns on their own route. Photo blobs are omitted (`hasFoto`).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Return rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevolucionEntregaListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/repartos/{id}/devoluciones/rendir:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [repartos]
+      summary: Remit pending delivery returns (stock + partial credit note)
+      description: |
+        Requires `orders.deliver.confirm` and `x-bizcode-channel: field`.
+        Confirms pending `DevolucionEntrega` rows for the route: `StockAjuste` motivo `devolucion_entrega`
+        (via server service, not `POST /api/articulos/:id/stock-ajuste`) and partial credit note when the OE has a factura.
+        Without factura: stock yes, NC no.
+        If an article has `controlLote` and FEFO is enabled, returns `422 LOTE_REQUIRED` and leaves rows `registered`.
+        Role `driver` is **not** granted `inventory.adjust`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Remitted rows plus summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevolucionEntregaRemitEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: None pending, lot required, or credit-note constraint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/logistica/kpis:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -19803,6 +19948,152 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/RepartoItemLine'
+
+    DevolucionEntregaRegisterInput:
+      type: object
+      required: [motivo, lineas]
+      properties:
+        motivo:
+          type: string
+          enum: [rechazo, producto_dañado]
+        motivoDetalle:
+          type: string
+          maxLength: 500
+          nullable: true
+        fotoBase64:
+          type: string
+          nullable: true
+          description: Data URL or base64 photo; required for producto_dañado; max ~200KB decoded.
+        lineas:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [articuloId, cantidad]
+            properties:
+              articuloId:
+                type: integer
+                minimum: 1
+              facturaItemId:
+                type: integer
+                minimum: 1
+                nullable: true
+              cantidad:
+                type: number
+                exclusiveMinimum: 0
+
+    DevolucionEntregaLinea:
+      type: object
+      required: [id, articuloId, facturaItemId, cantidad]
+      properties:
+        id:
+          type: integer
+        articuloId:
+          type: integer
+        facturaItemId:
+          type: integer
+          nullable: true
+        cantidad:
+          type: number
+
+    DevolucionEntrega:
+      type: object
+      required:
+        - id
+        - tenantId
+        - repartoId
+        - repartoItemId
+        - motivo
+        - motivoDetalle
+        - hasFoto
+        - estado
+        - notaCreditoId
+        - remittedAt
+        - createdAt
+        - lineas
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        repartoId:
+          type: integer
+        repartoItemId:
+          type: integer
+        motivo:
+          type: string
+          enum: [rechazo, producto_dañado]
+        motivoDetalle:
+          type: string
+          nullable: true
+        hasFoto:
+          type: boolean
+        estado:
+          type: string
+          enum: [registered, remitted]
+        notaCreditoId:
+          type: integer
+          nullable: true
+        remittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        lineas:
+          type: array
+          items:
+            $ref: '#/components/schemas/DevolucionEntregaLinea'
+
+    DevolucionEntregaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/DevolucionEntrega'
+
+    DevolucionEntregaListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DevolucionEntrega'
+
+    DevolucionEntregaRemitSummary:
+      type: object
+      required: [remitted, stockAdjustments, creditNotes, skippedNoInvoice]
+      properties:
+        remitted:
+          type: integer
+        stockAdjustments:
+          type: integer
+        creditNotes:
+          type: integer
+        skippedNoInvoice:
+          type: integer
+
+    DevolucionEntregaRemitEnvelope:
+      type: object
+      required: [success, data, summary]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DevolucionEntrega'
+        summary:
+          $ref: '#/components/schemas/DevolucionEntregaRemitSummary'
 
     Reparto:
       type: object

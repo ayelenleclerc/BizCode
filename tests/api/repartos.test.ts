@@ -49,6 +49,15 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findFirst: vi.fn().mockResolvedValue(null),
       findMany: vi.fn().mockResolvedValue([]),
     },
+    devolucionEntrega: {
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    devolucionEntregaLinea: {
+      create: vi.fn(),
+    },
     repartoItem: {
       findFirst: vi.fn().mockResolvedValue(null),
       update: vi.fn(),

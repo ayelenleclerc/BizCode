@@ -14,6 +14,9 @@ import ptCommon from './locales/pt-BR/common.json'
 import ptRuta from './locales/pt-BR/ruta.json'
 import ptCobros from './locales/pt-BR/cobros.json'
 import ptPod from './locales/pt-BR/pod.json'
+import enDevolucion from './locales/en/devolucion.json'
+import esDevolucion from './locales/es/devolucion.json'
+import ptDevolucion from './locales/pt-BR/devolucion.json'
 
 const deviceLang = Localization.getLocales()[0]?.languageCode ?? 'es'
 const lng = deviceLang === 'en' || deviceLang === 'pt' ? (deviceLang === 'pt' ? 'pt-BR' : 'en') : 'es'
@@ -23,11 +26,11 @@ void i18n.use(initReactI18next).init({
   lng,
   fallbackLng: 'es',
   resources: {
-    en: { common: enCommon, ruta: enRuta, cobros: enCobros, pod: enPod },
-    es: { common: esCommon, ruta: esRuta, cobros: esCobros, pod: esPod },
-    'pt-BR': { common: ptCommon, ruta: ptRuta, cobros: ptCobros, pod: ptPod },
+    en: { common: enCommon, ruta: enRuta, cobros: enCobros, pod: enPod, devolucion: enDevolucion },
+    es: { common: esCommon, ruta: esRuta, cobros: esCobros, pod: esPod, devolucion: esDevolucion },
+    'pt-BR': { common: ptCommon, ruta: ptRuta, cobros: ptCobros, pod: ptPod, devolucion: ptDevolucion },
   },
-  ns: ['common', 'ruta', 'cobros', 'pod'],
+  ns: ['common', 'ruta', 'cobros', 'pod', 'devolucion'],
   defaultNS: 'common',
   interpolation: { escapeValue: false },
 })
