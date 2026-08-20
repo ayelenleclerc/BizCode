@@ -95,6 +95,10 @@ App Driver registers `rechazo` / `producto_dañado` with `POST /api/repartos/{id
 
 With a downloaded day route, App Driver can confirm POD, record collections, and register returns without signal (outbox FIFO). Remittance of returns stays online. If sync hits `422` because the stop already changed on the server, dispatch roles (`owner`, `manager`, `logistics_planner`) receive in-app notification `reparto_sync_conflict`.
 
+## App Driver install (#166)
+
+Drivers install the **internal APK** from the GitHub Release for tag `driver-v*` (share the release URL or a QR). On Android, allow installation from unknown sources for the browser/file manager. JS-only updates arrive via Expo OTA (`production` channel) when the app opens; native changes need a new APK.
+
 ## Live GPS tracking (#144)
 
 Module **`logistics.gps`** (requires **`logistics.dispatches`**). Planners with roles **`owner`**, **`manager`**, or **`logistics_planner`** open **`/logistica/seguimiento`** (OpenStreetMap + Leaflet map, list of `on_route` routes, refresh every **60 s**).

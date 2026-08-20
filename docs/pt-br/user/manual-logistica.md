@@ -95,6 +95,10 @@ O App Entregador registra `rechazo` / `producto_dañado` com `POST /api/repartos
 
 Com a rota do dia baixada, o App Driver pode confirmar POD, registrar cobranças e devoluções sem sinal (outbox FIFO). A prestação de devoluções continua só online. Se o sync receber `422` porque a parada já mudou no servidor, os papéis de depósito (`owner`, `manager`, `logistics_planner`) recebem notificação in-app `reparto_sync_conflict`.
 
+## Instalação App Entregador (#166)
+
+Os motoristas instalam o **APK internal** a partir do GitHub Release da tag `driver-v*` (compartilhar a URL do release ou um QR). No Android, permitir instalação de fontes desconhecidas no navegador/gerenciador de arquivos. Atualizações só de JS chegam via OTA Expo (canal `production`) ao abrir o app; mudanças nativas exigem um APK novo.
+
 ## Rastreamento GPS ao vivo (#144)
 
 Módulo **`logistics.gps`** (depende de **`logistics.dispatches`**). Planejadores com papéis **`owner`**, **`manager`** ou **`logistics_planner`** abrem **`/logistica/seguimiento`** (mapa OpenStreetMap + Leaflet, lista de repartos `on_route`, atualização a cada **60 s**).

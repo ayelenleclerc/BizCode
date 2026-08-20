@@ -118,6 +118,15 @@ El job inicia **PostgreSQL 16** (`DATABASE_URL` configurada). Tras `prisma migra
 
 Secrets (falla si faltan, sin skip silencioso): `EXPO_TOKEN`, `EAS_PROJECT_ID`. Opcional: `EXPO_PUBLIC_API_BASE_URL`. CLI: `pnpm dlx eas-cli@16` (`--non-interactive`). Distinto de tags desktop `v*.*.*`. El primer AAB a Play Console lo sube el operador; `eas submit` iOS no está en este workflow.
 
+**EAS App Repartidor (#166)** **no** forma parte del Quality Gate. Workflow [`.github/workflows/driver-eas.yml`](../../../.github/workflows/driver-eas.yml):
+
+| Disparador | Qué corre |
+|---|---|
+| Tag `driver-v*` | Android `production` (AAB) + `internal` (APK), adjunta APK al GitHub Release, luego `eas update --channel production` |
+| `workflow_dispatch` | Plataforma (`android` / `ios`) y perfil; OTA opcional |
+
+Secrets (falla si faltan): `EXPO_TOKEN`, **`EAS_DRIVER_PROJECT_ID`** (proyecto Expo Driver — no reutilizar `EAS_PROJECT_ID` de Seller). Opcional: `EXPO_PUBLIC_API_BASE_URL`. Distinto de tags `seller-v*` y desktop `v*.*.*`.
+
 ## Rama huérfana `documentacion`
 
 La rama **huérfana** `documentacion` **no** contiene código de aplicación: solo una instantánea documental para publicación estática (p. ej. GitHub Pages).
@@ -214,6 +223,7 @@ Archivo: `.github/workflows/deploy.yml`.
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] Enlaces HTTP(S) en `docs/` — `docs-links.yml` + `.lycheeignore` (Lychee; no enlaces relativos `.md`)
 - [x] EAS App Seller en tags `seller-v*` — `.github/workflows/seller-eas.yml` (`EXPO_TOKEN` / `EAS_PROJECT_ID`; no Quality Gate) — #173
+- [x] EAS App Repartidor en tags `driver-v*` — `.github/workflows/driver-eas.yml` (`EXPO_TOKEN` / `EAS_DRIVER_PROJECT_ID`; Release con APK; no Quality Gate) — #166
 
 ## Flujo automático de Project (GitHub)
 
