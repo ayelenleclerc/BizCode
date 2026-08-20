@@ -46,6 +46,7 @@
   },
   "empresaName": "BizCode",
   "error": "Não foi possível registrar a cobrança.",
+  "queued": "Cobrança salva sem sinal. Será enviada ao reconectar.",
   "forbidden": "Você não tem permissão para cobrar.",
   "offline": "Sem conexão. Verifique o sinal e tente novamente."
 }

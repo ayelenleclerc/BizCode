@@ -60,6 +60,10 @@ Module **`logistics.pod`**. Driver UI `/logistica/repartos/chofer` requires **`o
 
 `POST /api/repartos/{id}/items/{itemId}/devolucion`, `GET /api/repartos/{id}/devoluciones`, and `POST /api/repartos/{id}/devoluciones/rendir` require **`orders.deliver.confirm` + `x-bizcode-channel: field`**. Role `driver` is **not** granted `inventory.adjust` or `sales.cancel` / `sales.create`. Stock (`StockAjuste` motivo `devolucion_entrega`) and partial credit notes run only on remittance, server-side. FEFO + `controlLote` without `loteId` returns **`422 LOTE_REQUIRED`** and leaves the return `registered`.
 
+## App Driver offline (#164)
+
+Offline flush reuses the same POD / cobro / devolución endpoints and **`orders.deliver.confirm` + field**. No extra permissions. Conflict notifications `reparto_sync_conflict` target **`owner`**, **`manager`**, and **`logistics_planner`** (in-app; Expo push only if those users have a token).
+
 ## Logistics KPIs and reports (#145)
 
 Module **`logistics.dispatches`**. Endpoints `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`: **`logistics.read`**; roles `owner`, `manager`, `logistics_planner` (UI tab on `/logistica`; drivers excluded). CSV via `Accept: text/csv` on driver/zone reports.

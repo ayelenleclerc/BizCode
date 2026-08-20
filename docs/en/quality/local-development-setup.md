@@ -129,7 +129,7 @@ Privacy policy URL: `{PUBLIC_WEB_ORIGIN}/privacidad` (public page from #195; ope
 
 **Note:** `@bizcode/ui` (#157) is out of scope for #167/#168; do not block type-check or login on that package.
 
-### App Driver (`apps/driver`, #159–#163)
+### App Driver (`apps/driver`, #159–#164)
 
 Expo SDK app with Expo Router (same stack as Seller). Auth uses **Bearer dual** mode with tokens in **expo-secure-store** and `Authorization: Bearer` plus `x-bizcode-channel: field`.
 
@@ -142,6 +142,8 @@ Allowed role: **`driver`** only. Other roles see an accessible “driver-only”
 **Proof of delivery (#161):** **Deliver** on a pending `on_route` stop opens a 4-step wizard (recipient name + optional DNI/notes, signature canvas, optional photo, summary). Confirm calls the same `PUT /api/repartos/:id/items/:itemId` with `outcome: delivered`, required `receptorNombre` and `firmaBase64`, optional `fotoBase64`. Client compression matches server/OpenAPI: signature **50 KB**, JPEG photo **200 KB**. Empty signature disables confirm. A failed upload keeps wizard fields for retry. Success patches the stop in `RutaContext` and returns to the list. Camera and library permissions come from the `expo-image-picker` plugin. No Prisma/OpenAPI change. Smoke needs a today `on_route` reparto for user `driver` (create via web logistics planner + **Start**).
 
 **Delivery returns (#163):** **Could not deliver** with motivo `rechazo` or `producto_dañado` (when the stop has invoice lines) opens a return form (qtys 0 < qty ≤ line, notes, photo required if damaged) and `POST /api/repartos/:id/items/:itemId/devolucion`. That call does **not** change stock or issue a credit note. Absent / wrong address / other still use `PUT` `not_delivered`. End-of-day **Remit returns** (`/ruta/rendicion`) lists pending rows and `POST .../devoluciones/rendir`: server `StockAjuste` motivo `devolucion_entrega` and partial NC if the OE has a factura. Without factura: stock yes, NC no. FEFO + `controlLote` → `422 LOTE_REQUIRED` (row stays pending; do not invent a lot). Role `driver` is not given `inventory.adjust`. Apply Prisma migration `20260819120000_devolucion_entrega_163`. Smoke: `on_route` stop with factura lines; register a partial rechazo; confirm stock unchanged until remittance.
+
+**Offline mode (#164):** with signal, login hydrates SQLite (`mi-reparto`, `formas-pago`, `transfer-info`) for the local calendar day (invalidated at midnight). Airplane mode: POD delivered / not-delivered, collections, and return register enqueue FIFO (`expo-sqlite` outbox + MMKV pending count); stop chips show pending sync. Queue survives app restart. Reconnect flushes in background (banner). **Remit returns stays online-only.** If the server already changed the stop (`422 REPARTO_ITEM_INVALID_STATE` / `REPARTO_INVALID_STATE` / `DEVOLUCION_ALREADY_EXISTS`), the driver sees a conflict banner and `owner`/`manager`/`logistics_planner` get in-app notification `reparto_sync_conflict`. No extra driver permissions. No Prisma migration.
 
 ```bash
 # Terminal 1 — API

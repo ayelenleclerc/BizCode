@@ -129,7 +129,7 @@ URL de privacidad: `{PUBLIC_WEB_ORIGIN}/privacidad` (página pública #195; el o
 
 **Nota:** `@bizcode/ui` (#157) está fuera de alcance de #167/#168; no bloquear type-check ni login por ese paquete.
 
-### App Repartidor (`apps/driver`, #159–#163)
+### App Repartidor (`apps/driver`, #159–#164)
 
 App Expo SDK con Expo Router (mismo stack que Seller). Auth en modo **Bearer dual** con tokens en **expo-secure-store** y `Authorization: Bearer` más `x-bizcode-channel: field`.
 
@@ -142,6 +142,8 @@ Rol permitido: solo **`driver`**. Otros roles ven pantalla de acceso denegado.
 **Comprobante de entrega (#161):** **Entregar** en una parada `pending` de un reparto `on_route` abre un wizard de 4 pasos (nombre del receptor + DNI/notas opcionales, lienzo de firma, foto opcional, resumen). Confirmar llama el mismo `PUT /api/repartos/:id/items/:itemId` con `outcome: delivered`, `receptorNombre` y `firmaBase64` obligatorios, `fotoBase64` opcional. La compresión del cliente alinea servidor/OpenAPI: firma **50 KB**, foto JPEG **200 KB**. Firma vacía deshabilita confirmar. Un error de subida conserva los datos para reintentar. El éxito actualiza la parada en `RutaContext` y vuelve a la lista. Permisos de cámara y galería vía plugin `expo-image-picker`. Sin cambio Prisma/OpenAPI. El smoke local necesita un reparto `on_route` de hoy para el usuario `driver` (crearlo en logística web + **Iniciar**).
 
 **Devoluciones en entrega (#163):** **No pude entregar** con motivo `rechazo` o `producto_dañado` (si hay renglones de factura) abre el formulario (cantidades 0 < qty ≤ línea, notas, foto obligatoria si dañado) y `POST /api/repartos/:id/items/:itemId/devolucion`. Ese POST **no** mueve stock ni emite NC. Ausente / domicilio incorrecto / otro siguen el `PUT` `not_delivered`. **Rendir devoluciones** (`/ruta/rendicion`) lista pendientes y `POST .../devoluciones/rendir`: `StockAjuste` motivo `devolucion_entrega` y NC parcial si hay factura. Sin factura: stock sí, NC no. FEFO + `controlLote` → `422 LOTE_REQUIRED` (queda pendiente; no inventar lote). El rol `driver` no recibe `inventory.adjust`. Aplicar migración Prisma `20260819120000_devolucion_entrega_163`. Smoke: parada `on_route` con líneas de factura; rechazo parcial; stock sin cambio hasta rendir.
+
+**Modo offline (#164):** con señal, el login hidrata SQLite (`mi-reparto`, `formas-pago`, `transfer-info`) del día local (se invalida a medianoche). Modo avión: POD entregado / no entregado, cobros y registro de devolución van a outbox FIFO; chips de parada muestran pendiente de sync. La cola sobrevive al cerrar la app. Al reconectar, flush en segundo plano (banner). **La rendición de devoluciones sigue solo online.** Si el servidor ya cambió la parada (`422 REPARTO_ITEM_INVALID_STATE` / `REPARTO_INVALID_STATE` / `DEVOLUCION_ALREADY_EXISTS`), el chofer ve conflicto y `owner`/`manager`/`logistics_planner` reciben notificación in-app `reparto_sync_conflict`. Sin permisos extra al `driver`. Sin migración Prisma.
 
 ```bash
 # Terminal 1 — API

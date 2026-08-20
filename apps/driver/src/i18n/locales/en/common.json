@@ -32,5 +32,15 @@
     "title": "Access denied",
     "body": "Your role cannot use the Driver app.",
     "back": "Back to login"
+  },
+  "offline": {
+    "banner": "Offline — data from {{date}}",
+    "hydrating": "Downloading today’s route…",
+    "syncing": "Syncing {{count}} actions…",
+    "pending": "{{count}} pending sync",
+    "synced": "Fully synced",
+    "syncError": "Sync error — will retry when online",
+    "syncConflict": "Conflict: the server already has another state for this stop. Dispatch was notified.",
+    "retrySync": "Sync"
   }
 }

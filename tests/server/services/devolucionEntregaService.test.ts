@@ -19,6 +19,11 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
         updatedAt: new Date(),
       }),
     },
+    appUser: { findMany: vi.fn().mockResolvedValue([]) },
+    notification: { create: vi.fn().mockResolvedValue({}) },
+    auditEvent: { create: vi.fn().mockResolvedValue({}) },
+    pushNotificationPreference: { findUnique: vi.fn().mockResolvedValue(null) },
+    devicePushToken: { findMany: vi.fn().mockResolvedValue([]) },
     recuento: { findFirst: vi.fn().mockResolvedValue(null) },
     deposito: { findFirst: vi.fn().mockResolvedValue(null) },
     articulo: {

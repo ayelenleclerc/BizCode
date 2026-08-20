@@ -21,6 +21,7 @@
     "loteRequired": "Um artigo exige lote. A devolução fica pendente; o depósito deve atribuir o lote.",
     "registered": "Pendente de prestar",
     "remitted": "Prestada",
-    "success": "Prestação concluída. O servidor aplicou estoque e notas de crédito."
+    "success": "Prestação concluída. O servidor aplicou estoque e notas de crédito.",
+    "needsOnline": "A prestação exige conexão. Devoluções offline sobem ao reconectar; preste depois."
   }
 }

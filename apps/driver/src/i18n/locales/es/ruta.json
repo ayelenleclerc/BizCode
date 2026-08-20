@@ -8,6 +8,7 @@
   "forbidden": "No podés ver esta ruta.",
   "bultos": "{{count}} artículos",
   "debtBadge": "Deuda",
+  "pendingSync": "Pendiente de sync",
   "estado": {
     "pending": "Pendiente",
     "delivered": "Entregado",

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { FlatList, Pressable, StyleSheet, View } from 'react-native'
 import { ActivityIndicator, Button, Chip, Text, Title } from 'react-native-paper'
 import { useRuta } from '../../../src/ruta/RutaContext'
+import { useOffline } from '../../../src/offline/OfflineContext'
 import { countBultos, hasDebt } from '../../../src/ruta/stopView'
 import type { RepartoItemEstado, RepartoItemRow } from '@bizcode/types'
 
@@ -16,6 +17,7 @@ export default function RutaIndexScreen() {
   const { t } = useTranslation(['ruta', 'common', 'devolucion'])
   const router = useRouter()
   const { status, reparto, load } = useRuta()
+  const { pendingStopIds } = useOffline()
 
   useEffect(() => {
     void load()
@@ -81,6 +83,7 @@ export default function RutaIndexScreen() {
         renderItem={({ item }) => (
           <StopRow
             item={item}
+            pendingSync={pendingStopIds.has(item.id)}
             onPress={() => router.push(`/(app)/ruta/${item.id}`)}
           />
         )}
@@ -89,7 +92,15 @@ export default function RutaIndexScreen() {
   )
 }
 
-function StopRow({ item, onPress }: { item: RepartoItemRow; onPress: () => void }) {
+function StopRow({
+  item,
+  pendingSync,
+  onPress,
+}: {
+  item: RepartoItemRow
+  pendingSync: boolean
+  onPress: () => void
+}) {
   const { t } = useTranslation('ruta')
   const cliente = item.ordenEntrega.cliente
   const bultos = countBultos(item)
@@ -118,6 +129,11 @@ function StopRow({ item, onPress }: { item: RepartoItemRow; onPress: () => void 
           {debt ? (
             <Chip compact selected testID={`driver-ruta-deuda-${item.id}`}>
               {t('debtBadge')}
+            </Chip>
+          ) : null}
+          {pendingSync ? (
+            <Chip compact testID={`driver-ruta-pending-sync-${item.id}`}>
+              {t('pendingSync')}
             </Chip>
           ) : null}
         </View>

@@ -77,6 +77,15 @@ export function buildPushContent(
             : 'Tenés un mensaje nuevo',
         data: { type, messageId: payload.messageId, fromUserId: payload.fromUserId },
       }
+    case 'reparto_sync_conflict':
+      return {
+        title: 'Conflicto de sync de ruta',
+        body:
+          typeof payload.detail === 'string' && payload.detail.length > 0
+            ? payload.detail
+            : 'Una acción offline del chofer no se aplicó',
+        data: { type, ...payload },
+      }
     default:
       return {
         title: 'BizCode',

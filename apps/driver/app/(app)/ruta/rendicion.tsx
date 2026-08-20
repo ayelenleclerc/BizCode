@@ -5,6 +5,7 @@ import { ActivityIndicator, Button, HelperText, Text, Title } from 'react-native
 import type { DevolucionEntregaPublic } from '@bizcode/types'
 import { driverRepartosApi } from '../../../src/api/driverApi'
 import { mapApiErrorToUiState, type UiLoadState } from '../../../src/lib/apiErrors'
+import { useOffline } from '../../../src/offline/OfflineContext'
 import { useRuta } from '../../../src/ruta/RutaContext'
 
 /**
@@ -15,6 +16,7 @@ import { useRuta } from '../../../src/ruta/RutaContext'
 export default function RendicionDevolucionesScreen() {
   const { t } = useTranslation(['devolucion', 'common'])
   const { reparto } = useRuta()
+  const { online } = useOffline()
   const [status, setStatus] = useState<UiLoadState>('idle')
   const [rows, setRows] = useState<DevolucionEntregaPublic[]>([])
   const [saving, setSaving] = useState(false)
@@ -63,6 +65,14 @@ export default function RendicionDevolucionesScreen() {
     } finally {
       setSaving(false)
     }
+  }
+
+  if (!online) {
+    return (
+      <View style={styles.centered} testID="driver-rendicion-offline">
+        <Text>{t('devolucion:rendicion.needsOnline')}</Text>
+      </View>
+    )
   }
 
   if (status === 'loading' || status === 'idle') {

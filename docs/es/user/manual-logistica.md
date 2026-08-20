@@ -90,6 +90,10 @@ Back-office: en **`/logistica/repartos`**, panel de seguimiento con badge **POD 
 
 App Repartidor registra `rechazo` / `producto_dañado` con `POST /api/repartos/{id}/items/{itemId}/devolucion` (`orders.deliver.confirm` + field). Eso no ajusta stock ni emite NC. La rendición `POST /api/repartos/{id}/devoluciones/rendir` aplica `StockAjuste` motivo `devolucion_entrega` y NC parcial si la OE tiene factura. Sin factura: stock sí, NC no. FEFO + `controlLote` sin lote → `422 LOTE_REQUIRED` (queda pendiente). El rol `driver` no recibe `inventory.adjust`.
 
+## App Repartidor offline (#164)
+
+Con la ruta del día descargada, App Driver puede confirmar POD, registrar cobros y devoluciones sin señal (outbox FIFO). La rendición de devoluciones sigue solo online. Si el sync recibe `422` porque la parada ya cambió en el servidor, los roles de depósito (`owner`, `manager`, `logistics_planner`) reciben notificación in-app `reparto_sync_conflict`.
+
 ## Seguimiento GPS en vivo (#144)
 
 Módulo **`logistics.gps`** (depende de **`logistics.dispatches`**). Planificadores con roles **`owner`**, **`manager`** o **`logistics_planner`** abren **`/logistica/seguimiento`** (mapa OpenStreetMap + Leaflet, lista de repartos `on_route`, actualización cada **60 s**).

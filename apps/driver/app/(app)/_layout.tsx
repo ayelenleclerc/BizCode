@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, View } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthContext'
+import { OfflineBanner } from '../../src/offline/OfflineBanner'
 import { RutaProvider } from '../../src/ruta/RutaContext'
 
 export default function AppLayout() {
@@ -43,6 +44,7 @@ export default function AppLayout() {
 
   return (
     <RutaProvider>
+      <OfflineBanner />
       <Tabs
         screenOptions={{
           headerRight: logoutButton,

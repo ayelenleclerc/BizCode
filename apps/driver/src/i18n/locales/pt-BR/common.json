@@ -32,5 +32,15 @@
     "title": "Acesso negado",
     "body": "Seu perfil não pode usar o App Entregador.",
     "back": "Voltar ao login"
+  },
+  "offline": {
+    "banner": "Sem conexão — dados de {{date}}",
+    "hydrating": "Baixando a rota de hoje…",
+    "syncing": "Sincronizando {{count}} ações…",
+    "pending": "{{count}} pendentes de sync",
+    "synced": "Tudo sincronizado",
+    "syncError": "Erro de sync — tentará de novo ao reconectar",
+    "syncConflict": "Conflito: o servidor já tem outro estado nesta parada. O depósito foi notificado.",
+    "retrySync": "Sincronizar"
   }
 }

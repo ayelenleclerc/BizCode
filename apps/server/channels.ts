@@ -328,6 +328,13 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Una parada de la ruta diaria fue postergada al próximo día hábil.${detail}`,
       }
     }
+    case 'reparto_sync_conflict': {
+      const detail = payload.detail ? `\n${payload.detail}` : ''
+      return {
+        subject: `[BizCode] Conflicto de sync de reparto`,
+        text: `Una acción offline del chofer no se aplicó porque el servidor ya tiene otro estado.${detail}`,
+      }
+    }
     case 'pedido_confirmed':
     case 'pedido_cancelled':
     case 'cliente_credit_alert':
