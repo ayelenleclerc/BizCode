@@ -13,7 +13,7 @@ import type { RepartoItemEstado, RepartoItemRow } from '@bizcode/types'
  * @pt-BR Lista da rota do dia ordenada por RepartoItem.secuencia (#160).
  */
 export default function RutaIndexScreen() {
-  const { t } = useTranslation(['ruta', 'common'])
+  const { t } = useTranslation(['ruta', 'common', 'devolucion'])
   const router = useRouter()
   const { status, reparto, load } = useRuta()
 
@@ -58,6 +58,16 @@ export default function RutaIndexScreen() {
         </View>
       ) : null}
       {reparto?.estado === 'planned' ? <Text>{t('ruta:plannedBanner')}</Text> : null}
+      {reparto ? (
+        <Button
+          mode="outlined"
+          testID="driver-ruta-rendicion"
+          accessibilityLabel={t('devolucion:rendicion.open')}
+          onPress={() => router.push('/(app)/ruta/rendicion')}
+        >
+          {t('devolucion:rendicion.open')}
+        </Button>
+      ) : null}
       <FlatList
         data={items}
         keyExtractor={(item) => String(item.id)}

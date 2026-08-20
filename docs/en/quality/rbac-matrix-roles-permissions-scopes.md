@@ -56,6 +56,10 @@ Module **`logistics.pod`**. Driver UI `/logistica/repartos/chofer` requires **`o
 
 `POST /api/cobros` and `GET /api/formas-pago` accept **`sales.create` or `orders.deliver.confirm`**. Role `driver` still has only `orders.deliver.confirm` in `ROLE_PERMISSIONS` (no `sales.create`). Actors without `sales.create` must send **`x-bizcode-channel: field`**, `clienteId` must be on the driver's `GET /api/repartos/mi-reparto` for today, and `retenciones` are rejected. `GET /api/cobros/transfer-info` requires **`orders.deliver.confirm` + field** and does not require `finance.bank_reconcile`. Web `GET /api/cobros` remains **`reports.operational.read`**. PATCH `/api/formas-pago/{id}` remains **`sales.create`** only.
 
+## App Driver delivery returns (#163)
+
+`POST /api/repartos/{id}/items/{itemId}/devolucion`, `GET /api/repartos/{id}/devoluciones`, and `POST /api/repartos/{id}/devoluciones/rendir` require **`orders.deliver.confirm` + `x-bizcode-channel: field`**. Role `driver` is **not** granted `inventory.adjust` or `sales.cancel` / `sales.create`. Stock (`StockAjuste` motivo `devolucion_entrega`) and partial credit notes run only on remittance, server-side. FEFO + `controlLote` without `loteId` returns **`422 LOTE_REQUIRED`** and leaves the return `registered`.
+
 ## Logistics KPIs and reports (#145)
 
 Module **`logistics.dispatches`**. Endpoints `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`: **`logistics.read`**; roles `owner`, `manager`, `logistics_planner` (UI tab on `/logistica`; drivers excluded). CSV via `Accept: text/csv` on driver/zone reports.

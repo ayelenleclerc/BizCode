@@ -41,6 +41,8 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | POST | `/api/repartos/:id/cerrar` | `reparto_closed` | `metadata` con resumen de cierre |
 | POST | `/api/repartos/:id/ubicacion` | `reparto_ubicacion_recorded` | módulo `logistics.gps`; `metadata` lat/lng |
 | PUT | `/api/repartos/:repartoId/items/:itemId` | `reparto_item_pod_signed` | POD en ítem; `resource: reparto_item` |
+| POST | `/api/repartos/:id/items/:itemId/devolucion` | `devolucion_entrega_registered` | canal `field`; `resource: devolucion_entrega` (#163) |
+| POST | `/api/repartos/:id/devoluciones/rendir` | `devolucion_entrega_remitted` | canal `field`; `resource: reparto`; metadata `summary` (#163) |
 | POST | `/api/proveedores/{id}/catalogo` | `proveedor_catalogo_create` | `resource: proveedor_articulo`; módulo `logistics.purchases` (#273) |
 | PUT | `/api/proveedores/{id}/catalogo/{articuloId}` | `proveedor_catalogo_update` | `resource: proveedor_articulo`; `resourceId` del catálogo (#273) |
 | POST | `/api/proveedores/{id}/catalogo/import` | `proveedor_catalogo_import` | metadata `created` / `updated` / `skipped` (#273) |

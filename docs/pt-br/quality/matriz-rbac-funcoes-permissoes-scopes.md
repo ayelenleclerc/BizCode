@@ -56,6 +56,10 @@ Módulo **`logistics.pod`**. UI motorista `/logistica/repartos/chofer` exige **`
 
 `POST /api/cobros` e `GET /api/formas-pago` aceitam **`sales.create` ou `orders.deliver.confirm`**. O papel `driver` continua só com `orders.deliver.confirm` em `ROLE_PERMISSIONS` (sem `sales.create`). Quem não tem `sales.create` deve enviar **`x-bizcode-channel: field`**, `clienteId` deve estar em `GET /api/repartos/mi-reparto` de hoje, e `retenciones` são recusadas. `GET /api/cobros/transfer-info` exige **`orders.deliver.confirm` + field** e não requer `finance.bank_reconcile`. O `GET /api/cobros` web segue com **`reports.operational.read`**. PATCH `/api/formas-pago/{id}` continua só **`sales.create`**.
 
+## Devoluções na entrega App Entregador (#163)
+
+`POST /api/repartos/{id}/items/{itemId}/devolucion`, `GET /api/repartos/{id}/devoluciones` e `POST /api/repartos/{id}/devoluciones/rendir` exigem **`orders.deliver.confirm` + `x-bizcode-channel: field`**. O papel `driver` **não** recebe `inventory.adjust` nem `sales.cancel` / `sales.create`. Estoque (`StockAjuste` motivo `devolucion_entrega`) e NC parcial só na prestação, no servidor. FEFO + `controlLote` sem `loteId` responde **`422 LOTE_REQUIRED`** e deixa a devolução `registered`.
+
 ## KPIs e relatórios logísticos (#145)
 
 Módulo **`logistics.dispatches`**. `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`: **`logistics.read`**; papéis `owner`, `manager`, `logistics_planner` (aba em `/logistica`; motorista excluído). CSV com `Accept: text/csv`.

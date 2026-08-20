@@ -132,6 +132,52 @@ export type MotivoNoEntrega =
   | 'producto_dañado'
   | 'otro'
 
+export type MotivoDevolucionEntrega = 'rechazo' | 'producto_dañado'
+
+export type DevolucionEntregaEstado = 'registered' | 'remitted'
+
+export type DevolucionEntregaLineaInput = {
+  articuloId: number
+  facturaItemId?: number | null
+  cantidad: number
+}
+
+export type DevolucionEntregaRegisterInput = {
+  motivo: MotivoDevolucionEntrega
+  motivoDetalle?: string | null
+  fotoBase64?: string | null
+  lineas: DevolucionEntregaLineaInput[]
+}
+
+export type DevolucionEntregaLineaPublic = {
+  id: number
+  articuloId: number
+  facturaItemId: number | null
+  cantidad: number
+}
+
+export type DevolucionEntregaPublic = {
+  id: number
+  tenantId: number
+  repartoId: number
+  repartoItemId: number
+  motivo: MotivoDevolucionEntrega
+  motivoDetalle: string | null
+  hasFoto: boolean
+  estado: DevolucionEntregaEstado
+  notaCreditoId: number | null
+  remittedAt: string | null
+  createdAt: string
+  lineas: DevolucionEntregaLineaPublic[]
+}
+
+export type DevolucionEntregaRemitSummary = {
+  remitted: number
+  stockAdjustments: number
+  creditNotes: number
+  skippedNoInvoice: number
+}
+
 export type RepartoItemRow = {
   id: number
   ordenEntregaId: number

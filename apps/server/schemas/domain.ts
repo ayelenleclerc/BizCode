@@ -2404,6 +2404,34 @@ export const repartoItemPodBodySchema = z
     }
   })
 
+export const devolucionEntregaRegisterBodySchema = z
+  .object({
+    motivo: z.enum(['rechazo', 'producto_dañado']),
+    motivoDetalle: z.string().max(500).nullable().optional(),
+    fotoBase64: z.string().nullable().optional(),
+    lineas: z
+      .array(
+        z.object({
+          articuloId: z.number().int().positive(),
+          facturaItemId: z.number().int().positive().nullable().optional(),
+          cantidad: z.number().positive(),
+        }),
+      )
+      .min(1),
+  })
+  .superRefine((body, ctx) => {
+    if (body.motivo === 'producto_dañado') {
+      const foto = body.fotoBase64?.trim() ?? ''
+      if (foto.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'fotoBase64 is required for producto_dañado',
+          path: ['fotoBase64'],
+        })
+      }
+    }
+  })
+
 export const repartoUbicacionBodySchema = z
   .object({
     lat: z.number(),

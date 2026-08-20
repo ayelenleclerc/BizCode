@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "items": {
+        "$ref": "./DevolucionEntrega.schema.json"
+      },
+      "type": "array"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    },
+    "summary": {
+      "$ref": "./DevolucionEntregaRemitSummary.schema.json"
+    }
+  },
+  "required": [
+    "success",
+    "data",
+    "summary"
+  ],
+  "title": "DevolucionEntregaRemitEnvelope",
+  "type": "object"
+}

@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { MotivoNoEntrega, Reparto, RepartoItemRow } from '@bizcode/types'
+import type { DevolucionEntregaRegisterInput, MotivoNoEntrega, Reparto, RepartoItemRow } from '@bizcode/types'
 import { driverRepartosApi } from '../api/driverApi'
 import { mapApiErrorToUiState, type UiLoadState } from '../lib/apiErrors'
 import type { DeliveredPodFields } from './pod/podValidation'
@@ -19,6 +19,7 @@ type RutaContextValue = {
   patchItem: (itemId: number, next: RepartoItemRow) => void
   markNotDelivered: (itemId: number, motivo: MotivoNoEntrega) => Promise<void>
   markDelivered: (itemId: number, input: DeliveredPodFields) => Promise<void>
+  registerDevolucion: (itemId: number, input: DevolucionEntregaRegisterInput) => Promise<void>
 }
 
 const RutaContext = createContext<RutaContextValue | null>(null)
@@ -99,9 +100,27 @@ export function RutaProvider({ children }: { children: ReactNode }) {
     [patchItem, reparto],
   )
 
+  const registerDevolucion = useCallback(
+    async (itemId: number, input: DevolucionEntregaRegisterInput) => {
+      if (!reparto) return
+      await driverRepartosApi.registerDevolucion(reparto.id, itemId, input)
+      await load()
+    },
+    [load, reparto],
+  )
+
   const value = useMemo(
-    () => ({ status, error, reparto, load, patchItem, markNotDelivered, markDelivered }),
-    [status, error, reparto, load, patchItem, markNotDelivered, markDelivered],
+    () => ({
+      status,
+      error,
+      reparto,
+      load,
+      patchItem,
+      markNotDelivered,
+      markDelivered,
+      registerDevolucion,
+    }),
+    [status, error, reparto, load, patchItem, markNotDelivered, markDelivered, registerDevolucion],
   )
 
   return <RutaContext.Provider value={value}>{children}</RutaContext.Provider>

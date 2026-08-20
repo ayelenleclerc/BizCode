@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidad": {
+      "type": "number"
+    },
+    "facturaItemId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "articuloId",
+    "facturaItemId",
+    "cantidad"
+  ],
+  "title": "DevolucionEntregaLinea",
+  "type": "object"
+}

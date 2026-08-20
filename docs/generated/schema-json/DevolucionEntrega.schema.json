@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "estado": {
+      "enum": [
+        "registered",
+        "remitted"
+      ],
+      "type": "string"
+    },
+    "hasFoto": {
+      "type": "boolean"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "lineas": {
+      "items": {
+        "$ref": "./DevolucionEntregaLinea.schema.json"
+      },
+      "type": "array"
+    },
+    "motivo": {
+      "enum": [
+        "rechazo",
+        "producto_dañado"
+      ],
+      "type": "string"
+    },
+    "motivoDetalle": {
+      "nullable": true,
+      "type": "string"
+    },
+    "notaCreditoId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "remittedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "repartoId": {
+      "type": "integer"
+    },
+    "repartoItemId": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "repartoId",
+    "repartoItemId",
+    "motivo",
+    "motivoDetalle",
+    "hasFoto",
+    "estado",
+    "notaCreditoId",
+    "remittedAt",
+    "createdAt",
+    "lineas"
+  ],
+  "title": "DevolucionEntrega",
+  "type": "object"
+}

@@ -349,6 +349,7 @@ model Articulo {
   updatedAt            DateTime           @updatedAt
 
   facturaItems           FacturaItem[]
+  devolucionEntregaLineas DevolucionEntregaLinea[]
   pedidoItems            PedidoItem[]
   plantillaPedidoItems   PlantillaPedidoItem[]
   contratoItems          ContratoItem[]
@@ -1234,6 +1235,7 @@ model NotaCredito {
   createdAt          DateTime             @default(now())
   movimientoCC       MovimientoClienteCC?
   mercadoPagoRefunds MercadoPagoRefund[]
+  devolucionesEntrega DevolucionEntrega[]
   /// @en Fiscal e-invoicing authorization attempts across providers (#378).
   /// @es Intentos de autorizaci\u00f3n fiscal multi-organismo (#378).
   /// @pt-BR Tentativas de autoriza\u00e7\u00e3o fiscal multi-organismo (#378).
@@ -1610,6 +1612,7 @@ model FacturaItem {
   createdAt DateTime @default(now())
 
   garantias Garantia[]
+  devolucionEntregaLineas DevolucionEntregaLinea[]
 
   @@index([loteId])
 }
@@ -1786,6 +1789,7 @@ model Tenant {
   documentosCompraImportados       DocumentoCompraImportado[]
   facturas                         Factura[]
   notasCredito                     NotaCredito[]
+  devolucionesEntrega              DevolucionEntrega[]
   pedidos                          Pedido[]
   plantillasPedido                 PlantillaPedido[]
   visitasVendedor                  VisitaVendedor[]
@@ -2622,8 +2626,9 @@ model Reparto {
   updatedAt     DateTime  @updatedAt
   closedAt      DateTime?
 
-  items       RepartoItem[]
-  ubicaciones RepartoUbicacion[]
+  items              RepartoItem[]
+  ubicaciones        RepartoUbicacion[]
+  devolucionesEntrega DevolucionEntrega[]
 
   @@index([tenantId, fecha])
   @@index([tenantId, estado])
@@ -2661,9 +2666,56 @@ model RepartoItem {
   notasEntrega    String?      @db.VarChar(500)
   /// { firmaBase64?, fotoBase64? } — MVP POD media (#142)
   podMedia        Json?
+  devolucionEntrega DevolucionEntrega?
 
   @@index([repartoId])
   @@index([ordenEntregaId])
+}
+
+/// @en Delivery-stop return registered by the driver; stock/NC only on remittance (#163).
+/// @es Devolución de parada registrada por el chofer; stock/NC solo en rendición (#163).
+/// @pt-BR Devolução da parada registrada pelo motorista; estoque/NC só na prestação (#163).
+model DevolucionEntrega {
+  id              Int      @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  repartoId       Int
+  reparto         Reparto  @relation(fields: [repartoId], references: [id], onDelete: Cascade)
+  repartoItemId   Int      @unique
+  repartoItem     RepartoItem @relation(fields: [repartoItemId], references: [id], onDelete: Cascade)
+  /// rechazo | producto_dañado
+  motivo          String   @db.VarChar(30)
+  motivoDetalle   String?  @db.VarChar(500)
+  fotoBase64      String?  @db.Text
+  /// registered | remitted
+  estado          String   @default("registered") @db.VarChar(20)
+  registeredById  Int
+  registeredBy    AppUser  @relation("DevolucionEntregaRegisteredBy", fields: [registeredById], references: [id])
+  remittedAt      DateTime?
+  remittedById    Int?
+  remittedBy      AppUser? @relation("DevolucionEntregaRemittedBy", fields: [remittedById], references: [id])
+  notaCreditoId   Int?
+  notaCredito     NotaCredito? @relation(fields: [notaCreditoId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  lineas          DevolucionEntregaLinea[]
+
+  @@index([tenantId, repartoId, estado])
+  @@index([tenantId, registeredById])
+}
+
+model DevolucionEntregaLinea {
+  id                  Int               @id @default(autoincrement())
+  devolucionEntregaId Int
+  devolucionEntrega   DevolucionEntrega @relation(fields: [devolucionEntregaId], references: [id], onDelete: Cascade)
+  articuloId          Int
+  articulo            Articulo          @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  facturaItemId       Int?
+  facturaItem         FacturaItem?      @relation(fields: [facturaItemId], references: [id], onDelete: SetNull)
+  cantidad            Decimal           @db.Decimal(14, 4)
+
+  @@index([devolucionEntregaId])
+  @@index([articuloId])
 }
 
 model AppUser {
@@ -2702,6 +2754,8 @@ model AppUser {
   ordenesEntregaDriver           OrdenEntrega[]             @relation("OrdenEntregaDriver")
   ordenesEntregaPicker           OrdenEntrega[]             @relation("OrdenEntregaPicker")
   repartosChofer                 Reparto[]                  @relation("RepartoChofer")
+  devolucionesEntregaRegistered  DevolucionEntrega[]        @relation("DevolucionEntregaRegisteredBy")
+  devolucionesEntregaRemitted    DevolucionEntrega[]        @relation("DevolucionEntregaRemittedBy")
   pedidosVendedor                Pedido[]
   plantillasPedido               PlantillaPedido[]
   visitasVendedor                VisitaVendedor[]

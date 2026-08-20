@@ -1,4 +1,4 @@
-import type { MotivoNoEntrega } from '@bizcode/types'
+import type { MotivoDevolucionEntrega, MotivoNoEntrega } from '@bizcode/types'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -6,6 +6,7 @@ import { Linking, ScrollView, StyleSheet, View } from 'react-native'
 import { Button, Dialog, HelperText, List, Portal, RadioButton, Text, Title } from 'react-native-paper'
 import { useRuta } from '../../../src/ruta/RutaContext'
 import PodDeliveryWizard from '../../../src/ruta/pod/PodDeliveryWizard'
+import DevolucionForm from '../../../src/ruta/devolucion/DevolucionForm'
 import { digitsOnly, hasDebt, mapsUrl } from '../../../src/ruta/stopView'
 
 const MOTIVOS: MotivoNoEntrega[] = [
@@ -25,11 +26,13 @@ export default function RutaDetailScreen() {
   const { t } = useTranslation(['ruta', 'common'])
   const router = useRouter()
   const { id } = useLocalSearchParams<{ id: string }>()
-  const { reparto, markNotDelivered, markDelivered } = useRuta()
+  const { reparto, markNotDelivered, markDelivered, registerDevolucion } = useRuta()
   const itemId = Number.parseInt(typeof id === 'string' ? id : '', 10)
   const item = reparto?.items.find((row) => row.id === itemId)
   const [motivoOpen, setMotivoOpen] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
+  const [devolucionOpen, setDevolucionOpen] = useState(false)
+  const [devolucionMotivo, setDevolucionMotivo] = useState<MotivoDevolucionEntrega>('rechazo')
   const [motivo, setMotivo] = useState<MotivoNoEntrega>('ausente')
   const [saving, setSaving] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -57,6 +60,12 @@ export default function RutaDetailScreen() {
 
   const onNotDelivered = async () => {
     setActionError(null)
+    if ((motivo === 'rechazo' || motivo === 'producto_dañado') && articles.length > 0) {
+      setDevolucionMotivo(motivo)
+      setMotivoOpen(false)
+      setDevolucionOpen(true)
+      return
+    }
     setSaving(true)
     try {
       await markNotDelivered(item.id, motivo)
@@ -157,6 +166,18 @@ export default function RutaDetailScreen() {
           {t('ruta:detail.collect')}
         </Button>
       ) : null}
+
+      <DevolucionForm
+        visible={devolucionOpen}
+        motivo={devolucionMotivo}
+        articles={articles}
+        onClose={() => setDevolucionOpen(false)}
+        onSubmit={async (input) => {
+          await registerDevolucion(item.id, input)
+          setDevolucionOpen(false)
+          router.back()
+        }}
+      />
 
       <PodDeliveryWizard
         visible={wizardOpen}
