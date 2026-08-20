@@ -60,7 +60,8 @@ Open **Delivery routes** from the logistics page link or navigate to `/logistica
 
 | Step | Action |
 |------|--------|
-| Plan | `POST /api/repartos` — select driver, optional vehicle/notes, assign **`ready`** delivery orders in sequence (UI supports drag-and-drop and keyboard reorder); OEs become `assigned` with `driverId` |
+| Plan | `POST /api/repartos` — select driver, optional vehicle/notes, assign **`ready`** delivery orders in sequence (UI supports drag-and-drop and keyboard reorder); OEs become `assigned` with `driverId`; assigned driver receives push `reparto_assigned` |
+| Edit stops | `POST /api/repartos/{id}/items` append **`ready`** OEs on `planned`/`on_route` routes; `DELETE /api/repartos/{id}/items/{itemId}` removes a **`pending`** stop and reverts OE to `ready` — driver push on add/remove |
 | Start | `POST /api/repartos/{id}/iniciar` — `planned` → `on_route`; pending items' OEs → `in_transit` |
 | Close | `POST /api/repartos/{id}/cerrar` — `on_route` → `completed`; items still `pending` → `not_delivered` and linked OEs → `failed` |
 

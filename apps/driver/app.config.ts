@@ -23,6 +23,13 @@ const config = {
     'expo-router',
     'expo-secure-store',
     'expo-sqlite',
+    [
+      'expo-notifications',
+      {
+        icon: './assets/icon.png',
+        color: '#1E40AF',
+      },
+    ],
     'expo-updates',
     [
       'expo-image-picker',
@@ -35,6 +42,9 @@ const config = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.bizcode.driver',
+    infoPlist: {
+      UIBackgroundModes: ['remote-notification'],
+    },
   },
   android: {
     adaptiveIcon: {

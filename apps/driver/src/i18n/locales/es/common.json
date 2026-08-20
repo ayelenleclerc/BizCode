@@ -15,7 +15,22 @@
   "perfil": {
     "title": "Perfil",
     "username": "Usuario",
-    "role": "Rol"
+    "role": "Rol",
+    "pushSection": "Notificaciones push",
+    "enabled": "Activa",
+    "muted": "Silenciada",
+    "pushTypes": {
+      "reparto_assigned": "Ruta asignada",
+      "reparto_stop_added": "Parada agregada",
+      "reparto_stop_removed": "Parada cancelada",
+      "chat_message": "Mensajes del depósito"
+    }
+  },
+  "chat": {
+    "title": "Chat #{{userId}}",
+    "placeholder": "Escribí un mensaje…",
+    "send": "Enviar",
+    "empty": "Sin mensajes todavía."
   },
   "logout": "Cerrar sesión",
   "login": {

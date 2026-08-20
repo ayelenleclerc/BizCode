@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
-import { repartosAPI, type Reparto, type RepartoCloseSummary } from '@/lib/api'
+import { ordenesEntregaAPI, repartosAPI, type OrdenEntrega, type Reparto, type RepartoCloseSummary } from '@/lib/api'
 import PodViewDialog from './PodViewDialog'
+import RepartosAvailableOrders from './RepartosAvailableOrders'
 
 type Props = {
   reparto: Reparto
@@ -19,6 +20,33 @@ export default function RepartosTrackingPanel({ reparto, canDispatch, onUpdated 
   const [error, setError] = useState<string | null>(null)
   const [closeSummary, setCloseSummary] = useState<RepartoCloseSummary | null>(null)
   const [podViewItemId, setPodViewItemId] = useState<number | null>(null)
+  const [availableOrders, setAvailableOrders] = useState<OrdenEntrega[]>([])
+
+  const canEditStops =
+    canDispatch && (reparto.estado === 'planned' || reparto.estado === 'on_route')
+
+  const assignedOeIds = useMemo(
+    () => new Set(reparto.items.map((item) => item.ordenEntregaId)),
+    [reparto.items],
+  )
+
+  const loadAvailableOrders = useCallback(async () => {
+    if (!canEditStops) {
+      setAvailableOrders([])
+      return
+    }
+    try {
+      const fecha = reparto.fecha.slice(0, 10)
+      const res = await ordenesEntregaAPI.list({ fecha, estado: 'ready', limit: 200 })
+      setAvailableOrders(res?.data ?? [])
+    } catch {
+      setAvailableOrders([])
+    }
+  }, [canEditStops, reparto.fecha])
+
+  useEffect(() => {
+    void loadAvailableOrders()
+  }, [loadAvailableOrders])
 
   const handleStart = async () => {
     setLoading(true)
@@ -51,6 +79,44 @@ export default function RepartosTrackingPanel({ reparto, canDispatch, onUpdated 
     }
   }
 
+  const handleAddOrder = async (orden: OrdenEntrega) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const updated = await repartosAPI.addItems(reparto.id, { ordenEntregaIds: [orden.id] })
+      if (updated) {
+        onUpdated(updated)
+        await loadAvailableOrders()
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      if (msg.includes('ORDEN_ALREADY_IN_ACTIVE_REPARTO')) {
+        setError(t('errors.alreadyInRoute'))
+      } else {
+        setError(t('errors.addStop'))
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleRemoveItem = async (itemId: number) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const updated = await repartosAPI.removeItem(reparto.id, itemId)
+      if (updated) {
+        onUpdated(updated)
+        await loadAvailableOrders()
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      setError(msg.includes('REPARTO_ITEM_INVALID_STATE') ? t('errors.invalidItemState') : t('errors.removeStop'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <section
       className="mt-6 rounded-lg border border-slate-200 dark:border-slate-600 p-4"
@@ -67,6 +133,16 @@ export default function RepartosTrackingPanel({ reparto, canDispatch, onUpdated 
       <p className="text-sm mb-4">
         {t('list.progress')}: {reparto.progress.delivered}/{reparto.progress.total}
       </p>
+
+      {canEditStops && (
+        <div className="mb-4">
+          <RepartosAvailableOrders
+            orders={availableOrders}
+            selectedIds={assignedOeIds}
+            onAdd={(orden) => void handleAddOrder(orden)}
+          />
+        </div>
+      )}
 
       <ol className="space-y-2 mb-4" data-testid="repartos-tracking-items">
         {reparto.items.map((item) => (
@@ -87,16 +163,29 @@ export default function RepartosTrackingPanel({ reparto, canDispatch, onUpdated 
                 </span>
               )}
             </span>
-            {podEnabled && item.hasPod && (
-              <button
-                type="button"
-                className="text-xs text-blue-600 underline"
-                onClick={() => setPodViewItemId(item.id)}
-                data-testid={`reparto-view-pod-${item.id}`}
-              >
-                {tPod('viewPod')}
-              </button>
-            )}
+            <span className="flex items-center gap-2">
+              {podEnabled && item.hasPod && (
+                <button
+                  type="button"
+                  className="text-xs text-blue-600 underline"
+                  onClick={() => setPodViewItemId(item.id)}
+                  data-testid={`reparto-view-pod-${item.id}`}
+                >
+                  {tPod('viewPod')}
+                </button>
+              )}
+              {canEditStops && item.estado === 'pending' && (
+                <button
+                  type="button"
+                  disabled={loading}
+                  className="text-xs text-red-700 underline disabled:opacity-50"
+                  onClick={() => void handleRemoveItem(item.id)}
+                  data-testid={`repartos-remove-item-${item.id}`}
+                >
+                  {t('actions.removeOrder')}
+                </button>
+              )}
+            </span>
           </li>
         ))}
       </ol>

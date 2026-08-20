@@ -1,7 +1,7 @@
 /**
  * @en Mutation ? AuditEvent.action matrix verification (issue #84). Each successful persistence path must emit an audit row.
- * @es Verificaci˜n matriz mutaci˜n ? AuditEvent.action (#84).
- * @pt-BR Verifica˜˜o muta˜˜o ? AuditEvent.action (#84).
+ * @es Verificacin matriz mutacin ? AuditEvent.action (#84).
+ * @pt-BR Verificao mutao ? AuditEvent.action (#84).
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
@@ -330,6 +330,7 @@ function basePrismaForMutations(): {
     count: vi.fn().mockResolvedValue(0),
     findMany: vi.fn().mockResolvedValue([]),
     findFirst: vi.fn().mockResolvedValue(null),
+    findFirstOrThrow: vi.fn().mockResolvedValue(REPARTO_ROW),
     create: vi.fn().mockResolvedValue(REPARTO_ROW),
     update: vi.fn().mockResolvedValue(REPARTO_ROW),
   }
@@ -344,6 +345,8 @@ function basePrismaForMutations(): {
   }
   prisma.repartoItem = {
     findFirst: vi.fn().mockResolvedValue(null),
+    create: vi.fn().mockResolvedValue({ id: 12 }),
+    delete: vi.fn().mockResolvedValue({ id: 10 }),
     update: vi.fn(),
     updateMany: vi.fn().mockResolvedValue({ count: 0 }),
   }
@@ -834,6 +837,55 @@ describe('HTTP mutations emit AuditEvent (coverage matrix)', () => {
     expect(auditCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ action: 'reparto_started', resource: 'reparto', resourceId: '1' }),
+      }),
+    )
+  })
+
+  it('POST /api/repartos/:id/items ? reparto_item_added', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+
+    vi.mocked(prisma.reparto.findFirst)
+      .mockResolvedValueOnce({ ...REPARTO_ROW, items: [{ secuencia: 1 }] } as never)
+      .mockResolvedValueOnce(REPARTO_ROW as never)
+    vi.mocked(prisma.ordenEntrega.findMany).mockResolvedValue([{ id: 6, estado: 'ready' }] as never)
+    vi.mocked(prisma.repartoItem.findFirst).mockResolvedValue(null)
+    vi.mocked(prisma.reparto.findFirstOrThrow).mockResolvedValue(REPARTO_ROW as never)
+
+    const app = createApp(prisma)
+    await request(app).post('/api/repartos/1/items').send({ ordenEntregaIds: [6] }).expect(200)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ action: 'reparto_item_added', resource: 'reparto', resourceId: '1' }),
+      }),
+    )
+  })
+
+  it('DELETE /api/repartos/:id/items/:itemId ? reparto_item_removed', async () => {
+    const { prisma, auditCreate } = basePrismaForMutations()
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+
+    vi.mocked(prisma.reparto.findFirst)
+      .mockResolvedValueOnce({ id: 1, estado: 'planned', choferId: 2, tenantId: 1 } as never)
+      .mockResolvedValueOnce(REPARTO_ROW as never)
+    vi.mocked(prisma.repartoItem.findFirst).mockResolvedValue({
+      id: 10,
+      estado: 'pending',
+      ordenEntregaId: 5,
+    } as never)
+    vi.mocked(prisma.reparto.findFirstOrThrow).mockResolvedValue(REPARTO_ROW as never)
+
+    const app = createApp(prisma)
+    await request(app).delete('/api/repartos/1/items/10').expect(200)
+
+    expect(auditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'reparto_item_removed',
+          resource: 'reparto_item',
+          resourceId: '10',
+        }),
       }),
     )
   })

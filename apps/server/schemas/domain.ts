@@ -2358,6 +2358,25 @@ export const repartoCreateBodySchema = z
     }
   })
 
+export const repartoAddItemsBodySchema = z
+  .object({
+    ordenEntregaIds: z
+      .array(z.number({ invalid_type_error: 'ordenEntregaIds entries must be numbers' }))
+      .min(1, 'ordenEntregaIds must contain at least one id'),
+  })
+  .superRefine((body, ctx) => {
+    for (let i = 0; i < body.ordenEntregaIds.length; i++) {
+      const id = body.ordenEntregaIds[i]
+      if (!Number.isInteger(id) || id < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'ordenEntregaIds entries must be positive integers',
+          path: ['ordenEntregaIds', i],
+        })
+      }
+    }
+  })
+
 const motivoNoEntregaEnum = z.enum([
   'ausente',
   'rechazo',

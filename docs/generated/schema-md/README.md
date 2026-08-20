@@ -1120,6 +1120,8 @@
 
 * [RepartoActivoListEnvelope](./repartoactivolistenvelope.md) – `-`
 
+* [RepartoAddItemsInput](./repartoadditemsinput.md) – `-`
+
 * [RepartoCloseEnvelope](./repartocloseenvelope.md) – `-`
 
 * [RepartoCloseSummary](./repartoclosesummary.md) – `-`
@@ -2199,6 +2201,8 @@
 * [Untitled array in Reparto](./reparto-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in RepartoActivoListEnvelope](./repartoactivolistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in RepartoAddItemsInput](./repartoadditemsinput-properties-ordenentregaids.md) – `undefined#/properties/ordenEntregaIds`
 
 * [Untitled array in RepartoCreateInput](./repartocreateinput-properties-ordenentregaids.md) – `undefined#/properties/ordenEntregaIds`
 

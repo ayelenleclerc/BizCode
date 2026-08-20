@@ -335,6 +335,21 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Una acción offline del chofer no se aplicó porque el servidor ya tiene otro estado.${detail}`,
       }
     }
+    case 'reparto_assigned':
+      return {
+        subject: '[BizCode] Ruta asignada',
+        text: `Tenés una ruta para hoy con ${payload.stopCount ?? 0} paradas (reparto #${payload.repartoId ?? '—'}).`,
+      }
+    case 'reparto_stop_added':
+      return {
+        subject: '[BizCode] Parada agregada a tu ruta',
+        text: `Se agregó una parada al reparto #${payload.repartoId ?? '—'}.`,
+      }
+    case 'reparto_stop_removed':
+      return {
+        subject: '[BizCode] Parada quitada de tu ruta',
+        text: `Se quitó una parada del reparto #${payload.repartoId ?? '—'}.`,
+      }
     case 'pedido_confirmed':
     case 'pedido_cancelled':
     case 'cliente_credit_alert':

@@ -52,6 +52,21 @@ describe('mobilePushDelivery (#172)', () => {
     expect(content.data.type).toBe('reparto_sync_conflict')
   })
 
+  it('buildPushContent for reparto_assigned (#165)', () => {
+    const content = buildPushContent('reparto_assigned', { repartoId: 7, stopCount: 3 })
+    expect(content.body).toContain('3 paradas')
+    expect(content.data.repartoId).toBe(7)
+  })
+
+  it('buildPushContent for chat_message with username (#165)', () => {
+    const content = buildPushContent('chat_message', {
+      preview: 'Hola',
+      username: 'planner1',
+      fromUserId: 2,
+    })
+    expect(content.body).toBe('Mensaje de planner1: Hola')
+  })
+
   it('skips muted types', async () => {
     const deleteMany = vi.fn()
     const prisma = {

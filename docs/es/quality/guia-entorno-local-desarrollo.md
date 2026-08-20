@@ -145,6 +145,8 @@ Rol permitido: solo **`driver`**. Otros roles ven pantalla de acceso denegado.
 
 **Modo offline (#164):** con señal, el login hidrata SQLite (`mi-reparto`, `formas-pago`, `transfer-info`) del día local (se invalida a medianoche). Modo avión: POD entregado / no entregado, cobros y registro de devolución van a outbox FIFO; chips de parada muestran pendiente de sync. La cola sobrevive al cerrar la app. Al reconectar, flush en segundo plano (banner). **La rendición de devoluciones sigue solo online.** Si el servidor ya cambió la parada (`422 REPARTO_ITEM_INVALID_STATE` / `REPARTO_INVALID_STATE` / `DEVOLUCION_ALREADY_EXISTS`), el chofer ve conflicto y `owner`/`manager`/`logistics_planner` reciben notificación in-app `reparto_sync_conflict`. Sin permisos extra al `driver`. Sin migración Prisma.
 
+**Push (#165):** al login la app registra token Expo (`POST /api/users/me/push-token`, borrado al logout). El backend envía push al asignar ruta (`reparto_assigned`), agregar/quitar parada pendiente (`reparto_stop_added` / `reparto_stop_removed`) o chat (`chat_message` con nombre del remitente). Perfil silencia tipos vía `GET/PUT /api/users/me/push-preferences`. Tap abre `/ruta`, detalle de parada o `/mensajes/{userId}`. Tipos silenciados no llegan por Expo (puede quedar notificación in-app). Push físico requiere dev client o EAS (#166). El cache de ruta no se invalida automáticamente con push.
+
 ```bash
 # Terminal 1 — API
 pnpm run server

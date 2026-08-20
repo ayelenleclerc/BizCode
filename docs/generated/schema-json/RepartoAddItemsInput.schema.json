@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "ordenEntregaIds": {
+      "items": {
+        "minimum": 1,
+        "type": "integer"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "ordenEntregaIds"
+  ],
+  "title": "RepartoAddItemsInput",
+  "type": "object"
+}
