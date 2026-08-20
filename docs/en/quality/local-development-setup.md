@@ -145,7 +145,40 @@ Allowed role: **`driver`** only. Other roles see an accessible “driver-only”
 
 **Offline mode (#164):** with signal, login hydrates SQLite (`mi-reparto`, `formas-pago`, `transfer-info`) for the local calendar day (invalidated at midnight). Airplane mode: POD delivered / not-delivered, collections, and return register enqueue FIFO (`expo-sqlite` outbox + MMKV pending count); stop chips show pending sync. Queue survives app restart. Reconnect flushes in background (banner). **Remit returns stays online-only.** If the server already changed the stop (`422 REPARTO_ITEM_INVALID_STATE` / `REPARTO_INVALID_STATE` / `DEVOLUCION_ALREADY_EXISTS`), the driver sees a conflict banner and `owner`/`manager`/`logistics_planner` get in-app notification `reparto_sync_conflict`. No extra driver permissions. No Prisma migration.
 
-**Push notifications (#165):** on login the app registers an Expo push token (`POST /api/users/me/push-token`, deleted on logout). Backend sends push when a planner assigns a route (`reparto_assigned`), adds/removes a pending stop (`reparto_stop_added` / `reparto_stop_removed`), or sends chat (`chat_message` with sender name in preview). Profile tab mutes driver types via `GET/PUT /api/users/me/push-preferences`. Taps open `/ruta`, stop detail, or `/mensajes/{userId}`. Muted types skip Expo delivery (in-app DB notifications may still appear). Physical push requires a dev client or EAS build (#166); CI covers API + sender tests. Route cache is not auto-invalidated on push — pull-to-refresh / foreground hydrate as in #164.
+**Push notifications (#165):** on login the app registers an Expo push token (`POST /api/users/me/push-token`, deleted on logout). Backend sends push when a planner assigns a route (`reparto_assigned`), adds/removes a pending stop (`reparto_stop_added` / `reparto_stop_removed`), or sends chat (`chat_message` with sender name in preview). Profile tab mutes driver types via `GET/PUT /api/users/me/push-preferences`. Taps open `/ruta`, stop detail, or `/mensajes/{userId}`. Muted types skip Expo delivery (in-app DB notifications may still appear). Physical push requires a native / EAS build (#166); CI covers API + sender tests. Route cache is not auto-invalidated on push — pull-to-refresh / foreground hydrate as in #164.
+
+### EAS build and OTA — App Driver (#166)
+
+Managed Expo workflow (`apps/driver`). Native `android/` / `ios/` stay gitignored. There is **no** committed Expo `projectId`.
+
+Operator (once):
+
+1. From `apps/driver`, run `eas init` on an Expo account (writes the real project UUID for **Driver**, separate from Seller).
+2. Store GitHub secrets `EXPO_TOKEN` and **`EAS_DRIVER_PROJECT_ID`** (see `.env.example`). Do **not** reuse Seller `EAS_PROJECT_ID`. Optional `EXPO_PUBLIC_API_BASE_URL` is baked into native builds.
+3. Do **not** commit the UUID into git; `app.config.ts` sets `extra.eas.projectId` and `updates.url` only when `EAS_DRIVER_PROJECT_ID` is present. Push tokens (#165) read that extra field.
+
+Profiles in `apps/driver/eas.json`:
+
+| Profile | Android | iOS | Distribution |
+|---|---|---|---|
+| `production` | AAB (`app-bundle`) | IPA (`simulator: false`) | `store` |
+| `internal` | APK | IPA | `internal` |
+
+OTA uses `expo-updates` with `runtimeVersion.policy: appVersion` (app version `0.1.0`). CI on tag `driver-v*` runs Android `production` + `internal`, `eas update --channel production`, and attaches the **internal APK** to a **GitHub Release**. iOS is available via `workflow_dispatch` only (MVP is Android). This PR does **not** measure OTA latency on a device.
+
+**Audit / reproducibility:** the same git commit + `appVersion` / `runtimeVersion` submitted to EAS cloud produces the release artifacts for that tag; do not claim bit-identical APKs beyond what EAS guarantees.
+
+**Employee distribution:** share the GitHub Release APK link (or a QR to that URL) via WhatsApp / internal email. On Android, installers must allow the browser/file manager to install unknown apps (unknown sources) for the APK. JS-only changes ship via OTA; native plugin / SDK changes require a new EAS build and a new APK.
+
+Local wrappers (need Expo login / `EXPO_TOKEN`; export `EAS_DRIVER_PROJECT_ID`; `eas-cli@16` via `pnpm dlx`):
+
+```bash
+pnpm --filter @bizcode/driver eas:build:production
+pnpm --filter @bizcode/driver eas:build:internal
+pnpm --filter @bizcode/driver eas:update
+```
+
+First Play Console / App Store upload and Apple Developer / `eas submit` are **manual** (operator). Quality Gate does **not** run EAS.
 
 ```bash
 # Terminal 1 — API

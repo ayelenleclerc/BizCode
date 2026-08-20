@@ -1,11 +1,11 @@
 import type { ExpoConfig } from 'expo/config'
 
 /**
- * @en Expo config for App Driver. Sets EAS projectId and updates URL only when EAS_PROJECT_ID is set (operator `eas init`).
- * @es Config Expo de App Driver. Solo setea projectId y URL de updates si existe EAS_PROJECT_ID (`eas init` del operador).
- * @pt-BR Config Expo do App Driver. Só define projectId e URL de updates se EAS_PROJECT_ID existir (`eas init` do operador).
+ * @en Expo config for App Driver. Sets EAS projectId and updates URL only when EAS_DRIVER_PROJECT_ID is set (operator `eas init`).
+ * @es Config Expo de App Driver. Solo setea projectId y URL de updates si existe EAS_DRIVER_PROJECT_ID (`eas init` del operador).
+ * @pt-BR Config Expo do App Driver. Só define projectId e URL de updates se EAS_DRIVER_PROJECT_ID existir (`eas init` do operador).
  */
-const easProjectId = process.env.EAS_PROJECT_ID?.trim() ?? ''
+const easProjectId = process.env.EAS_DRIVER_PROJECT_ID?.trim() ?? ''
 
 const config = {
   name: 'BizCode Driver',

@@ -95,6 +95,10 @@ App Repartidor registra `rechazo` / `producto_dañado` con `POST /api/repartos/{
 
 Con la ruta del día descargada, App Driver puede confirmar POD, registrar cobros y devoluciones sin señal (outbox FIFO). La rendición de devoluciones sigue solo online. Si el sync recibe `422` porque la parada ya cambió en el servidor, los roles de depósito (`owner`, `manager`, `logistics_planner`) reciben notificación in-app `reparto_sync_conflict`.
 
+## Instalación App Repartidor (#166)
+
+Los choferes instalan el **APK internal** desde el GitHub Release del tag `driver-v*` (compartir URL del release o un QR). En Android, permitir instalación desde orígenes desconocidos para el navegador/gestor de archivos. Las actualizaciones solo JS llegan por OTA Expo (canal `production`) al abrir la app; cambios nativos requieren un APK nuevo.
+
 ## Seguimiento GPS en vivo (#144)
 
 Módulo **`logistics.gps`** (depende de **`logistics.dispatches`**). Planificadores con roles **`owner`**, **`manager`** o **`logistics_planner`** abren **`/logistica/seguimiento`** (mapa OpenStreetMap + Leaflet, lista de repartos `on_route`, actualización cada **60 s**).

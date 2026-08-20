@@ -108,6 +108,15 @@ Build desktop Tauri (WebKit nativo, display, Rust). Build local: `npm run tauri 
 
 Secrets (falha se faltarem, sem skip silencioso): `EXPO_TOKEN`, `EAS_PROJECT_ID`. Opcional: `EXPO_PUBLIC_API_BASE_URL`. CLI: `pnpm dlx eas-cli@16` (`--non-interactive`). Distinto das tags desktop `v*.*.*`. O primeiro AAB na Play Console é upload manual do operador; `eas submit` iOS não está neste workflow.
 
+**EAS App Entregador (#166)** **não** faz parte do Quality Gate. Workflow [`.github/workflows/driver-eas.yml`](../../../.github/workflows/driver-eas.yml):
+
+| Gatilho | O que executa |
+|---|---|
+| Tag `driver-v*` | Android `production` (AAB) + `internal` (APK), anexa APK ao GitHub Release, depois `eas update --channel production` |
+| `workflow_dispatch` | Plataforma (`android` / `ios`) e perfil; OTA opcional |
+
+Secrets (falha se faltarem): `EXPO_TOKEN`, **`EAS_DRIVER_PROJECT_ID`** (projeto Expo Driver — não reutilizar `EAS_PROJECT_ID` do Seller). Opcional: `EXPO_PUBLIC_API_BASE_URL`. Distinto das tags `seller-v*` e desktop `v*.*.*`.
+
 ## Branch órfão `documentacion`
 
 O branch **órfão** `documentacion` **não** contém código da aplicação — apenas um snapshot de documentação para hospedagem estática (ex.: GitHub Pages).
@@ -204,6 +213,7 @@ Arquivo: `.github/workflows/deploy.yml`.
 - [x] semantic-release — `release.config.cjs`, `.github/workflows/release.yml` — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] Links HTTP(S) em `docs/` — `docs-links.yml` + `.lycheeignore` (Lychee; sem checagem de links relativos `.md`)
 - [x] EAS App Seller em tags `seller-v*` — `.github/workflows/seller-eas.yml` (`EXPO_TOKEN` / `EAS_PROJECT_ID`; fora do Quality Gate) — #173
+- [x] EAS App Entregador em tags `driver-v*` — `.github/workflows/driver-eas.yml` (`EXPO_TOKEN` / `EAS_DRIVER_PROJECT_ID`; Release com APK; fora do Quality Gate) — #166
 
 ## Automação de status do Project (GitHub)
 

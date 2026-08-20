@@ -145,7 +145,40 @@ Papel permitido: apenas **`driver`**. Outros papéis veem tela de acesso negado.
 
 **Modo offline (#164):** com sinal, o login hidrata SQLite (`mi-reparto`, `formas-pago`, `transfer-info`) do dia local (invalida à meia-noite). Modo avião: POD entregue / não entregue, cobranças e registro de devolução vão para outbox FIFO; chips da parada mostram pendente de sync. A fila sobrevive ao fechar o app. Ao reconectar, flush em segundo plano (banner). **A prestação de devoluções continua só online.** Se o servidor já mudou a parada (`422 REPARTO_ITEM_INVALID_STATE` / `REPARTO_INVALID_STATE` / `DEVOLUCION_ALREADY_EXISTS`), o motorista vê conflito e `owner`/`manager`/`logistics_planner` recebem notificação in-app `reparto_sync_conflict`. Sem permissões extras ao `driver`. Sem migration Prisma.
 
-**Push (#165):** no login o app registra token Expo (`POST /api/users/me/push-token`, removido no logout). O backend envia push ao atribuir rota (`reparto_assigned`), adicionar/remover parada pendente (`reparto_stop_added` / `reparto_stop_removed`) ou chat (`chat_message` com nome do remetente). Perfil silencia tipos via `GET/PUT /api/users/me/push-preferences`. Toque abre `/ruta`, detalhe da parada ou `/mensajes/{userId}`. Tipos silenciados não chegam via Expo (notificação in-app pode permanecer). Push físico exige dev client ou EAS (#166). O cache da rota não é invalidado automaticamente pelo push.
+**Push (#165):** no login o app registra token Expo (`POST /api/users/me/push-token`, removido no logout). O backend envia push ao atribuir rota (`reparto_assigned`), adicionar/remover parada pendente (`reparto_stop_added` / `reparto_stop_removed`) ou chat (`chat_message` com nome do remetente). Perfil silencia tipos via `GET/PUT /api/users/me/push-preferences`. Toque abre `/ruta`, detalhe da parada ou `/mensajes/{userId}`. Tipos silenciados não chegam via Expo (notificação in-app pode permanecer). Push físico exige build nativo / EAS (#166). O cache da rota não é invalidado automaticamente pelo push.
+
+### Build EAS e OTA — App Entregador (#166)
+
+Workflow managed Expo (`apps/driver`). Pastas nativas `android/` / `ios/` permanecem no `.gitignore`. **Não** há `projectId` Expo commitado.
+
+Operador (uma vez):
+
+1. Em `apps/driver`, `eas init` numa conta Expo (UUID do projeto **Driver**, distinto do Seller).
+2. Secrets do GitHub: `EXPO_TOKEN` e **`EAS_DRIVER_PROJECT_ID`** (ver `.env.example`). **Não** reutilizar `EAS_PROJECT_ID` do Seller. Opcional: `EXPO_PUBLIC_API_BASE_URL`.
+3. **Não** commitar o UUID; `app.config.ts` define `extra.eas.projectId` e `updates.url` só se `EAS_DRIVER_PROJECT_ID` existir. Push (#165) lê esse campo.
+
+Perfis em `apps/driver/eas.json`:
+
+| Perfil | Android | iOS | Distribuição |
+|---|---|---|---|
+| `production` | AAB (`app-bundle`) | IPA (`simulator: false`) | `store` |
+| `internal` | APK | IPA | `internal` |
+
+OTA com `expo-updates` e `runtimeVersion.policy: appVersion` (versão `0.1.0`). Em tag `driver-v*` o CI roda Android `production` + `internal`, `eas update --channel production`, e anexa o **APK internal** a um **GitHub Release**. iOS só via `workflow_dispatch` (MVP Android).
+
+**Auditoria / reprodutibilidade:** o mesmo commit + `appVersion` / `runtimeVersion` enviados ao EAS cloud produzem os artefatos da tag; não afirmar APKs bit-idênticos além do que o EAS garante.
+
+**Distribuição a funcionários:** compartilhar o link do APK do GitHub Release (ou QR) via WhatsApp / e-mail interno. No Android é preciso permitir instalação de fontes desconhecidas. Mudanças só JS vão por OTA; mudanças nativas (plugins/SDK) exigem novo build EAS e novo APK.
+
+Wrappers locais (`EXPO_TOKEN` + `EAS_DRIVER_PROJECT_ID`; `eas-cli@16` via `pnpm dlx`):
+
+```bash
+pnpm --filter @bizcode/driver eas:build:production
+pnpm --filter @bizcode/driver eas:build:internal
+pnpm --filter @bizcode/driver eas:update
+```
+
+Primeiro upload Play / App Store e `eas submit` = **manual**. Quality Gate **não** executa EAS.
 
 ```bash
 # Terminal 1 — API

@@ -1,0 +1,205 @@
+# App Driver EAS build + OTA + GitHub Release (APK). Not part of Quality Gate (cost / Expo credentials).
+# eas-cli is invoked via pnpm dlx (not a production dependency). Pin: eas-cli@16
+# Secrets: EXPO_TOKEN, EAS_DRIVER_PROJECT_ID (Driver Expo project — do not reuse Seller EAS_PROJECT_ID).
+name: Driver EAS
+
+on:
+  push:
+    tags:
+      - 'driver-v*'
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'EAS build profile'
+        type: choice
+        options:
+          - production
+          - internal
+        default: production
+      platform:
+        description: 'Target platform'
+        type: choice
+        options:
+          - android
+          - ios
+        default: android
+      run_update:
+        description: 'Also run eas update on the production channel'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  EAS_CLI: eas-cli@16
+
+jobs:
+  eas:
+    name: EAS build / update / release
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    defaults:
+      run:
+        working-directory: apps/driver
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        working-directory: .
+        run: pnpm install --frozen-lockfile
+
+      - name: Require Expo secrets
+        working-directory: .
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPO_TOKEN:-}" ]; then
+            echo "::error::GitHub secret EXPO_TOKEN is not set. Create an Expo access token and add it as a repository secret. Do not skip this job."
+            exit 1
+          fi
+          if [ -z "${EAS_DRIVER_PROJECT_ID:-}" ]; then
+            echo "::error::GitHub secret EAS_DRIVER_PROJECT_ID is not set. Run eas init in apps/driver as the operator, then store the Expo project UUID as EAS_DRIVER_PROJECT_ID (do not reuse Seller EAS_PROJECT_ID)."
+            exit 1
+          fi
+
+      - name: Tag release notes
+        working-directory: .
+        if: github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          {
+            echo "## App Driver EAS (${GITHUB_REF_NAME})"
+            echo
+            echo "### Commits since previous driver-v* tag"
+            echo
+            PREV="$(git describe --tags --abbrev=0 --match 'driver-v*' HEAD^ 2>/dev/null || true)"
+            if [ -n "${PREV}" ]; then
+              git log --pretty=format:'- %s (%h)' "${PREV}"..HEAD
+            else
+              echo "_No previous driver-v* tag; last 30 commits:_"
+              echo
+              git log --pretty=format:'- %s (%h)' -30
+            fi
+            echo
+          } >> "${GITHUB_STEP_SUMMARY}"
+          {
+            echo "## App Driver ${GITHUB_REF_NAME}"
+            echo
+            echo "Internal Android APK (EAS profile \`internal\`) and OTA channel \`production\`."
+            echo
+            echo "### Commits since previous driver-v* tag"
+            echo
+            PREV="$(git describe --tags --abbrev=0 --match 'driver-v*' HEAD^ 2>/dev/null || true)"
+            if [ -n "${PREV}" ]; then
+              git log --pretty=format:'- %s (%h)' "${PREV}"..HEAD
+            else
+              echo "_No previous driver-v* tag; last 30 commits:_"
+              echo
+              git log --pretty=format:'- %s (%h)' -30
+            fi
+            echo
+          } > /tmp/driver-release-notes.md
+
+      - name: EAS build (tag Android production AAB)
+        if: github.event_name == 'push'
+        id: build_production
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
+          EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          pnpm dlx ${EAS_CLI} build --platform android --profile production --non-interactive --wait
+
+      - name: EAS build (tag Android internal APK)
+        if: github.event_name == 'push'
+        id: build_internal
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
+          EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          BUILD_JSON="$(pnpm dlx ${EAS_CLI} build --platform android --profile internal --non-interactive --json --wait)"
+          echo "${BUILD_JSON}" > /tmp/eas-internal-build.json
+          APK_URL="$(node -e '
+            const fs = require("node:fs");
+            const raw = fs.readFileSync("/tmp/eas-internal-build.json", "utf8").trim();
+            let data = JSON.parse(raw);
+            if (Array.isArray(data)) data = data[0];
+            const url =
+              data?.artifacts?.buildUrl ||
+              data?.artifacts?.applicationArchiveUrl ||
+              data?.buildUrl ||
+              "";
+            if (!url) {
+              console.error("Could not find APK URL in EAS build JSON");
+              console.error(raw.slice(0, 2000));
+              process.exit(1);
+            }
+            process.stdout.write(url);
+          ')"
+          echo "apk_url=${APK_URL}" >> "${GITHUB_OUTPUT}"
+          echo "### Internal APK" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- EAS artifact: ${APK_URL}" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Download APK and create GitHub Release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APK_URL: ${{ steps.build_internal.outputs.apk_url }}
+        working-directory: .
+        run: |
+          set -euo pipefail
+          if [ -z "${APK_URL:-}" ]; then
+            echo "::error::Missing APK URL from internal EAS build"
+            exit 1
+          fi
+          curl -fsSL -o "BizCode-Driver-${GITHUB_REF_NAME}.apk" "${APK_URL}"
+          ls -lh "BizCode-Driver-${GITHUB_REF_NAME}.apk"
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" "BizCode-Driver-${GITHUB_REF_NAME}.apk" --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" "BizCode-Driver-${GITHUB_REF_NAME}.apk" \
+              --title "App Driver ${GITHUB_REF_NAME}" \
+              --notes-file /tmp/driver-release-notes.md
+          fi
+          echo "- GitHub Release: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: EAS build (workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
+          EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          pnpm dlx ${EAS_CLI} build --platform "${{ inputs.platform }}" --profile "${{ inputs.profile }}" --non-interactive --wait
+
+      - name: EAS update (OTA production channel)
+        if: github.event_name == 'push' || inputs.run_update == true
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
+          EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          pnpm dlx ${EAS_CLI} update --channel production --message "${GITHUB_REF_NAME}" --non-interactive

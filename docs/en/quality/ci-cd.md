@@ -132,6 +132,15 @@ The job starts a **PostgreSQL 16** service container (`DATABASE_URL` is set). Af
 
 Secrets (fail-closed, no silent skip): `EXPO_TOKEN`, `EAS_PROJECT_ID`. Optional: `EXPO_PUBLIC_API_BASE_URL`. CLI: `pnpm dlx eas-cli@16` (`--non-interactive`). Distinct from desktop tags `v*.*.*`. Operator still uploads the first AAB to Play Console; `eas submit` iOS is out of this workflow.
 
+**App Driver EAS (#166)** is **not** part of Quality Gate. Workflow [`.github/workflows/driver-eas.yml`](../../../.github/workflows/driver-eas.yml):
+
+| Trigger | What runs |
+|---|---|
+| Tag `driver-v*` | Android `production` (AAB) + `internal` (APK), attach APK to GitHub Release, then `eas update --channel production` |
+| `workflow_dispatch` | Chosen platform (`android` / `ios`) and profile; optional OTA |
+
+Secrets (fail-closed): `EXPO_TOKEN`, **`EAS_DRIVER_PROJECT_ID`** (Driver Expo project — do not reuse Seller `EAS_PROJECT_ID`). Optional: `EXPO_PUBLIC_API_BASE_URL`. Distinct from tags `seller-v*` and desktop `v*.*.*`.
+
 ## Documentation branch (`documentacion`)
 
 The **orphan** branch `documentacion` contains **no application source** — only a snapshot of documentation suitable for static hosting (e.g. GitHub Pages).
@@ -228,6 +237,7 @@ Workflow file: `.github/workflows/deploy.yml`.
 - [x] **semantic-release** — `release.config.cjs`, `.github/workflows/release.yml` (`workflow_dispatch` on `main`) — [ADR-0006](../adr/ADR-0006-release-and-tauri-ci-workflows.md)
 - [x] **External HTTP(S) links in `docs/`** — `.github/workflows/docs-links.yml`, `.lycheeignore` (Lychee; not relative `.md` cross-links)
 - [x] **App Seller EAS on `seller-v*` tags** — `.github/workflows/seller-eas.yml` (`EXPO_TOKEN` / `EAS_PROJECT_ID`; not Quality Gate) — #173
+- [x] **App Driver EAS on `driver-v*` tags** — `.github/workflows/driver-eas.yml` (`EXPO_TOKEN` / `EAS_DRIVER_PROJECT_ID`; GitHub Release APK; not Quality Gate) — #166
 
 ## Project status automation (GitHub)
 
