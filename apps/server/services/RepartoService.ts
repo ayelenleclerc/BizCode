@@ -13,6 +13,7 @@ import {
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 import { notifyLogisticsPlannersForRepartoConflict } from './logisticsPlannerNotify'
+import { notifyDriverForRepartoEvent } from './driverPushNotify'
 
 export const POD_VIEW_ROLES = ['owner', 'manager', 'logistics_planner'] as const
 
@@ -450,6 +451,153 @@ export class RepartoService {
       })
 
       return reparto
+    })
+
+    await notifyDriverForRepartoEvent(this.prisma, tenantId, input.choferId, 'reparto_assigned', {
+      repartoId: row.id,
+      stopCount: uniqueIds.length,
+    }).catch(() => {
+      /* push must not break create */
+    })
+
+    return { ok: true, data: withProgress(row) }
+  }
+
+  async addItems(
+    tenantId: number,
+    repartoId: number,
+    ordenEntregaIds: number[],
+  ): Promise<ServiceResult<RepartoListRow>> {
+    const uniqueIds = [...new Set(ordenEntregaIds)]
+    if (uniqueIds.length === 0) {
+      return { ok: false, status: 400, error: 'ordenEntregaIds must contain at least one id' }
+    }
+
+    const existing = await this.prisma.reparto.findFirst({
+      where: { id: repartoId, tenantId },
+      include: { items: { select: { secuencia: true } } },
+    })
+    if (!existing) {
+      return { ok: false, status: 404, error: 'REPARTO_NOT_FOUND' }
+    }
+    if (existing.estado !== 'planned' && existing.estado !== 'on_route') {
+      return { ok: false, status: 422, error: 'REPARTO_INVALID_STATE' }
+    }
+
+    const ordenes = await this.prisma.ordenEntrega.findMany({
+      where: { tenantId, id: { in: uniqueIds } },
+      select: { id: true, estado: true },
+    })
+    if (ordenes.length !== uniqueIds.length) {
+      return { ok: false, status: 400, error: 'INVALID_LINE_ITEM' }
+    }
+    for (const oe of ordenes) {
+      if (oe.estado !== 'ready') {
+        return { ok: false, status: 422, error: 'INVALID_LINE_ITEM' }
+      }
+    }
+
+    const guard = await assertOrdenNotInActiveReparto(this.prisma, tenantId, uniqueIds)
+    if (!guard.ok) {
+      return { ok: false, status: 422, error: 'ORDEN_ALREADY_IN_ACTIVE_REPARTO' }
+    }
+
+    const maxSecuencia = existing.items.reduce((max, item) => Math.max(max, item.secuencia), 0)
+    const onRoute = existing.estado === 'on_route'
+    const now = new Date()
+
+    const row = await this.prisma.$transaction(async (tx) => {
+      for (let index = 0; index < uniqueIds.length; index++) {
+        const ordenEntregaId = uniqueIds[index]!
+        await tx.repartoItem.create({
+          data: {
+            repartoId,
+            ordenEntregaId,
+            secuencia: maxSecuencia + index + 1,
+            estado: 'pending',
+          },
+        })
+      }
+
+      await tx.ordenEntrega.updateMany({
+        where: { tenantId, id: { in: uniqueIds } },
+        data: onRoute
+          ? {
+              estado: 'in_transit',
+              driverId: existing.choferId,
+              dispatchedAt: now,
+              dispatchTimestampSource: 'event',
+            }
+          : { estado: 'assigned', driverId: existing.choferId },
+      })
+
+      return tx.reparto.findFirstOrThrow({
+        where: { id: repartoId, tenantId },
+        include: repartoInclude,
+      })
+    })
+
+    const lastItem = row.items[row.items.length - 1]
+    await notifyDriverForRepartoEvent(this.prisma, tenantId, row.choferId, 'reparto_stop_added', {
+      repartoId: row.id,
+      itemId: lastItem?.id,
+      addedCount: uniqueIds.length,
+    }).catch(() => {
+      /* push must not break addItems */
+    })
+
+    return { ok: true, data: withProgress(row) }
+  }
+
+  async removeItem(
+    tenantId: number,
+    repartoId: number,
+    itemId: number,
+  ): Promise<ServiceResult<RepartoListRow>> {
+    const existing = await this.prisma.reparto.findFirst({
+      where: { id: repartoId, tenantId },
+      select: { id: true, estado: true, choferId: true },
+    })
+    if (!existing) {
+      return { ok: false, status: 404, error: 'REPARTO_NOT_FOUND' }
+    }
+    if (existing.estado !== 'planned' && existing.estado !== 'on_route') {
+      return { ok: false, status: 422, error: 'REPARTO_INVALID_STATE' }
+    }
+
+    const item = await this.prisma.repartoItem.findFirst({
+      where: { id: itemId, repartoId, reparto: { tenantId } },
+      select: { id: true, estado: true, ordenEntregaId: true },
+    })
+    if (!item) {
+      return { ok: false, status: 404, error: 'REPARTO_ITEM_NOT_FOUND' }
+    }
+    if (item.estado !== 'pending') {
+      return { ok: false, status: 422, error: 'REPARTO_ITEM_INVALID_STATE' }
+    }
+
+    const row = await this.prisma.$transaction(async (tx) => {
+      await tx.repartoItem.delete({ where: { id: itemId } })
+      await tx.ordenEntrega.update({
+        where: { id: item.ordenEntregaId },
+        data: {
+          estado: 'ready',
+          driverId: null,
+          dispatchedAt: null,
+          dispatchTimestampSource: null,
+        },
+      })
+      return tx.reparto.findFirstOrThrow({
+        where: { id: repartoId, tenantId },
+        include: repartoInclude,
+      })
+    })
+
+    await notifyDriverForRepartoEvent(this.prisma, tenantId, existing.choferId, 'reparto_stop_removed', {
+      repartoId,
+      itemId,
+    }).catch(() => {
+      /* push must not break removeItem */
     })
 
     return { ok: true, data: withProgress(row) }

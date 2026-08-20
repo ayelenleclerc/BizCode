@@ -59,6 +59,9 @@
     "start": "No se pudo iniciar la ruta.",
     "close": "No se pudo cerrar la ruta.",
     "alreadyInRoute": "Una orden ya está en un reparto activo.",
-    "invalidState": "Estado del reparto no válido para esta acción."
+    "invalidState": "Estado del reparto no válido para esta acción.",
+    "addStop": "No se pudo agregar la parada.",
+    "removeStop": "No se pudo quitar la parada.",
+    "invalidItemState": "Solo se pueden quitar paradas pendientes."
   }
 }

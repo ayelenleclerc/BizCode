@@ -14414,9 +14414,105 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/repartos/{id}/items:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [repartos]
+      summary: Append delivery orders to an active route
+      description: |
+        Requires `orders.dispatch`. Route must be `planned` or `on_route`.
+        Each OE must be `ready` and not on another active route. Notifies assigned driver (`reparto_stop_added`).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepartoAddItemsInput'
+      responses:
+        '200':
+          description: Updated route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state or OE already assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/repartos/{id}/items/{itemId}:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
+    delete:
+      tags: [repartos]
+      summary: Remove a pending stop from a route
+      description: |
+        Requires `orders.dispatch`. Route `planned` or `on_route`; item must be `pending`.
+        Reverts OE to `ready` and notifies assigned driver (`reparto_stop_removed`).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Updated route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route or item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid route or item state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
     put:
       tags: [repartos]
       summary: Record delivery proof (POD) for a route item
@@ -20155,6 +20251,17 @@ components:
           type: string
           maxLength: 500
           nullable: true
+        ordenEntregaIds:
+          type: array
+          minItems: 1
+          items:
+            type: integer
+            minimum: 1
+
+    RepartoAddItemsInput:
+      type: object
+      required: [ordenEntregaIds]
+      properties:
         ordenEntregaIds:
           type: array
           minItems: 1

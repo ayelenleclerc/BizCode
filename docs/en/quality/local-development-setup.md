@@ -145,6 +145,8 @@ Allowed role: **`driver`** only. Other roles see an accessible “driver-only”
 
 **Offline mode (#164):** with signal, login hydrates SQLite (`mi-reparto`, `formas-pago`, `transfer-info`) for the local calendar day (invalidated at midnight). Airplane mode: POD delivered / not-delivered, collections, and return register enqueue FIFO (`expo-sqlite` outbox + MMKV pending count); stop chips show pending sync. Queue survives app restart. Reconnect flushes in background (banner). **Remit returns stays online-only.** If the server already changed the stop (`422 REPARTO_ITEM_INVALID_STATE` / `REPARTO_INVALID_STATE` / `DEVOLUCION_ALREADY_EXISTS`), the driver sees a conflict banner and `owner`/`manager`/`logistics_planner` get in-app notification `reparto_sync_conflict`. No extra driver permissions. No Prisma migration.
 
+**Push notifications (#165):** on login the app registers an Expo push token (`POST /api/users/me/push-token`, deleted on logout). Backend sends push when a planner assigns a route (`reparto_assigned`), adds/removes a pending stop (`reparto_stop_added` / `reparto_stop_removed`), or sends chat (`chat_message` with sender name in preview). Profile tab mutes driver types via `GET/PUT /api/users/me/push-preferences`. Taps open `/ruta`, stop detail, or `/mensajes/{userId}`. Muted types skip Expo delivery (in-app DB notifications may still appear). Physical push requires a dev client or EAS build (#166); CI covers API + sender tests. Route cache is not auto-invalidated on push — pull-to-refresh / foreground hydrate as in #164.
+
 ```bash
 # Terminal 1 — API
 pnpm run server

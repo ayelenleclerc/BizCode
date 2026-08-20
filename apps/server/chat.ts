@@ -186,14 +186,20 @@ export function registerChatRoutes(app: Application, prisma: PrismaClient): void
       return
     }
     try {
-      const recipient = await prisma.appUser.findFirst({
-        where: {
-          id: toUserId,
-          tenantId: me.tenantId,
-          active: true,
-        },
-        select: { id: true },
-      })
+      const [recipient, sender] = await Promise.all([
+        prisma.appUser.findFirst({
+          where: {
+            id: toUserId,
+            tenantId: me.tenantId,
+            active: true,
+          },
+          select: { id: true },
+        }),
+        prisma.appUser.findFirst({
+          where: { id: me.userId, tenantId: me.tenantId },
+          select: { username: true },
+        }),
+      ])
       if (!recipient) {
         res.status(404).json({ success: false, error: 'Recipient not found' })
         return
@@ -212,6 +218,7 @@ export function registerChatRoutes(app: Application, prisma: PrismaClient): void
         messageId: message.id,
         fromUserId: me.userId,
         preview: toPreview(content),
+        username: sender?.username,
       })
 
       await writeAuditEvent({

@@ -2,7 +2,10 @@ import type { Application, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
 import { type AuthenticatedRequest } from '../auth'
 import { writeAuditEvent } from '../audit'
-import { isMuteablePushType, MUTEABLE_PUSH_TYPES } from '../services/mobilePushDelivery'
+import {
+  getMuteablePushTypesForRole,
+  isMuteablePushType,
+} from '../services/mobilePushDelivery'
 
 /**
  * @en Registers authenticated user's push token and mute preference routes (#172).
@@ -94,6 +97,8 @@ export function registerPushNotificationRoutes(app: Application, prisma: PrismaC
     }
     const tenantId = authReq.auth.claims.tenantId
     const userId = authReq.auth.claims.userId
+    const role = authReq.auth.claims.role
+    const muteableTypes = getMuteablePushTypesForRole(role)
     try {
       const row = await prisma.pushNotificationPreference.findUnique({
         where: { tenantId_userId: { tenantId, userId } },
@@ -102,7 +107,7 @@ export function registerPushNotificationRoutes(app: Application, prisma: PrismaC
         success: true,
         data: {
           mutedTypes: row?.mutedTypes ?? [],
-          muteableTypes: [...MUTEABLE_PUSH_TYPES],
+          muteableTypes: [...muteableTypes],
         },
       })
     } catch (err: unknown) {
@@ -124,9 +129,14 @@ export function registerPushNotificationRoutes(app: Application, prisma: PrismaC
       res.status(400).json({ success: false, error: 'mutedTypes must be an array' })
       return
     }
+    const tenantId = authReq.auth.claims.tenantId
+    const userId = authReq.auth.claims.userId
+    const role = authReq.auth.claims.role
+    const muteableTypes = getMuteablePushTypesForRole(role)
+
     const mutedTypes: string[] = []
     for (const raw of body.mutedTypes) {
-      if (typeof raw !== 'string' || !isMuteablePushType(raw)) {
+      if (typeof raw !== 'string' || !isMuteablePushType(raw, role)) {
         res.status(400).json({
           success: false,
           error: `invalid muted type: ${String(raw)}`,
@@ -138,9 +148,6 @@ export function registerPushNotificationRoutes(app: Application, prisma: PrismaC
       }
     }
 
-    const tenantId = authReq.auth.claims.tenantId
-    const userId = authReq.auth.claims.userId
-
     try {
       const row = await prisma.pushNotificationPreference.upsert({
         where: { tenantId_userId: { tenantId, userId } },
@@ -151,7 +158,7 @@ export function registerPushNotificationRoutes(app: Application, prisma: PrismaC
         success: true,
         data: {
           mutedTypes: row.mutedTypes,
-          muteableTypes: [...MUTEABLE_PUSH_TYPES],
+          muteableTypes: [...muteableTypes],
         },
       })
     } catch (err: unknown) {

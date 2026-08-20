@@ -4,7 +4,7 @@ import type { AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { hasPermission, type Permission } from '@bizcode/types'
 import { requireModule } from '../middleware/requireModule'
-import { devolucionEntregaRegisterBodySchema, repartoCreateBodySchema, repartoItemPodBodySchema, repartoUbicacionBodySchema } from '../schemas/domain'
+import { devolucionEntregaRegisterBodySchema, repartoAddItemsBodySchema, repartoCreateBodySchema, repartoItemPodBodySchema, repartoUbicacionBodySchema } from '../schemas/domain'
 import { GPS_VIEW_ROLES, POD_VIEW_ROLES } from '../services/RepartoService'
 import type { RepartoUbicacionService } from '../services/RepartoUbicacionService'
 import type { RepartoService, RepartoEstado } from '../services/RepartoService'
@@ -191,6 +191,62 @@ export function registerRepartosRoutes(app: Application, ctx: RestRouteContext):
         }
         await writeAudit(authReq, 'reparto_created', 'reparto', String(result.data.id))
         res.status(201).json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/repartos/:id/items',
+    requirePermission('orders.dispatch'),
+    validateBody(repartoAddItemsBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const result = await repartos.addItems(tenantId, id, req.body.ordenEntregaIds)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'reparto_item_added', 'reparto', String(result.data.id), {
+          ordenEntregaIds: req.body.ordenEntregaIds,
+        })
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.delete(
+    '/api/repartos/:id/items/:itemId',
+    requirePermission('orders.dispatch'),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const repartoId = Number.parseInt(String(req.params.id), 10)
+        const itemId = Number.parseInt(String(req.params.itemId), 10)
+        if (!Number.isFinite(repartoId) || repartoId < 1 || !Number.isFinite(itemId) || itemId < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const result = await repartos.removeItem(tenantId, repartoId, itemId)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        await writeAudit(authReq, 'reparto_item_removed', 'reparto_item', String(itemId), {
+          repartoId,
+        })
+        res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

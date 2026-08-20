@@ -46,6 +46,9 @@ export const NOTIFICATION_TYPES = [
   'cliente_credit_alert',
   'cliente_payment_received',
   'reparto_sync_conflict',
+  'reparto_assigned',
+  'reparto_stop_added',
+  'reparto_stop_removed',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
@@ -98,6 +101,10 @@ export type NotificationPayload = {
   ordenEntregaId?: number
   transportista?: string
   nroSeguimiento?: string
+  repartoId?: number
+  stopCount?: number
+  itemId?: number
+  addedCount?: number
 }
 
 /**

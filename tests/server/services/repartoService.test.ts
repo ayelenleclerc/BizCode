@@ -64,11 +64,14 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
     ordenEntrega: {
       findMany: vi.fn().mockResolvedValue([ordenPending]),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      update: vi.fn().mockResolvedValue({ id: 10 }),
     },
     factura: { findMany: vi.fn().mockResolvedValue([]) },
     reciboCobroImputacion: { groupBy: vi.fn().mockResolvedValue([]) },
     repartoItem: {
       findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue({ id: 101 }),
+      delete: vi.fn().mockResolvedValue({ id: 100 }),
       update: vi.fn(),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
@@ -76,6 +79,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
       count: vi.fn().mockResolvedValue(1),
       findMany: vi.fn().mockResolvedValue([repartoRow]),
       findFirst: vi.fn().mockResolvedValue(repartoRow),
+      findFirstOrThrow: vi.fn().mockResolvedValue(repartoRow),
       create: vi.fn().mockResolvedValue(repartoRow),
       update: vi.fn().mockResolvedValue({ ...repartoRow, estado: 'on_route' }),
     },
@@ -122,6 +126,77 @@ describe('RepartoService.create', () => {
       expect(result.data.progress.total).toBe(1)
     }
     expect(prisma.ordenEntrega.updateMany).toHaveBeenCalled()
+    expect(prisma.notification.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ type: 'reparto_assigned', userId: 5 }),
+      }),
+    )
+  })
+})
+
+describe('RepartoService.addItems (#165)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('appends ready orders and notifies driver', async () => {
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ ...repartoRow, items: [{ secuencia: 2 }] }),
+        findFirstOrThrow: vi.fn().mockResolvedValue(repartoRow),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      ordenEntrega: {
+        findMany: vi.fn().mockResolvedValue([{ id: 11, estado: 'ready' }]),
+        updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+        update: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.addItems(1, 1, [11])
+    expect(result.ok).toBe(true)
+    expect(prisma.repartoItem.create).toHaveBeenCalled()
+    expect(prisma.notification.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ type: 'reparto_stop_added' }),
+      }),
+    )
+  })
+})
+
+describe('RepartoService.removeItem (#165)', () => {
+  it('removes pending item and reverts OE', async () => {
+    const prisma = buildPrisma({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi
+          .fn()
+          .mockResolvedValueOnce({ id: 1, estado: 'planned', choferId: 5 })
+          .mockResolvedValue(repartoRow),
+        findFirstOrThrow: vi.fn().mockResolvedValue(repartoRow),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      repartoItem: {
+        findFirst: vi.fn().mockResolvedValue({ id: 100, estado: 'pending', ordenEntregaId: 10 }),
+        create: vi.fn(),
+        delete: vi.fn(),
+        update: vi.fn(),
+        updateMany: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.removeItem(1, 1, 100)
+    expect(result.ok).toBe(true)
+    expect(prisma.repartoItem.delete).toHaveBeenCalledWith({ where: { id: 100 } })
+    expect(prisma.ordenEntrega.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 10 },
+        data: expect.objectContaining({ estado: 'ready', driverId: null }),
+      }),
+    )
   })
 })
 

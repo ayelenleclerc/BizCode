@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -11,6 +12,7 @@ import { useTranslation } from 'react-i18next'
 import type { AuthClaims } from '@bizcode/types'
 import { isDriverAppRole } from './driverRoles'
 import { loadSessionClaims, loginDriver, logoutDriver } from './session'
+import { registerDriverPushToken, unregisterDriverPushToken } from '../push/registerPush'
 
 export type AuthStatus = 'loading' | 'anonymous' | 'authenticated' | 'forbidden'
 
@@ -36,12 +38,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>('loading')
   const [claims, setClaims] = useState<AuthClaims | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const pushTokenRef = useRef<string | null>(null)
 
   const refreshSession = useCallback(async () => {
     setError(null)
     const next = await loadSessionClaims()
     setClaims(next)
-    setStatus(statusFromClaims(next))
+    const nextStatus = statusFromClaims(next)
+    setStatus(nextStatus)
+    if (nextStatus === 'authenticated') {
+      try {
+        pushTokenRef.current = await registerDriverPushToken()
+      } catch {
+        /* permissions / Expo token optional in web/dev */
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -77,6 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const logout = useCallback(async () => {
+    await unregisterDriverPushToken(pushTokenRef.current)
+    pushTokenRef.current = null
     await logoutDriver()
     setClaims(null)
     setStatus('anonymous')

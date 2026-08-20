@@ -15,7 +15,22 @@
   "perfil": {
     "title": "Profile",
     "username": "Username",
-    "role": "Role"
+    "role": "Role",
+    "pushSection": "Push notifications",
+    "enabled": "Enabled",
+    "muted": "Muted",
+    "pushTypes": {
+      "reparto_assigned": "Route assigned",
+      "reparto_stop_added": "Stop added",
+      "reparto_stop_removed": "Stop removed",
+      "chat_message": "Warehouse messages"
+    }
+  },
+  "chat": {
+    "title": "Chat #{{userId}}",
+    "placeholder": "Type a message…",
+    "send": "Send",
+    "empty": "No messages yet."
   },
   "logout": "Sign out",
   "login": {

@@ -93,6 +93,24 @@ export function createRepartosAPI(http: AxiosInstance) {
       }
     },
 
+    addItems: async (repartoId: number, body: { ordenEntregaIds: number[] }) => {
+      try {
+        const response = await http.post(`/repartos/${repartoId}/items`, body)
+        return response.data.data as Reparto
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    removeItem: async (repartoId: number, itemId: number) => {
+      try {
+        const response = await http.delete(`/repartos/${repartoId}/items/${itemId}`)
+        return response.data.data as Reparto
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
     updateItemPod: async (repartoId: number, itemId: number, body: RepartoItemPodInput) => {
       try {
         const response = await http.put(`/repartos/${repartoId}/items/${itemId}`, body)

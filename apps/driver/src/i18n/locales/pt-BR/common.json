@@ -15,7 +15,22 @@
   "perfil": {
     "title": "Perfil",
     "username": "Usuário",
-    "role": "Função"
+    "role": "Função",
+    "pushSection": "Notificações push",
+    "enabled": "Ativa",
+    "muted": "Silenciada",
+    "pushTypes": {
+      "reparto_assigned": "Rota atribuída",
+      "reparto_stop_added": "Parada adicionada",
+      "reparto_stop_removed": "Parada removida",
+      "chat_message": "Mensagens do depósito"
+    }
+  },
+  "chat": {
+    "title": "Chat #{{userId}}",
+    "placeholder": "Digite uma mensagem…",
+    "send": "Enviar",
+    "empty": "Nenhuma mensagem ainda."
   },
   "logout": "Sair",
   "login": {

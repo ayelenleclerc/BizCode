@@ -4,12 +4,15 @@ import { ActivityIndicator, View } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthContext'
 import { OfflineBanner } from '../../src/offline/OfflineBanner'
+import { usePushNotificationNavigation } from '../../src/push/usePushNotificationNavigation'
 import { RutaProvider } from '../../src/ruta/RutaContext'
 
 export default function AppLayout() {
   const { t } = useTranslation('common')
   const { status, logout } = useAuth()
   const router = useRouter()
+
+  usePushNotificationNavigation(status === 'authenticated')
 
   if (status === 'loading') {
     return (
@@ -53,6 +56,7 @@ export default function AppLayout() {
         <Tabs.Screen name="ruta" options={{ title: t('tabs.ruta') }} />
         <Tabs.Screen name="cobros" options={{ title: t('tabs.cobros') }} />
         <Tabs.Screen name="perfil" options={{ title: t('tabs.perfil') }} />
+        <Tabs.Screen name="mensajes" options={{ href: null, headerShown: false }} />
       </Tabs>
     </RutaProvider>
   )

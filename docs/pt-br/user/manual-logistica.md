@@ -60,7 +60,8 @@ Abra **Repartos** pelo link na página de logística ou navegue para `/logistica
 
 | Etapa | Ação |
 |-------|------|
-| Planejar | `POST /api/repartos` — motorista, veículo/notas opcionais, OEs em estado **`ready`** em sequência (UI com arrastar e teclado); OEs passam a `assigned` com `driverId` |
+| Planejar | `POST /api/repartos` — motorista, veículo/notas opcionais, OEs em estado **`ready`** em sequência (UI com arrastar e teclado); OEs passam a `assigned` com `driverId`; push `reparto_assigned` ao motorista |
+| Editar paradas | `POST /api/repartos/{id}/items` adiciona OEs **`ready`** em repartos `planned`/`on_route`; `DELETE /api/repartos/{id}/items/{itemId}` remove parada **`pending`** e reverte OE para `ready` — push ao motorista |
 | Iniciar | `POST /api/repartos/{id}/iniciar` — `planned` → `on_route`; OEs dos itens pendentes → `in_transit` |
 | Fechar | `POST /api/repartos/{id}/cerrar` — `on_route` → `completed`; itens `pending` → `not_delivered` e OEs vinculadas → `failed` |
 

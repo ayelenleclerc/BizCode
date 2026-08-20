@@ -37,6 +37,8 @@ Evidencia automática equivalente en `tests/server/http-mutations-audit-coverage
 | POST | `/api/ordenes-entrega/:id/iniciar-picking` | `orden_entrega_picking_start` | módulo `logistics.picking`; asigna picker |
 | POST | `/api/ordenes-entrega/:id/lista` | `orden_entrega_picking_ready` | OE → `ready` |
 | POST | `/api/repartos` | `reparto_created` | `resource: reparto` |
+| POST | `/api/repartos/:id/items` | `reparto_item_added` | `metadata.ordenEntregaIds` |
+| DELETE | `/api/repartos/:id/items/:itemId` | `reparto_item_removed` | `resource: reparto_item` |
 | POST | `/api/repartos/:id/iniciar` | `reparto_started` | `resourceId` del path |
 | POST | `/api/repartos/:id/cerrar` | `reparto_closed` | `metadata` con resumen de cierre |
 | POST | `/api/repartos/:id/ubicacion` | `reparto_ubicacion_recorded` | módulo `logistics.gps`; `metadata` lat/lng |

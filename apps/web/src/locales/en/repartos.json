@@ -59,6 +59,9 @@
     "start": "Could not start the route.",
     "close": "Could not close the route.",
     "alreadyInRoute": "An order is already on an active route.",
-    "invalidState": "Route status is not valid for this action."
+    "invalidState": "Route status is not valid for this action.",
+    "addStop": "Could not add the stop.",
+    "removeStop": "Could not remove the stop.",
+    "invalidItemState": "Only pending stops can be removed."
   }
 }
