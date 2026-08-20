@@ -1,9 +1,9 @@
 import type { ExpoConfig } from 'expo/config'
 
 /**
- * @en Expo config for App Driver. Sets EAS projectId and updates URL only when EAS_DRIVER_PROJECT_ID is set (operator `eas init`).
- * @es Config Expo de App Driver. Solo setea projectId y URL de updates si existe EAS_DRIVER_PROJECT_ID (`eas init` del operador).
- * @pt-BR Config Expo do App Driver. Só define projectId e URL de updates se EAS_DRIVER_PROJECT_ID existir (`eas init` do operador).
+ * @en Expo config for App Driver. Sets EAS projectId and updates URL only when EAS_DRIVER_PROJECT_ID is set (operator `eas init`). TLS pins (#220) via withApiTlsPinning when EXPO_PUBLIC_API_TLS_PINS is set.
+ * @es Config Expo de App Driver. Solo setea projectId y URL de updates si existe EAS_DRIVER_PROJECT_ID (`eas init` del operador). Pins TLS (#220) vía withApiTlsPinning si hay EXPO_PUBLIC_API_TLS_PINS.
+ * @pt-BR Config Expo do App Driver. Só define projectId e URL de updates se EAS_DRIVER_PROJECT_ID existir (`eas init` do operador). Pins TLS (#220) via withApiTlsPinning se EXPO_PUBLIC_API_TLS_PINS existir.
  */
 const easProjectId = process.env.EAS_DRIVER_PROJECT_ID?.trim() ?? ''
 
@@ -16,6 +16,7 @@ const config = {
   userInterfaceStyle: 'light',
   scheme: 'bizcode-driver',
   newArchEnabled: true,
+  jsEngine: 'hermes',
   runtimeVersion: {
     policy: 'appVersion',
   },
@@ -38,6 +39,16 @@ const config = {
         photosPermission: 'Allow BizCode Driver to choose a photo for proof of delivery.',
       },
     ],
+    [
+      'expo-build-properties',
+      {
+        android: {
+          enableMinifyInReleaseBuilds: true,
+          enableShrinkResourcesInReleaseBuilds: true,
+        },
+      },
+    ],
+    '../../plugins/withApiTlsPinning.cjs',
   ],
   ios: {
     supportsTablet: true,

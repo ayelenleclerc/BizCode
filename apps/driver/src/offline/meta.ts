@@ -22,34 +22,60 @@ const memoryStore: MetaStore = {
 }
 
 let store: MetaStore = memoryStore
+let boundEncrypted = false
 
 /**
- * @en Lazily binds MMKV when native module is available; otherwise in-memory meta.
- * @es Enlaza MMKV si el módulo nativo existe; si no, meta en memoria.
- * @pt-BR Liga MMKV se o módulo nativo existir; senão, meta em memória.
+ * @en Resets MMKV binding (legacy wipe / tests).
+ * @es Resetea el binding MMKV (wipe legado / tests).
+ * @pt-BR Redefine o binding MMKV (wipe legado / tests).
  */
-function getStore(): MetaStore {
-  if (store !== memoryStore) return store
-  if (Platform.OS === 'web') return memoryStore
+export function resetOfflineMetaStore(): void {
+  memory.clear()
+  store = memoryStore
+  boundEncrypted = false
+}
+
+/**
+ * @en Binds encrypted MMKV (id v2 + encryptionKey) once offline crypto is ready (#220).
+ * @es Enlaza MMKV cifrado (id v2 + encryptionKey) cuando el crypto offline está listo (#220).
+ * @pt-BR Liga MMKV cifrado (id v2 + encryptionKey) quando o crypto offline está pronto (#220).
+ */
+export function bindEncryptedMetaStore(mmkvId: string, encryptionKey: string): void {
+  if (boundEncrypted && store !== memoryStore) return
+  if (Platform.OS === 'web') {
+    store = memoryStore
+    boundEncrypted = true
+    return
+  }
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports -- optional native; web/tests use memory
     const { createMMKV } = require('react-native-mmkv') as {
-      createMMKV: (opts: { id: string }) => {
+      createMMKV: (opts: { id: string; encryptionKey?: string }) => {
         getString: (k: string) => string | undefined
         set: (k: string, v: string | number | boolean) => void
         getNumber: (k: string) => number | undefined
       }
     }
-    const mmkv = createMMKV({ id: 'bizcode-driver-offline' })
+    const mmkv = createMMKV({ id: mmkvId, encryptionKey })
     store = {
       getString: (k) => mmkv.getString(k),
       set: (k, v) => mmkv.set(k, v),
       getNumber: (k) => mmkv.getNumber(k),
     }
-    return store
+    boundEncrypted = true
   } catch {
-    return memoryStore
+    store = memoryStore
+    boundEncrypted = true
   }
+}
+
+/**
+ * @en Lazily returns meta store (memory until bindEncryptedMetaStore).
+ * @es Devuelve el store meta (memoria hasta bindEncryptedMetaStore).
+ * @pt-BR Retorna o store meta (memória até bindEncryptedMetaStore).
+ */
+function getStore(): MetaStore {
+  return store
 }
 
 export const META_KEYS = {
@@ -61,9 +87,9 @@ export const META_KEYS = {
 } as const
 
 /**
- * @en Reads/writes offline cache metadata (MMKV with memory fallback).
- * @es Lee/escribe metadatos de cache offline (MMKV con fallback en memoria).
- * @pt-BR Lê/escreve metadados de cache offline (MMKV com fallback em memória).
+ * @en Reads/writes offline cache metadata (encrypted MMKV with memory fallback).
+ * @es Lee/escribe metadatos de cache offline (MMKV cifrado con fallback en memoria).
+ * @pt-BR Lê/escreve metadados de cache offline (MMKV cifrado com fallback em memória).
  */
 export const offlineMeta = {
   getString(key: string): string | null {

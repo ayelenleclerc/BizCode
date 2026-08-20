@@ -18,6 +18,7 @@ import { useAuth } from '../../../src/auth/AuthContext'
 import { mapApiErrorToUiState } from '../../../src/lib/apiErrors'
 import { formatMoney, parseMoney } from '../../../src/lib/money'
 import { useOffline } from '../../../src/offline/OfflineContext'
+import { useDeviceIntegrity } from '../../../src/security/DeviceIntegrityContext'
 import { usePedidoCart } from '../../../src/pedidos/CartContext'
 import { NumpadSheet } from '../../../src/pedidos/NumpadSheet'
 import { roundQtyToMultiplo } from '../../../src/pedidos/numpadParse'
@@ -36,6 +37,7 @@ export default function PedidoResumenScreen() {
   const cart = usePedidoCart()
   const { claims } = useAuth()
   const { refreshMeta } = useOffline()
+  const { confirmSensitiveAction } = useDeviceIntegrity()
   const locale = i18n.language === 'en' ? 'en-US' : i18n.language === 'pt-BR' ? 'pt-BR' : 'es-AR'
 
   const [saldo, setSaldo] = useState<number | null>(null)
@@ -429,7 +431,7 @@ export default function PedidoResumenScreen() {
 
       <Button
         mode="contained"
-        onPress={() => void onConfirm()}
+        onPress={() => confirmSensitiveAction(() => onConfirm())}
         disabled={confirmDisabled}
         loading={submitting}
         testID={policyBlocked ? 'seller-pedido-confirm-blocked' : 'seller-pedido-confirm'}

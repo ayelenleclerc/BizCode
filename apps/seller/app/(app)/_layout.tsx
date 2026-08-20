@@ -4,6 +4,7 @@ import { ActivityIndicator, View } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthContext'
 import { OfflineBanner } from '../../src/offline/OfflineBanner'
+import { DeviceIntegrityBanner } from '../../src/security/DeviceIntegrityBanner'
 import { PedidoCartProvider } from '../../src/pedidos/CartContext'
 import { usePushNotificationNavigation } from '../../src/push/usePushNotificationNavigation'
 
@@ -47,6 +48,7 @@ export default function AppLayout() {
   return (
     <PedidoCartProvider>
       <View style={{ flex: 1 }}>
+        <DeviceIntegrityBanner />
         <OfflineBanner />
         <Tabs
           screenOptions={{

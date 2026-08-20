@@ -51,5 +51,12 @@
     "syncError": "Erro de sincronização — será tentado de novo",
     "retrySync": "Sincronizar",
     "queuedOrder": "Pedido salvo offline (#{{id}}). Será enviado ao reconectar."
+  },
+  "security": {
+    "compromisedBanner": "Este dispositivo parece com root ou jailbreak. Ações sensíveis pedirão confirmação.",
+    "compromisedTitle": "Dispositivo comprometido",
+    "compromisedSensitiveBody": "Continuar pode expor dados de clientes ou pedidos. Siga só se confiar neste dispositivo.",
+    "cancel": "Cancelar",
+    "continueAnyway": "Continuar mesmo assim"
   }
 }

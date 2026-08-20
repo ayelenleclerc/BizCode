@@ -17,7 +17,7 @@ BizCode already runs informational `pnpm audit`, CodeQL, Gitleaks, CycloneDX SBO
 3. **Snyk:** GitHub Actions job uses `SNYK_TOKEN` repository secret. When the secret is set: `snyk test --severity-threshold=high --fail-on=upgradable` on pull requests and pushes; `snyk monitor` on push to `develop`/`main`. When `SNYK_TOKEN` is absent, the job skips the scan with a warning (Quality Gate still blocks via `pnpm audit`); operators should add the secret to enforce the Snyk gate.
 4. **Trivy images:** After `docker build` of API and frontend in Deploy Containers, scan local tags with Trivy; **fail on CRITICAL** before GHCR publish. Existing Terraform IaC Trivy remains.
 5. **Documentation:** Trilingual triage guide under `docs/*/quality/` (locale map). README Snyk badge for `ayelenleclerc/BizCode` (ops must link the repo in Snyk once for live status). SBOM generation uses `pnpm dlx @cyclonedx/cdxgen` (pnpm 10–compatible) instead of `@cyclonedx/cyclonedx-npm` (incompatible `pnpm ls` flags / shell-injection advisory on older majors).
-6. **Out of scope v1:** Socket.dev, Renovate, `dependency-review-action`, mobile app hardening (#220).
+6. **Out of scope v1:** Socket.dev, Renovate, `dependency-review-action`.
 
 ## Consequences
 

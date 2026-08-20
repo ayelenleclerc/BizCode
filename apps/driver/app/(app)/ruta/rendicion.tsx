@@ -6,6 +6,7 @@ import type { DevolucionEntregaPublic } from '@bizcode/types'
 import { driverRepartosApi } from '../../../src/api/driverApi'
 import { mapApiErrorToUiState, type UiLoadState } from '../../../src/lib/apiErrors'
 import { useOffline } from '../../../src/offline/OfflineContext'
+import { useDeviceIntegrity } from '../../../src/security/DeviceIntegrityContext'
 import { useRuta } from '../../../src/ruta/RutaContext'
 
 /**
@@ -17,6 +18,7 @@ export default function RendicionDevolucionesScreen() {
   const { t } = useTranslation(['devolucion', 'common'])
   const { reparto } = useRuta()
   const { online } = useOffline()
+  const { confirmSensitiveAction } = useDeviceIntegrity()
   const [status, setStatus] = useState<UiLoadState>('idle')
   const [rows, setRows] = useState<DevolucionEntregaPublic[]>([])
   const [saving, setSaving] = useState(false)
@@ -126,7 +128,7 @@ export default function RendicionDevolucionesScreen() {
         mode="contained"
         disabled={pending.length === 0 || saving}
         loading={saving}
-        onPress={() => void onRemit()}
+        onPress={() => confirmSensitiveAction(() => onRemit())}
         testID="driver-rendicion-confirm"
         accessibilityLabel={t('devolucion:rendicion.confirm')}
       >

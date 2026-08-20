@@ -60,3 +60,7 @@ Operational runbook (classification, runbooks, legal notes, post-mortem): [Incid
 ## Security monitoring (#221)
 
 Async classification and alerts for platform operators: [Security monitoring](quality/security-monitoring.md). Timeline UI `/superadmin/security`; API `GET /api/superadmin/security-events`. Related ISO stub: [SEC-011](certificacion-iso/sec/sec-011-log-monitoring-alerting-procedure.md).
+
+## Mobile app hardening (#220)
+
+App Driver / App Seller: SecureStore tokens, encrypted offline cache, root/jailbreak soft-gate, Android TLS pinning, pin rotation runbook — [Mobile app hardening](quality/mobile-app-hardening.md).

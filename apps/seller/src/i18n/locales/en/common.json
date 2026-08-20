@@ -51,5 +51,12 @@
     "syncError": "Sync error — will retry",
     "retrySync": "Sync",
     "queuedOrder": "Order saved offline (#{{id}}). It will upload when online."
+  },
+  "security": {
+    "compromisedBanner": "This device appears rooted or jailbroken. Sensitive actions will ask for confirmation.",
+    "compromisedTitle": "Compromised device",
+    "compromisedSensitiveBody": "Continuing may expose customer or order data. Continue only if you trust this device.",
+    "cancel": "Cancel",
+    "continueAnyway": "Continue anyway"
   }
 }

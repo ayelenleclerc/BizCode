@@ -1,4 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite'
+import { openJson, sealJson } from '../security/offlineCrypto'
 
 const now = () => new Date().toISOString()
 
@@ -9,7 +10,7 @@ export async function upsertCliente(db: SQLiteDatabase, cliente: Record<string, 
     `INSERT INTO clientes (id, json, rsocial, codigo, updated_at) VALUES (?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET json=excluded.json, rsocial=excluded.rsocial, codigo=excluded.codigo, updated_at=excluded.updated_at`,
     id,
-    JSON.stringify(cliente),
+    await sealJson(cliente),
     String(cliente.rsocial ?? ''),
     Number(cliente.codigo ?? 0),
     now(),
@@ -25,7 +26,7 @@ export async function searchClientesLocal(
     const rows = await db.getAllAsync<{ json: string }>(
       'SELECT json FROM clientes ORDER BY rsocial COLLATE NOCASE LIMIT 200',
     )
-    return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+    return Promise.all(rows.map(async (r) => openJson<Record<string, unknown>>(r.json)))
   }
   const like = `%${trimmed}%`
   const asCode = Number.parseInt(trimmed, 10)
@@ -40,7 +41,7 @@ export async function searchClientesLocal(
     Number.isInteger(asCode) ? asCode : null,
     Number.isInteger(asCode) ? asCode : -1,
   )
-  return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+  return Promise.all(rows.map(async (r) => openJson<Record<string, unknown>>(r.json)))
 }
 
 export async function getClienteLocal(
@@ -48,7 +49,7 @@ export async function getClienteLocal(
   id: number,
 ): Promise<Record<string, unknown> | null> {
   const row = await db.getFirstAsync<{ json: string }>('SELECT json FROM clientes WHERE id = ?', id)
-  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+  return row ? await openJson<Record<string, unknown>>(row.json) : null
 }
 
 export async function upsertArticulo(db: SQLiteDatabase, articulo: Record<string, unknown>): Promise<void> {
@@ -62,7 +63,7 @@ export async function upsertArticulo(db: SQLiteDatabase, articulo: Record<string
     `INSERT INTO articulos (id, json, descripcion, codigo, codigo_barras, updated_at) VALUES (?, ?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET json=excluded.json, descripcion=excluded.descripcion, codigo=excluded.codigo, codigo_barras=excluded.codigo_barras, updated_at=excluded.updated_at`,
     id,
-    JSON.stringify(articulo),
+    await sealJson(articulo),
     String(articulo.descripcion ?? ''),
     Number(articulo.codigo ?? 0),
     barcode,
@@ -81,7 +82,7 @@ export async function getArticuloByBarcodeLocal(
     code,
   )
   if (!row) return null
-  const articulo = JSON.parse(row.json) as Record<string, unknown>
+  const articulo = await openJson<Record<string, unknown>>(row.json)
   if (articulo.activo === false || articulo.esPadre === true || articulo.tipo === 'servicio') {
     return null
   }
@@ -97,7 +98,7 @@ export async function searchArticulosLocal(
     const rows = await db.getAllAsync<{ json: string }>(
       'SELECT json FROM articulos ORDER BY descripcion COLLATE NOCASE LIMIT 500',
     )
-    return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+    return Promise.all(rows.map(async (r) => openJson<Record<string, unknown>>(r.json)))
   }
   const like = `%${trimmed}%`
   const rows = await db.getAllAsync<{ json: string }>(
@@ -110,7 +111,7 @@ export async function searchArticulosLocal(
     like,
     trimmed,
   )
-  return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+  return Promise.all(rows.map(async (r) => openJson<Record<string, unknown>>(r.json)))
 }
 
 export async function upsertRubro(db: SQLiteDatabase, rubro: Record<string, unknown>): Promise<void> {
@@ -120,14 +121,14 @@ export async function upsertRubro(db: SQLiteDatabase, rubro: Record<string, unkn
     `INSERT INTO rubros (id, json, updated_at) VALUES (?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET json=excluded.json, updated_at=excluded.updated_at`,
     id,
-    JSON.stringify(rubro),
+    await sealJson(rubro),
     now(),
   )
 }
 
 export async function listRubrosLocal(db: SQLiteDatabase): Promise<Record<string, unknown>[]> {
   const rows = await db.getAllAsync<{ json: string }>('SELECT json FROM rubros ORDER BY id')
-  return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+  return Promise.all(rows.map(async (r) => openJson<Record<string, unknown>>(r.json)))
 }
 
 export async function upsertVisita(
@@ -143,7 +144,7 @@ export async function upsertVisita(
      ON CONFLICT(id) DO UPDATE SET fecha=excluded.fecha, json=excluded.json, pending_sync=excluded.pending_sync, updated_at=excluded.updated_at`,
     id,
     fecha,
-    JSON.stringify(visita),
+    await sealJson(visita),
     opts?.pendingSync ? 1 : 0,
     now(),
   )
@@ -157,7 +158,7 @@ export async function listVisitasByFechaLocal(
     'SELECT json FROM visitas WHERE fecha = ? ORDER BY id',
     fecha,
   )
-  return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+  return Promise.all(rows.map(async (r) => openJson<Record<string, unknown>>(r.json)))
 }
 
 export async function upsertPedidoCache(
@@ -173,7 +174,7 @@ export async function upsertPedidoCache(
      ON CONFLICT(id) DO UPDATE SET cliente_id=excluded.cliente_id, json=excluded.json, pending_sync=excluded.pending_sync, updated_at=excluded.updated_at`,
     id,
     clienteId,
-    JSON.stringify(pedido),
+    await sealJson(pedido),
     opts?.pendingSync ? 1 : 0,
     now(),
   )
@@ -189,7 +190,7 @@ export async function listPedidosByClienteLocal(
     clienteId,
     limit,
   )
-  return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+  return Promise.all(rows.map(async (r) => openJson<Record<string, unknown>>(r.json)))
 }
 
 export async function getPedidoLocal(
@@ -197,7 +198,7 @@ export async function getPedidoLocal(
   id: number,
 ): Promise<Record<string, unknown> | null> {
   const row = await db.getFirstAsync<{ json: string }>('SELECT json FROM pedidos_cache WHERE id = ?', id)
-  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+  return row ? await openJson<Record<string, unknown>>(row.json) : null
 }
 
 export async function replacePedidoId(
@@ -231,7 +232,7 @@ export async function upsertRuta(
      ON CONFLICT(id) DO UPDATE SET fecha=excluded.fecha, json=excluded.json, pending_sync=excluded.pending_sync, updated_at=excluded.updated_at`,
     id,
     fecha,
-    JSON.stringify(ruta),
+    await sealJson(ruta),
     opts?.pendingSync ? 1 : 0,
     now(),
   )
@@ -245,7 +246,7 @@ export async function getRutaByFechaLocal(
     'SELECT json FROM rutas WHERE fecha = ? ORDER BY id DESC LIMIT 1',
     fecha.slice(0, 10),
   )
-  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+  return row ? await openJson<Record<string, unknown>>(row.json) : null
 }
 
 export async function replaceRutaId(
@@ -265,7 +266,7 @@ export async function upsertFeriado(db: SQLiteDatabase, feriado: Record<string, 
      ON CONFLICT(id) DO UPDATE SET fecha=excluded.fecha, json=excluded.json, updated_at=excluded.updated_at`,
     id,
     String(feriado.fecha ?? '').slice(0, 10),
-    JSON.stringify(feriado),
+    await sealJson(feriado),
     now(),
   )
 }
@@ -278,7 +279,7 @@ export async function listFeriadosOnDateLocal(
     'SELECT json FROM feriados_cache WHERE fecha = ?',
     fecha.slice(0, 10),
   )
-  return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+  return Promise.all(rows.map(async (r) => openJson<Record<string, unknown>>(r.json)))
 }
 
 /**
@@ -297,7 +298,7 @@ export async function upsertEstadoCredito(
     `INSERT INTO estado_credito_cache (cliente_id, json, as_of, updated_at) VALUES (?, ?, ?, ?)
      ON CONFLICT(cliente_id) DO UPDATE SET json=excluded.json, as_of=excluded.as_of, updated_at=excluded.updated_at`,
     clienteId,
-    JSON.stringify(data),
+    await sealJson(data),
     asOf,
     now(),
   )
@@ -311,7 +312,7 @@ export async function getEstadoCreditoLocal(
     'SELECT json FROM estado_credito_cache WHERE cliente_id = ?',
     clienteId,
   )
-  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+  return row ? await openJson<Record<string, unknown>>(row.json) : null
 }
 
 /**
@@ -326,7 +327,7 @@ export async function upsertStockSnapshot(
   await db.runAsync(
     `INSERT INTO stock_snapshot (id, json, as_of, updated_at) VALUES (1, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET json=excluded.json, as_of=excluded.as_of, updated_at=excluded.updated_at`,
-    JSON.stringify(snapshot),
+    await sealJson(snapshot),
     snapshot.asOf,
     now(),
   )
@@ -339,7 +340,7 @@ export async function getStockSnapshotLocal(
     'SELECT json, as_of FROM stock_snapshot WHERE id = 1',
   )
   if (!row) return null
-  const parsed = JSON.parse(row.json) as { asOf?: string; items?: unknown[] }
+  const parsed = await openJson<{ asOf?: string; items?: unknown[] }>(row.json)
   return {
     asOf: parsed.asOf ?? row.as_of,
     items: Array.isArray(parsed.items) ? parsed.items : [],
@@ -353,7 +354,7 @@ export async function upsertSellerPolicies(
   await db.runAsync(
     `INSERT INTO seller_policies_cache (id, json, updated_at) VALUES (1, ?, ?)
      ON CONFLICT(id) DO UPDATE SET json=excluded.json, updated_at=excluded.updated_at`,
-    JSON.stringify(policies),
+    await sealJson(policies),
     now(),
   )
 }
@@ -364,7 +365,7 @@ export async function getSellerPoliciesLocal(
   const row = await db.getFirstAsync<{ json: string }>(
     'SELECT json FROM seller_policies_cache WHERE id = 1',
   )
-  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+  return row ? await openJson<Record<string, unknown>>(row.json) : null
 }
 
 /**
@@ -384,7 +385,7 @@ export async function upsertPlantillaPedido(
      ON CONFLICT(id) DO UPDATE SET cliente_id=excluded.cliente_id, json=excluded.json, updated_at=excluded.updated_at`,
     id,
     clienteId,
-    JSON.stringify(plantilla),
+    await sealJson(plantilla),
     now(),
   )
 }
@@ -397,7 +398,7 @@ export async function listPlantillasByClienteLocal(
     'SELECT json FROM plantillas_pedido_cache WHERE cliente_id = ?',
     clienteId,
   )
-  return rows.map((r) => JSON.parse(r.json) as Record<string, unknown>)
+  return Promise.all(rows.map(async (r) => openJson<Record<string, unknown>>(r.json)))
 }
 
 export async function upsertUltimoPedidoRepeat(
@@ -410,7 +411,7 @@ export async function upsertUltimoPedidoRepeat(
     `INSERT INTO ultimo_pedido_repeat_cache (cliente_id, json, updated_at) VALUES (?, ?, ?)
      ON CONFLICT(cliente_id) DO UPDATE SET json=excluded.json, updated_at=excluded.updated_at`,
     clienteId,
-    JSON.stringify(data),
+    await sealJson(data),
     now(),
   )
 }
@@ -423,7 +424,7 @@ export async function getUltimoPedidoRepeatLocal(
     'SELECT json FROM ultimo_pedido_repeat_cache WHERE cliente_id = ?',
     clienteId,
   )
-  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+  return row ? await openJson<Record<string, unknown>>(row.json) : null
 }
 
 /**
@@ -441,7 +442,7 @@ export async function upsertSugerenciasPedido(
     `INSERT INTO sugerencias_pedido_cache (cliente_id, json, updated_at) VALUES (?, ?, ?)
      ON CONFLICT(cliente_id) DO UPDATE SET json=excluded.json, updated_at=excluded.updated_at`,
     clienteId,
-    JSON.stringify(data),
+    await sealJson(data),
     now(),
   )
 }
@@ -454,6 +455,6 @@ export async function getSugerenciasPedidoLocal(
     'SELECT json FROM sugerencias_pedido_cache WHERE cliente_id = ?',
     clienteId,
   )
-  return row ? (JSON.parse(row.json) as Record<string, unknown>) : null
+  return row ? await openJson<Record<string, unknown>>(row.json) : null
 }
 

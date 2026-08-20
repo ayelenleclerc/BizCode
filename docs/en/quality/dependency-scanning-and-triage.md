@@ -39,4 +39,4 @@ The README badge reports Snyk status for this GitHub repo. After linking the pro
 
 ## Out of scope
 
-Socket.dev, Renovate, mobile certificate pinning (#220).
+Socket.dev, Renovate.

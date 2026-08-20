@@ -57,5 +57,12 @@
     "syncError": "Sync error — will retry when online",
     "syncConflict": "Conflict: the server already has another state for this stop. Dispatch was notified.",
     "retrySync": "Sync"
+  },
+  "security": {
+    "compromisedBanner": "This device appears rooted or jailbroken. Sensitive actions will ask for confirmation.",
+    "compromisedTitle": "Compromised device",
+    "compromisedSensitiveBody": "Continuing may expose delivery proofs or payments. Continue only if you trust this device.",
+    "cancel": "Cancel",
+    "continueAnyway": "Continue anyway"
   }
 }

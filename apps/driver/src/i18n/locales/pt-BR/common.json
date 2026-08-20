@@ -57,5 +57,12 @@
     "syncError": "Erro de sync — tentará de novo ao reconectar",
     "syncConflict": "Conflito: o servidor já tem outro estado nesta parada. O depósito foi notificado.",
     "retrySync": "Sincronizar"
+  },
+  "security": {
+    "compromisedBanner": "Este dispositivo parece com root ou jailbreak. Ações sensíveis pedirão confirmação.",
+    "compromisedTitle": "Dispositivo comprometido",
+    "compromisedSensitiveBody": "Continuar pode expor provas de entrega ou cobranças. Siga só se confiar neste dispositivo.",
+    "cancel": "Cancelar",
+    "continueAnyway": "Continuar mesmo assim"
   }
 }

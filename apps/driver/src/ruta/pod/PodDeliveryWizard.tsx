@@ -16,6 +16,7 @@ import {
   mapPodSaveError,
   type DeliveredPodFields,
 } from './podValidation'
+import { useDeviceIntegrity } from '../../security/DeviceIntegrityContext'
 
 type Props = {
   visible: boolean
@@ -33,6 +34,7 @@ const STEP_KEYS = ['stepReceptor', 'stepSignature', 'stepPhoto', 'stepConfirm'] 
  */
 export default function PodDeliveryWizard({ visible, clienteName, onClose, onSubmit }: Props) {
   const { t } = useTranslation(['pod'])
+  const { confirmSensitiveAction } = useDeviceIntegrity()
   const [step, setStep] = useState(0)
   const [receptorNombre, setReceptorNombre] = useState('')
   const [receptorDni, setReceptorDni] = useState('')
@@ -306,7 +308,7 @@ export default function PodDeliveryWizard({ visible, clienteName, onClose, onSub
                   mode="contained"
                   testID="driver-pod-confirm"
                   accessibilityLabel={t('pod:confirmDelivery')}
-                  onPress={() => void handleConfirm()}
+                  onPress={() => confirmSensitiveAction(() => handleConfirm())}
                   loading={saving}
                   disabled={saving || !canConfirm}
                 >
