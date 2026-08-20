@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { AppState, type AppStateStatus } from 'react-native'
 import { useAuth } from '../auth/AuthContext'
+import { ensureOfflineCryptoReady } from '../security/ensureOfflineCryptoReady'
 import { getOfflineDb } from './db'
 import { hydrateOfflineCache } from './hydrate'
 import { localYmd } from './localYmd'
@@ -117,25 +118,37 @@ export function OfflineProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (status !== 'authenticated') return
-    const today = localYmd()
-    if (online && isCacheStale(offlineMeta.getCacheDay(), today)) {
-      void runHydrate()
-    } else if (online) {
-      void runSync()
+    let cancelled = false
+    void (async () => {
+      await ensureOfflineCryptoReady()
+      if (cancelled) return
+      await refreshMeta()
+      const today = localYmd()
+      if (online && isCacheStale(offlineMeta.getCacheDay(), today)) {
+        await runHydrate()
+      } else if (online) {
+        await runSync()
+      }
+    })()
+    return () => {
+      cancelled = true
     }
-  }, [status, online, runHydrate, runSync])
+  }, [status, online, runHydrate, runSync, refreshMeta])
 
   useEffect(() => {
     if (status !== 'authenticated') return
     const onAppState = (next: AppStateStatus) => {
       if (next !== 'active') return
-      const today = localYmd()
-      if (isCacheStale(offlineMeta.getCacheDay(), today)) {
-        void runHydrate()
-      } else if (online) {
-        void runSync()
-      }
-      void refreshMeta()
+      void (async () => {
+        await ensureOfflineCryptoReady()
+        const today = localYmd()
+        if (isCacheStale(offlineMeta.getCacheDay(), today)) {
+          await runHydrate()
+        } else if (online) {
+          await runSync()
+        }
+        await refreshMeta()
+      })()
     }
     const sub = AppState.addEventListener('change', onAppState)
     return () => sub.remove()

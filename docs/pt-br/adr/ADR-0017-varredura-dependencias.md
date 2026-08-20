@@ -17,7 +17,7 @@ O BizCode já executa `pnpm audit` informativo, CodeQL, Gitleaks, SBOM CycloneDX
 3. **Snyk:** Job de Actions com segredo `SNYK_TOKEN`. Com o segredo: `snyk test --severity-threshold=high --fail-on=upgradable` em PR/push; `snyk monitor` em push para `develop`/`main`. Sem `SNYK_TOKEN`, o job omite o scan com warning (Quality Gate continua bloqueando via `pnpm audit`); ops deve adicionar o segredo para ativar o gate Snyk.
 4. **Trivy imagens:** Após `docker build` no Deploy Containers, escanear tags locais; **falhar em CRITICAL** antes de publicar no GHCR.
 5. **Documentação:** Guia de triage trilingue em `docs/*/quality/`. Badge Snyk no README para `ayelenleclerc/BizCode` (ops deve vincular o repo no Snyk uma vez). A geração SBOM usa `pnpm dlx @cyclonedx/cdxgen` (compatível com pnpm 10) em vez de `@cyclonedx/cyclonedx-npm`.
-6. **Fora de escopo v1:** Socket.dev, Renovate, `dependency-review-action`, hardening mobile (#220).
+6. **Fora de escopo v1:** Socket.dev, Renovate, `dependency-review-action`.
 
 ## Consequências
 

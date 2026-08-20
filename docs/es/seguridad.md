@@ -58,4 +58,8 @@ Runbook operativo (clasificación, runbooks, notas legales, post-mortem): [Respu
 
 Clasificación asíncrona y alertas para operadores de plataforma: [Monitoreo de seguridad](quality/monitoreo-de-seguridad.md). Timeline UI `/superadmin/security`; API `GET /api/superadmin/security-events`. Stub ISO: [SEC-011](certificacion-iso/sec/sec-011-logs-alertas.md).
 
+## Hardening apps móviles (#220)
+
+App Repartidor / App Vendedor: SecureStore, cache offline cifrado, soft-gate root/jailbreak, pinning TLS Android — [Hardening apps móviles](quality/hardening-apps-moviles.md).
+
 **Otros idiomas:** [English](../en/security.md) · [Português](../pt-br/seguranca.md)

@@ -43,9 +43,9 @@ Describe cómo BizCode clasifica eventos de auditoría relevantes para seguridad
 
 - Bull/BullMQ; Datadog / GuardDuty.
 - Nuevas integraciones Mercado Pago / ARCA.
-- Hardening mobile (#220).
 
 ## Relacionado
 
 - [Respuesta a incidentes](respuesta-a-incidentes.md)
+- [Hardening apps móviles (#220)](hardening-apps-moviles.md)
 - [Seguridad](../seguridad.md)

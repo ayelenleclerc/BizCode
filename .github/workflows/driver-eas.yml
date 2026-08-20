@@ -68,6 +68,9 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
+          EXPO_PUBLIC_API_TLS_PINS: ${{ secrets.EXPO_PUBLIC_API_TLS_PINS }}
+          EXPO_PUBLIC_API_TLS_PIN_HOST: ${{ secrets.EXPO_PUBLIC_API_TLS_PIN_HOST }}
+          EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
         run: |
           set -euo pipefail
           if [ -z "${EXPO_TOKEN:-}" ]; then
@@ -76,6 +79,14 @@ jobs:
           fi
           if [ -z "${EAS_DRIVER_PROJECT_ID:-}" ]; then
             echo "::error::GitHub secret EAS_DRIVER_PROJECT_ID is not set. Run eas init in apps/driver as the operator, then store the Expo project UUID as EAS_DRIVER_PROJECT_ID (do not reuse Seller EAS_PROJECT_ID)."
+            exit 1
+          fi
+          if [ -z "${EXPO_PUBLIC_API_TLS_PINS:-}" ]; then
+            echo "::error::GitHub secret EXPO_PUBLIC_API_TLS_PINS is required for release EAS builds (#220). Provide comma-separated SPKI SHA-256 pins."
+            exit 1
+          fi
+          if [ -z "${EXPO_PUBLIC_API_TLS_PIN_HOST:-}" ] && [ -z "${EXPO_PUBLIC_API_BASE_URL:-}" ]; then
+            echo "::error::Set EXPO_PUBLIC_API_TLS_PIN_HOST or EXPO_PUBLIC_API_BASE_URL so Android network_security_config has a pin host (#220)."
             exit 1
           fi
 
@@ -124,6 +135,9 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
           EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+          EXPO_PUBLIC_API_TLS_PINS: ${{ secrets.EXPO_PUBLIC_API_TLS_PINS }}
+          EXPO_PUBLIC_API_TLS_PIN_HOST: ${{ secrets.EXPO_PUBLIC_API_TLS_PIN_HOST }}
+          EXPO_PUBLIC_API_TLS_PIN_EXPIRATION: ${{ secrets.EXPO_PUBLIC_API_TLS_PIN_EXPIRATION }}
         run: |
           set -euo pipefail
           pnpm dlx ${EAS_CLI} build --platform android --profile production --non-interactive --wait
@@ -135,6 +149,9 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
           EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+          EXPO_PUBLIC_API_TLS_PINS: ${{ secrets.EXPO_PUBLIC_API_TLS_PINS }}
+          EXPO_PUBLIC_API_TLS_PIN_HOST: ${{ secrets.EXPO_PUBLIC_API_TLS_PIN_HOST }}
+          EXPO_PUBLIC_API_TLS_PIN_EXPIRATION: ${{ secrets.EXPO_PUBLIC_API_TLS_PIN_EXPIRATION }}
         run: |
           set -euo pipefail
           BUILD_JSON="$(pnpm dlx ${EAS_CLI} build --platform android --profile internal --non-interactive --json --wait)"
@@ -190,6 +207,9 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
           EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+          EXPO_PUBLIC_API_TLS_PINS: ${{ secrets.EXPO_PUBLIC_API_TLS_PINS }}
+          EXPO_PUBLIC_API_TLS_PIN_HOST: ${{ secrets.EXPO_PUBLIC_API_TLS_PIN_HOST }}
+          EXPO_PUBLIC_API_TLS_PIN_EXPIRATION: ${{ secrets.EXPO_PUBLIC_API_TLS_PIN_EXPIRATION }}
         run: |
           set -euo pipefail
           pnpm dlx ${EAS_CLI} build --platform "${{ inputs.platform }}" --profile "${{ inputs.profile }}" --non-interactive --wait
@@ -200,6 +220,9 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EAS_DRIVER_PROJECT_ID: ${{ secrets.EAS_DRIVER_PROJECT_ID }}
           EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+          EXPO_PUBLIC_API_TLS_PINS: ${{ secrets.EXPO_PUBLIC_API_TLS_PINS }}
+          EXPO_PUBLIC_API_TLS_PIN_HOST: ${{ secrets.EXPO_PUBLIC_API_TLS_PIN_HOST }}
+          EXPO_PUBLIC_API_TLS_PIN_EXPIRATION: ${{ secrets.EXPO_PUBLIC_API_TLS_PIN_EXPIRATION }}
         run: |
           set -euo pipefail
           pnpm dlx ${EAS_CLI} update --channel production --message "${GITHUB_REF_NAME}" --non-interactive

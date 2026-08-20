@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite'
+import { SELLER_OFFLINE_DB_V2 } from '../security/offlineStorageIds'
 
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null
 
@@ -122,14 +123,14 @@ CREATE TABLE IF NOT EXISTS sugerencias_pedido_cache (
 `
 
 /**
- * @en Opens the Seller offline SQLite DB (singleton) and ensures schema.
- * @es Abre la SQLite offline del Seller (singleton) y asegura el schema.
- * @pt-BR Abre o SQLite offline do Seller (singleton) e garante o schema.
+ * @en Opens the Seller offline SQLite DB v2 (singleton) and ensures schema (#220 encrypted JSON).
+ * @es Abre la SQLite offline Seller v2 (singleton) y asegura el schema (#220 JSON cifrado).
+ * @pt-BR Abre o SQLite offline Seller v2 (singleton) e garante o schema (#220 JSON cifrado).
  */
 export async function getOfflineDb(): Promise<SQLite.SQLiteDatabase> {
   if (!dbPromise) {
     dbPromise = (async () => {
-      const db = await SQLite.openDatabaseAsync('bizcode-seller-offline.db')
+      const db = await SQLite.openDatabaseAsync(SELLER_OFFLINE_DB_V2)
       await db.execAsync(SCHEMA)
       // @en Add codigo_barras for DBs created before #255 (CREATE TABLE IF NOT EXISTS does not alter).
       // @es Añade codigo_barras en DBs previas a #255 (CREATE TABLE IF NOT EXISTS no altera).

@@ -1,4 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite'
+import { openUtf8, sealJson } from '../security/offlineCrypto'
 import { offlineMeta } from './meta'
 import { nextLocalId, type OutboxActionType, type OutboxRow } from './types'
 
@@ -17,7 +18,7 @@ export async function enqueueOutbox(
     `INSERT INTO outbox (action_type, payload_json, created_at, attempts, last_error)
      VALUES (?, ?, ?, 0, NULL)`,
     actionType,
-    JSON.stringify(payload),
+    await sealJson(payload),
     createdAt,
   )
   const count = await countOutbox(db)
@@ -39,14 +40,16 @@ export async function listOutboxFifo(db: SQLiteDatabase): Promise<OutboxRow[]> {
     attempts: number
     last_error: string | null
   }>('SELECT * FROM outbox ORDER BY id ASC')
-  return rows.map((r) => ({
-    id: r.id,
-    actionType: r.action_type as OutboxActionType,
-    payloadJson: r.payload_json,
-    createdAt: r.created_at,
-    attempts: r.attempts,
-    lastError: r.last_error,
-  }))
+  return Promise.all(
+    rows.map(async (r) => ({
+      id: r.id,
+      actionType: r.action_type as OutboxActionType,
+      payloadJson: await openUtf8(r.payload_json),
+      createdAt: r.created_at,
+      attempts: r.attempts,
+      lastError: r.last_error,
+    })),
+  )
 }
 
 export async function deleteOutbox(db: SQLiteDatabase, id: number): Promise<void> {

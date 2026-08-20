@@ -43,11 +43,11 @@ Describes how BizCode classifies security-relevant audit events, evaluates detec
 
 - Bull/BullMQ queue; Datadog / AWS GuardDuty.
 - New Mercado Pago / ARCA integrations.
-- Mobile app hardening (#220).
 - AFIP/MP credential-change rules without existing audit actions.
 
 ## Related
 
 - [Incident response](incident-response.md)
+- [Mobile app hardening (#220)](mobile-app-hardening.md)
 - [Security](../security.md)
 - [IAM / sessions / audit](iam-model-sessions-audit.md)

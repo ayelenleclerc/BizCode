@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite'
+import { DRIVER_OFFLINE_DB_V2 } from '../security/offlineStorageIds'
 
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null
 
@@ -20,14 +21,14 @@ CREATE TABLE IF NOT EXISTS outbox (
 `
 
 /**
- * @en Opens the Driver offline SQLite DB (singleton) and ensures schema.
- * @es Abre la SQLite offline del Driver (singleton) y asegura el schema.
- * @pt-BR Abre o SQLite offline do Driver (singleton) e garante o schema.
+ * @en Opens the Driver offline SQLite DB v2 (singleton) and ensures schema (#220 encrypted payloads).
+ * @es Abre la SQLite offline Driver v2 (singleton) y asegura el schema (#220 payloads cifrados).
+ * @pt-BR Abre o SQLite offline Driver v2 (singleton) e garante o schema (#220 payloads cifrados).
  */
 export async function getOfflineDb(): Promise<SQLite.SQLiteDatabase> {
   if (!dbPromise) {
     dbPromise = (async () => {
-      const db = await SQLite.openDatabaseAsync('bizcode-driver-offline.db')
+      const db = await SQLite.openDatabaseAsync(DRIVER_OFFLINE_DB_V2)
       await db.execAsync(SCHEMA)
       return db
     })()

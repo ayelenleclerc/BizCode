@@ -39,4 +39,4 @@ El badge del README refleja el estado Snyk del repo. Tras enlazar el proyecto en
 
 ## Fuera de alcance
 
-Socket.dev, Renovate, certificate pinning mobile (#220).
+Socket.dev, Renovate.

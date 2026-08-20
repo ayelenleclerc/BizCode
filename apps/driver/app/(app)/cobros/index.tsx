@@ -20,6 +20,7 @@ import { enqueueCobroCreate } from '../../../src/offline/actions'
 import { getOfflineDb } from '../../../src/offline/db'
 import { isOnline } from '../../../src/offline/network'
 import { useOffline } from '../../../src/offline/OfflineContext'
+import { useDeviceIntegrity } from '../../../src/security/DeviceIntegrityContext'
 import { loadFormasPagoCache, loadTransferInfoCache } from '../../../src/offline/repos'
 import {
   canSubmitWithoutOverSaldoDialog,
@@ -124,6 +125,7 @@ export default function CobrosScreen() {
 
 function CobroForm({ clienteId, onQueued }: { clienteId: number; onQueued: () => Promise<void> }) {
   const { t } = useTranslation(['cobros', 'common'])
+  const { confirmSensitiveAction } = useDeviceIntegrity()
   const { reparto, load } = useRuta()
   const stop = reparto?.items.find((item) => item.ordenEntrega.clienteId === clienteId)
   const cliente = stop?.ordenEntrega.cliente
@@ -472,7 +474,7 @@ function CobroForm({ clienteId, onQueued }: { clienteId: number; onQueued: () =>
 
         <Button
           mode="contained"
-          onPress={() => void submitCobro(false)}
+          onPress={() => confirmSensitiveAction(() => submitCobro(false))}
           loading={saving}
           disabled={saving || monto <= 0}
           accessibilityLabel={t('cobros:submit')}

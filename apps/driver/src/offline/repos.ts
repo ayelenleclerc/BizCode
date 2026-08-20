@@ -1,6 +1,7 @@
 import type { SQLiteDatabase } from 'expo-sqlite'
 import type { CobroTransferInfo, FormaPagoDTO } from '@bizcode/api-client'
 import type { Reparto, RepartoItemRow } from '@bizcode/types'
+import { openJson, sealJson } from '../security/offlineCrypto'
 import { mapProgressFromItems } from './types'
 
 const KEY_REPARTO = 'mi_reparto'
@@ -12,7 +13,7 @@ async function putJson(db: SQLiteDatabase, key: string, value: unknown): Promise
   await db.runAsync(
     `INSERT OR REPLACE INTO kv_cache (key, json, updated_at) VALUES (?, ?, ?)`,
     key,
-    JSON.stringify(value),
+    await sealJson(value),
     updatedAt,
   )
 }
@@ -21,7 +22,7 @@ async function getJson<T>(db: SQLiteDatabase, key: string): Promise<T | null> {
   const row = await db.getFirstAsync<{ json: string }>('SELECT json FROM kv_cache WHERE key = ?', key)
   if (!row?.json) return null
   try {
-    return JSON.parse(row.json) as T
+    return await openJson<T>(row.json)
   } catch {
     return null
   }
