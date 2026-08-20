@@ -46,6 +46,7 @@
   },
   "empresaName": "BizCode",
   "error": "No se pudo registrar el cobro.",
+  "queued": "Cobro guardado sin señal. Se enviará al reconectar.",
   "forbidden": "No tenés permiso para cobrar.",
   "offline": "Sin conexión. Revisá la señal e intentá de nuevo."
 }

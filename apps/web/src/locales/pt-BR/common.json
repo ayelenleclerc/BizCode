@@ -188,7 +188,8 @@
       "chat_message": "Nova mensagem",
       "contract_invoice_generated": "Fatura gerada por contrato",
       "contract_adjustment_due": "Reajuste de preço do contrato aplicado",
-      "shipment_delivered": "Envio entregue"
+      "shipment_delivered": "Envio entregue",
+      "reparto_sync_conflict": "Conflito de sincronização de rota"
     }
   },
   "notifChannels": {

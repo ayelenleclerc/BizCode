@@ -9,6 +9,17 @@ import {
 import type { DevolucionEntregaRegisterInput, MotivoNoEntrega, Reparto, RepartoItemRow } from '@bizcode/types'
 import { driverRepartosApi } from '../api/driverApi'
 import { mapApiErrorToUiState, type UiLoadState } from '../lib/apiErrors'
+import {
+  enqueueDevolucionRegister,
+  enqueuePodDelivered,
+  enqueuePodNotDelivered,
+} from '../offline/actions'
+import { getOfflineDb } from '../offline/db'
+import { hydrateOfflineCache } from '../offline/hydrate'
+import { isOnline } from '../offline/network'
+import { useOffline } from '../offline/OfflineContext'
+import { loadRepartoCache, saveRepartoCache } from '../offline/repos'
+import { localYmd } from '../offline/localYmd'
 import type { DeliveredPodFields } from './pod/podValidation'
 
 type RutaContextValue = {
@@ -24,20 +35,13 @@ type RutaContextValue = {
 
 const RutaContext = createContext<RutaContextValue | null>(null)
 
-function todayYmd(): string {
-  const d = new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-}
-
 /**
- * @en Day-route state for App Driver: load mi-reparto, patch stops, POD deliver/not-delivered, collections (#160/#161/#162).
- * @es Estado de ruta del día: carga mi-reparto, parches de parada, POD entregar/no entregar, cobros (#160/#161/#162).
- * @pt-BR Estado da rota do dia: carrega mi-reparto, patches de parada, POD entregar/não entregar, cobranças (#160/#161/#162).
+ * @en Day-route state: load mi-reparto (online or SQLite cache) and queue POD/returns when offline (#160/#164).
+ * @es Estado de ruta: carga mi-reparto (online o cache SQLite) y encola POD/devoluciones si está offline (#160/#164).
+ * @pt-BR Estado da rota: carrega mi-reparto (online ou cache SQLite) e enfileira POD/devoluções offline (#160/#164).
  */
 export function RutaProvider({ children }: { children: ReactNode }) {
+  const { refreshMeta } = useOffline()
   const [status, setStatus] = useState<UiLoadState>('idle')
   const [error, setError] = useState<string | null>(null)
   const [reparto, setReparto] = useState<Reparto | null>(null)
@@ -45,16 +49,42 @@ export function RutaProvider({ children }: { children: ReactNode }) {
   const load = useCallback(async () => {
     setStatus('loading')
     setError(null)
+    const online = await isOnline()
     try {
-      const data = await driverRepartosApi.getMiReparto({ fecha: todayYmd() })
-      if (!data || data.items.length === 0) {
-        setReparto(data ?? null)
-        setStatus('empty')
+      if (online) {
+        const data = await driverRepartosApi.getMiReparto({ fecha: localYmd() })
+        const db = await getOfflineDb()
+        await saveRepartoCache(db, data ?? null)
+        if (!data || data.items.length === 0) {
+          setReparto(data ?? null)
+          setStatus('empty')
+          return
+        }
+        setReparto(data)
+        setStatus('success')
         return
       }
-      setReparto(data)
+      const db = await getOfflineDb()
+      const cached = await loadRepartoCache(db)
+      if (!cached || cached.items.length === 0) {
+        setReparto(cached)
+        setStatus(cached ? 'empty' : 'offline')
+        return
+      }
+      setReparto(cached)
       setStatus('success')
     } catch (err) {
+      try {
+        const db = await getOfflineDb()
+        const cached = await loadRepartoCache(db)
+        if (cached && cached.items.length > 0) {
+          setReparto(cached)
+          setStatus('success')
+          return
+        }
+      } catch {
+        // fall through to mapped error
+      }
       const next = mapApiErrorToUiState(err)
       setReparto(null)
       setStatus(next === 'not_found' ? 'empty' : next)
@@ -75,20 +105,39 @@ export function RutaProvider({ children }: { children: ReactNode }) {
   const markNotDelivered = useCallback(
     async (itemId: number, motivo: MotivoNoEntrega) => {
       if (!reparto) return
+      const online = await isOnline()
+      if (!online) {
+        const updated = await enqueuePodNotDelivered(itemId, motivo)
+        patchItem(itemId, updated)
+        await refreshMeta()
+        return
+      }
       const updated = await driverRepartosApi.updateItemPod(reparto.id, itemId, {
         outcome: 'not_delivered',
         motivoNoEntrega: motivo,
       })
       if (updated) {
         patchItem(itemId, updated)
+        const db = await getOfflineDb()
+        await saveRepartoCache(db, {
+          ...reparto,
+          items: reparto.items.map((item) => (item.id === itemId ? updated : item)),
+        })
       }
     },
-    [patchItem, reparto],
+    [patchItem, refreshMeta, reparto],
   )
 
   const markDelivered = useCallback(
     async (itemId: number, input: DeliveredPodFields) => {
       if (!reparto) return
+      const online = await isOnline()
+      if (!online) {
+        const updated = await enqueuePodDelivered(itemId, input)
+        patchItem(itemId, updated)
+        await refreshMeta()
+        return
+      }
       const updated = await driverRepartosApi.updateItemPod(reparto.id, itemId, {
         outcome: 'delivered',
         ...input,
@@ -97,16 +146,26 @@ export function RutaProvider({ children }: { children: ReactNode }) {
         patchItem(itemId, updated)
       }
     },
-    [patchItem, reparto],
+    [patchItem, refreshMeta, reparto],
   )
 
   const registerDevolucion = useCallback(
     async (itemId: number, input: DevolucionEntregaRegisterInput) => {
       if (!reparto) return
+      const online = await isOnline()
+      if (!online) {
+        await enqueueDevolucionRegister(itemId, input)
+        await refreshMeta()
+        const db = await getOfflineDb()
+        const cached = await loadRepartoCache(db)
+        if (cached) setReparto(cached)
+        return
+      }
       await driverRepartosApi.registerDevolucion(reparto.id, itemId, input)
+      await hydrateOfflineCache({ fecha: localYmd() })
       await load()
     },
-    [load, reparto],
+    [load, refreshMeta, reparto],
   )
 
   const value = useMemo(

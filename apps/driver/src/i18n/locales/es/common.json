@@ -32,5 +32,15 @@
     "title": "Acceso denegado",
     "body": "Tu rol no puede usar la App Repartidor.",
     "back": "Volver al login"
+  },
+  "offline": {
+    "banner": "Sin conexión — datos de {{date}}",
+    "hydrating": "Descargando la ruta de hoy…",
+    "syncing": "Sincronizando {{count}} acciones…",
+    "pending": "{{count}} pendientes de sync",
+    "synced": "Todo sincronizado",
+    "syncError": "Error de sync — se reintenta al reconectar",
+    "syncConflict": "Conflicto: el servidor ya tiene otro estado para esta parada. El depósito fue notificado.",
+    "retrySync": "Sincronizar"
   }
 }

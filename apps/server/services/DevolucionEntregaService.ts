@@ -13,6 +13,7 @@ import { MeliStockSyncService } from './MeliStockSyncService'
 import { TiendanubeStockSyncService } from './TiendanubeStockSyncService'
 import { WooCommerceStockSyncService } from './WooCommerceStockSyncService'
 import type { ServiceResult } from './serviceResults'
+import { notifyLogisticsPlannersForRepartoConflict } from './logisticsPlannerNotify'
 import { applyStockDepositoDelta, getDefaultDepositoId } from './stockDepositoSync'
 
 const MOTIVOS = ['rechazo', 'producto_dañado'] as const
@@ -109,6 +110,14 @@ export class DevolucionEntregaService {
     const route = await this.assertChoferRoute(tenantId, repartoId, actor)
     if (!route.ok) return route
     if (route.data.estado !== 'on_route') {
+      await notifyLogisticsPlannersForRepartoConflict(this.prisma, tenantId, {
+        repartoId,
+        itemId,
+        code: 'REPARTO_INVALID_STATE',
+        actorUserId: actor.userId,
+      }).catch(() => {
+        /* notify must not break register */
+      })
       return { ok: false, status: 422, error: 'REPARTO_INVALID_STATE' }
     }
 
@@ -139,6 +148,14 @@ export class DevolucionEntregaService {
       return { ok: false, status: 422, error: 'REPARTO_ITEM_INVALID_STATE' }
     }
     if (item.devolucionEntrega) {
+      await notifyLogisticsPlannersForRepartoConflict(this.prisma, tenantId, {
+        repartoId,
+        itemId,
+        code: 'DEVOLUCION_ALREADY_EXISTS',
+        actorUserId: actor.userId,
+      }).catch(() => {
+        /* notify must not break register */
+      })
       return { ok: false, status: 422, error: 'DEVOLUCION_ALREADY_EXISTS' }
     }
     if (input.lineas.length === 0) {
@@ -223,6 +240,14 @@ export class DevolucionEntregaService {
       return { ok: true, data: { devolucion: mapPublic(created) } }
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        await notifyLogisticsPlannersForRepartoConflict(this.prisma, tenantId, {
+          repartoId,
+          itemId,
+          code: 'DEVOLUCION_ALREADY_EXISTS',
+          actorUserId: actor.userId,
+        }).catch(() => {
+          /* notify must not break register */
+        })
         return { ok: false, status: 422, error: 'DEVOLUCION_ALREADY_EXISTS' }
       }
       throw err

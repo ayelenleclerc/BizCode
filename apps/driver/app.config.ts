@@ -22,6 +22,7 @@ const config = {
   plugins: [
     'expo-router',
     'expo-secure-store',
+    'expo-sqlite',
     'expo-updates',
     [
       'expo-image-picker',

@@ -55,7 +55,12 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
   const base = {
     appUser: {
       findFirst: vi.fn().mockResolvedValue({ id: 5 }),
+      findMany: vi.fn().mockResolvedValue([]),
     },
+    notification: { create: vi.fn().mockResolvedValue({}) },
+    auditEvent: { create: vi.fn().mockResolvedValue({}) },
+    pushNotificationPreference: { findUnique: vi.fn().mockResolvedValue(null) },
+    devicePushToken: { findMany: vi.fn().mockResolvedValue([]) },
     ordenEntrega: {
       findMany: vi.fn().mockResolvedValue([ordenPending]),
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
@@ -250,6 +255,41 @@ describe('RepartoService.updateItemPod', () => {
     )
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.error).toBe('INVALID_MOTIVO_NO_ENTREGA')
+  })
+
+  it('notifies planners when item is no longer pending', async () => {
+    const prisma = buildPrisma({
+      appUser: {
+        findFirst: vi.fn(),
+        findMany: vi.fn().mockResolvedValue([{ id: 8 }]),
+      },
+      notification: { create: vi.fn().mockResolvedValue({}) },
+      auditEvent: { create: vi.fn().mockResolvedValue({}) },
+      pushNotificationPreference: { findUnique: vi.fn().mockResolvedValue(null) },
+      devicePushToken: { findMany: vi.fn().mockResolvedValue([]) },
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue({ id: 1, estado: 'on_route', choferId: 5, tenantId: 1 }),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      repartoItem: {
+        findFirst: vi.fn().mockResolvedValue({ ...onRouteItem, estado: 'delivered' }),
+        update: vi.fn(),
+        updateMany: vi.fn(),
+      },
+    })
+    const svc = new RepartoService(prisma)
+    const result = await svc.updateItemPod(
+      1,
+      1,
+      100,
+      { outcome: 'delivered', receptorNombre: 'Ana', firmaBase64: TEST_FIRMA },
+      { userId: 5, role: 'driver' },
+    )
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error).toBe('REPARTO_ITEM_INVALID_STATE')
   })
 
   it('rejects firma larger than limit', async () => {

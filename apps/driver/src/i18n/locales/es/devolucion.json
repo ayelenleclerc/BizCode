@@ -21,6 +21,7 @@
     "loteRequired": "Un artículo exige lote. La devolución queda pendiente; el depósito debe asignar el lote.",
     "registered": "Pendiente de rendir",
     "remitted": "Rendida",
-    "success": "Rendición completa. El servidor aplicó stock y notas de crédito."
+    "success": "Rendición completa. El servidor aplicó stock y notas de crédito.",
+    "needsOnline": "La rendición requiere conexión. Las devoluciones registradas offline se suben al reconectar; rendí después."
   }
 }

@@ -46,6 +46,7 @@
   },
   "empresaName": "BizCode",
   "error": "Could not record the collection.",
+  "queued": "Collection saved offline. It will upload when you reconnect.",
   "forbidden": "You do not have permission to collect.",
   "offline": "No network connection. Check your signal and retry."
 }

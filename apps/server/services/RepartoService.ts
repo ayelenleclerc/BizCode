@@ -12,6 +12,7 @@ import {
 } from '../lib/podMediaValidation'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
+import { notifyLogisticsPlannersForRepartoConflict } from './logisticsPlannerNotify'
 
 export const POD_VIEW_ROLES = ['owner', 'manager', 'logistics_planner'] as const
 
@@ -559,6 +560,14 @@ export class RepartoService {
       return { ok: false, status: 404, error: 'REPARTO_NOT_FOUND' }
     }
     if (reparto.estado !== 'on_route') {
+      await notifyLogisticsPlannersForRepartoConflict(this.prisma, tenantId, {
+        repartoId,
+        itemId,
+        code: 'REPARTO_INVALID_STATE',
+        actorUserId: actor.userId,
+      }).catch(() => {
+        /* notify must not break POD */
+      })
       return { ok: false, status: 422, error: 'REPARTO_INVALID_STATE' }
     }
     if (actor.role === 'driver' && reparto.choferId !== actor.userId) {
@@ -573,6 +582,14 @@ export class RepartoService {
       return { ok: false, status: 404, error: 'REPARTO_ITEM_NOT_FOUND' }
     }
     if (item.estado !== 'pending') {
+      await notifyLogisticsPlannersForRepartoConflict(this.prisma, tenantId, {
+        repartoId,
+        itemId,
+        code: 'REPARTO_ITEM_INVALID_STATE',
+        actorUserId: actor.userId,
+      }).catch(() => {
+        /* notify must not break POD */
+      })
       return { ok: false, status: 422, error: 'REPARTO_ITEM_INVALID_STATE' }
     }
 

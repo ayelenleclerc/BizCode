@@ -90,6 +90,10 @@ Back-office: on **`/logistica/repartos`**, tracking panel shows **POD available*
 
 App Driver registers `rechazo` / `producto_dañado` with `POST /api/repartos/{id}/items/{itemId}/devolucion` (`orders.deliver.confirm` + field). That does not adjust stock or issue a credit note. Remittance `POST /api/repartos/{id}/devoluciones/rendir` applies `StockAjuste` motivo `devolucion_entrega` and a partial credit note when the OE has a factura. Without factura: stock yes, NC no. FEFO + `controlLote` without lot → `422 LOTE_REQUIRED` (leave pending). Role `driver` is not given `inventory.adjust`.
 
+## App Driver offline (#164)
+
+With a downloaded day route, App Driver can confirm POD, record collections, and register returns without signal (outbox FIFO). Remittance of returns stays online. If sync hits `422` because the stop already changed on the server, dispatch roles (`owner`, `manager`, `logistics_planner`) receive in-app notification `reparto_sync_conflict`.
+
 ## Live GPS tracking (#144)
 
 Module **`logistics.gps`** (requires **`logistics.dispatches`**). Planners with roles **`owner`**, **`manager`**, or **`logistics_planner`** open **`/logistica/seguimiento`** (OpenStreetMap + Leaflet map, list of `on_route` routes, refresh every **60 s**).

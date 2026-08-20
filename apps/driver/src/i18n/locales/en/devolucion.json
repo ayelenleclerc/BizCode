@@ -21,6 +21,7 @@
     "loteRequired": "A lot is required for an article. Leave the return pending and ask the warehouse to assign the lot.",
     "registered": "Pending remittance",
     "remitted": "Remitted",
-    "success": "Remittance complete. Stock and credit notes were applied on the server."
+    "success": "Remittance complete. Stock and credit notes were applied on the server.",
+    "needsOnline": "Remittance requires a connection. Offline returns upload when you reconnect; remit afterwards."
   }
 }

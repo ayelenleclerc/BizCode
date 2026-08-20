@@ -44,6 +44,14 @@ describe('mobilePushDelivery (#172)', () => {
     expect(content.data.pedidoId).toBe(9)
   })
 
+  it('buildPushContent for reparto_sync_conflict (#164)', () => {
+    const content = buildPushContent('reparto_sync_conflict', {
+      detail: 'code=REPARTO_ITEM_INVALID_STATE repartoId=9',
+    })
+    expect(content.title).toContain('Conflicto')
+    expect(content.data.type).toBe('reparto_sync_conflict')
+  })
+
   it('skips muted types', async () => {
     const deleteMany = vi.fn()
     const prisma = {

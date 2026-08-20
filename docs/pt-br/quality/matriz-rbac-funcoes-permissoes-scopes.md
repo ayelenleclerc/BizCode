@@ -60,6 +60,10 @@ Módulo **`logistics.pod`**. UI motorista `/logistica/repartos/chofer` exige **`
 
 `POST /api/repartos/{id}/items/{itemId}/devolucion`, `GET /api/repartos/{id}/devoluciones` e `POST /api/repartos/{id}/devoluciones/rendir` exigem **`orders.deliver.confirm` + `x-bizcode-channel: field`**. O papel `driver` **não** recebe `inventory.adjust` nem `sales.cancel` / `sales.create`. Estoque (`StockAjuste` motivo `devolucion_entrega`) e NC parcial só na prestação, no servidor. FEFO + `controlLote` sem `loteId` responde **`422 LOTE_REQUIRED`** e deixa a devolução `registered`.
 
+## App Entregador offline (#164)
+
+O flush offline reutiliza os mesmos endpoints de POD / cobrança / devolução e **`orders.deliver.confirm` + field**. Sem permissões extras. Notificações de conflito `reparto_sync_conflict` vão para **`owner`**, **`manager`** e **`logistics_planner`** (in-app; push Expo só se tiverem token).
+
 ## KPIs e relatórios logísticos (#145)
 
 Módulo **`logistics.dispatches`**. `GET /api/logistica/kpis`, `reporte-choferes`, `reporte-zonas`: **`logistics.read`**; papéis `owner`, `manager`, `logistics_planner` (aba em `/logistica`; motorista excluído). CSV com `Accept: text/csv`.

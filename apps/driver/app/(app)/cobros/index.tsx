@@ -16,6 +16,11 @@ import {
   Title,
 } from 'react-native-paper'
 import { driverCobrosApi, driverFormasPagoApi } from '../../../src/api/driverApi'
+import { enqueueCobroCreate } from '../../../src/offline/actions'
+import { getOfflineDb } from '../../../src/offline/db'
+import { isOnline } from '../../../src/offline/network'
+import { useOffline } from '../../../src/offline/OfflineContext'
+import { loadFormasPagoCache, loadTransferInfoCache } from '../../../src/offline/repos'
 import {
   canSubmitWithoutOverSaldoDialog,
   formatMoney,
@@ -52,6 +57,7 @@ export default function CobrosScreen() {
   const { clienteId: clienteIdParam } = useLocalSearchParams<{ clienteId?: string | string[] }>()
   const clienteId = parseClienteId(clienteIdParam)
   const { status, reparto, load } = useRuta()
+  const { refreshMeta } = useOffline()
 
   useEffect(() => {
     if (status === 'idle') {
@@ -113,10 +119,10 @@ export default function CobrosScreen() {
     )
   }
 
-  return <CobroForm clienteId={clienteId} />
+  return <CobroForm clienteId={clienteId} onQueued={refreshMeta} />
 }
 
-function CobroForm({ clienteId }: { clienteId: number }) {
+function CobroForm({ clienteId, onQueued }: { clienteId: number; onQueued: () => Promise<void> }) {
   const { t } = useTranslation(['cobros', 'common'])
   const { reparto, load } = useRuta()
   const stop = reparto?.items.find((item) => item.ordenEntrega.clienteId === clienteId)
@@ -147,14 +153,26 @@ function CobroForm({ clienteId }: { clienteId: number }) {
 
   useEffect(() => {
     let cancelled = false
-    void driverFormasPagoApi.list().then((rows) => {
-      if (cancelled || !rows) return
-      setFormas(rows)
-      setFormaPagoId((prev) => prev ?? pickDefaultFormaPagoId(rows))
-    })
-    void driverCobrosApi.getTransferInfo().then((info) => {
-      if (!cancelled) setTransferInfo(info)
-    })
+    void (async () => {
+      const online = await isOnline()
+      if (online) {
+        const rows = await driverFormasPagoApi.list()
+        if (!cancelled && rows) {
+          setFormas(rows)
+          setFormaPagoId((prev) => prev ?? pickDefaultFormaPagoId(rows))
+        }
+        const info = await driverCobrosApi.getTransferInfo()
+        if (!cancelled) setTransferInfo(info)
+        return
+      }
+      const db = await getOfflineDb()
+      const rows = await loadFormasPagoCache(db)
+      if (!cancelled) {
+        setFormas(rows)
+        setFormaPagoId((prev) => prev ?? pickDefaultFormaPagoId(rows))
+        setTransferInfo(await loadTransferInfoCache(db))
+      }
+    })()
     return () => {
       cancelled = true
     }
@@ -204,7 +222,7 @@ function CobroForm({ clienteId }: { clienteId: number }) {
       setSaving(true)
       setFormError(null)
       try {
-        const result = await driverCobrosApi.create({
+        const body = {
           clienteId: cliente.id,
           fecha: todayYmd(),
           monto,
@@ -212,7 +230,15 @@ function CobroForm({ clienteId }: { clienteId: number }) {
           referencia: referencia.trim() || null,
           nota: nota.trim() || null,
           chequeNuevo: buildChequeNuevo(),
-        })
+        }
+        const online = await isOnline()
+        if (!online) {
+          await enqueueCobroCreate(body)
+          await onQueued()
+          setFormError(t('cobros:queued'))
+          return
+        }
+        const result = await driverCobrosApi.create(body)
         const cobroId = result?.cobro.id ?? 0
         const formaLabel = selectedForma?.descripcion ?? ''
         const text = buildCobroReceiptText({
@@ -247,6 +273,7 @@ function CobroForm({ clienteId }: { clienteId: number }) {
       load,
       monto,
       nota,
+      onQueued,
       referencia,
       saldo,
       selectedForma,

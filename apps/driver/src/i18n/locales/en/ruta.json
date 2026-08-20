@@ -8,6 +8,7 @@
   "forbidden": "You cannot view this route.",
   "bultos": "{{count}} items",
   "debtBadge": "Balance due",
+  "pendingSync": "Pending sync",
   "estado": {
     "pending": "Pending",
     "delivered": "Delivered",

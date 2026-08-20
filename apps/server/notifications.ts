@@ -45,6 +45,7 @@ export const NOTIFICATION_TYPES = [
   'pedido_cancelled',
   'cliente_credit_alert',
   'cliente_payment_received',
+  'reparto_sync_conflict',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]
