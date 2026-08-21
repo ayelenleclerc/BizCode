@@ -12,7 +12,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
       '@bizcode/types': path.resolve(__dirname, '../../packages/types/src/index.ts'),
       '@bizcode/api-client': path.resolve(__dirname, '../../packages/api-client/src/index.ts'),
+      // Subpaths before bare `@bizcode/ui` so `@bizcode/ui/web` is not rewritten to index.ts/web.
+      '@bizcode/ui/web': path.resolve(__dirname, '../../packages/ui/src/web/index.ts'),
+      '@bizcode/ui': path.resolve(__dirname, '../../packages/ui/src/index.ts'),
     },
+    dedupe: ['react', 'react-dom'],
   },
   /**
    * @en esbuild ≥0.28 (pnpm override for CVE-2025-68121) cannot downlevel some
