@@ -9,12 +9,15 @@
       "@hooks/*": ["./src/hooks/*"],
       "@store/*": ["./src/store/*"],
       "@bizcode/types": ["../../packages/types/src/index.ts"],
-      "@bizcode/api-client": ["../../packages/api-client/src/index.ts"]
+      "@bizcode/api-client": ["../../packages/api-client/src/index.ts"],
+      "@bizcode/ui": ["../../packages/ui/src/index.ts"],
+      "@bizcode/ui/web": ["../../packages/ui/src/web/index.ts"]
     }
   },
   "include": ["src"],
   "references": [
     { "path": "../../packages/types" },
-    { "path": "../../packages/api-client" }
+    { "path": "../../packages/api-client" },
+    { "path": "../../packages/ui" }
   ]
 }

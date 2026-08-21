@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { Spinner } from '@bizcode/ui/web'
 
 type LoadingSpinnerProps = {
   message?: string
@@ -15,18 +16,10 @@ export default function LoadingSpinner({ message }: LoadingSpinnerProps) {
 
   return (
     <div
-      className="flex flex-col items-center justify-center gap-3 py-12 text-slate-600 dark:text-slate-300"
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
-      aria-label={label}
+      className="flex flex-col items-center justify-center py-12 text-slate-600 dark:text-slate-300"
       data-testid="loading-spinner"
     >
-      <span
-        className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600 dark:border-slate-600 dark:border-t-blue-400"
-        aria-hidden="true"
-      />
-      <span>{label}</span>
+      <Spinner label={label} testID="loading-spinner-indicator" />
     </div>
   )
 }

@@ -22,6 +22,7 @@
   "dependencies": {
     "@bizcode/api-client": "workspace:*",
     "@bizcode/types": "workspace:*",
+    "@bizcode/ui": "workspace:*",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-community/netinfo": "^12.0.1",
     "@shopify/flash-list": "^2.3.2",

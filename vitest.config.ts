@@ -15,6 +15,7 @@ export default defineConfig({
       ['tests/server/**', 'node'],
       ['tests/plan-sync/**', 'node'],
       ['packages/api-client/**', 'jsdom'],
+      ['packages/ui/src/**/*.test.ts', 'node'],
     ],
     globals: true,
     setupFiles: ['./apps/web/src/test/setup.ts'],
@@ -55,6 +56,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'apps/web/src'),
       '@bizcode/types': path.resolve(__dirname, 'packages/types/src/index.ts'),
       '@bizcode/api-client': path.resolve(__dirname, 'packages/api-client/src/index.ts'),
+      '@bizcode/ui': path.resolve(__dirname, 'packages/ui/src/index.ts'),
+      '@bizcode/ui/web': path.resolve(__dirname, 'packages/ui/src/web/index.ts'),
+      '@bizcode/ui/native': path.resolve(__dirname, 'packages/ui/src/native/index.ts'),
     },
   },
 })

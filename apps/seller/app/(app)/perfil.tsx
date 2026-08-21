@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet, View } from 'react-native'
 import { List, Switch, Text } from 'react-native-paper'
+import { Spinner } from '@bizcode/ui/native'
 import { sellerPushApi } from '../../src/push/registerPush'
 import { mapApiErrorToUiState } from '../../src/lib/apiErrors'
 
@@ -76,7 +77,7 @@ export default function PerfilScreen() {
   if (loading) {
     return (
       <View style={styles.centered} accessibilityLabel={t('loading')}>
-        <ActivityIndicator />
+        <Spinner label={t('loading')} testID="seller-perfil-loading" />
       </View>
     )
   }

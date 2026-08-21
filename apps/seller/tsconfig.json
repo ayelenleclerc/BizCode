@@ -6,7 +6,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@bizcode/types": ["../../packages/types/src/index.ts"],
-      "@bizcode/api-client": ["../../packages/api-client/src/index.ts"]
+      "@bizcode/api-client": ["../../packages/api-client/src/index.ts"],
+      "@bizcode/ui": ["../../packages/ui/src/index.ts"],
+      "@bizcode/ui/native": ["../../packages/ui/src/native/index.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", ".expo/types/**/*.ts", "expo-env.d.ts"]

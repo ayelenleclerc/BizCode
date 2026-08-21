@@ -351,6 +351,9 @@ importers:
       '@bizcode/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@bizcode/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@expo/vector-icons':
         specifier: ^15.1.1
         version: 15.1.1(expo-font@57.0.1)(react-native@0.86.2(@babel/core@7.29.7)(@react-native/metro-config@0.86.2(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
@@ -451,6 +454,9 @@ importers:
       '@bizcode/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@bizcode/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@expo/vector-icons':
         specifier: ^15.1.1
         version: 15.1.1(expo-font@57.0.1)(react-native@0.86.2(@babel/core@7.29.7)(@react-native/metro-config@0.86.2(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
@@ -569,6 +575,9 @@ importers:
       '@bizcode/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@bizcode/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
 
   packages/api-client:
     dependencies:
@@ -580,6 +589,22 @@ importers:
         version: 1.18.0
 
   packages/types: {}
+
+  packages/ui:
+    dependencies:
+      react-native:
+        specifier: '*'
+        version: 0.86.2(@babel/core@7.29.7)(@react-native/metro-config@0.86.2(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3)
+      react-native-paper:
+        specifier: ^5.15.3
+        version: 5.15.3(react-native-safe-area-context@5.7.0(react-native@0.86.2(@babel/core@7.29.7)(@react-native/metro-config@0.86.2(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.2(@babel/core@7.29.7)(@react-native/metro-config@0.86.2(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.18
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
 
 packages:
 
@@ -10682,7 +10707,9 @@ snapshots:
       metro-runtime: 0.84.4
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-colors@0.86.2': {}
 

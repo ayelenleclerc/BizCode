@@ -30,7 +30,7 @@ Optional in `.env` for the web app:
 
 ### App Seller (`apps/seller`, #167–#172)
 
-Expo SDK app with Expo Router. UI uses React Native Paper (shared `@bizcode/ui` is deferred to #157). Auth uses **Bearer dual** mode: the API still sets HttpOnly cookies for the web app and also returns `accessToken` / `refreshToken` / `expiresIn` in the login and refresh JSON bodies. The seller app stores those tokens in **expo-secure-store** (never AsyncStorage) and sends `Authorization: Bearer` plus `x-bizcode-channel: field`.
+Expo SDK app with Expo Router. UI uses React Native Paper and may import shared primitives from `@bizcode/ui/native` (see [#157](../quality/bizcode-ui-design-system.md)). Auth uses **Bearer dual** mode: the API still sets HttpOnly cookies for the web app and also returns `accessToken` / `refreshToken` / `expiresIn` in the login and refresh JSON bodies. The seller app stores those tokens in **expo-secure-store** (never AsyncStorage) and sends `Authorization: Bearer` plus `x-bizcode-channel: field`.
 
 Allowed roles: `seller`, `manager`, `owner`. Other roles see an accessible “seller-only” denial screen.
 
@@ -127,7 +127,7 @@ Privacy policy URL: `{PUBLIC_WEB_ORIGIN}/privacidad` (public page from #195; ope
 
 **ES — completa:** BizCode Seller es la app de vendedor de campo del ERP BizCode. El vendedor inicia sesión con la cuenta de la empresa, consulta clientes, toma pedidos (catálogo, escáner, sugerencias), confirma visitas en la ruta del día y trabaja sin conexión con sincronización posterior. Las notificaciones push y la confirmación por WhatsApp usan el servidor BizCode de la empresa. No hay capturas de Play Store en el repositorio; usar capturas de un build firmado.
 
-**Note:** `@bizcode/ui` (#157) is out of scope for #167/#168; do not block type-check or login on that package.
+**Note:** `@bizcode/ui` (#157) is available as a workspace package; smoke imports exist in Seller Profile. Mass UI migration remains out of scope.
 
 ### App Driver (`apps/driver`, #159–#164)
 
