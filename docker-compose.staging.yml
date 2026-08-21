@@ -1,0 +1,80 @@
+# Staging stack (#152). Same shape as prod; APP_ENV defaults to staging; separate volume.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bizcode_staging}
+      POSTGRES_USER: ${POSTGRES_USER:-bizcode}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-bizcode} -d ${POSTGRES_DB:-bizcode_staging}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    image: ${BIZCODE_SERVER_IMAGE:-ghcr.io/ayelenleclerc/bizcode-server:staging}
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-staging}
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bizcode}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-bizcode_staging}?schema=public
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_SECRET_PREVIOUS: ${JWT_SECRET_PREVIOUS:-}
+      REDIS_URL: ${REDIS_URL:?REDIS_URL is required}
+      TRUST_PROXY: ${TRUST_PROXY:-1}
+      WEBHOOK_IP_ALLOWLIST: ${WEBHOOK_IP_ALLOWLIST:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      HTTP_RATE_LIMIT_PER_MINUTE: ${HTTP_RATE_LIMIT_PER_MINUTE:-100}
+      HTTP_RATE_LIMIT_UNAUTH_PER_MINUTE: ${HTTP_RATE_LIMIT_UNAUTH_PER_MINUTE:-20}
+      HTTP_RATE_LIMIT_AUTH_PER_MINUTE: ${HTTP_RATE_LIMIT_AUTH_PER_MINUTE:-20}
+      HTTP_RATE_LIMIT_LOGIN_PER_15_MIN: ${HTTP_RATE_LIMIT_LOGIN_PER_15_MIN:-5}
+      HTTP_RATE_LIMIT_LOGIN_USERNAME_PER_HOUR: ${HTTP_RATE_LIMIT_LOGIN_USERNAME_PER_HOUR:-10}
+      HTTP_RATE_LIMIT_REPORTS_PER_HOUR: ${HTTP_RATE_LIMIT_REPORTS_PER_HOUR:-10}
+      HTTP_RATE_LIMIT_IMPORT_PER_HOUR: ${HTTP_RATE_LIMIT_IMPORT_PER_HOUR:-5}
+      BIZCODE_SEED_SUPERADMIN_PASSWORD: ${BIZCODE_SEED_SUPERADMIN_PASSWORD:-}
+      BIZCODE_FISCAL_ENCRYPTION_KEY: ${BIZCODE_FISCAL_ENCRYPTION_KEY:?BIZCODE_FISCAL_ENCRYPTION_KEY is required}
+      BIZCODE_MFA_ENCRYPTION_KEY: ${BIZCODE_MFA_ENCRYPTION_KEY:?BIZCODE_MFA_ENCRYPTION_KEY is required}
+      SMTP_URL: ${SMTP_URL:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - '3001'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:3001/api/health >/dev/null || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  frontend:
+    image: ${BIZCODE_FRONTEND_IMAGE:-ghcr.io/ayelenleclerc/bizcode-frontend:staging}
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - '${FRONTEND_PORT:-8081}:80'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1/ >/dev/null || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_staging_data:

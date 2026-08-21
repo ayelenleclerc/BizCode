@@ -14,6 +14,7 @@ export default defineConfig({
       ['tests/api/**', 'node'],
       ['tests/server/**', 'node'],
       ['tests/plan-sync/**', 'node'],
+      ['tests/scripts/**', 'node'],
       ['packages/api-client/**', 'jsdom'],
       ['packages/ui/src/**/*.test.ts', 'node'],
     ],

@@ -21,6 +21,8 @@ BizCode es un **workspace pnpm** (`apps/web`, `apps/server`, `packages/types`, `
 
 `deploy.yml` corre en `push`/`pull_request` solo si cambian rutas de app, packages, Docker o lockfile; `workflow_dispatch` y `release` no cambian.
 
+**Entornos staging / producción (#152):** `.github/workflows/staging.yml` en push a `develop` publica tags GHCR `staging` / `sha-…` y despliega por SSH solo si existen `STAGING_DEPLOY_*` (`environment: staging`). El deploy SSH de producción en `deploy.yml` usa Environment **`production`**. Véase [entornos-despliegue.md](entornos-despliegue.md) y [ENVIRONMENTS.md](../../ENVIRONMENTS.md).
+
 **Limitación:** la regeneración del SBOM se omite en CI (`scripts/docs-generate.mjs`); el `docs/evidence/sbom-cyclonedx.json` commitado no se valida por drift en CI.
 
 ## Etapas del pipeline

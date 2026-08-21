@@ -1,0 +1,179 @@
+# Staging deploy (#152): push to develop → build/test → GHCR staging tags → optional SSH.
+# SSH deploy is skipped (success + summary) when STAGING_DEPLOY_* secrets are absent.
+
+name: Staging Deploy
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'prisma/**'
+      - 'Dockerfile'
+      - 'Dockerfile.frontend'
+      - 'docker-compose*.yml'
+      - 'package.json'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+      - 'tsconfig.json'
+      - 'eslint.config.mjs'
+      - 'vitest.config.ts'
+      - '.github/workflows/staging.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: staging-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_and_test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Restore Turborepo cache
+        uses: ./.github/actions/turbo-cache
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run type-check
+        run: pnpm run type-check
+
+      - name: Run lint
+        run: pnpm exec turbo run lint
+
+      - name: Run tests
+        run: pnpm run test
+
+      - name: Build backend image
+        run: docker build -f Dockerfile -t bizcode-server-staging:${{ github.sha }} .
+
+      - name: Build frontend image
+        run: docker build -f Dockerfile.frontend --build-arg VITE_API_URL=/api -t bizcode-frontend-staging:${{ github.sha }} .
+
+  publish_staging_images:
+    name: Publish Staging GHCR Images
+    runs-on: ubuntu-latest
+    needs: build_and_test
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata (server)
+        id: server_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/bizcode-server
+          tags: |
+            type=sha,prefix=staging-
+            type=raw,value=staging
+
+      - name: Extract Docker metadata (frontend)
+        id: frontend_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/bizcode-frontend
+          tags: |
+            type=sha,prefix=staging-
+            type=raw,value=staging
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.server_meta.outputs.tags }}
+          labels: ${{ steps.server_meta.outputs.labels }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.frontend
+          push: true
+          build-args: |
+            VITE_API_URL=/api
+          tags: ${{ steps.frontend_meta.outputs.tags }}
+          labels: ${{ steps.frontend_meta.outputs.labels }}
+
+  deploy_staging:
+    name: Deploy Staging via SSH
+    runs-on: ubuntu-latest
+    needs: publish_staging_images
+    environment: staging
+    # Fail-closed: skip SSH when staging deploy secrets are not configured (no remote host yet).
+    if: >-
+      secrets.STAGING_DEPLOY_HOST != '' &&
+      secrets.STAGING_DEPLOY_USER != '' &&
+      secrets.STAGING_DEPLOY_SSH_KEY != '' &&
+      secrets.STAGING_DEPLOY_PATH != ''
+    permissions:
+      contents: read
+    steps:
+      - name: Deploy staging using SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.STAGING_DEPLOY_HOST }}
+          username: ${{ secrets.STAGING_DEPLOY_USER }}
+          key: ${{ secrets.STAGING_DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd "${{ secrets.STAGING_DEPLOY_PATH }}"
+            docker compose -f docker-compose.staging.yml pull
+            docker compose -f docker-compose.staging.yml up -d
+            docker compose -f docker-compose.staging.yml exec -T server npx prisma migrate deploy || true
+
+      - name: Staging deploy summary
+        run: echo "Staging SSH deploy finished for ref $GITHUB_REF"
+
+  staging_deploy_skipped:
+    name: Staging SSH skipped (no secrets)
+    runs-on: ubuntu-latest
+    needs: publish_staging_images
+    if: >-
+      secrets.STAGING_DEPLOY_HOST == '' ||
+      secrets.STAGING_DEPLOY_USER == '' ||
+      secrets.STAGING_DEPLOY_SSH_KEY == '' ||
+      secrets.STAGING_DEPLOY_PATH == ''
+    steps:
+      - name: Summary
+        run: |
+          echo "STAGING_DEPLOY_* secrets are not configured."
+          echo "GHCR staging images were published; SSH deploy skipped (fail-closed)."
+          echo "See docs/en/quality/deployment-environments.md"
