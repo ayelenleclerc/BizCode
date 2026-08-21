@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "daysRemaining": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "invoiceMutationsBlocked": {
+      "type": "boolean"
+    },
+    "saasStatus": {
+      "type": "string"
+    },
+    "trialEndsAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "saasStatus",
+    "trialEndsAt",
+    "daysRemaining",
+    "invoiceMutationsBlocked"
+  ],
+  "title": "SaasTrialStatus",
+  "type": "object"
+}
