@@ -27,6 +27,7 @@ import { tenantModules } from './middleware/tenantModules'
 import { tenantPlan } from './middleware/tenantPlan'
 import { registerRestDomainRoutes } from './registerRestDomainRoutes'
 import { registerMetricsRoute } from './routes/registerMetricsRoute'
+import { registerSaasRoutes } from './routes/registerSaasRoutes'
 import { bootstrapEcommerceConnectors } from './integrations/ecommerce/bootstrapEcommerceConnectors'
 
 /**
@@ -182,6 +183,7 @@ export function createApp(prisma: PrismaClient): Application {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getOpenApiDocument()))
 
   bootstrapEcommerceConnectors()
+  registerSaasRoutes(app, prisma)
   registerRestDomainRoutes(app, prisma)
 
   app.use((_req: Request, res: Response) => {

@@ -3588,6 +3588,67 @@ export const printingAPI = {
   },
 }
 
+export type SaasRegisterInput = {
+  businessName: string
+  cuit: string
+  email: string
+  phone?: string
+  tenantSlug: string
+  password: string
+  acceptTerms: true
+  acceptPrivacy: true
+}
+
+export type SaasRegisterResult = {
+  tenantId: number
+  tenantSlug: string
+  ownerUsername: string
+  trialEndsAt: string
+  saasStatus: string
+  emailSent: boolean
+}
+
+export type SaasTrialStatus = {
+  saasStatus: string
+  trialEndsAt: string | null
+  daysRemaining: number | null
+  invoiceMutationsBlocked: boolean
+}
+
+/** @en Public SaaS onboarding + trial status (#180). */
+export const saasAPI = {
+  suggestSlug: async (name: string): Promise<{ slug: string }> => {
+    try {
+      const response = await api.get<{ success: boolean; data: { slug: string } }>(
+        '/saas/slug-suggestion',
+        { params: { name } },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  register: async (body: SaasRegisterInput): Promise<SaasRegisterResult> => {
+    try {
+      const response = await api.post<{ success: boolean; data: SaasRegisterResult }>(
+        '/saas/register',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  trial: async (): Promise<SaasTrialStatus> => {
+    try {
+      const response = await api.get<{ success: boolean; data: SaasTrialStatus }>('/saas/trial')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
 export const empresaAPI = {
   get: async () => {
     try {

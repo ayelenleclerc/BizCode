@@ -1761,6 +1761,22 @@ model Tenant {
   /// @es Si es true, usuarios del tenant no pueden login ni usar API; el super_admin de plataforma sí gestiona (#222).
   /// @pt-BR Se true, usuários do tenant não fazem login nem usam API; o super_admin da plataforma ainda gerencia (#222).
   maintenanceMode Boolean  @default(false)
+  /// @en SaaS subscription status (#180): `trial` | `active` | `suspended_trial`.
+  /// @es Estado de suscripción SaaS (#180): `trial` | `active` | `suspended_trial`.
+  /// @pt-BR Status de assinatura SaaS (#180): `trial` | `active` | `suspended_trial`.
+  saasStatus      String   @default("active") @db.VarChar(32)
+  /// @en End of self-service trial window (#180); null when not on trial.
+  /// @es Fin de la ventana de trial self-service (#180); null si no está en trial.
+  /// @pt-BR Fim da janela de trial self-service (#180); null se não estiver em trial.
+  trialEndsAt     DateTime?
+  /// @en Contact email from SaaS registration (#180); used for trial reminders.
+  /// @es Email de contacto del registro SaaS (#180); recordatorios de trial.
+  /// @pt-BR E-mail de contato do registro SaaS (#180); lembretes de trial.
+  contactEmail    String?  @db.VarChar(120)
+  /// @en Contact phone from SaaS registration (#180).
+  /// @es Teléfono de contacto del registro SaaS (#180).
+  /// @pt-BR Telefone de contato do registro SaaS (#180).
+  contactPhone    String?  @db.VarChar(40)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

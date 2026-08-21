@@ -19,6 +19,7 @@ import { requireModule } from '../middleware/requireModule'
 import { errorMessage, getTenantId } from './restDomainShared'
 import { FacturaPrintService } from '../services/FacturaPrintService'
 import { mapRemitoPublic } from '../services/RemitoService'
+import { SaasTrialService } from '../saas/SaasTrialService'
 
 /**
  * @en Invoice create/list and void routes.
@@ -29,6 +30,7 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
   const creditNotesModule = requireModule('billing.credit_notes')
   const remitoModule = requireModule('fiscal.remito')
   const ownership = verifyOwnership(prisma, 'factura')
+  const saasTrial = new SaasTrialService(prisma)
 
   app.get('/api/facturas', requirePermission('reports.operational.read'), async (req: Request, res: Response) => {
     try {
@@ -49,6 +51,15 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
       try {
         const tenantId = getTenantId(req)
         const authReq = req as AuthenticatedRequest
+        const trialGate = await saasTrial.assertCanCreateInvoice(tenantId)
+        if (!trialGate.ok) {
+          res.status(trialGate.status).json({
+            success: false,
+            error: trialGate.error,
+            code: trialGate.code,
+          })
+          return
+        }
         const planService = new TenantPlanService(prisma)
         try {
           const snapshot =

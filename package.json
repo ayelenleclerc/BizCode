@@ -35,6 +35,7 @@
     "type-check:workspaces": "turbo run type-check",
     "lint:workspaces": "turbo run lint",
     "seed:staging": "tsx scripts/seed-staging.ts",
+    "saas:trial-reminders": "tsx scripts/saas-trial-reminders-job.ts",
     "check:openapi": "tsx scripts/check-openapi.ts",
     "check:openapi-sync": "tsx scripts/validate-openapi-sync.ts",
     "check:logs": "tsx scripts/check-log-sanitization.ts",

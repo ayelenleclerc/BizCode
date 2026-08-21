@@ -14,7 +14,7 @@ Describe cómo BizCode soporta derechos del titular (Ley 25.326 / alineación GD
 | Rectificación | `PUT /api/clientes/:id` existente |
 | Supresión (anonimización) | `POST /api/clientes/:id/anonimizar` con `{ "confirm": "ANONYMIZE" }`; `Cliente.anonymizedAt`; revoca sesiones portal; conserva filas fiscales |
 | Página pública | `/privacidad` (sin autenticación) |
-| Consentimiento en alta | Checkbox UI (no persistido); consent onboarding SaaS diferido a #180 |
+| Consentimiento en alta | Checkbox UI (no persistido); consentimiento onboarding SaaS en `/registro` (#180) |
 | Servicio | [`ClientePrivacyService.ts`](../../../apps/server/services/ClientePrivacyService.ts) |
 
 ## Retención (política documentada)
@@ -31,7 +31,7 @@ Procedimiento ante la AAIP a cargo del operador. **No inventar** número de insc
 
 ## Fuera de alcance
 
-- Consent onboarding SaaS (#180)
+- Consent onboarding SaaS (#180) — entregado; véase [onboarding-saas-self-service.md](onboarding-saas-self-service.md)
 - Centro de preferencias de marketing
 - Entornos staging/prod (#152)
 

@@ -1,0 +1,32 @@
+{
+  "landing": {
+    "brand": "BizCode",
+    "headline": "Commercial management ready for your business",
+    "subhead": "Try BizCode free for 30 days. Starter plan included. No invented pricing: start your trial and configure your company.",
+    "cta": "Start free 30-day trial",
+    "login": "I already have an account",
+    "privacy": "Privacy"
+  },
+  "register": {
+    "title": "Create account",
+    "businessName": "Legal / business name",
+    "cuit": "CUIT",
+    "email": "Email (owner username)",
+    "phone": "Phone (optional)",
+    "tenantSlug": "Tenant identifier (slug)",
+    "password": "Password",
+    "acceptTerms": "I accept the terms of use",
+    "acceptPrivacy": "I accept the privacy policy",
+    "submit": "Create account and start trial",
+    "submitting": "Creating account…",
+    "success": "Account created. Sign in with your email and tenant slug.",
+    "goLogin": "Go to login",
+    "errorGeneric": "Registration could not be completed",
+    "privacyLink": "View privacy policy"
+  },
+  "trial": {
+    "banner": "You have {{days}} days left in your free trial.",
+    "bannerExpired": "Your free trial has ended. Invoice creation is read-only until a subscription is activated.",
+    "bannerCta": "Complete company details"
+  }
+}

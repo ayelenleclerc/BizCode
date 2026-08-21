@@ -2,6 +2,7 @@ import { useState, useEffect, useLayoutEffect, useRef, useId } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import LanguageSelect from '@/components/LanguageSelect'
+import TrialBanner from '@/components/saas/TrialBanner'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import { notificationsAPI, type AppNotification } from '@/lib/api'
@@ -320,6 +321,8 @@ export default function Layout({ children }: LayoutProps) {
             </p>
           </div>
         ) : null}
+
+        {status === 'authenticated' ? <TrialBanner /> : null}
 
         {/* Content Area */}
         <div className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-900">
