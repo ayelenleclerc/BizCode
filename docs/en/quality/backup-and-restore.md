@@ -4,7 +4,7 @@
 
 Describes the automated PostgreSQL backup pipeline shipped in-repo: logical `pg_dump`, gzip, AES-256-GCM encryption, local retention (7 daily / 4 weekly / 3 monthly), optional S3/R2 upload via AWS CLI, and a verified restore path. Complements ISO [SEC-007](../certificacion-iso/sec/sec-007-backup-and-restore-procedure.md).
 
-**Evidence status:** Implemented in product scripts (local Docker `:5432` verified on the development host). Staging/production restore drills remain an operational step pending environment [#152](https://github.com/ayelenleclerc/BizCode/issues/152). Not a certification claim.
+**Evidence status:** Implemented in product scripts (local Docker `:5432` verified on the development host). Staging/production restore drills remain an operational step once remote hosts from [#152](https://github.com/ayelenleclerc/BizCode/issues/152) / [deployment-environments.md](deployment-environments.md) are provisioned. Not a certification claim.
 
 ## Components (evidence)
 
@@ -68,7 +68,7 @@ Prefer a dedicated restore database for drills. Do not point at production witho
 
 - Restic integration
 - `@aws-sdk` client in the Node app
-- Staging/production host provisioning (#152)
+- Staging/production host provisioning (residual of [#152](https://github.com/ayelenleclerc/BizCode/issues/152); see [deployment-environments.md](deployment-environments.md))
 - Mobile / Mercado Pago / ARCA changes
 
 ## Related
