@@ -226,7 +226,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SaasTrialEnvelope'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/UnauthorizedError'
 
   /api/auth/login:
     post:

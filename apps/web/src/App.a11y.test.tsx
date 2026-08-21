@@ -37,6 +37,16 @@ vi.mock('@/lib/api', () => ({
   facturasAPI: { list: vi.fn(), create: vi.fn() },
   dashboardAPI: { summary: vi.fn().mockResolvedValue({ ventasHoy: { count: 0, total: '0' }, facturasVencidas: { count: 0, total: '0' }, cobrosHoy: { count: 0, total: '0' }, alertasActivas: 0, facturasPagar: { vencido: { count: 0, total: '0' }, proximoVencer: { count: 0, total: '0' } } }) },
   notificationsAPI: { list: vi.fn().mockResolvedValue([]), markRead: vi.fn(), markAllRead: vi.fn() },
+  saasAPI: {
+    trial: vi.fn().mockResolvedValue({
+      saasStatus: 'active',
+      trialEndsAt: null,
+      daysRemaining: null,
+      invoiceMutationsBlocked: false,
+    }),
+    register: vi.fn(),
+    suggestSlug: vi.fn().mockResolvedValue({ slug: 'demo' }),
+  },
   checkAPI: vi.fn().mockResolvedValue({ status: 'ok' }),
 }))
 

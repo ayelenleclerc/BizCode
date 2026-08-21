@@ -12,6 +12,7 @@ import {
   SAAS_TRIAL_DAYS,
 } from './saasStatus'
 import { isValidTenantSlug, normalizeTenantSlug } from './tenantSlug'
+import { isPlausibleEmail } from './emailCheck'
 
 export type SaasRegisterInput = {
   businessName: string
@@ -124,7 +125,7 @@ export class SaasOnboardingService {
     }
 
     const email = input.email.trim().toLowerCase()
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 120) {
+    if (!isPlausibleEmail(email)) {
       return { ok: false, status: 400, error: 'Invalid email', code: 'INVALID_EMAIL' }
     }
 

@@ -17,6 +17,17 @@ vi.mock('@/lib/api', () => ({
   rubrosAPI: { list: vi.fn() },
   formasPagoAPI: { list: vi.fn() },
   facturasAPI: { list: vi.fn(), create: vi.fn() },
+  notificationsAPI: { list: vi.fn().mockResolvedValue([]), markRead: vi.fn(), markAllRead: vi.fn() },
+  saasAPI: {
+    trial: vi.fn().mockResolvedValue({
+      saasStatus: 'active',
+      trialEndsAt: null,
+      daysRemaining: null,
+      invoiceMutationsBlocked: false,
+    }),
+    register: vi.fn(),
+    suggestSlug: vi.fn().mockResolvedValue({ slug: 'demo' }),
+  },
   checkAPI: vi.fn().mockResolvedValue({ status: 'ok' }),
 }))
 
@@ -51,11 +62,11 @@ describe('App auth routing', () => {
     })
   })
 
-  it('renders login screen when unauthenticated', async () => {
+  it('renders landing when unauthenticated at /', async () => {
     vi.mocked(authAPI.me).mockRejectedValueOnce(new Error('unauthorized'))
     render(<App />)
     await waitFor(() => {
-      expect(screen.getByTestId('login-tenant-slug')).toBeInTheDocument()
+      expect(screen.getByTestId('saas-landing-page')).toBeInTheDocument()
     })
   })
 })

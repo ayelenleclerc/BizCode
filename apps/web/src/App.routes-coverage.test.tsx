@@ -218,6 +218,16 @@ vi.mock('@/lib/api', async () => {
       markRead: vi.fn(),
       markAllRead: vi.fn(),
     },
+    saasAPI: {
+      trial: vi.fn().mockResolvedValue({
+        saasStatus: 'active',
+        trialEndsAt: null,
+        daysRemaining: null,
+        invoiceMutationsBlocked: false,
+      }),
+      register: vi.fn(),
+      suggestSlug: vi.fn().mockResolvedValue({ slug: 'demo' }),
+    },
     notifChannelsAPI: { status: vi.fn().mockResolvedValue({ inApp: true, email: false, whatsapp: false }) },
     zonasEntregaAPI: {
       list: vi.fn().mockResolvedValue([sampleZone]),
