@@ -18,6 +18,7 @@ const REPORTS_DEFAULT = 10
 const IMPORT_DEFAULT = 5
 const PORTAL_MAGIC_LINK_DEFAULT = 5
 const PORTAL_VERIFY_DEFAULT = 30
+const SAAS_REGISTER_DEFAULT = 5
 const MERCADOPAGO_TEST_DEFAULT = 10
 const MERCADOPAGO_PREFERENCE_DEFAULT = 20
 const MERCADOPAGO_WEBHOOK_DEFAULT = 120
@@ -178,6 +179,18 @@ export const portalVerifyHttpRateLimiter = createRouteLimiter({
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PORTAL_VERIFY, PORTAL_VERIFY_DEFAULT),
   skipUnless: () => true,
   storePrefix: 'portal-verify',
+})
+
+/**
+ * @en Per-IP rate limit for SaaS self-service register (default 5 / 15 min; `HTTP_RATE_LIMIT_SAAS_REGISTER`) (#180).
+ * @es Límite por IP para registro SaaS self-service (5 / 15 min por defecto; `HTTP_RATE_LIMIT_SAAS_REGISTER`) (#180).
+ * @pt-BR Limite por IP para registro SaaS self-service (5 / 15 min padrão; `HTTP_RATE_LIMIT_SAAS_REGISTER`) (#180).
+ */
+export const saasRegisterHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_SAAS_REGISTER, SAAS_REGISTER_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'saas-register',
 })
 
 /**

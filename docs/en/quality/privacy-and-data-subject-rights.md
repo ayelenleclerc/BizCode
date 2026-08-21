@@ -14,7 +14,7 @@ Describes how BizCode supports Ley 25.326 / GDPR-aligned data-subject rights for
 | Rectification | Existing `PUT /api/clientes/:id` |
 | Erasure (anonymization) | `POST /api/clientes/:id/anonimizar` with `{ "confirm": "ANONYMIZE" }`; sets `Cliente.anonymizedAt`; revokes portal sessions; keeps fiscal rows |
 | Public policy page | `/privacidad` (unauthenticated) |
-| Consent on customer create | UI checkbox gate (not persisted); SaaS tenant onboarding consent deferred to #180 |
+| Consent on customer create | UI checkbox gate (not persisted); SaaS tenant onboarding consent on `/registro` (#180) |
 | Service | [`ClientePrivacyService.ts`](../../../apps/server/services/ClientePrivacyService.ts) |
 
 ## Retention (documented policy)
@@ -35,7 +35,7 @@ No automated fiscal purge job is shipped in this delivery.
 
 ## Out of scope
 
-- Self-service tenant onboarding consent (#180)
+- Self-service tenant onboarding consent (#180) — delivered; see [saas-self-service-onboarding.md](saas-self-service-onboarding.md)
 - Marketing preference center (no marketing engine in product)
 - Staging/production environment provision (#152)
 - `/api/admin/...` prefix (canonical routes remain `/api/clientes/...`)

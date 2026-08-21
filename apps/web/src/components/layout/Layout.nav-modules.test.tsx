@@ -29,6 +29,14 @@ vi.mock('@/lib/api', () => ({
     list: vi.fn().mockResolvedValue([]),
     markRead: vi.fn(),
   },
+  saasAPI: {
+    trial: vi.fn().mockResolvedValue({
+      saasStatus: 'active',
+      trialEndsAt: null,
+      daysRemaining: null,
+      invoiceMutationsBlocked: false,
+    }),
+  },
 }))
 
 describe('Layout nav module gating', () => {

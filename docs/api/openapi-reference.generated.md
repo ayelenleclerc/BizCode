@@ -134,6 +134,269 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### Suggest tenant slug from business name (#180)
+
+- **Method:** `GET`
+- **Path:** `/api/saas/slug-suggestion`
+- **Tags:** saas
+
+#### Responses
+
+##### Status: 200 Suggested slug
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`slug` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "slug": ""
+  }
+}
+```
+
+### Self-service SaaS tenant registration with 30-day trial (#180)
+
+- **Method:** `POST`
+- **Path:** `/api/saas/register`
+- **Tags:** saas
+
+Public endpoint (rate-limited). Creates tenant + owner + ParamEmpresa starter plan. Padrón A4 uses existing mock when live SOAP is unavailable (#192).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`acceptPrivacy` (required)**
+
+  `boolean`
+
+- **`acceptTerms` (required)**
+
+  `boolean`
+
+- **`businessName` (required)**
+
+  `string`
+
+- **`cuit` (required)**
+
+  `string`
+
+- **`email` (required)**
+
+  `string`, format: `email`
+
+- **`password` (required)**
+
+  `string`
+
+- **`tenantSlug` (required)**
+
+  `string`
+
+- **`phone`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "businessName": "",
+  "cuit": "",
+  "email": "",
+  "phone": "",
+  "tenantSlug": "",
+  "password": "",
+  "acceptTerms": true,
+  "acceptPrivacy": true
+}
+```
+
+#### Responses
+
+##### Status: 201 Tenant created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`emailSent` (required)**
+
+    `boolean`
+
+  - **`ownerUsername` (required)**
+
+    `string`
+
+  - **`saasStatus` (required)**
+
+    `string`, possible values: `"trial", "active", "suspended_trial"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tenantSlug` (required)**
+
+    `string`
+
+  - **`trialEndsAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "tenantSlug": "",
+    "ownerUsername": "",
+    "trialEndsAt": "",
+    "saasStatus": "trial",
+    "emailSent": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 503 Padrón lookup timeout
+
+### Current tenant SaaS trial status (#180)
+
+- **Method:** `GET`
+- **Path:** `/api/saas/trial`
+- **Tags:** saas
+
+#### Responses
+
+##### Status: 200 Trial snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`invoiceMutationsBlocked` (required)**
+
+    `boolean`
+
+  - **`saasStatus` (required)**
+
+    `string`
+
+  - **`trialEndsAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "saasStatus": "",
+    "trialEndsAt": "",
+    "daysRemaining": 1,
+    "invoiceMutationsBlocked": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Create authenticated session (cookies + Bearer tokens for RN) or MFA challenge (#213,
 
 - **Method:** `POST`
@@ -99180,6 +99443,223 @@ Rate-limited mutation; requires products.manage. USD only.
     "tenantId": 1,
     "userId": 1,
     "role": ""
+  }
+}
+```
+
+### SaasRegisterInput
+
+- **Type:**`object`
+
+* **`acceptPrivacy` (required)**
+
+  `boolean`
+
+* **`acceptTerms` (required)**
+
+  `boolean`
+
+* **`businessName` (required)**
+
+  `string`
+
+* **`cuit` (required)**
+
+  `string`
+
+* **`email` (required)**
+
+  `string`, format: `email`
+
+* **`password` (required)**
+
+  `string`
+
+* **`tenantSlug` (required)**
+
+  `string`
+
+* **`phone`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "businessName": "",
+  "cuit": "",
+  "email": "",
+  "phone": "",
+  "tenantSlug": "",
+  "password": "",
+  "acceptTerms": true,
+  "acceptPrivacy": true
+}
+```
+
+### SaasRegisterResult
+
+- **Type:**`object`
+
+* **`emailSent` (required)**
+
+  `boolean`
+
+* **`ownerUsername` (required)**
+
+  `string`
+
+* **`saasStatus` (required)**
+
+  `string`, possible values: `"trial", "active", "suspended_trial"`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tenantSlug` (required)**
+
+  `string`
+
+* **`trialEndsAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "tenantId": 1,
+  "tenantSlug": "",
+  "ownerUsername": "",
+  "trialEndsAt": "",
+  "saasStatus": "trial",
+  "emailSent": true
+}
+```
+
+### SaasRegisterEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`emailSent` (required)**
+
+    `boolean`
+
+  - **`ownerUsername` (required)**
+
+    `string`
+
+  - **`saasStatus` (required)**
+
+    `string`, possible values: `"trial", "active", "suspended_trial"`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tenantSlug` (required)**
+
+    `string`
+
+  - **`trialEndsAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": 1,
+    "tenantSlug": "",
+    "ownerUsername": "",
+    "trialEndsAt": "",
+    "saasStatus": "trial",
+    "emailSent": true
+  }
+}
+```
+
+### SaasTrialStatus
+
+- **Type:**`object`
+
+* **`daysRemaining` (required)**
+
+  `integer`
+
+* **`invoiceMutationsBlocked` (required)**
+
+  `boolean`
+
+* **`saasStatus` (required)**
+
+  `string`
+
+* **`trialEndsAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "saasStatus": "",
+  "trialEndsAt": "",
+  "daysRemaining": 1,
+  "invoiceMutationsBlocked": true
+}
+```
+
+### SaasTrialEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`daysRemaining` (required)**
+
+    `integer`
+
+  - **`invoiceMutationsBlocked` (required)**
+
+    `boolean`
+
+  - **`saasStatus` (required)**
+
+    `string`
+
+  - **`trialEndsAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "saasStatus": "",
+    "trialEndsAt": "",
+    "daysRemaining": 1,
+    "invoiceMutationsBlocked": true
   }
 }
 ```

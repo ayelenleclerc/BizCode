@@ -10,6 +10,8 @@ import RecuentosPage from './pages/recuentos'
 import FacturacionPage from './pages/facturacion'
 import LoginPage from './pages/login'
 import PrivacyPage from './pages/privacidad'
+import LandingPage from './pages/saas/LandingPage'
+import RegistroPage from './pages/saas/RegistroPage'
 import UsersPage from './pages/users'
 import InicioPage from './pages/inicio'
 import LogisticaPage from './pages/logistica'
@@ -132,7 +134,7 @@ function RootRedirect() {
   if (status === 'authenticated') {
     return <Navigate to="/inicio" replace />
   }
-  return <Navigate to="/login" replace />
+  return <LandingPage />
 }
 
 function AppRoutes() {
@@ -140,6 +142,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
       <Route path="/privacidad" element={<PrivacyPage />} />
+      <Route path="/registro" element={<RegistroPage />} />
       <Route
         path="/portal/:tenantSlug"
         element={

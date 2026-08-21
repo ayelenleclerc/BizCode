@@ -43,6 +43,7 @@ import tiposCambioEs from '@/locales/es/tiposCambio.json'
 import formulasProduccionEs from '@/locales/es/formulasProduccion.json'
 import ordenesProduccionEs from '@/locales/es/ordenesProduccion.json'
 import privacidadEs from '@/locales/es/privacidad.json'
+import saasEs from '@/locales/es/saas.json'
 import visitasEs from '@/locales/es/visitas.json'
 
 import commonEn from '@/locales/en/common.json'
@@ -85,6 +86,7 @@ import tiposCambioEn from '@/locales/en/tiposCambio.json'
 import formulasProduccionEn from '@/locales/en/formulasProduccion.json'
 import ordenesProduccionEn from '@/locales/en/ordenesProduccion.json'
 import privacidadEn from '@/locales/en/privacidad.json'
+import saasEn from '@/locales/en/saas.json'
 import visitasEn from '@/locales/en/visitas.json'
 
 import commonPt from '@/locales/pt-BR/common.json'
@@ -127,6 +129,7 @@ import tiposCambioPt from '@/locales/pt-BR/tiposCambio.json'
 import formulasProduccionPt from '@/locales/pt-BR/formulasProduccion.json'
 import ordenesProduccionPt from '@/locales/pt-BR/ordenesProduccion.json'
 import privacidadPt from '@/locales/pt-BR/privacidad.json'
+import saasPt from '@/locales/pt-BR/saas.json'
 import visitasPt from '@/locales/pt-BR/visitas.json'
 
 // Persist language preference in localStorage
@@ -140,7 +143,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'fidelizacion', 'lotes', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones', 'tiposCambio', 'formulasProduccion', 'ordenesProduccion', 'privacidad', 'visitas'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'fidelizacion', 'lotes', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones', 'tiposCambio', 'formulasProduccion', 'ordenesProduccion', 'privacidad', 'saas', 'visitas'],
     resources: {
       es: {
         common: commonEs,
@@ -183,6 +186,7 @@ i18n
         formulasProduccion: formulasProduccionEs,
         ordenesProduccion: ordenesProduccionEs,
         privacidad: privacidadEs,
+        saas: saasEs,
         visitas: visitasEs,
       },
       en: {
@@ -226,6 +230,7 @@ i18n
         formulasProduccion: formulasProduccionEn,
         ordenesProduccion: ordenesProduccionEn,
         privacidad: privacidadEn,
+        saas: saasEn,
         visitas: visitasEn,
       },
       'pt-BR': {
@@ -269,6 +274,7 @@ i18n
         formulasProduccion: formulasProduccionPt,
         ordenesProduccion: ordenesProduccionPt,
         privacidad: privacidadPt,
+        saas: saasPt,
         visitas: visitasPt,
       },
     },

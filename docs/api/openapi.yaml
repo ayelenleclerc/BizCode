@@ -22,6 +22,8 @@ tags:
     description: Health check
   - name: auth
     description: Authentication and session bootstrap
+  - name: saas
+    description: Public SaaS self-service onboarding and trial status (#180)
   - name: clientes
     description: Customer management
   - name: articulos
@@ -152,6 +154,79 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '409':
           $ref: '#/components/responses/ConflictError'
+
+  /api/saas/slug-suggestion:
+    get:
+      tags: [saas]
+      summary: Suggest tenant slug from business name (#180)
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Suggested slug
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  data:
+                    type: object
+                    required: [slug]
+                    properties:
+                      slug:
+                        type: string
+
+  /api/saas/register:
+    post:
+      tags: [saas]
+      summary: Self-service SaaS tenant registration with 30-day trial (#180)
+      description: >
+        Public endpoint (rate-limited). Creates tenant + owner + ParamEmpresa starter plan.
+        Padrón A4 uses existing mock when live SOAP is unavailable (#192).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaasRegisterInput'
+      responses:
+        '201':
+          description: Tenant created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaasRegisterEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '503':
+          description: Padrón lookup timeout
+
+  /api/saas/trial:
+    get:
+      tags: [saas]
+      summary: Current tenant SaaS trial status (#180)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Trial snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaasTrialEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 
   /api/auth/login:
     post:
@@ -16646,6 +16721,96 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/SetupOwnerResult'
+
+    SaasRegisterInput:
+      type: object
+      required:
+        [businessName, cuit, email, tenantSlug, password, acceptTerms, acceptPrivacy]
+      properties:
+        businessName:
+          type: string
+          minLength: 2
+          maxLength: 80
+        cuit:
+          type: string
+          minLength: 11
+          maxLength: 14
+        email:
+          type: string
+          format: email
+          maxLength: 120
+        phone:
+          type: string
+          maxLength: 40
+        tenantSlug:
+          type: string
+          minLength: 2
+          maxLength: 80
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+        acceptTerms:
+          type: boolean
+          const: true
+        acceptPrivacy:
+          type: boolean
+          const: true
+
+    SaasRegisterResult:
+      type: object
+      required: [tenantId, tenantSlug, ownerUsername, trialEndsAt, saasStatus, emailSent]
+      properties:
+        tenantId:
+          type: integer
+        tenantSlug:
+          type: string
+        ownerUsername:
+          type: string
+        trialEndsAt:
+          type: string
+          format: date-time
+        saasStatus:
+          type: string
+          enum: [trial, active, suspended_trial]
+        emailSent:
+          type: boolean
+
+    SaasRegisterEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SaasRegisterResult'
+
+    SaasTrialStatus:
+      type: object
+      required: [saasStatus, trialEndsAt, daysRemaining, invoiceMutationsBlocked]
+      properties:
+        saasStatus:
+          type: string
+        trialEndsAt:
+          type: string
+          format: date-time
+          nullable: true
+        daysRemaining:
+          type: integer
+          nullable: true
+        invoiceMutationsBlocked:
+          type: boolean
+
+    SaasTrialEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SaasTrialStatus'
 
     LoginInput:
       type: object

@@ -1206,6 +1206,16 @@
 
 * [RutaStatsEnvelope](./rutastatsenvelope.md) – `-`
 
+* [SaasRegisterEnvelope](./saasregisterenvelope.md) – `-`
+
+* [SaasRegisterInput](./saasregisterinput.md) – `-`
+
+* [SaasRegisterResult](./saasregisterresult.md) – `-`
+
+* [SaasTrialEnvelope](./saastrialenvelope.md) – `-`
+
+* [SaasTrialStatus](./saastrialstatus.md) – `-`
+
 * [SellerAlertAction](./selleralertaction.md) – `-`
 
 * [SellerCreditNivel](./sellercreditnivel.md) – `-`

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "emailSent": {
+      "type": "boolean"
+    },
+    "ownerUsername": {
+      "type": "string"
+    },
+    "saasStatus": {
+      "enum": [
+        "trial",
+        "active",
+        "suspended_trial"
+      ],
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tenantSlug": {
+      "type": "string"
+    },
+    "trialEndsAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "tenantId",
+    "tenantSlug",
+    "ownerUsername",
+    "trialEndsAt",
+    "saasStatus",
+    "emailSent"
+  ],
+  "title": "SaasRegisterResult",
+  "type": "object"
+}

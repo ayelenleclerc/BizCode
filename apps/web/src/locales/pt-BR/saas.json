@@ -1,0 +1,32 @@
+{
+  "landing": {
+    "brand": "BizCode",
+    "headline": "Gestão comercial pronta para o seu negócio",
+    "subhead": "Experimente o BizCode grátis por 30 dias. Plano starter incluído. Sem preços inventados: inicie o trial e configure sua empresa.",
+    "cta": "Começar grátis por 30 dias",
+    "login": "Já tenho conta",
+    "privacy": "Privacidade"
+  },
+  "register": {
+    "title": "Criar conta",
+    "businessName": "Razão social / nome do negócio",
+    "cuit": "CUIT",
+    "email": "E-mail (usuário owner)",
+    "phone": "Telefone (opcional)",
+    "tenantSlug": "Identificador do tenant (slug)",
+    "password": "Senha",
+    "acceptTerms": "Aceito os termos de uso",
+    "acceptPrivacy": "Aceito a política de privacidade",
+    "submit": "Criar conta e iniciar trial",
+    "submitting": "Criando conta…",
+    "success": "Conta criada. Entre com seu e-mail e o slug do tenant.",
+    "goLogin": "Ir para o login",
+    "errorGeneric": "Não foi possível concluir o registro",
+    "privacyLink": "Ver política de privacidade"
+  },
+  "trial": {
+    "banner": "Restam {{days}} dias de teste gratuito.",
+    "bannerExpired": "Seu teste gratuito encerrou. A emissão de faturas está somente leitura até ativar a assinatura.",
+    "bannerCta": "Completar dados da empresa"
+  }
+}

@@ -11,6 +11,10 @@ const tenantRow = {
   slug: 'demo',
   active: true,
   maintenanceMode: false,
+  saasStatus: 'active',
+  trialEndsAt: null as Date | null,
+  contactEmail: null as string | null,
+  contactPhone: null as string | null,
   createdAt: new Date('2025-01-01T00:00:00.000Z'),
   updatedAt: new Date('2025-01-02T00:00:00.000Z'),
 }
