@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@bizcode/api-client": "workspace:*",
-    "@bizcode/types": "workspace:*"
+    "@bizcode/types": "workspace:*",
+    "@bizcode/ui": "workspace:*"
   }
 }

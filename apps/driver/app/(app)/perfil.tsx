@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet, View } from 'react-native'
 import { Button, List, Switch, Text } from 'react-native-paper'
+import { Spinner } from '@bizcode/ui/native'
 import { useAuth } from '../../src/auth/AuthContext'
 import { driverPushApi } from '../../src/push/registerPush'
 import { mapApiErrorToUiState } from '../../src/lib/apiErrors'
@@ -96,7 +97,7 @@ export default function PerfilScreen() {
         {t('perfil.pushSection')}
       </Text>
       {prefsLoading ? (
-        <ActivityIndicator accessibilityLabel={t('loading')} />
+        <Spinner label={t('loading')} testID="driver-perfil-push-loading" />
       ) : (
         <>
           {prefsError ? (
