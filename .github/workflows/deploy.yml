@@ -215,4 +215,4 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d
 
       - name: Deployment summary
-        run: echo "Production deploy finished for ref $GITHUB_REF (Environment: production)"
+        run: 'echo "Production deploy finished for ref $GITHUB_REF (Environment: production)"'
