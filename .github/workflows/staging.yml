@@ -137,16 +137,29 @@ jobs:
     runs-on: ubuntu-latest
     needs: publish_staging_images
     environment: staging
-    # Fail-closed: skip SSH when staging deploy secrets are not configured (no remote host yet).
-    if: >-
-      secrets.STAGING_DEPLOY_HOST != '' &&
-      secrets.STAGING_DEPLOY_USER != '' &&
-      secrets.STAGING_DEPLOY_SSH_KEY != '' &&
-      secrets.STAGING_DEPLOY_PATH != ''
     permissions:
       contents: read
     steps:
+      # secrets cannot be referenced in job-level `if:` (GitHub Actions validation).
+      - name: Detect staging deploy secrets
+        id: staging_auth
+        env:
+          STAGING_DEPLOY_HOST: ${{ secrets.STAGING_DEPLOY_HOST }}
+          STAGING_DEPLOY_USER: ${{ secrets.STAGING_DEPLOY_USER }}
+          STAGING_DEPLOY_SSH_KEY: ${{ secrets.STAGING_DEPLOY_SSH_KEY }}
+          STAGING_DEPLOY_PATH: ${{ secrets.STAGING_DEPLOY_PATH }}
+        run: |
+          if [ -n "${STAGING_DEPLOY_HOST}" ] && [ -n "${STAGING_DEPLOY_USER}" ] && [ -n "${STAGING_DEPLOY_SSH_KEY}" ] && [ -n "${STAGING_DEPLOY_PATH}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "STAGING_DEPLOY_* secrets are not configured."
+            echo "GHCR staging images were published; SSH deploy skipped (fail-closed)."
+            echo "See docs/en/quality/deployment-environments.md"
+          fi
+
       - name: Deploy staging using SSH
+        if: steps.staging_auth.outputs.configured == 'true'
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.STAGING_DEPLOY_HOST }}
@@ -160,20 +173,5 @@ jobs:
             docker compose -f docker-compose.staging.yml exec -T server npx prisma migrate deploy || true
 
       - name: Staging deploy summary
+        if: steps.staging_auth.outputs.configured == 'true'
         run: echo "Staging SSH deploy finished for ref $GITHUB_REF"
-
-  staging_deploy_skipped:
-    name: Staging SSH skipped (no secrets)
-    runs-on: ubuntu-latest
-    needs: publish_staging_images
-    if: >-
-      secrets.STAGING_DEPLOY_HOST == '' ||
-      secrets.STAGING_DEPLOY_USER == '' ||
-      secrets.STAGING_DEPLOY_SSH_KEY == '' ||
-      secrets.STAGING_DEPLOY_PATH == ''
-    steps:
-      - name: Summary
-        run: |
-          echo "STAGING_DEPLOY_* secrets are not configured."
-          echo "GHCR staging images were published; SSH deploy skipped (fail-closed)."
-          echo "See docs/en/quality/deployment-environments.md"
