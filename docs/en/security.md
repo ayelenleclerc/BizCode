@@ -67,7 +67,7 @@ Automated DAST (OWASP ZAP baseline) and external engagement process: [Penetratio
 | Check | Evidence |
 |---|---|
 | Dependency HIGH+ gates | Quality Gate `pnpm audit`; Snyk workflow |
-| Raw SQL review | Tagged `$queryRaw` / `Prisma.sql`; no user-string concatenation found in current `$queryRaw*` call sites |
+| Raw SQL review | Tagged `$queryRaw` / `Prisma.sql`; guardrail `npm run check:raw-sql` fails on `$queryRawUnsafe` / `$executeRawUnsafe` under `apps/server` |
 | Security headers | Helmet middleware on API |
 | Tenant / IDOR | Auth + permission middleware; external pentest must verify cross-tenant access |
 | Secrets in logs | Operators: review production log sinks before launch |

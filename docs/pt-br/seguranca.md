@@ -63,7 +63,7 @@ DAST automatizado (OWASP ZAP baseline) e processo de engagement externo: [Testes
 | Verificação | Evidência |
 |---|---|
 | Gates HIGH+ de dependências | Quality Gate; Snyk |
-| Revisão de SQL bruto | `$queryRaw` etiquetado; sem concatenação de input nos call sites atuais |
+| Revisão de SQL bruto | `$queryRaw` / `Prisma.sql` etiquetado; guardrail `npm run check:raw-sql` falha com `$queryRawUnsafe` / `$executeRawUnsafe` em `apps/server` |
 | Cabeçalhos de segurança | Helmet na API |
 | Tenant / IDOR | Middleware de auth; o pentest externo deve verificar acesso cross-tenant |
 | Segredos em logs | Revisar sinks de produção antes do lançamento |
