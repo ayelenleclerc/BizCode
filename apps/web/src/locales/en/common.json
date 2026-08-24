@@ -44,6 +44,7 @@
     "users": "Users",
     "zonasEntrega": "Delivery zones",
     "empresa": "Company",
+    "billing": "SaaS subscription",
     "seguridad": "Security",
     "auditLog": "Audit log",
     "superadmin": "SuperAdmin"

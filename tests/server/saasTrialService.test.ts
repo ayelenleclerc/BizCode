@@ -38,4 +38,15 @@ describe('SaasTrialService', () => {
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.code).toBe('TRIAL_SUSPENDED')
   })
+
+  it('assertCanCreateInvoice blocks payment suspension', async () => {
+    findUnique.mockResolvedValue({
+      saasStatus: 'suspended_payment',
+      trialEndsAt: null,
+    })
+    const svc = new SaasTrialService(prisma)
+    const r = await svc.assertCanCreateInvoice(1)
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.code).toBe('PAYMENT_SUSPENDED')
+  })
 })

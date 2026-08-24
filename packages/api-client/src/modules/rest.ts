@@ -3615,7 +3615,45 @@ export type SaasTrialStatus = {
   invoiceMutationsBlocked: boolean
 }
 
-/** @en Public SaaS onboarding + trial status (#180). */
+export type SaasSubscribeInput = {
+  planKey?: string
+}
+
+export type SaasSubscribeResult = {
+  planKey: string
+  saasStatus: string
+  subscriptionStatus: string
+  mock: boolean
+  initPoint: string | null
+  amount: string
+  currency: string
+}
+
+export type SaasInvoice = {
+  id: number
+  planKey: string
+  periodStart: string
+  periodEnd: string
+  amount: string
+  currency: string
+  status: string
+  createdAt: string
+}
+
+export type SaasBillingList = {
+  saasStatus: string
+  subscription: {
+    planKey: string
+    status: string
+    mock: boolean
+    initPoint: string | null
+    paymentRetryCount: number
+  } | null
+  invoices: SaasInvoice[]
+  platformMpLive: boolean
+}
+
+/** @en Public SaaS onboarding + trial status + tenant billing (#180/#182). */
 export const saasAPI = {
   suggestSlug: async (name: string): Promise<{ slug: string }> => {
     try {
@@ -3642,6 +3680,25 @@ export const saasAPI = {
   trial: async (): Promise<SaasTrialStatus> => {
     try {
       const response = await api.get<{ success: boolean; data: SaasTrialStatus }>('/saas/trial')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  billing: async (): Promise<SaasBillingList> => {
+    try {
+      const response = await api.get<{ success: boolean; data: SaasBillingList }>('/tenant/billing')
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+  subscribe: async (body?: SaasSubscribeInput): Promise<SaasSubscribeResult> => {
+    try {
+      const response = await api.post<{ success: boolean; data: SaasSubscribeResult }>(
+        '/tenant/billing/subscribe',
+        body ?? {},
+      )
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

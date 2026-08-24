@@ -26,7 +26,7 @@ npm run saas:trial-reminders
 
 ## Residual
 
-- Billing SaaS (#182)
+- Billing SaaS: ver [billing-saas-plataforma.md](billing-saas-plataforma.md) (#182)
 - Padrón SOAP live
 - E-mails sem SMTP
 

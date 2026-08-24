@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "duplicate": {
+      "type": "boolean"
+    },
+    "saasStatus": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "duplicate",
+    "saasStatus"
+  ],
+  "title": "SaasBillingWebhookResult",
+  "type": "object"
+}

@@ -228,6 +228,76 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+  /api/tenant/billing:
+    get:
+      tags: [saas]
+      summary: Tenant SaaS billing history (#182)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Billing snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaasBillingListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/tenant/billing/subscribe:
+    post:
+      tags: [saas]
+      summary: Start or renew platform SaaS subscription (#182)
+      description: >
+        Uses PLAN_CATALOG prices. Without BIZCODE_SAAS_MP_ACCESS_TOKEN, mock-activates the plan.
+        With token and paid plan, creates Mercado Pago preapproval and returns initPoint.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaasSubscribeInput'
+      responses:
+        '200':
+          description: Subscription started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaasSubscribeEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/saas/billing/webhook:
+    post:
+      tags: [saas]
+      summary: Platform SaaS billing webhook (#182)
+      description: >
+        Public. Mock mode (no platform MP token) accepts unsigned JSON.
+        Live mode requires `x-bizcode-saas-webhook-secret` matching BIZCODE_SAAS_MP_WEBHOOK_SECRET (fail-closed).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaasBillingWebhookInput'
+      responses:
+        '200':
+          description: Processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaasBillingWebhookEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
   /api/auth/login:
     post:
       tags: [auth]
@@ -16811,6 +16881,149 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/SaasTrialStatus'
+
+    SaasSubscribeInput:
+      type: object
+      properties:
+        planKey:
+          type: string
+          minLength: 2
+          maxLength: 20
+
+    SaasSubscribeResult:
+      type: object
+      required: [planKey, saasStatus, subscriptionStatus, mock, initPoint, amount, currency]
+      properties:
+        planKey:
+          type: string
+        saasStatus:
+          type: string
+        subscriptionStatus:
+          type: string
+        mock:
+          type: boolean
+        initPoint:
+          type: string
+          nullable: true
+        amount:
+          type: string
+        currency:
+          type: string
+
+    SaasSubscribeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SaasSubscribeResult'
+
+    SaasInvoice:
+      type: object
+      required: [id, planKey, periodStart, periodEnd, amount, currency, status, createdAt]
+      properties:
+        id:
+          type: integer
+        planKey:
+          type: string
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        amount:
+          type: string
+        currency:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    SaasBillingSubscription:
+      type: object
+      required: [planKey, status, mock, initPoint, paymentRetryCount]
+      properties:
+        planKey:
+          type: string
+        status:
+          type: string
+        mock:
+          type: boolean
+        initPoint:
+          type: string
+          nullable: true
+        paymentRetryCount:
+          type: integer
+
+    SaasBillingList:
+      type: object
+      required: [saasStatus, subscription, invoices, platformMpLive]
+      properties:
+        saasStatus:
+          type: string
+        subscription:
+          oneOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/SaasBillingSubscription'
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/SaasInvoice'
+        platformMpLive:
+          type: boolean
+
+    SaasBillingListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SaasBillingList'
+
+    SaasBillingWebhookInput:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+        tenantId:
+          type: integer
+        outcome:
+          type: string
+          enum: [authorized, paid, failed]
+        id:
+          type: string
+
+    SaasBillingWebhookResult:
+      type: object
+      required: [duplicate, saasStatus]
+      properties:
+        duplicate:
+          type: boolean
+        saasStatus:
+          type: string
+
+    SaasBillingWebhookEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/SaasBillingWebhookResult'
 
     LoginInput:
       type: object

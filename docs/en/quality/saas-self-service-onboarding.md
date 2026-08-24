@@ -28,7 +28,7 @@ Suspends overdue trials and sends reminders at 7 / 3 / 1 days before end when SM
 
 ## Residual
 
-- SaaS subscription billing / auto-charge (#182)
+- SaaS subscription billing / auto-charge is implemented in [#182](saas-platform-billing.md); residuals there (AFIP SaaS invoice, Stripe, SMTP).
 - Live Padrón A4 SOAP in production
 - Email delivery without SMTP
 

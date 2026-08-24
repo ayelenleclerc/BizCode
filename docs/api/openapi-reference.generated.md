@@ -397,6 +397,379 @@ Public endpoint (rate-limited). Creates tenant + owner + ParamEmpresa starter pl
 }
 ```
 
+### Tenant SaaS billing history (#182)
+
+- **Method:** `GET`
+- **Path:** `/api/tenant/billing`
+- **Tags:** saas
+
+#### Responses
+
+##### Status: 200 Billing snapshot
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`invoices` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`amount` (required)**
+
+      `string`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`currency` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`periodEnd` (required)**
+
+      `string`, format: `date-time`
+
+    - **`periodStart` (required)**
+
+      `string`, format: `date-time`
+
+    - **`planKey` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+  - **`platformMpLive` (required)**
+
+    `boolean`
+
+  - **`saasStatus` (required)**
+
+    `string`
+
+  - **`subscription` (required)**
+
+    `object`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "saasStatus": "",
+    "subscription": {
+      "planKey": "",
+      "status": "",
+      "mock": true,
+      "initPoint": "",
+      "paymentRetryCount": 1
+    },
+    "invoices": [
+      {
+        "id": 1,
+        "planKey": "",
+        "periodStart": "",
+        "periodEnd": "",
+        "amount": "",
+        "currency": "",
+        "status": "",
+        "createdAt": ""
+      }
+    ],
+    "platformMpLive": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Start or renew platform SaaS subscription (#182)
+
+- **Method:** `POST`
+- **Path:** `/api/tenant/billing/subscribe`
+- **Tags:** saas
+
+Uses PLAN\_CATALOG prices. Without BIZCODE\_SAAS\_MP\_ACCESS\_TOKEN, mock-activates the plan. With token and paid plan, creates Mercado Pago preapproval and returns initPoint.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`planKey`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "planKey": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Subscription started
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`amount` (required)**
+
+    `string`
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`initPoint` (required)**
+
+    `string`
+
+  - **`mock` (required)**
+
+    `boolean`
+
+  - **`planKey` (required)**
+
+    `string`
+
+  - **`saasStatus` (required)**
+
+    `string`
+
+  - **`subscriptionStatus` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "planKey": "",
+    "saasStatus": "",
+    "subscriptionStatus": "",
+    "mock": true,
+    "initPoint": "",
+    "amount": "",
+    "currency": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### Platform SaaS billing webhook (#182)
+
+- **Method:** `POST`
+- **Path:** `/api/saas/billing/webhook`
+- **Tags:** saas
+
+Public. Mock mode (no platform MP token) accepts unsigned JSON. Live mode requires `x-bizcode-saas-webhook-secret` matching BIZCODE\_SAAS\_MP\_WEBHOOK\_SECRET (fail-closed).
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`type` (required)**
+
+  `string`
+
+- **`data`**
+
+  `object`
+
+  - **`id`**
+
+    `string`
+
+- **`id`**
+
+  `string`
+
+- **`outcome`**
+
+  `string`, possible values: `"authorized", "paid", "failed"`
+
+- **`tenantId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "type": "",
+  "data": {
+    "id": ""
+  },
+  "tenantId": 1,
+  "outcome": "authorized",
+  "id": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Processed
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`duplicate` (required)**
+
+    `boolean`
+
+  - **`saasStatus` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "duplicate": true,
+    "saasStatus": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### Create authenticated session (cookies + Bearer tokens for RN) or MFA challenge (#213,
 
 - **Method:** `POST`
@@ -99660,6 +100033,482 @@ Rate-limited mutation; requires products.manage. USD only.
     "trialEndsAt": "",
     "daysRemaining": 1,
     "invoiceMutationsBlocked": true
+  }
+}
+```
+
+### SaasSubscribeInput
+
+- **Type:**`object`
+
+* **`planKey`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "planKey": ""
+}
+```
+
+### SaasSubscribeResult
+
+- **Type:**`object`
+
+* **`amount` (required)**
+
+  `string`
+
+* **`currency` (required)**
+
+  `string`
+
+* **`initPoint` (required)**
+
+  `string`
+
+* **`mock` (required)**
+
+  `boolean`
+
+* **`planKey` (required)**
+
+  `string`
+
+* **`saasStatus` (required)**
+
+  `string`
+
+* **`subscriptionStatus` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "planKey": "",
+  "saasStatus": "",
+  "subscriptionStatus": "",
+  "mock": true,
+  "initPoint": "",
+  "amount": "",
+  "currency": ""
+}
+```
+
+### SaasSubscribeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`amount` (required)**
+
+    `string`
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`initPoint` (required)**
+
+    `string`
+
+  - **`mock` (required)**
+
+    `boolean`
+
+  - **`planKey` (required)**
+
+    `string`
+
+  - **`saasStatus` (required)**
+
+    `string`
+
+  - **`subscriptionStatus` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "planKey": "",
+    "saasStatus": "",
+    "subscriptionStatus": "",
+    "mock": true,
+    "initPoint": "",
+    "amount": "",
+    "currency": ""
+  }
+}
+```
+
+### SaasInvoice
+
+- **Type:**`object`
+
+* **`amount` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`currency` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`periodEnd` (required)**
+
+  `string`, format: `date-time`
+
+* **`periodStart` (required)**
+
+  `string`, format: `date-time`
+
+* **`planKey` (required)**
+
+  `string`
+
+* **`status` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "planKey": "",
+  "periodStart": "",
+  "periodEnd": "",
+  "amount": "",
+  "currency": "",
+  "status": "",
+  "createdAt": ""
+}
+```
+
+### SaasBillingSubscription
+
+- **Type:**`object`
+
+* **`initPoint` (required)**
+
+  `string`
+
+* **`mock` (required)**
+
+  `boolean`
+
+* **`paymentRetryCount` (required)**
+
+  `integer`
+
+* **`planKey` (required)**
+
+  `string`
+
+* **`status` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "planKey": "",
+  "status": "",
+  "mock": true,
+  "initPoint": "",
+  "paymentRetryCount": 1
+}
+```
+
+### SaasBillingList
+
+- **Type:**`object`
+
+* **`invoices` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`amount` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`currency` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`periodEnd` (required)**
+
+    `string`, format: `date-time`
+
+  - **`periodStart` (required)**
+
+    `string`, format: `date-time`
+
+  - **`planKey` (required)**
+
+    `string`
+
+  - **`status` (required)**
+
+    `string`
+
+* **`platformMpLive` (required)**
+
+  `boolean`
+
+* **`saasStatus` (required)**
+
+  `string`
+
+* **`subscription` (required)**
+
+  `object`
+
+**Example:**
+
+```json
+{
+  "saasStatus": "",
+  "subscription": {
+    "planKey": "",
+    "status": "",
+    "mock": true,
+    "initPoint": "",
+    "paymentRetryCount": 1
+  },
+  "invoices": [
+    {
+      "id": 1,
+      "planKey": "",
+      "periodStart": "",
+      "periodEnd": "",
+      "amount": "",
+      "currency": "",
+      "status": "",
+      "createdAt": ""
+    }
+  ],
+  "platformMpLive": true
+}
+```
+
+### SaasBillingListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`invoices` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`amount` (required)**
+
+      `string`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`currency` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`periodEnd` (required)**
+
+      `string`, format: `date-time`
+
+    - **`periodStart` (required)**
+
+      `string`, format: `date-time`
+
+    - **`planKey` (required)**
+
+      `string`
+
+    - **`status` (required)**
+
+      `string`
+
+  - **`platformMpLive` (required)**
+
+    `boolean`
+
+  - **`saasStatus` (required)**
+
+    `string`
+
+  - **`subscription` (required)**
+
+    `object`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "saasStatus": "",
+    "subscription": {
+      "planKey": "",
+      "status": "",
+      "mock": true,
+      "initPoint": "",
+      "paymentRetryCount": 1
+    },
+    "invoices": [
+      {
+        "id": 1,
+        "planKey": "",
+        "periodStart": "",
+        "periodEnd": "",
+        "amount": "",
+        "currency": "",
+        "status": "",
+        "createdAt": ""
+      }
+    ],
+    "platformMpLive": true
+  }
+}
+```
+
+### SaasBillingWebhookInput
+
+- **Type:**`object`
+
+* **`type` (required)**
+
+  `string`
+
+* **`data`**
+
+  `object`
+
+  - **`id`**
+
+    `string`
+
+* **`id`**
+
+  `string`
+
+* **`outcome`**
+
+  `string`, possible values: `"authorized", "paid", "failed"`
+
+* **`tenantId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "type": "",
+  "data": {
+    "id": ""
+  },
+  "tenantId": 1,
+  "outcome": "authorized",
+  "id": ""
+}
+```
+
+### SaasBillingWebhookResult
+
+- **Type:**`object`
+
+* **`duplicate` (required)**
+
+  `boolean`
+
+* **`saasStatus` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "duplicate": true,
+  "saasStatus": ""
+}
+```
+
+### SaasBillingWebhookEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`duplicate` (required)**
+
+    `boolean`
+
+  - **`saasStatus` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "duplicate": true,
+    "saasStatus": ""
   }
 }
 ```

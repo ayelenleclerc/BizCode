@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "id": {
+      "type": "string"
+    },
+    "outcome": {
+      "enum": [
+        "authorized",
+        "paid",
+        "failed"
+      ],
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "type": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "type"
+  ],
+  "title": "SaasBillingWebhookInput",
+  "type": "object"
+}

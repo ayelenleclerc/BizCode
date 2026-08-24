@@ -1,8 +1,9 @@
 import type { PrismaClient } from '@prisma/client'
 import {
+  SAAS_STATUS_SUSPENDED_PAYMENT,
   SAAS_STATUS_SUSPENDED_TRIAL,
   SAAS_STATUS_TRIAL,
-  isInvoiceMutationBlockedByTrial,
+  isInvoiceMutationBlocked,
   trialDaysRemaining,
 } from './saasStatus'
 
@@ -55,17 +56,25 @@ export class SaasTrialService {
         saasStatus === SAAS_STATUS_TRIAL || saasStatus === SAAS_STATUS_SUSPENDED_TRIAL
           ? trialDaysRemaining(trialEndsAt, now)
           : null,
-      invoiceMutationsBlocked: isInvoiceMutationBlockedByTrial(saasStatus),
+      invoiceMutationsBlocked: isInvoiceMutationBlocked(saasStatus),
     }
   }
 
   async assertCanCreateInvoice(tenantId: number, now = new Date()): Promise<
     | { ok: true }
-    | { ok: false; status: 403; error: string; code: 'TRIAL_SUSPENDED' }
+    | { ok: false; status: 403; error: string; code: 'TRIAL_SUSPENDED' | 'PAYMENT_SUSPENDED' }
   > {
     const snap = await this.ensureAndGetSnapshot(tenantId, now)
     if (!snap) {
       return { ok: false, status: 403, error: 'Tenant not found', code: 'TRIAL_SUSPENDED' }
+    }
+    if (snap.saasStatus === SAAS_STATUS_SUSPENDED_PAYMENT) {
+      return {
+        ok: false,
+        status: 403,
+        error: 'Subscription payment failed — invoice creation is read-only until you renew',
+        code: 'PAYMENT_SUSPENDED',
+      }
     }
     if (snap.invoiceMutationsBlocked) {
       return {

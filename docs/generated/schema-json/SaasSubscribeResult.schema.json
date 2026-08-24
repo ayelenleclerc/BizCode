@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "amount": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string"
+    },
+    "initPoint": {
+      "nullable": true,
+      "type": "string"
+    },
+    "mock": {
+      "type": "boolean"
+    },
+    "planKey": {
+      "type": "string"
+    },
+    "saasStatus": {
+      "type": "string"
+    },
+    "subscriptionStatus": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "planKey",
+    "saasStatus",
+    "subscriptionStatus",
+    "mock",
+    "initPoint",
+    "amount",
+    "currency"
+  ],
+  "title": "SaasSubscribeResult",
+  "type": "object"
+}

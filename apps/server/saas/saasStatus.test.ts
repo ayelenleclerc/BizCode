@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { isValidTenantSlug, normalizeTenantSlug, suggestTenantSlug } from './tenantSlug'
 import {
+  isInvoiceMutationBlocked,
   isInvoiceMutationBlockedByTrial,
+  SAAS_STATUS_SUSPENDED_PAYMENT,
   SAAS_STATUS_SUSPENDED_TRIAL,
   SAAS_STATUS_TRIAL,
   trialDaysRemaining,
@@ -23,10 +25,13 @@ describe('tenantSlug', () => {
 })
 
 describe('saasStatus helpers', () => {
-  it('blocks invoice mutations only for suspended_trial', () => {
+  it('blocks invoice mutations for suspended_trial and suspended_payment', () => {
     expect(isInvoiceMutationBlockedByTrial(SAAS_STATUS_SUSPENDED_TRIAL)).toBe(true)
     expect(isInvoiceMutationBlockedByTrial(SAAS_STATUS_TRIAL)).toBe(false)
     expect(isInvoiceMutationBlockedByTrial('active')).toBe(false)
+    expect(isInvoiceMutationBlocked(SAAS_STATUS_SUSPENDED_PAYMENT)).toBe(true)
+    expect(isInvoiceMutationBlocked(SAAS_STATUS_SUSPENDED_TRIAL)).toBe(true)
+    expect(isInvoiceMutationBlocked('active')).toBe(false)
   })
 
   it('computes days remaining', () => {

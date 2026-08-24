@@ -47,6 +47,7 @@ import ReportesPage from './pages/reportes'
 import ConfiguracionPage from './pages/configuracion'
 import ZonasEntregaPage from './pages/configuracion/ZonasEntregaPage'
 import EmpresaPage from './pages/configuracion/EmpresaPage'
+import BillingPage from './pages/saas/BillingPage'
 import SeguridadPage from './pages/configuracion/SeguridadPage'
 import { PortalAuthProvider } from './contexts/PortalAuthContext'
 import PortalLayout from './pages/portal/PortalLayout'
@@ -435,6 +436,7 @@ function AppRoutes() {
           <Route path="configuracion" element={<ConfiguracionPage />} />
           <Route path="configuracion/zonas-entrega" element={<ZonasEntregaPage />} />
           <Route path="configuracion/empresa" element={<EmpresaPage />} />
+          <Route path="configuracion/billing" element={<BillingPage />} />
           <Route path="configuracion/seguridad" element={<SeguridadPage />} />
           <Route
             path="chat"

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "invoices": {
+      "items": {
+        "$ref": "./SaasInvoice.schema.json"
+      },
+      "type": "array"
+    },
+    "platformMpLive": {
+      "type": "boolean"
+    },
+    "saasStatus": {
+      "type": "string"
+    },
+    "subscription": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "./SaasBillingSubscription.schema.json"
+        }
+      ]
+    }
+  },
+  "required": [
+    "saasStatus",
+    "subscription",
+    "invoices",
+    "platformMpLive"
+  ],
+  "title": "SaasBillingList",
+  "type": "object"
+}

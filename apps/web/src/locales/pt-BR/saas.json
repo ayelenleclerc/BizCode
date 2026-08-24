@@ -27,6 +27,26 @@
   "trial": {
     "banner": "Restam {{days}} dias de teste gratuito.",
     "bannerExpired": "Seu teste gratuito encerrou. A emissão de faturas está somente leitura até ativar a assinatura.",
-    "bannerCta": "Completar dados da empresa"
+    "bannerCta": "Ativar assinatura"
+  },
+  "billing": {
+    "title": "Assinatura SaaS",
+    "subtitle": "Histórico de cobranças da plataforma. Preços do catálogo de planos (starter pode ser $0).",
+    "loading": "Carregando faturamento…",
+    "errorGeneric": "Não foi possível carregar ou atualizar a assinatura",
+    "status": "Status",
+    "subscribeCta": "Ativar ou renovar assinatura",
+    "submitting": "Processando…",
+    "successMock": "Assinatura ativada (mock: sem credenciais Mercado Pago da plataforma).",
+    "successLive": "Assinatura iniciada. Conclua o pagamento no Mercado Pago se o checkout abriu.",
+    "empty": "Ainda não há faturas SaaS.",
+    "tableCaption": "Histórico de faturas SaaS",
+    "colPeriod": "Período",
+    "colPlan": "Plano",
+    "colAmount": "Valor",
+    "colStatus": "Status",
+    "renewTitle": "Renove sua assinatura",
+    "renewBody": "A cobrança falhou. Você só pode usar esta tela de renovação até regularizar o pagamento.",
+    "renewCta": "Ir para assinatura"
   }
 }
