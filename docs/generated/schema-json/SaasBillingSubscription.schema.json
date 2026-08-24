@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "initPoint": {
+      "nullable": true,
+      "type": "string"
+    },
+    "mock": {
+      "type": "boolean"
+    },
+    "paymentRetryCount": {
+      "type": "integer"
+    },
+    "planKey": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "planKey",
+    "status",
+    "mock",
+    "initPoint",
+    "paymentRetryCount"
+  ],
+  "title": "SaasBillingSubscription",
+  "type": "object"
+}

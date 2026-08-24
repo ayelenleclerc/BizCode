@@ -1206,11 +1206,31 @@
 
 * [RutaStatsEnvelope](./rutastatsenvelope.md) – `-`
 
+* [SaasBillingList](./saasbillinglist.md) – `-`
+
+* [SaasBillingListEnvelope](./saasbillinglistenvelope.md) – `-`
+
+* [SaasBillingSubscription](./saasbillingsubscription.md) – `-`
+
+* [SaasBillingWebhookEnvelope](./saasbillingwebhookenvelope.md) – `-`
+
+* [SaasBillingWebhookInput](./saasbillingwebhookinput.md) – `-`
+
+* [SaasBillingWebhookResult](./saasbillingwebhookresult.md) – `-`
+
+* [SaasInvoice](./saasinvoice.md) – `-`
+
 * [SaasRegisterEnvelope](./saasregisterenvelope.md) – `-`
 
 * [SaasRegisterInput](./saasregisterinput.md) – `-`
 
 * [SaasRegisterResult](./saasregisterresult.md) – `-`
+
+* [SaasSubscribeEnvelope](./saassubscribeenvelope.md) – `-`
+
+* [SaasSubscribeInput](./saassubscribeinput.md) – `-`
+
+* [SaasSubscribeResult](./saassubscriberesult.md) – `-`
 
 * [SaasTrialEnvelope](./saastrialenvelope.md) – `-`
 
@@ -1776,6 +1796,8 @@
 
 * [Untitled object in RutaParadasReplaceInput](./rutaparadasreplaceinput-properties-paradas-items.md) – `undefined#/properties/paradas/items`
 
+* [Untitled object in SaasBillingWebhookInput](./saasbillingwebhookinput-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled object in StockAdjustData](./stockadjustdata-properties-articulo.md) – `undefined#/properties/articulo`
 
 * [Untitled object in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0.md) – `undefined#/allOf/0`
@@ -2235,6 +2257,8 @@
 * [Untitled array in RutaCreateInput](./rutacreateinput-properties-clienteids.md) – `undefined#/properties/clienteIds`
 
 * [Untitled array in RutaParadasReplaceInput](./rutaparadasreplaceinput-properties-paradas.md) – `undefined#/properties/paradas`
+
+* [Untitled array in SaasBillingList](./saasbillinglist-properties-invoices.md) – `undefined#/properties/invoices`
 
 * [Untitled array in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

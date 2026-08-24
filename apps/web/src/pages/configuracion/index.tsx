@@ -6,6 +6,7 @@ const TILES = [
   { key: 'users', path: '/users', icon: '👥' },
   { key: 'seguridad', path: '/configuracion/seguridad', icon: '🔐' },
   { key: 'empresa', path: '/configuracion/empresa', icon: '🏢' },
+  { key: 'billing', path: '/configuracion/billing', icon: '💳' },
   { key: 'zonasEntrega', path: '/configuracion/zonas-entrega', icon: '📍' },
 ] as const
 

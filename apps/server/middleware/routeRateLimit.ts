@@ -19,6 +19,8 @@ const IMPORT_DEFAULT = 5
 const PORTAL_MAGIC_LINK_DEFAULT = 5
 const PORTAL_VERIFY_DEFAULT = 30
 const SAAS_REGISTER_DEFAULT = 5
+const SAAS_BILLING_SUBSCRIBE_DEFAULT = 10
+const SAAS_BILLING_WEBHOOK_DEFAULT = 120
 const MERCADOPAGO_TEST_DEFAULT = 10
 const MERCADOPAGO_PREFERENCE_DEFAULT = 20
 const MERCADOPAGO_WEBHOOK_DEFAULT = 120
@@ -191,6 +193,36 @@ export const saasRegisterHttpRateLimiter = createRouteLimiter({
   limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_SAAS_REGISTER, SAAS_REGISTER_DEFAULT),
   skipUnless: () => true,
   storePrefix: 'saas-register',
+})
+
+/**
+ * @en Per-tenant-user rate limit for SaaS billing subscribe (default 10 / 15 min; `HTTP_RATE_LIMIT_SAAS_BILLING_SUBSCRIBE`) (#182).
+ * @es Límite por usuario de tenant para suscribir billing SaaS (10 / 15 min; `HTTP_RATE_LIMIT_SAAS_BILLING_SUBSCRIBE`) (#182).
+ * @pt-BR Limite por usuário do tenant para assinar billing SaaS (10 / 15 min; `HTTP_RATE_LIMIT_SAAS_BILLING_SUBSCRIBE`) (#182).
+ */
+export const saasBillingSubscribeHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(
+    process.env.HTTP_RATE_LIMIT_SAAS_BILLING_SUBSCRIBE,
+    SAAS_BILLING_SUBSCRIBE_DEFAULT,
+  ),
+  skipUnless: () => true,
+  storePrefix: 'saas-billing-subscribe',
+})
+
+/**
+ * @en Per-IP rate limit for platform SaaS billing webhook (default 120 / 15 min; `HTTP_RATE_LIMIT_SAAS_BILLING_WEBHOOK`) (#182).
+ * @es Límite por IP para webhook de billing SaaS de plataforma (120 / 15 min; `HTTP_RATE_LIMIT_SAAS_BILLING_WEBHOOK`) (#182).
+ * @pt-BR Limite por IP para webhook de billing SaaS da plataforma (120 / 15 min; `HTTP_RATE_LIMIT_SAAS_BILLING_WEBHOOK`) (#182).
+ */
+export const saasBillingWebhookHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(
+    process.env.HTTP_RATE_LIMIT_SAAS_BILLING_WEBHOOK,
+    SAAS_BILLING_WEBHOOK_DEFAULT,
+  ),
+  skipUnless: () => true,
+  storePrefix: 'saas-billing-webhook',
 })
 
 /**

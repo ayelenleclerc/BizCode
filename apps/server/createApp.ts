@@ -28,6 +28,7 @@ import { tenantPlan } from './middleware/tenantPlan'
 import { registerRestDomainRoutes } from './registerRestDomainRoutes'
 import { registerMetricsRoute } from './routes/registerMetricsRoute'
 import { registerSaasRoutes } from './routes/registerSaasRoutes'
+import { registerSaasBillingRoutes } from './routes/registerSaasBillingRoutes'
 import { bootstrapEcommerceConnectors } from './integrations/ecommerce/bootstrapEcommerceConnectors'
 
 /**
@@ -184,6 +185,7 @@ export function createApp(prisma: PrismaClient): Application {
 
   bootstrapEcommerceConnectors()
   registerSaasRoutes(app, prisma)
+  registerSaasBillingRoutes(app, prisma)
   registerRestDomainRoutes(app, prisma)
 
   app.use((_req: Request, res: Response) => {

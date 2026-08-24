@@ -27,6 +27,26 @@
   "trial": {
     "banner": "You have {{days}} days left in your free trial.",
     "bannerExpired": "Your free trial has ended. Invoice creation is read-only until a subscription is activated.",
-    "bannerCta": "Complete company details"
+    "bannerCta": "Activate subscription"
+  },
+  "billing": {
+    "title": "SaaS subscription",
+    "subtitle": "Platform charge history. Prices come from the plan catalog (starter may be $0).",
+    "loading": "Loading billing…",
+    "errorGeneric": "Could not load or update the subscription",
+    "status": "Status",
+    "subscribeCta": "Activate or renew subscription",
+    "submitting": "Processing…",
+    "successMock": "Subscription activated (mock: no platform Mercado Pago credentials).",
+    "successLive": "Subscription started. Complete payment in Mercado Pago if checkout opened.",
+    "empty": "No SaaS invoices yet.",
+    "tableCaption": "SaaS invoice history",
+    "colPeriod": "Period",
+    "colPlan": "Plan",
+    "colAmount": "Amount",
+    "colStatus": "Status",
+    "renewTitle": "Renew your subscription",
+    "renewBody": "Payment failed. You can only use this renewal screen until payment is regularized.",
+    "renewCta": "Go to subscription"
   }
 }

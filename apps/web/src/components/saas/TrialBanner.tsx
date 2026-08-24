@@ -55,7 +55,7 @@ export default function TrialBanner() {
           ? t('trial.bannerExpired')
           : t('trial.banner', { days: trial.daysRemaining ?? 0 })}{' '}
         <Link
-          to="/configuracion/empresa"
+          to="/configuracion/billing"
           className="font-medium underline"
           data-testid="saas-trial-banner-cta"
         >

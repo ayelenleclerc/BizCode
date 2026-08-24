@@ -27,6 +27,26 @@
   "trial": {
     "banner": "Te quedan {{days}} días de prueba gratuita.",
     "bannerExpired": "Tu prueba gratuita venció. La emisión de facturas está en solo lectura hasta activar la suscripción.",
-    "bannerCta": "Completar datos de empresa"
+    "bannerCta": "Activar suscripción"
+  },
+  "billing": {
+    "title": "Suscripción SaaS",
+    "subtitle": "Historial de cobros de plataforma. Precios según el catálogo de planes (starter puede ser $0).",
+    "loading": "Cargando facturación…",
+    "errorGeneric": "No se pudo cargar o actualizar la suscripción",
+    "status": "Estado",
+    "subscribeCta": "Activar o renovar suscripción",
+    "submitting": "Procesando…",
+    "successMock": "Suscripción activada (mock: sin credenciales Mercado Pago de plataforma).",
+    "successLive": "Suscripción iniciada. Completá el pago en Mercado Pago si se abrió el checkout.",
+    "empty": "Todavía no hay facturas SaaS.",
+    "tableCaption": "Historial de facturas SaaS",
+    "colPeriod": "Período",
+    "colPlan": "Plan",
+    "colAmount": "Importe",
+    "colStatus": "Estado",
+    "renewTitle": "Renová tu suscripción",
+    "renewBody": "El cobro falló. Solo podés operar esta pantalla de renovación hasta regularizar el pago.",
+    "renewCta": "Ir a suscripción"
   }
 }

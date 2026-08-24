@@ -1761,9 +1761,9 @@ model Tenant {
   /// @es Si es true, usuarios del tenant no pueden login ni usar API; el super_admin de plataforma sí gestiona (#222).
   /// @pt-BR Se true, usuários do tenant não fazem login nem usam API; o super_admin da plataforma ainda gerencia (#222).
   maintenanceMode Boolean  @default(false)
-  /// @en SaaS subscription status (#180): `trial` | `active` | `suspended_trial`.
-  /// @es Estado de suscripción SaaS (#180): `trial` | `active` | `suspended_trial`.
-  /// @pt-BR Status de assinatura SaaS (#180): `trial` | `active` | `suspended_trial`.
+  /// @en SaaS subscription status (#180/#182): `trial` | `active` | `suspended_trial` | `suspended_payment`.
+  /// @es Estado de suscripción SaaS (#180/#182): `trial` | `active` | `suspended_trial` | `suspended_payment`.
+  /// @pt-BR Status de assinatura SaaS (#180/#182): `trial` | `active` | `suspended_trial` | `suspended_payment`.
   saasStatus      String   @default("active") @db.VarChar(32)
   /// @en End of self-service trial window (#180); null when not on trial.
   /// @es Fin de la ventana de trial self-service (#180); null si no está en trial.
@@ -1842,6 +1842,8 @@ model Tenant {
   tenantConfig                     TenantConfig?
   moduleTrials                     TenantModuleTrial[]
   tenantPlan                       TenantPlan?
+  saasSubscription                 SaasSubscription?
+  saasInvoices                     SaasInvoice[]
   fiscalRetencionesConfig          FiscalRetencionesConfig?
   regimenesRetencion               RegimenRetencion[]
   retencionesAplicadas             RetencionAplicada[]
@@ -2476,6 +2478,62 @@ model TenantPlan {
 
   @@index([tenantId])
   @@index([planId])
+}
+
+/// @en Platform SaaS subscription for a tenant (#182). Separate from tenant Mercado Pago (ADR-0019).
+/// @es Suscripción SaaS de plataforma por tenant (#182). Separada del Mercado Pago del tenant (ADR-0019).
+/// @pt-BR Assinatura SaaS de plataforma por tenant (#182). Separada do Mercado Pago do tenant (ADR-0019).
+model SaasSubscription {
+  id                   Int       @id @default(autoincrement())
+  tenantId             Int       @unique
+  tenant               Tenant    @relation(fields: [tenantId], references: [id])
+  planKey              String    @db.VarChar(20)
+  /// pending | authorized | cancelled
+  status               String    @db.VarChar(32)
+  mpPreapprovalId      String?   @unique @db.VarChar(80)
+  initPoint            String?   @db.VarChar(500)
+  mock                 Boolean   @default(false)
+  paymentRetryCount    Int       @default(0)
+  lastPaymentFailedAt  DateTime?
+  cancelReason         String?   @db.VarChar(200)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  invoices             SaasInvoice[]
+}
+
+/// @en Platform SaaS invoice period for a tenant (#182). Not a business Factura.
+/// @es Factura de cobro SaaS de plataforma (#182). No es Factura de negocio.
+/// @pt-BR Fatura de cobrança SaaS da plataforma (#182). Não é Factura de negócio.
+model SaasInvoice {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  subscriptionId Int?
+  subscription   SaasSubscription? @relation(fields: [subscriptionId], references: [id])
+  planKey        String    @db.VarChar(20)
+  periodStart    DateTime
+  periodEnd      DateTime
+  amount         Decimal   @db.Decimal(14, 2)
+  currency       String    @default("ARS") @db.VarChar(8)
+  /// pending | paid | failed
+  status         String    @db.VarChar(20)
+  mpPaymentId    String?   @unique @db.VarChar(80)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([tenantId, createdAt])
+  @@index([subscriptionId])
+}
+
+/// @en Idempotent platform SaaS billing webhook receipts (#182).
+/// @es Recibos idempotentes de webhook de billing SaaS de plataforma (#182).
+/// @pt-BR Recibos idempotentes de webhook de billing SaaS da plataforma (#182).
+model SaasWebhookEvent {
+  id             Int      @id @default(autoincrement())
+  idempotencyKey String   @unique @db.VarChar(160)
+  eventType      String   @db.VarChar(80)
+  payload        Json
+  processedAt    DateTime @default(now())
 }
 
 model TenantConfig {
