@@ -10,7 +10,7 @@ export function registerHealthRoute(app: Application, ctx: RestRouteContext): vo
     const dbStartedAt = process.hrtime.bigint()
     let dbOk = true
     try {
-      await ctx.prisma.$queryRawUnsafe('SELECT 1')
+      await ctx.prisma.$queryRaw`SELECT 1`
     } catch {
       dbOk = false
     }

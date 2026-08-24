@@ -1,0 +1,4 @@
+# ZAP baseline rules (#194). Columns: ruleId<TAB>action<TAB>optional comment
+# Actions: IGNORE | WARN | FAIL
+# Keep empty of IGNORE lines until CI noise is triaged; then pin known false positives here.
+# Enabling job failure on unignored WARN/FAIL: remove -I from .github/workflows/zap.yml after triage.

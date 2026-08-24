@@ -4,62 +4,80 @@
 
 | Amenaza | Categoría | Mitigación |
 |---|---|---|
-| Inyección SQL vía API | Manipulación | Prisma con consultas parametrizadas |
+| Inyección SQL vía API | Manipulación | Prisma parametrizado; `$queryRaw` / `Prisma.sql` etiquetado cuando hace falta SQL crudo (parámetros enlazados, sin concatenar input). Health: `SELECT 1` constante |
 | XSS en datos mostrados | Manipulación | JSX escapa valores |
-| Acceso no autorizado a la API | Elevación de privilegios | API en loopback (127.0.0.1) |
-| Datos sensibles en logs | Divulgación | Sin PII en INFO |
-| Vulnerabilidades en dependencias | Varias | `npm audit` en CI |
+| Acceso no autorizado a la API | Elevación de privilegios | Cookie de sesión + permisos; escritorio suele ser loopback; SaaS/hosted requiere TLS y controles de red |
+| Datos sensibles en logs | Divulgación | Sin PII en INFO; no registrar tokens, contraseñas ni secretos de pago |
+| Vulnerabilidades en dependencias | Varias | `pnpm audit --audit-level=high` bloqueante; Snyk en CI — [escaneo de dependencias](quality/escaneo-dependencias-y-triage.md) |
 | Rutas maliciosas en Tauri | Manipulación | Allowlist de filesystem |
 
 ## Mapeo OWASP Top 10
 
 | Riesgo | Estado |
 |---|---|
-| A01 Control de acceso roto | Parcial — sesión por cookie y comprobación de permisos en rutas protegidas ([`server/createApp.ts`](../../server/createApp.ts), [`server/auth.ts`](../../server/auth.ts)) |
-| A02 Fallos criptográficos | N/A — sin secretos de aplicación en la base |
-| A03 Inyección | Mitigado — Prisma parametrizado |
-| A04 Diseño inseguro | Mitigado — modelo de amenazas; API en loopback |
-| A05 Configuración insegura | Parcial — CORS con lista blanca y `credentials: true` ([`server/createApp.ts`](../../server/createApp.ts), `CORS_ORIGINS` en [`.env.example`](../../.env.example)); resto de cabeceras sin endurecer del todo |
-| A06 Componentes vulnerables | Monitorizado — `npm audit` en CI |
-| A07 Fallos de identificación | Parcial — login y sesión; hash de contraseña en [`server/auth.ts`](../../server/auth.ts) |
-| A09 Fallos de registro | Parcial — sin logging estructurado aún |
+| A01 Control de acceso roto | Parcial — sesión y permisos ([`apps/server/createApp.ts`](../../apps/server/createApp.ts)); IDOR/tenant es foco de pentest ([#194](https://github.com/ayelenleclerc/BizCode/issues/194)) |
+| A02 Fallos criptográficos | Parcial — secretos en env / tokens cifrados donde aplica |
+| A03 Inyección | Mitigado — Prisma + plantillas etiquetadas |
+| A04 Diseño inseguro | Parcial — modelo revisado; SaaS amplía superficie vs desktop |
+| A05 Configuración insegura | Parcial — CORS allowlist; Helmet/CSP en [`securityHeaders.ts`](../../apps/server/middleware/securityHeaders.ts) |
+| A06 Componentes vulnerables | Monitorizado — audit HIGH+ bloqueante; Snyk con `SNYK_TOKEN` |
+| A07 Fallos de identificación | Parcial — login/sesión; hash de contraseña |
+| A09 Fallos de registro | Parcial — observabilidad; eventos de seguridad (#221) |
+
+## Cabeceras HTTP de seguridad
+
+Helmet vía [`getSecurityHeadersMiddleware`](../../apps/server/middleware/securityHeaders.ts) en `createApp`. CSP permite inline limitado para Swagger en `/api-docs`.
 
 ## Gestión de secretos
 
 - `DATABASE_URL` en `.env` (no versionado).
-- `.env.example` solo nombres de variables y marcadores no secretos (p. ej. `REPLACE_DB_USER` / `REPLACE_DB_CREDENTIAL` en `DATABASE_URL`); el archivo versionado no debe contener credenciales reales.
-- Bootstrap de super admin (`npm run bootstrap:superadmin`): contraseña vía `BIZCODE_BOOTSTRAP_SUPERADMIN_PASSWORD` solo en tu `.env` local (claves comentadas en `.env.example`; no subir valores reales).
+- `.env.example` solo nombres de variables y marcadores no secretos; el archivo versionado no debe contener credenciales reales.
+- Bootstrap de super admin (`npm run bootstrap:superadmin`): contraseña vía `BIZCODE_BOOTSTRAP_SUPERADMIN_PASSWORD` solo en tu `.env` local.
 - Sin secretos en el código.
 
 ## Seed de Prisma (arranque en desarrollo)
 
-- `npx prisma db seed` crea o actualiza el tenant `platform` y el usuario `ayelen` (SuperAdmin). **`BIZCODE_SEED_SUPERADMIN_PASSWORD` debe estar definida** en `.env` antes de ejecutar el seed (mínimo 8 caracteres). [`.env.example`](../../.env.example) declara la variable **sin** valor por defecto versionado.
-- **No** reutilices la misma contraseña de desarrollo en preproducción, producción ni bases compartidas. Usa un secreto fuerte por entorno; volver a ejecutar el seed sobrescribe el hash almacenado de ese usuario.
+- `npx prisma db seed` crea o actualiza el tenant `platform` y el usuario `ayelen` (SuperAdmin). **`BIZCODE_SEED_SUPERADMIN_PASSWORD` debe estar definida** en `.env` (mínimo 8 caracteres).
+- **No** reutilices la misma contraseña de desarrollo en preproducción, producción ni bases compartidas.
 
 ## CORS
 
-La app Express usa **`cors`** con **`credentials: true`** para que el navegador envíe la cookie de sesión en peticiones cross-origin desde el servidor de desarrollo del SPA (por ejemplo Vite en el puerto **5173**) hacia la API en el puerto **3001**.
+La app Express usa **`cors`** con **`credentials: true`**.
 
-- **Lista blanca:** por defecto `http://localhost:5173` y `http://127.0.0.1:5173`, más orígenes extra en la variable **`CORS_ORIGINS`** (CSV); véase [`.env.example`](../../.env.example).
-- **Código:** [`server/createApp.ts`](../../server/createApp.ts) (`getCorsOriginAllowlist`, `createApp`).
+- **Lista blanca:** por defecto `http://localhost:5173` y `http://127.0.0.1:5173`, más **`CORS_ORIGINS`** (CSV).
+- **Código:** [`apps/server/createApp.ts`](../../apps/server/createApp.ts).
 - **Pruebas:** [`tests/server/cors.test.ts`](../../tests/server/cors.test.ts).
-- Las peticiones **sin** cabecera `Origin` (por ejemplo supertest en CI) se permiten; orígenes no listados no reciben `Access-Control-Allow-Origin`.
-- **Escritorio empaquetado:** si el WebView usa otro origen, añádelo a `CORS_ORIGINS`.
 
 ## Política de dependencias
 
-`npm audit --audit-level=high` en CI; críticas/altas antes de merge a `main`.
+- `pnpm audit --audit-level=high` **bloqueante** en Quality Gate.
+- Snyk cuando existe `SNYK_TOKEN` ([`.github/workflows/snyk.yml`](../../.github/workflows/snyk.yml)).
+- Ver [escaneo y triage](quality/escaneo-dependencias-y-triage.md).
+
+## Pruebas de penetración (#194)
+
+DAST automatizado (OWASP ZAP baseline) y proceso de engagement externo: [Pruebas de penetración](quality/pruebas-de-penetracion.md). Los informes ZAP de CI **no** sustituyen el informe de pentest externo.
+
+## Checklist pre-lanzamiento (ingeniería)
+
+| Comprobación | Evidencia |
+|---|---|
+| Gates HIGH+ de dependencias | Quality Gate; Snyk |
+| Revisión SQL crudo | `$queryRaw` etiquetado; sin concatenación de input en call sites actuales |
+| Cabeceras de seguridad | Helmet en la API |
+| Tenant / IDOR | Middleware de auth; el pentest externo debe verificar acceso cross-tenant |
+| Secretos en logs | Revisar sinks de producción antes del lanzamiento |
 
 ## Respuesta a incidentes (#222)
 
-Runbook operativo (clasificación, runbooks, notas legales, post-mortem): [Respuesta a incidentes](quality/respuesta-a-incidentes.md). Herramientas super-admin: revocar sesiones del tenant, deshabilitar tenant, modo mantenimiento, listado forense de auditoría.
+[Respuesta a incidentes](quality/respuesta-a-incidentes.md).
 
 ## Monitoreo de seguridad (#221)
 
-Clasificación asíncrona y alertas para operadores de plataforma: [Monitoreo de seguridad](quality/monitoreo-de-seguridad.md). Timeline UI `/superadmin/security`; API `GET /api/superadmin/security-events`. Stub ISO: [SEC-011](certificacion-iso/sec/sec-011-logs-alertas.md).
+[Monitoreo de seguridad](quality/monitoreo-de-seguridad.md). Stub ISO: [SEC-011](certificacion-iso/sec/sec-011-logs-alertas.md).
 
 ## Hardening apps móviles (#220)
 
-App Repartidor / App Vendedor: SecureStore, cache offline cifrado, soft-gate root/jailbreak, pinning TLS Android — [Hardening apps móviles](quality/hardening-apps-moviles.md).
+[Hardening apps móviles](quality/hardening-apps-moviles.md).
 
 **Otros idiomas:** [English](../en/security.md) · [Português](../pt-br/seguranca.md)
