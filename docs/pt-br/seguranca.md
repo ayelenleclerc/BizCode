@@ -4,63 +4,80 @@
 
 | Ameaça | Categoria | Mitigação |
 |---|---|---|
-| SQL injection via API | Tampering | Prisma com consultas parametrizadas |
+| SQL injection via API | Tampering | Prisma parametrizado; `$queryRaw` / `Prisma.sql` etiquetado quando SQL bruto é necessário (parâmetros vinculados). Health: `SELECT 1` constante |
 | XSS em dados renderizados | Tampering | JSX do React escapa valores |
-| Acesso não autorizado à API | Elev. privilégio | API em loopback (127.0.0.1) |
-| Dados sensíveis em logs | Divulgação | Sem PII em INFO; `console.error` só para erros |
-| Vulnerabilidades em dependências | Várias | `npm audit` no CI |
+| Acesso não autorizado à API | Elev. privilégio | Cookie de sessão + permissões; desktop costuma ser loopback; SaaS/hosted exige TLS e controles de rede |
+| Dados sensíveis em logs | Divulgação | Sem PII em INFO; não registrar tokens, senhas nem segredos de pagamento |
+| Vulnerabilidades em dependências | Várias | `pnpm audit --audit-level=high` bloqueante; Snyk no CI — [varredura de dependências](quality/varredura-dependencias-e-triagem.md) |
 | Caminhos maliciosos no Tauri | Tampering | Allowlist de filesystem |
 
 ## OWASP Top 10 (mapeamento)
 
 | Risco | Estado |
 |---|---|
-| A01 Quebra de controle de acesso | Parcial — sessão por cookie e checagem de permissões nas rotas protegidas ([`server/createApp.ts`](../../server/createApp.ts), [`server/auth.ts`](../../server/auth.ts)) |
-| A02 Falhas criptográficas | N/A — sem segredos de aplicação na base |
-| A03 Injeção | Mitigado — Prisma parametrizado |
-| A04 Design inseguro | Mitigado — modelo de ameaças; API em loopback |
-| A05 Configuração insegura | Parcial — CORS com allowlist e `credentials: true` ([`server/createApp.ts`](../../server/createApp.ts), `CORS_ORIGINS` em [`.env.example`](../../.env.example)); demais cabeçalhos não endurecidos |
-| A06 Componentes vulneráveis | Monitorado — `npm audit` no CI |
-| A07 Falhas de identificação | Parcial — login e sessão; hash de senha em [`server/auth.ts`](../../server/auth.ts) |
-| A09 Falhas de registro | Parcial — sem logging estruturado ainda |
+| A01 Quebra de controle de acesso | Parcial — sessão e permissões ([`apps/server/createApp.ts`](../../apps/server/createApp.ts)); IDOR/tenant é foco de pentest ([#194](https://github.com/ayelenleclerc/BizCode/issues/194)) |
+| A02 Falhas criptográficas | Parcial — segredos em env / tokens cifrados onde aplicável |
+| A03 Injeção | Mitigado — Prisma + templates etiquetados |
+| A04 Design inseguro | Parcial — modelo revisado; SaaS amplia superfície vs desktop |
+| A05 Configuração insegura | Parcial — CORS allowlist; Helmet/CSP em [`securityHeaders.ts`](../../apps/server/middleware/securityHeaders.ts) |
+| A06 Componentes vulneráveis | Monitorado — audit HIGH+ bloqueante; Snyk com `SNYK_TOKEN` |
+| A07 Falhas de identificação | Parcial — login/sessão; hash de senha |
+| A09 Falhas de registro | Parcial — observabilidade; eventos de segurança (#221) |
+
+## Cabeçalhos HTTP de segurança
+
+Helmet via [`getSecurityHeadersMiddleware`](../../apps/server/middleware/securityHeaders.ts) em `createApp`. CSP permite inline limitado para Swagger em `/api-docs`.
 
 ## Segredos
 
 - `DATABASE_URL` em `.env` (não versionado).
-- `.env.example` apenas nomes de variáveis e *placeholders* não secretos (por exemplo `REPLACE_DB_USER` / `REPLACE_DB_CREDENTIAL` em `DATABASE_URL`); o arquivo versionado não deve conter credenciais reais.
-- Bootstrap de super admin (`npm run bootstrap:superadmin`): senha via `BIZCODE_BOOTSTRAP_SUPERADMIN_PASSWORD` apenas no `.env` local (chaves comentadas no `.env.example`; nunca commitar valores reais).
+- `.env.example` apenas nomes de variáveis e *placeholders*; o arquivo versionado não deve conter credenciais reais.
+- Bootstrap de super admin: `BIZCODE_BOOTSTRAP_SUPERADMIN_PASSWORD` apenas no `.env` local.
 - Sem segredos no código-fonte.
 
 ## Seed Prisma (bootstrap em desenvolvimento)
 
-- `npx prisma db seed` cria ou atualiza o tenant `platform` e o usuário `ayelen` (SuperAdmin). **`BIZCODE_SEED_SUPERADMIN_PASSWORD` deve estar definida** no `.env` antes de rodar o seed (mínimo 8 caracteres). O [`.env.example`](../../.env.example) declara a variável **sem** valor padrão versionado.
-- **Não** reutilize a mesma senha de desenvolvimento em homologação, produção ou bases compartilhadas. Use um segredo forte por ambiente; rodar o seed de novo sobrescreve o hash armazenado desse usuário.
+- `npx prisma db seed` cria/atualiza tenant `platform` e usuário `ayelen` (SuperAdmin). **`BIZCODE_SEED_SUPERADMIN_PASSWORD` deve estar definida** (mínimo 8 caracteres).
+- **Não** reutilize a mesma senha de desenvolvimento em homologação, produção ou bases compartilhadas.
 
 ## CORS
 
-O app Express usa **`cors`** com **`credentials: true`** para o navegador enviar o cookie de sessão em requisições cross-origin do servidor de desenvolvimento do SPA (por exemplo Vite na porta **5173**) para a API na porta **3001**.
+O app Express usa **`cors`** com **`credentials: true`**.
 
-- **Allowlist:** por padrão `http://localhost:5173` e `http://127.0.0.1:5173`, mais origens extras na variável **`CORS_ORIGINS`** (CSV); ver [`.env.example`](../../.env.example).
-- **Código:** [`server/createApp.ts`](../../server/createApp.ts) (`getCorsOriginAllowlist`, `createApp`).
+- **Allowlist:** `http://localhost:5173` e `http://127.0.0.1:5173`, mais **`CORS_ORIGINS`** (CSV).
+- **Código:** [`apps/server/createApp.ts`](../../apps/server/createApp.ts).
 - **Testes:** [`tests/server/cors.test.ts`](../../tests/server/cors.test.ts).
-- Requisições **sem** cabeçalho `Origin` (por exemplo supertest no CI) são permitidas; origens não listadas não recebem `Access-Control-Allow-Origin`.
-- **Desktop empacotado:** se o WebView usar outra origem, adicione-a a `CORS_ORIGINS`.
 
 ## Política de dependências
 
-- `npm audit --audit-level=high` no CI.
-- Críticas/Altas devem ser corrigidas antes do merge em `main`.
+- `pnpm audit --audit-level=high` **bloqueante** no Quality Gate.
+- Snyk quando existe `SNYK_TOKEN` ([`.github/workflows/snyk.yml`](../../.github/workflows/snyk.yml)).
+- Ver [varredura e triagem](quality/varredura-dependencias-e-triagem.md).
+
+## Testes de penetração (#194)
+
+DAST automatizado (OWASP ZAP baseline) e processo de engagement externo: [Testes de penetração](quality/testes-de-penetracao.md). Relatórios ZAP do CI **não** substituem o relatório de pentest externo.
+
+## Checklist pré-lançamento (engenharia)
+
+| Verificação | Evidência |
+|---|---|
+| Gates HIGH+ de dependências | Quality Gate; Snyk |
+| Revisão de SQL bruto | `$queryRaw` etiquetado; sem concatenação de input nos call sites atuais |
+| Cabeçalhos de segurança | Helmet na API |
+| Tenant / IDOR | Middleware de auth; o pentest externo deve verificar acesso cross-tenant |
+| Segredos em logs | Revisar sinks de produção antes do lançamento |
 
 ## Resposta a incidentes (#222)
 
-Runbook operacional (classificação, runbooks, notas legais, post-mortem): [Resposta a incidentes](quality/resposta-a-incidentes.md). Ferramentas super-admin: revogar sessões do tenant, desabilitar tenant, modo manutenção, listagem forense de auditoria.
+[Resposta a incidentes](quality/resposta-a-incidentes.md).
 
 ## Monitoramento de segurança (#221)
 
-Classificação assíncrona e alertas para operadores da plataforma: [Monitoramento de segurança](quality/monitoramento-de-seguranca.md). Timeline UI `/superadmin/security`; API `GET /api/superadmin/security-events`. Stub ISO: [SEC-011](certificacion-iso/sec/sec-011-logs-alertas.md).
+[Monitoramento de segurança](quality/monitoramento-de-seguranca.md). Stub ISO: [SEC-011](certificacion-iso/sec/sec-011-logs-alertas.md).
 
 ## Hardening de apps móveis (#220)
 
-App Entregador / App Vendedor: SecureStore, cache offline cifrado, soft-gate root/jailbreak, pinning TLS Android — [Hardening de apps móveis](quality/hardening-apps-moveis.md).
+[Hardening de apps móveis](quality/hardening-apps-moveis.md).
 
 **Outros idiomas:** [English](../en/security.md) · [Español](../es/seguridad.md)

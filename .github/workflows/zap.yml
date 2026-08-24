@@ -1,0 +1,150 @@
+# OWASP ZAP baseline DAST (#194)
+# Default: ephemeral API on the runner (Postgres service + pnpm run server).
+# Optional repository variable ZAP_TARGET_URL (staging/non-prod only) overrides the target.
+# Never configure production with live secrets. Blocking fail_action is deferred until triage
+# (see docs/en/quality/penetration-testing.md).
+
+name: OWASP ZAP Baseline
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zap-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap_baseline:
+    name: ZAP Baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: bizcode
+          POSTGRES_DB: bizcode_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://bizcode@localhost:5432/bizcode_test?sslmode=disable
+      NODE_ENV: test
+      JWT_SECRET: ci-zap-jwt-secret
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve scan target
+        id: target
+        env:
+          ZAP_TARGET_URL: ${{ vars.ZAP_TARGET_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p zap-out
+          if [ -n "${ZAP_TARGET_URL:-}" ]; then
+            case "${ZAP_TARGET_URL}" in
+              http://*|https://*)
+                echo "url=${ZAP_TARGET_URL}" >> "$GITHUB_OUTPUT"
+                echo "mode=external" >> "$GITHUB_OUTPUT"
+                echo "Using repository variable ZAP_TARGET_URL (must be staging/non-prod)."
+                ;;
+              *)
+                echo "::error::ZAP_TARGET_URL must start with http:// or https://"
+                exit 1
+                ;;
+            esac
+          else
+            echo "url=http://127.0.0.1:3001" >> "$GITHUB_OUTPUT"
+            echo "mode=ephemeral" >> "$GITHUB_OUTPUT"
+            echo "No ZAP_TARGET_URL set; will scan ephemeral API on the runner."
+          fi
+
+      - name: Install pnpm
+        if: steps.target.outputs.mode == 'ephemeral'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.2
+
+      - name: Setup Node.js 22
+        if: steps.target.outputs.mode == 'ephemeral'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        if: steps.target.outputs.mode == 'ephemeral'
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        if: steps.target.outputs.mode == 'ephemeral'
+        run: npx prisma generate
+
+      - name: Apply database schema
+        if: steps.target.outputs.mode == 'ephemeral'
+        run: |
+          if [ -d prisma/migrations ] && [ "$(ls -A prisma/migrations 2>/dev/null)" ]; then
+            npx prisma migrate deploy
+          else
+            npx prisma db push
+          fi
+
+      - name: Start API for ZAP (background)
+        if: steps.target.outputs.mode == 'ephemeral'
+        env:
+          BIZCODE_TEST_AUTH_BYPASS: 'false'
+        run: |
+          set -euo pipefail
+          pnpm run server &
+          for i in $(seq 1 45); do
+            if curl -sf http://127.0.0.1:3001/api/health >/dev/null; then
+              echo "API healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::API did not become healthy in time"
+          exit 1
+
+      - name: OWASP ZAP baseline scan
+        run: |
+          set -euo pipefail
+          TARGET='${{ steps.target.outputs.url }}'
+          # --network host: ZAP container must reach ephemeral API on the runner.
+          # -I: do not fail the job on WARN alerts until rules are triaged (.zap/rules.tsv).
+          docker run --rm --network host \
+            -v "${{ github.workspace }}/zap-out:/zap/wrk:rw" \
+            -v "${{ github.workspace }}/.zap:/zap/bizcode-rules:ro" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t "${TARGET}" \
+              -c /zap/bizcode-rules/rules.tsv \
+              -J zap-report.json \
+              -r zap-report.html \
+              -w zap-report.md \
+              -I
+          ls -la zap-out
+
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: zap-out/
+          retention-days: 14
+          if-no-files-found: warn

@@ -16,6 +16,7 @@ function buildPrismaMock(): PrismaClient {
     appUser: { count: vi.fn().mockResolvedValue(1), findMany: vi.fn().mockResolvedValue([]), findFirst: vi.fn().mockResolvedValue(null), findUnique: vi.fn().mockResolvedValue(null), create: vi.fn().mockResolvedValue(null), update: vi.fn().mockResolvedValue(null) },
     tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, slug: 'demo', active: true }) },
     appSession: { create: vi.fn().mockResolvedValue({ id: 1 }), findFirst: vi.fn().mockResolvedValue(null), updateMany: vi.fn().mockResolvedValue({ count: 1 }), update: vi.fn().mockResolvedValue({ id: 1 }) },
+    $queryRaw: vi.fn().mockResolvedValue([{ '?column?': 1 }]),
     $queryRawUnsafe: vi.fn().mockResolvedValue([{ '?column?': 1 }]),
     $transaction: vi.fn(async (arg: unknown) => {
       if (typeof arg === 'function') return arg(buildPrismaMock())

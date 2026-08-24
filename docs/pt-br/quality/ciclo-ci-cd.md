@@ -52,6 +52,7 @@ O workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleak
 - **Dependabot:** [`.github/dependabot.yml`](../../../.github/dependabot.yml) (npm + GitHub Actions semanal, grupos patch).
 - **pnpm audit:** bloqueante HIGH+ no Quality Gate ([ADR-0017](../adr/ADR-0017-varredura-dependencias.md)).
 - **Snyk:** [`.github/workflows/snyk.yml`](../../../.github/workflows/snyk.yml) — requer `SNYK_TOKEN`.
+- **OWASP ZAP baseline (#194):** [`.github/workflows/zap.yml`](../../../.github/workflows/zap.yml) — API efêmera ou variável `ZAP_TARGET_URL` (staging/não prod); artefato `zap-baseline-report`; não falha por WARN enquanto `-I` estiver ativo (ver [testes-de-penetracao.md](testes-de-penetracao.md)).
 - **Trivy imagens:** após build Docker em [`.github/workflows/deploy.yml`](../../../.github/workflows/deploy.yml), falha em CRITICAL antes do GHCR.
 - Triagem: [varredura de dependências e triagem](varredura-dependencias-e-triagem.md).
 
