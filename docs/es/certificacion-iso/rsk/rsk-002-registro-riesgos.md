@@ -30,13 +30,13 @@ Registrar los riesgos de seguridad de la información más críticos a partir de
 | R-02 | Secretos/tokens en logs o artefactos CI | M | H | Ingeniería | A.8.12, A.8.15 | Redacción + `check:logs`; sinks de ops pendientes |
 | R-03 | Dependencia High+ sin parche | M | H | Ingeniería | A.8.8, A.5.21 | `pnpm audit` + Snyk; triage #219 |
 | R-04 | Sin revisión de seguridad independiente antes del lanzamiento | H | H | Product owner | A.5.35, A.8.29 | Registro pentest vacío; #194 OPEN |
-| R-05 | Fallo de restore / DR no probado | M | H | Ops plataforma | A.8.13, A.5.30 | Scripts #150; drill/#197 pendiente |
+| R-05 | Fallo de restore / DR no probado | M | H | Ops plataforma | A.8.13, A.5.30 | Scripts #150; **smoke local** SEC-015 (2026-08-25); drill staging pendiente [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
 | R-06 | Confusión staging/producción (DB/secretos) | M | H | Ops plataforma | A.8.31, A.8.9 | Docs #152; error humano residual |
 | R-07 | Compromiso SuperAdmin / bootstrap | L | H | Product owner | A.8.2, A.5.17 | Passwords solo en env |
 | R-08 | Cumplimiento incompleto de privacidad / titular | M | M | Product owner | A.5.34 | Docs #195 |
 | R-09 | Compromiso supply-chain (npm / Actions) | M | H | Ingeniería | A.5.21 | Lockfile + audit; SBOM generado |
 | R-10 | Exposición SaaS sin TLS / WAF mal configurado | M | H | Ops plataforma | A.8.20, A.5.23 | Helmet/CORS; Cloudflare #217 |
-| R-11 | Brecha de continuidad (sin SLA / RTO no probado) | H | H | Product owner | A.5.29, A.5.30 | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
+| R-11 | Brecha de continuidad (sin SLA / RTO no probado) | H | H | Product owner | A.5.29, A.5.30 | Docs SLA/DR (#197); **uptime público + RTO staging** siguen abiertos |
 | R-12 | Concienciación insuficiente de operadores | M | M | Product owner | A.6.3 | Sin registros de formación |
 
 Tratamiento: [RSK-004](rsk-004-plan-tratamiento-riesgos.md). Contexto: [gap Anexo A](../../quality/analisis-brechas-anexo-a-iso27001.md).

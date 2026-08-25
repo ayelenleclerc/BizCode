@@ -28,13 +28,13 @@ Mitigar · Aceitar · Transferir · Evitar (por linha).
 | R-02 | Mitigar | Manter `check:logs` / redação; revisar sinks de produção | Engenharia + Ops | Antes do lançamento comercial | Política de sanitização de logs |
 | R-03 | Mitigar | Manter `pnpm audit` High+ bloqueante; triagem #219 | Engenharia | Contínuo | Varredura de dependências |
 | R-04 | Mitigar | Contratar pentest externo; arquivar relatório | Product owner | Antes do lançamento comercial | [#194](https://github.com/ayelenleclerc/BizCode/issues/194) |
-| R-05 | Mitigar | Executar drill de restore em staging; registrar RTO | Ops plataforma | Com #197 | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
+| R-05 | Mitigar | Smoke local feito (SEC-015); executar drill staging; registrar RTO | Ops plataforma | Host staging pronto | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
 | R-06 | Mitigar | Seguir guards de ambientes; não apontar tools de staging para prod | Ops plataforma | Contínuo | Docs #152 |
 | R-07 | Mitigar | Rotacionar senhas bootstrap/seed por ambiente | Product owner | Contínuo | seguranca.md |
 | R-08 | Mitigar | Operar processo de privacidade conforme #195 | Product owner | Contínuo | #195 |
 | R-09 | Mitigar | Fixar Actions; revisar SBOM; bloquear deps High+ | Engenharia | Contínuo | CI / SBOM |
 | R-10 | Mitigar | Forçar TLS + WAF em edges hosted | Ops plataforma | Antes do SaaS GA | #217 |
-| R-11 | Mitigar | Publicar SLA + runbooks DR; completar drill | Product owner | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) | #197 |
+| R-11 | Mitigar | Docs SLA/DR publicados; ativar status page; completar drill staging | Product owner | AC restantes #197 | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
 | R-12 | Mitigar | Briefing de conscientização; registro de presença | Product owner | 90 dias após merge #196 | RH / ops |
 
 ## Temas de lacuna fechados por este issue (#196)

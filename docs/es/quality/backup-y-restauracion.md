@@ -73,6 +73,8 @@ Preferir una base dedicada para drills. No apuntar a producción sin ventana de 
 ## Relacionado
 
 - [SEC-007 Procedimiento de backup y restauración](../certificacion-iso/sec/sec-007-backup-restauracion.md)
+- [Recuperación ante desastres (#197)](recuperacion-ante-desastres.md)
+- [SLA (#197)](sla.md)
 - [CI/CD — jobs programados](ciclo-ci-cd.md)
 - [Política de sanitización de logs](politica-sanitizacion-logs.md)
 - [Gestión de secretos / Doppler](gestion-secretos-y-doppler.md)

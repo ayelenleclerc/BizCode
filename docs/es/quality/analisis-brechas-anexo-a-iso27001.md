@@ -73,8 +73,8 @@ Conteo indicativo (conservador: la evidencia de producto es mayormente **Partial
 | A.5.26 | Respuesta a incidentes | Partial | Runbooks; registro SEC-009 stub |
 | A.5.27 | Aprendizaje de incidentes | Partial | Post-mortem documentado; sin registro lleno |
 | A.5.28 | Recolección de evidencia | Partial | Audit events / forense documentado |
-| A.5.29 | Seguridad durante la disrupción | Not evidenced | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
-| A.5.30 | Continuidad TIC | Not evidenced | #197; SEC-014/015 |
+| A.5.29 | Seguridad durante la disrupción | Partial | Runbooks DR [#197](https://github.com/ayelenleclerc/BizCode/issues/197); drill staging pendiente |
+| A.5.30 | Continuidad TIC | Partial | SEC-014/015 + backup #150; status page + drill staging pendientes (#197) |
 | A.5.31 | Requisitos legales y contractuales | Partial | Privacidad #195; ADR-0007 |
 | A.5.32 | Derechos de propiedad intelectual | Not evidenced | Sin política IP |
 | A.5.33 | Protección de registros | Partial | Auditoría / plantillas ISO |
@@ -134,7 +134,7 @@ Todos **N/A** bajo el alcance SaaS/escritorio actual (seguridad física de hosti
 | A.8.11 | Enmascaramiento de datos | Not evidenced | Sin framework |
 | A.8.12 | Prevención de fuga de datos | Partial | Redacción de logs |
 | A.8.13 | Copia de seguridad | Partial | Backup/restore #150 |
-| A.8.14 | Redundancia | Not evidenced | #197 |
+| A.8.14 | Redundancia | Partial | Checklist migración en [recuperacion-ante-desastres.md](recuperacion-ante-desastres.md); sin multi-AZ automático; drill staging pendiente (#197) |
 | A.8.15 | Registro (logging) | Partial | Observabilidad + eventos |
 | A.8.16 | Supervisión | Partial | Monitoreo de seguridad |
 | A.8.17 | Sincronización de reloj | Not evidenced | NTP del host no documentado |

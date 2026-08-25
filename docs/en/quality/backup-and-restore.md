@@ -74,6 +74,8 @@ Prefer a dedicated restore database for drills. Do not point at production witho
 ## Related
 
 - [SEC-007 Backup and restore procedure](../certificacion-iso/sec/sec-007-backup-and-restore-procedure.md)
+- [Disaster recovery (#197)](disaster-recovery.md)
+- [SLA (#197)](sla.md)
 - [CI/CD — scheduled jobs](ci-cd.md)
 - [Log sanitization policy](log-sanitization-policy.md)
 - [Secrets management / Doppler](secrets-management-and-doppler.md)
