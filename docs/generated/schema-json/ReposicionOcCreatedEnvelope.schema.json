@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "lines": {
+          "items": {
+            "$ref": "./OrdenCompraItemInput.schema.json"
+          },
+          "type": "array"
+        },
+        "ordenCompra": {
+          "$ref": "./OrdenCompra.schema.json"
+        },
+        "skipped": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "ordenCompra",
+        "skipped",
+        "lines"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "ReposicionOcCreatedEnvelope",
+  "type": "object"
+}

@@ -6,6 +6,7 @@ import ClientesPage from './pages/clientes'
 import ArticulosPage from './pages/articulos'
 import ProveedoresPage from './pages/proveedores'
 import ComprasPage from './pages/compras'
+import ReposicionPage from './pages/catalogo/ReposicionPage'
 import RecuentosPage from './pages/recuentos'
 import FacturacionPage from './pages/facturacion'
 import LoginPage from './pages/login'
@@ -180,6 +181,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="logistics.purchases">
                 <ComprasPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="catalogo/reposicion"
+            element={
+              <ModuleRoute moduleKey="logistics.purchases">
+                <ReposicionPage />
               </ModuleRoute>
             }
           />

@@ -3,6 +3,7 @@ import type { PrismaClient, Prisma } from '@prisma/client'
 import type { AuthenticatedRequest } from './auth'
 import { writeAuditEvent } from './audit'
 import { registerArticulosRoutes } from './routes/registerArticulosRoutes'
+import { registerReplenishmentRoutes } from './routes/registerReplenishmentRoutes'
 import { registerClientesRoutes } from './routes/registerClientesRoutes'
 import { registerComprasRoutes } from './routes/registerComprasRoutes'
 import { registerRecuentosRoutes } from './routes/registerRecuentosRoutes'
@@ -142,6 +143,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerSugerenciasPedidoRoutes(app, ctx)
   registerArticuloVariantesRoutes(app, ctx)
   registerArticulosRoutes(app, ctx)
+  registerReplenishmentRoutes(app, ctx)
   registerRubrosRoutes(app, ctx)
   registerProveedorAlertasRoutes(app, ctx)
   registerArticuloProveedoresComparadorRoutes(app, ctx)

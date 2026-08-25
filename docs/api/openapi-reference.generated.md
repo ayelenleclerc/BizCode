@@ -13343,6 +13343,808 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 }
 ```
 
+### PARAMETERS /api/articulos/{id}/reposicion-forecast
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/articulos/{id}/reposicion-forecast`
+
+### Demand forecast / replenishment suggestion for one article (#198)
+
+- **Method:** `GET`
+- **Path:** `/api/articulos/{id}/reposicion-forecast`
+- **Tags:** articulos
+
+Moving-average forecast from `FacturaItem` quantities on active invoices (`estado=A`). Requires `products.read` and module `logistics.purchases`. Not ML (no Holt-Winters/Prophet). Returns 404 when the article is missing, a parent, or a service.
+
+#### Responses
+
+##### Status: 200 Forecast row
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`minimo` (required)**
+
+    `number`
+
+  - **`needsReplenishment` (required)**
+
+    `boolean`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"ok", "insufficient_data"`
+
+  - **`stock` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`unitsSoldInWindow` (required)**
+
+    `number`
+
+  - **`windowDays` (required)**
+
+    `integer`, possible values: `30, 60, 90`
+
+  - **`costoUnitario`**
+
+    `number`
+
+  - **`daysRemaining`**
+
+    `integer`
+
+  - **`leadTimeDays`**
+
+    `integer`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`suggestedOrderQty`**
+
+    `integer`
+
+  - **`velocityPerDay`**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articuloId": 1,
+    "codigo": 1,
+    "descripcion": "",
+    "stock": 1,
+    "minimo": 1,
+    "tipo": "",
+    "proveedorId": 1,
+    "leadTimeDays": 1,
+    "costoUnitario": 1,
+    "status": "ok",
+    "windowDays": 30,
+    "unitsSoldInWindow": 1,
+    "velocityPerDay": 1,
+    "daysRemaining": 1,
+    "suggestedOrderQty": 1,
+    "needsReplenishment": true
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Article not found or not forecastable
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/catalogo/reposicion
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/catalogo/reposicion`
+
+### List articles needing replenishment (#198)
+
+- **Method:** `GET`
+- **Path:** `/api/catalogo/reposicion`
+- **Tags:** articulos
+
+Articles where stock is at/below minimum or estimated days remaining ≤ `horizonDays`. Requires `products.read` and module `logistics.purchases`.
+
+#### Responses
+
+##### Status: 200 Replenishment candidates
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`minimo` (required)**
+
+    `number`
+
+  - **`needsReplenishment` (required)**
+
+    `boolean`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"ok", "insufficient_data"`
+
+  - **`stock` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`unitsSoldInWindow` (required)**
+
+    `number`
+
+  - **`windowDays` (required)**
+
+    `integer`, possible values: `30, 60, 90`
+
+  - **`costoUnitario`**
+
+    `number`
+
+  - **`daysRemaining`**
+
+    `integer`
+
+  - **`leadTimeDays`**
+
+    `integer`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`suggestedOrderQty`**
+
+    `integer`
+
+  - **`velocityPerDay`**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "articuloId": 1,
+      "codigo": 1,
+      "descripcion": "",
+      "stock": 1,
+      "minimo": 1,
+      "tipo": "",
+      "proveedorId": 1,
+      "leadTimeDays": 1,
+      "costoUnitario": 1,
+      "status": "ok",
+      "windowDays": 30,
+      "unitsSoldInWindow": 1,
+      "velocityPerDay": 1,
+      "daysRemaining": 1,
+      "suggestedOrderQty": 1,
+      "needsReplenishment": true
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+### PARAMETERS /api/catalogo/reposicion/orden-compra-sugerida
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/catalogo/reposicion/orden-compra-sugerida`
+
+### Build suggested purchase-order lines from replenishment forecast (#198)
+
+- **Method:** `POST`
+- **Path:** `/api/catalogo/reposicion/orden-compra-sugerida`
+- **Tags:** compras
+
+With `create=false` (default) returns prefill lines for `/compras`. With `create=true` creates a draft `OrdenCompra` via `CompraService`. Requires `suppliers.manage` and module `logistics.purchases`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`articuloIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+- **`proveedorId` (required)**
+
+  `integer`
+
+- **`create`**
+
+  `boolean`
+
+- **`horizonDays`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "articuloIds": [
+    1
+  ],
+  "horizonDays": 1,
+  "create": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Prefill payload (create omitted or false)
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`prefill` (required)**
+
+    `object`
+
+    - **`lines` (required)**
+
+      `array`
+
+      **Items:**
+
+      - **`articuloId` (required)**
+
+        `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`costoUnitario` (required)**
+
+        `string`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+  - **`skipped` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "prefill": {
+      "proveedorId": 1,
+      "lines": [
+        {
+          "articuloId": 1,
+          "cantidad": 1,
+          "costoUnitario": ""
+        }
+      ]
+    },
+    "skipped": [
+      1
+    ]
+  }
+}
+```
+
+##### Status: 201 Purchase order created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`lines` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `number`
+
+  - **`ordenCompra` (required)**
+
+    `object`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`fechaEstimada`**
+
+      `string`, format: `date-time`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articuloId` (required)**
+
+        `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`cantidadRecibida` (required)**
+
+        `integer`
+
+      - **`costoUnitario` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`subtotal` (required)**
+
+        `string`
+
+      - **`articulo`**
+
+        `object`
+
+        - **`codigo`**
+
+          `integer`
+
+        - **`descripcion`**
+
+          `string`
+
+        - **`id`**
+
+          `integer`
+
+      - **`codigoProveedor`**
+
+        `string` — Supplier catalog code snapshot (#323)
+
+      - **`descripcionProveedor`**
+
+        `string` — Supplier catalog description snapshot (#323)
+
+    - **`nota`**
+
+      `string`
+
+    - **`proveedor`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`id`**
+
+        `integer`
+
+      - **`rsocial`**
+
+        `string`
+
+  - **`skipped` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ordenCompra": {
+      "id": 1,
+      "tenantId": 1,
+      "proveedorId": 1,
+      "estado": "draft",
+      "total": "",
+      "fechaEstimada": "",
+      "nota": "",
+      "proveedor": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "codigoProveedor": "",
+          "descripcionProveedor": "",
+          "cantidad": 1,
+          "cantidadRecibida": 1,
+          "costoUnitario": "",
+          "subtotal": "",
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ]
+    },
+    "skipped": [
+      1
+    ],
+    "lines": [
+      {
+        "articuloId": 1,
+        "cantidad": 1,
+        "costoUnitario": 0
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 No suggested lines or CompraService validation failure
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/articulos/{id}/proveedores
 
 - **Method:** `PARAMETERS`
@@ -109813,6 +110615,602 @@ Rate-limited mutation; requires products.manage. USD only.
 - **Type:**
 
 **Example:**
+
+### ReplenishmentForecast
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`codigo` (required)**
+
+  `integer`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`minimo` (required)**
+
+  `number`
+
+* **`needsReplenishment` (required)**
+
+  `boolean`
+
+* **`status` (required)**
+
+  `string`, possible values: `"ok", "insufficient_data"`
+
+* **`stock` (required)**
+
+  `number`
+
+* **`tipo` (required)**
+
+  `string`
+
+* **`unitsSoldInWindow` (required)**
+
+  `number`
+
+* **`windowDays` (required)**
+
+  `integer`, possible values: `30, 60, 90`
+
+* **`costoUnitario`**
+
+  `number`
+
+* **`daysRemaining`**
+
+  `integer`
+
+* **`leadTimeDays`**
+
+  `integer`
+
+* **`proveedorId`**
+
+  `integer`
+
+* **`suggestedOrderQty`**
+
+  `integer`
+
+* **`velocityPerDay`**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "codigo": 1,
+  "descripcion": "",
+  "stock": 1,
+  "minimo": 1,
+  "tipo": "",
+  "proveedorId": 1,
+  "leadTimeDays": 1,
+  "costoUnitario": 1,
+  "status": "ok",
+  "windowDays": 30,
+  "unitsSoldInWindow": 1,
+  "velocityPerDay": 1,
+  "daysRemaining": 1,
+  "suggestedOrderQty": 1,
+  "needsReplenishment": true
+}
+```
+
+### ReplenishmentForecastEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`minimo` (required)**
+
+    `number`
+
+  - **`needsReplenishment` (required)**
+
+    `boolean`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"ok", "insufficient_data"`
+
+  - **`stock` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`unitsSoldInWindow` (required)**
+
+    `number`
+
+  - **`windowDays` (required)**
+
+    `integer`, possible values: `30, 60, 90`
+
+  - **`costoUnitario`**
+
+    `number`
+
+  - **`daysRemaining`**
+
+    `integer`
+
+  - **`leadTimeDays`**
+
+    `integer`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`suggestedOrderQty`**
+
+    `integer`
+
+  - **`velocityPerDay`**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "articuloId": 1,
+    "codigo": 1,
+    "descripcion": "",
+    "stock": 1,
+    "minimo": 1,
+    "tipo": "",
+    "proveedorId": 1,
+    "leadTimeDays": 1,
+    "costoUnitario": 1,
+    "status": "ok",
+    "windowDays": 30,
+    "unitsSoldInWindow": 1,
+    "velocityPerDay": 1,
+    "daysRemaining": 1,
+    "suggestedOrderQty": 1,
+    "needsReplenishment": true
+  }
+}
+```
+
+### ReplenishmentForecastListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`codigo` (required)**
+
+    `integer`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`minimo` (required)**
+
+    `number`
+
+  - **`needsReplenishment` (required)**
+
+    `boolean`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"ok", "insufficient_data"`
+
+  - **`stock` (required)**
+
+    `number`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`unitsSoldInWindow` (required)**
+
+    `number`
+
+  - **`windowDays` (required)**
+
+    `integer`, possible values: `30, 60, 90`
+
+  - **`costoUnitario`**
+
+    `number`
+
+  - **`daysRemaining`**
+
+    `integer`
+
+  - **`leadTimeDays`**
+
+    `integer`
+
+  - **`proveedorId`**
+
+    `integer`
+
+  - **`suggestedOrderQty`**
+
+    `integer`
+
+  - **`velocityPerDay`**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "articuloId": 1,
+      "codigo": 1,
+      "descripcion": "",
+      "stock": 1,
+      "minimo": 1,
+      "tipo": "",
+      "proveedorId": 1,
+      "leadTimeDays": 1,
+      "costoUnitario": 1,
+      "status": "ok",
+      "windowDays": 30,
+      "unitsSoldInWindow": 1,
+      "velocityPerDay": 1,
+      "daysRemaining": 1,
+      "suggestedOrderQty": 1,
+      "needsReplenishment": true
+    }
+  ]
+}
+```
+
+### ReposicionOrdenCompraSugeridaInput
+
+- **Type:**`object`
+
+* **`articuloIds` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`
+
+* **`proveedorId` (required)**
+
+  `integer`
+
+* **`create`**
+
+  `boolean`
+
+* **`horizonDays`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "proveedorId": 1,
+  "articuloIds": [
+    1
+  ],
+  "horizonDays": 1,
+  "create": true
+}
+```
+
+### ReposicionOcPrefillEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`prefill` (required)**
+
+    `object`
+
+    - **`lines` (required)**
+
+      `array`
+
+      **Items:**
+
+      - **`articuloId` (required)**
+
+        `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`costoUnitario` (required)**
+
+        `string`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+  - **`skipped` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "prefill": {
+      "proveedorId": 1,
+      "lines": [
+        {
+          "articuloId": 1,
+          "cantidad": 1,
+          "costoUnitario": ""
+        }
+      ]
+    },
+    "skipped": [
+      1
+    ]
+  }
+}
+```
+
+### ReposicionOcCreatedEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`lines` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `integer`
+
+    - **`costoUnitario` (required)**
+
+      `number`
+
+  - **`ordenCompra` (required)**
+
+    `object`
+
+    - **`estado` (required)**
+
+      `string`, possible values: `"draft", "sent", "received", "cancelled"`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`proveedorId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`total` (required)**
+
+      `string`
+
+    - **`fechaEstimada`**
+
+      `string`, format: `date-time`
+
+    - **`items`**
+
+      `array`
+
+      **Items:**
+
+      - **`articuloId` (required)**
+
+        `integer`
+
+      - **`cantidad` (required)**
+
+        `integer`
+
+      - **`cantidadRecibida` (required)**
+
+        `integer`
+
+      - **`costoUnitario` (required)**
+
+        `string`
+
+      - **`id` (required)**
+
+        `integer`
+
+      - **`subtotal` (required)**
+
+        `string`
+
+      - **`articulo`**
+
+        `object`
+
+        - **`codigo`**
+
+          `integer`
+
+        - **`descripcion`**
+
+          `string`
+
+        - **`id`**
+
+          `integer`
+
+      - **`codigoProveedor`**
+
+        `string` — Supplier catalog code snapshot (#323)
+
+      - **`descripcionProveedor`**
+
+        `string` — Supplier catalog description snapshot (#323)
+
+    - **`nota`**
+
+      `string`
+
+    - **`proveedor`**
+
+      `object`
+
+      - **`codigo`**
+
+        `integer`
+
+      - **`id`**
+
+        `integer`
+
+      - **`rsocial`**
+
+        `string`
+
+  - **`skipped` (required)**
+
+    `array`
+
+    **Items:**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ordenCompra": {
+      "id": 1,
+      "tenantId": 1,
+      "proveedorId": 1,
+      "estado": "draft",
+      "total": "",
+      "fechaEstimada": "",
+      "nota": "",
+      "proveedor": {
+        "id": 1,
+        "codigo": 1,
+        "rsocial": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "articuloId": 1,
+          "codigoProveedor": "",
+          "descripcionProveedor": "",
+          "cantidad": 1,
+          "cantidadRecibida": 1,
+          "costoUnitario": "",
+          "subtotal": "",
+          "articulo": {
+            "id": 1,
+            "codigo": 1,
+            "descripcion": ""
+          }
+        }
+      ]
+    },
+    "skipped": [
+      1
+    ],
+    "lines": [
+      {
+        "articuloId": 1,
+        "cantidad": 1,
+        "costoUnitario": 0
+      }
+    ]
+  }
+}
+```
 
 ### Rubro
 

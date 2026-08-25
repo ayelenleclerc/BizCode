@@ -24,6 +24,7 @@ import {
   type UnidadBase,
 } from '@bizcode/types'
 import ArticuloProveedoresComparadorSection from './ArticuloProveedoresComparadorSection'
+import ArticuloReposicionForecastSection from './ArticuloReposicionForecastSection'
 import ArticuloVariantesPanel from './ArticuloVariantesPanel'
 import ArticuloStockDepositosPanel from './ArticuloStockDepositosPanel'
 import ArticuloMeliSection from './ArticuloMeliSection'
@@ -1030,6 +1031,10 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
           {showComparador && articulo && showComparadorAccess && (
             <ArticuloProveedoresComparadorSection articuloId={articulo.id} />
           )}
+
+          {articulo && tipoWatch !== 'servicio' ? (
+            <ArticuloReposicionForecastSection articuloId={articulo.id} />
+          ) : null}
 
           {articulo && tipoWatch !== 'servicio' ? <ArticuloMeliSection articuloId={articulo.id} /> : null}
 

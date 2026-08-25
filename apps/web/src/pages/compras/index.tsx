@@ -147,20 +147,79 @@ function ComprasPageContent() {
   useEffect(() => {
     const prefill = (location.state as ComprasOcPrefillState | null)?.ocPrefill
     if (!prefill) return
-    setFormProveedorId(String(prefill.proveedorId))
-    setFormArticuloId(String(prefill.articuloId))
-    setFormCosto(prefill.costoUnitario ?? '')
-    setFormCantidad('1')
-    setFormNota('')
-    if (prefill.codigoProveedor || prefill.descripcionProveedor) {
-      setCatalogHint(
-        [prefill.codigoProveedor, prefill.descripcionProveedor].filter(Boolean).join(' — '),
-      )
-    } else {
-      setCatalogHint(null)
+
+    const lines =
+      prefill.lines && prefill.lines.length > 0
+        ? prefill.lines
+        : prefill.articuloId != null
+          ? [
+              {
+                articuloId: prefill.articuloId,
+                cantidad: 1,
+                costoUnitario: prefill.costoUnitario,
+                codigoProveedor: prefill.codigoProveedor,
+                descripcionProveedor: prefill.descripcionProveedor,
+              },
+            ]
+          : []
+
+    if (lines.length === 0) {
+      navigate(location.pathname, { replace: true, state: {} })
+      return
     }
-    setShowForm(true)
-    navigate(location.pathname, { replace: true, state: {} })
+
+    setFormProveedorId(String(prefill.proveedorId))
+
+    if (lines.length === 1) {
+      const line = lines[0]
+      setFormArticuloId(String(line.articuloId))
+      setFormCosto(line.costoUnitario ?? '')
+      setFormCantidad(String(line.cantidad ?? 1))
+      setFormNota('')
+      if (line.codigoProveedor || line.descripcionProveedor) {
+        setCatalogHint(
+          [line.codigoProveedor, line.descripcionProveedor].filter(Boolean).join(' — '),
+        )
+      } else {
+        setCatalogHint(null)
+      }
+      setShowForm(true)
+      navigate(location.pathname, { replace: true, state: {} })
+      return
+    }
+
+    // Multi-line (#198): create draft OC immediately from suggested lines
+    let cancelled = false
+    void (async () => {
+      setActionLoading(true)
+      try {
+        const created = await comprasAPI.create({
+          proveedorId: prefill.proveedorId,
+          nota: null,
+          items: lines.map((l) => ({
+            articuloId: l.articuloId,
+            cantidad: l.cantidad ?? 1,
+            costoUnitario: Number.parseFloat(String(l.costoUnitario ?? '0')),
+          })),
+        })
+        if (cancelled) return
+        const res = await comprasAPI.list()
+        setOrdenes(res?.data ?? [])
+        if (created?.id) {
+          const detail = await comprasAPI.get(created.id)
+          if (detail) setSelected(detail)
+        }
+      } finally {
+        if (!cancelled) {
+          setActionLoading(false)
+          navigate(location.pathname, { replace: true, state: {} })
+        }
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
   }, [location.pathname, location.state, navigate])
 
   useEffect(() => {
