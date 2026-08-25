@@ -1,5 +1,41 @@
 # Seguridad
 
+## Política de seguridad de la información (SGSI) (#196)
+
+Sección de **política de seguridad de la información de producto** BizCode (ISO-ready). **No** afirma certificación ISO/IEC 27001. La aprobación organizacional de esta revisión se registra cuando la autoridad de producto fusiona el PR de documentación de [#196](https://github.com/ayelenleclerc/BizCode/issues/196).
+
+### Objetivos
+
+- Proteger confidencialidad, integridad y disponibilidad de los datos de negocio de tenants.
+- Aplicar mínimo privilegio vía roles y permisos.
+- Detectar, responder y aprender de eventos de seguridad con procedimientos documentados.
+- Mantener cambios de ingeniería revisables (PR a `develop`, gates CI) sin inventar controles sin evidencia.
+
+### Roles (producto)
+
+| Rol | Responsabilidades de seguridad |
+|-----|--------------------------------|
+| Product owner / operadores SuperAdmin | Aprobar revisiones de política; operar herramientas de tenant/sesión; escalar incidentes |
+| Ingeniería | Implementar controles; docs fieles al código; remediar hallazgos High+ de CI |
+| Operadores de plataforma | Seguir runbooks de backup, deploy e incidentes; no commitear secretos |
+
+### Declaraciones de política
+
+1. El acceso a APIs y datos requiere sesión autenticada y comprobaciones de permiso en el servidor.
+2. Los secretos viven en configuración de entorno (o gestores aprobados); nunca se commitean.
+3. Producción y staging permanecen separados; no se usan datos de clientes de producción para DAST abierto sin aprobación explícita.
+4. Los incidentes siguen [respuesta-a-incidentes.md](quality/respuesta-a-incidentes.md).
+5. Privacidad y derechos del titular siguen [privacidad-y-derechos-del-titular.md](quality/privacidad-y-derechos-del-titular.md).
+6. Aplicabilidad y brechas del Anexo A: [analisis-brechas-anexo-a-iso27001.md](quality/analisis-brechas-anexo-a-iso27001.md) y [SEC-002](certificacion-iso/sec/sec-002-declaracion-aplicabilidad-soa.md).
+
+### Revisión
+
+Al menos anual, o tras cambios materiales de arquitectura/seguridad, o tras hallazgos de pentest externo (#194).
+
+### Stub controlado
+
+[SEC-001 Política de seguridad de la información](certificacion-iso/sec/sec-001-politica-seguridad-informacion.md)
+
 ## Modelo de amenazas (STRIDE — resumido)
 
 | Amenaza | Categoría | Mitigación |

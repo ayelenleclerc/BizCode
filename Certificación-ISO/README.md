@@ -16,4 +16,6 @@ Esta carpeta es el **punto de entrada** para la documentación orientada a audit
 
 **Política:** no se afirma certificación ISO en el repositorio; se mantiene trazabilidad y evidencia según [docs/I18N_DOCUMENTATION.md](../docs/I18N_DOCUMENTATION.md) y [docs/DOCUMENT_LOCALE_MAP.md](../docs/DOCUMENT_LOCALE_MAP.md).
 
+**Gap analysis inicial Anexo A (#196):** narrativa canónica en [docs/en/quality/iso27001-annex-a-gap-analysis.md](../docs/en/quality/iso27001-annex-a-gap-analysis.md) (ES/PT-BR vía mapa de locales). SoA SEC-002, política SEC-001, riesgos RSK-002 y plan RSK-004 actualizados como Partial.
+
 **Calidad operativa** (estrategia de pruebas, CI/CD, plan Swagger/OpenAPI) permanece en `docs/*/quality/` y se enlaza desde el índice del paquete.

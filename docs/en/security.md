@@ -1,5 +1,41 @@
 # Security
 
+## Information security policy (ISMS) (#196)
+
+This section is the **product information security policy** for BizCode (ISO-ready). It does **not** claim ISO/IEC 27001 certification. Organizational approval for this revision is recorded when the owning product authority merges the documenting PR for [#196](https://github.com/ayelenleclerc/BizCode/issues/196).
+
+### Objectives
+
+- Protect confidentiality, integrity, and availability of tenant business data processed by BizCode.
+- Enforce least-privilege access via roles and permissions.
+- Detect, respond to, and learn from security events using documented procedures.
+- Keep engineering changes reviewable (PR to `develop`, CI gates) and free of invented controls without evidence.
+
+### Roles (product)
+
+| Role | Security responsibilities |
+|------|---------------------------|
+| Product owner / SuperAdmin operators | Approve policy revisions; operate tenant disable / session revoke tools; escalate incidents |
+| Engineering | Implement controls; keep docs faithful to code; remediate CI High+ findings |
+| Platform operators | Follow backup, deploy, and incident runbooks; never commit secrets |
+
+### Policy statements
+
+1. Access to APIs and data requires authenticated sessions and permission checks as implemented in the server.
+2. Secrets live in environment configuration (or approved secret managers); they are never committed.
+3. Production and staging remain separated; customer production data is not used for open DAST without explicit approval.
+4. Security incidents follow [incident-response.md](quality/incident-response.md).
+5. Privacy and data-subject requests follow [privacy-and-data-subject-rights.md](quality/privacy-and-data-subject-rights.md).
+6. Annex A applicability and gaps are maintained in [iso27001-annex-a-gap-analysis.md](quality/iso27001-annex-a-gap-analysis.md) and [SEC-002](certificacion-iso/sec/sec-002-statement-of-applicability-soa.md).
+
+### Review
+
+Review at least annually, or after material architecture/security changes, or after external pentest findings (#194).
+
+### Controlled stub
+
+[SEC-001 Information security policy](certificacion-iso/sec/sec-001-information-security-policy.md)
+
 ## Threat Model (STRIDE — lightweight)
 
 | Threat | Category | Mitigation |
