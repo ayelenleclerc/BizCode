@@ -474,6 +474,75 @@ export const articulosAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
+
+  reposicionForecast: async (id: number): Promise<ReplenishmentForecastRow> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ReplenishmentForecastRow }>(
+        `/articulos/${id}/reposicion-forecast`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  listReposicion: async (params?: { horizonDays?: number }): Promise<ReplenishmentForecastRow[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: ReplenishmentForecastRow[] }>(
+        '/catalogo/reposicion',
+        { params },
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  ordenCompraSugerida: async (body: {
+    proveedorId: number
+    articuloIds: number[]
+    horizonDays?: number
+    create?: boolean
+  }): Promise<ReposicionOcSugeridaResult> => {
+    try {
+      const response = await api.post<{ success: boolean; data: ReposicionOcSugeridaResult }>(
+        '/catalogo/reposicion/orden-compra-sugerida',
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+export type ReplenishmentForecastRow = {
+  articuloId: number
+  codigo: number
+  descripcion: string
+  stock: number
+  minimo: number
+  tipo: string
+  proveedorId: number | null
+  leadTimeDays: number | null
+  costoUnitario: number | null
+  status: 'ok' | 'insufficient_data'
+  windowDays: 30 | 60 | 90
+  unitsSoldInWindow: number
+  velocityPerDay: number | null
+  daysRemaining: number | null
+  suggestedOrderQty: number | null
+  needsReplenishment: boolean
+}
+
+export type ReposicionOcSugeridaResult = {
+  prefill?: {
+    proveedorId: number
+    lines: Array<{ articuloId: number; cantidad: number; costoUnitario: string }>
+  }
+  ordenCompra?: OrdenCompra
+  skipped: number[]
+  lines?: Array<{ articuloId: number; cantidad: number; costoUnitario: number }>
 }
 
 export type StockAjusteHistorialRow = {

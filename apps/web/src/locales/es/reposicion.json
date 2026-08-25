@@ -1,0 +1,29 @@
+{
+  "title": "Reposición sugerida",
+  "subtitle": "Artículos con stock bajo o agotamiento estimado en ≤30 días (media móvil de ventas, #198).",
+  "noAccess": "No tenés permiso para ver reposición.",
+  "proveedorId": "ID proveedor",
+  "generateOc": "Generar OC sugerida",
+  "generating": "Generando…",
+  "empty": "No hay artículos que requieran reposición con el horizonte actual.",
+  "columns": {
+    "select": "Seleccionar",
+    "selectRow": "Seleccionar artículo {{codigo}}",
+    "codigo": "Código",
+    "descripcion": "Descripción",
+    "stock": "Stock",
+    "days": "Días restantes",
+    "qty": "Qty sugerida",
+    "status": "Estado"
+  },
+  "status": {
+    "ok": "OK",
+    "insufficient": "Datos insuficientes"
+  },
+  "errors": {
+    "proveedorRequired": "Indicá un ID de proveedor válido.",
+    "selectArticles": "Seleccioná al menos un artículo.",
+    "noLines": "No se pudieron armar líneas sugeridas (faltan datos o costo).",
+    "generic": "No se pudo generar la OC sugerida."
+  }
+}

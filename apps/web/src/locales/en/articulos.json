@@ -242,5 +242,15 @@
     "resync": "Sync now",
     "productId": "WC product ID",
     "publishing": "Publishing…"
+  },
+  "reposicionForecast": {
+    "title": "Replenishment forecast",
+    "loading": "Computing estimate…",
+    "error": "Could not load forecast (purchases module required).",
+    "insufficientData": "Insufficient data: fewer than 30 units sold in the window.",
+    "daysRemaining": "Estimated days until stock-out: {{days}}",
+    "suggestedQty": "Suggested order quantity: {{qty}}",
+    "velocity": "Velocity (u/day): {{velocity}}",
+    "openList": "Open replenishment list"
   }
 }

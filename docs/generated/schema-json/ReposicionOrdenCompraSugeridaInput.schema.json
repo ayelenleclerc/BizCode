@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "articuloIds": {
+      "items": {
+        "minimum": 1,
+        "type": "integer"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "type": "array"
+    },
+    "create": {
+      "type": "boolean"
+    },
+    "horizonDays": {
+      "maximum": 90,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "proveedorId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "proveedorId",
+    "articuloIds"
+  ],
+  "title": "ReposicionOrdenCompraSugeridaInput",
+  "type": "object"
+}

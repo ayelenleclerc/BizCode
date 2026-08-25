@@ -1,20 +1,20 @@
 # OrdenCompra Schema
 
 ```txt
-undefined#/allOf/1/properties/data/items
+undefined#/properties/data/properties/ordenCompra
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                         |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [OrdenCompraListEnvelope.schema.json\*](../schema-json/OrdenCompraListEnvelope.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                                 |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ReposicionOcCreatedEnvelope.schema.json\*](../schema-json/ReposicionOcCreatedEnvelope.schema.json "open original schema") |
 
-## items Type
+## ordenCompra Type
 
 `object` ([OrdenCompra](ordencompra.md))
 
-# items Properties
+# ordenCompra Properties
 
 | Property                        | Type      | Required | Nullable       | Defined by                                                                                   |
 | :------------------------------ | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------- |

@@ -2328,6 +2328,117 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/articulos/{id}/reposicion-forecast:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [articulos]
+      summary: Demand forecast / replenishment suggestion for one article (#198)
+      description: |
+        Moving-average forecast from `FacturaItem` quantities on active invoices (`estado=A`).
+        Requires `products.read` and module `logistics.purchases`. Not ML (no Holt-Winters/Prophet).
+        Returns 404 when the article is missing, a parent, or a service.
+      responses:
+        '200':
+          description: Forecast row
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplenishmentForecastEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Article not found or not forecastable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/catalogo/reposicion:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [articulos]
+      summary: List articles needing replenishment (#198)
+      description: |
+        Articles where stock is at/below minimum or estimated days remaining ≤ `horizonDays`.
+        Requires `products.read` and module `logistics.purchases`.
+      parameters:
+        - name: horizonDays
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 90
+            default: 30
+      responses:
+        '200':
+          description: Replenishment candidates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplenishmentForecastListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/catalogo/reposicion/orden-compra-sugerida:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [compras]
+      summary: Build suggested purchase-order lines from replenishment forecast (#198)
+      description: |
+        With `create=false` (default) returns prefill lines for `/compras`.
+        With `create=true` creates a draft `OrdenCompra` via `CompraService`.
+        Requires `suppliers.manage` and module `logistics.purchases`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReposicionOrdenCompraSugeridaInput'
+      responses:
+        '200':
+          description: Prefill payload (create omitted or false)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReposicionOcPrefillEnvelope'
+        '201':
+          description: Purchase order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReposicionOcCreatedEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          description: No suggested lines or CompraService validation failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/articulos/{id}/proveedores:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -19840,6 +19951,161 @@ components:
               items:
                 $ref: '#/components/schemas/StockAjuste'
         - $ref: '#/components/schemas/ListPaginationMeta'
+
+    ReplenishmentForecast:
+      type: object
+      required:
+        - articuloId
+        - codigo
+        - descripcion
+        - stock
+        - minimo
+        - tipo
+        - status
+        - windowDays
+        - unitsSoldInWindow
+        - needsReplenishment
+      properties:
+        articuloId:
+          type: integer
+        codigo:
+          type: integer
+        descripcion:
+          type: string
+        stock:
+          type: number
+        minimo:
+          type: number
+        tipo:
+          type: string
+        proveedorId:
+          type: integer
+          nullable: true
+        leadTimeDays:
+          type: integer
+          nullable: true
+        costoUnitario:
+          type: number
+          nullable: true
+        status:
+          type: string
+          enum: [ok, insufficient_data]
+        windowDays:
+          type: integer
+          enum: [30, 60, 90]
+        unitsSoldInWindow:
+          type: number
+        velocityPerDay:
+          type: number
+          nullable: true
+        daysRemaining:
+          type: integer
+          nullable: true
+        suggestedOrderQty:
+          type: integer
+          nullable: true
+        needsReplenishment:
+          type: boolean
+
+    ReplenishmentForecastEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ReplenishmentForecast'
+
+    ReplenishmentForecastListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReplenishmentForecast'
+
+    ReposicionOrdenCompraSugeridaInput:
+      type: object
+      additionalProperties: false
+      required: [proveedorId, articuloIds]
+      properties:
+        proveedorId:
+          type: integer
+          minimum: 1
+        articuloIds:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: integer
+            minimum: 1
+        horizonDays:
+          type: integer
+          minimum: 1
+          maximum: 90
+        create:
+          type: boolean
+
+    ReposicionOcPrefillEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [prefill, skipped]
+          properties:
+            prefill:
+              type: object
+              required: [proveedorId, lines]
+              properties:
+                proveedorId:
+                  type: integer
+                lines:
+                  type: array
+                  items:
+                    type: object
+                    required: [articuloId, cantidad, costoUnitario]
+                    properties:
+                      articuloId:
+                        type: integer
+                      cantidad:
+                        type: integer
+                      costoUnitario:
+                        type: string
+            skipped:
+              type: array
+              items:
+                type: integer
+
+    ReposicionOcCreatedEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [ordenCompra, skipped, lines]
+          properties:
+            ordenCompra:
+              $ref: '#/components/schemas/OrdenCompra'
+            skipped:
+              type: array
+              items:
+                type: integer
+            lines:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrdenCompraItemInput'
 
     Rubro:
       type: object

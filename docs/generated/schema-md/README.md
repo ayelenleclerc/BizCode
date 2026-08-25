@@ -1156,6 +1156,12 @@
 
 * [RepeatOmitReason](./repeatomitreason.md) – `-`
 
+* [ReplenishmentForecast](./replenishmentforecast.md) – `-`
+
+* [ReplenishmentForecastEnvelope](./replenishmentforecastenvelope.md) – `-`
+
+* [ReplenishmentForecastListEnvelope](./replenishmentforecastlistenvelope.md) – `-`
+
 * [ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope.md) – `-`
 
 * [ReporteCobranzasRow](./reportecobranzasrow.md) – `-`
@@ -1163,6 +1169,12 @@
 * [ReporteVentasListEnvelope](./reporteventaslistenvelope.md) – `-`
 
 * [ReporteVentasRow](./reporteventasrow.md) – `-`
+
+* [ReposicionOcCreatedEnvelope](./reposicionoccreatedenvelope.md) – `-`
+
+* [ReposicionOcPrefillEnvelope](./reposicionocprefillenvelope.md) – `-`
+
+* [ReposicionOrdenCompraSugeridaInput](./reposicionordencomprasugeridainput.md) – `-`
 
 * [RetencionAplicada](./retencionaplicada.md) – `-`
 
@@ -1786,6 +1798,14 @@
 
 * [Untitled object in RepartoListEnvelope](./repartolistenvelope-allof-1.md) – `undefined#/allOf/1`
 
+* [Untitled object in ReposicionOcCreatedEnvelope](./reposicionoccreatedenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in ReposicionOcPrefillEnvelope](./reposicionocprefillenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in ReposicionOcPrefillEnvelope](./reposicionocprefillenvelope-properties-data-properties-prefill.md) – `undefined#/properties/data/properties/prefill`
+
+* [Untitled object in ReposicionOcPrefillEnvelope](./reposicionocprefillenvelope-properties-data-properties-prefill-properties-lines-items.md) – `undefined#/properties/data/properties/prefill/properties/lines/items`
+
 * [Untitled object in RetencionAplicadaListEnvelope](./retencionaplicadalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in RetencionesPreviewResult](./retencionespreviewresult-properties-retenciones-items.md) – `undefined#/properties/retenciones/items`
@@ -2240,11 +2260,23 @@
 
 * [Untitled array in RepartoListEnvelope](./repartolistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
 
+* [Untitled array in ReplenishmentForecastListEnvelope](./replenishmentforecastlistenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled array in ReporteCobranzasListEnvelope](./reportecobranzaslistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ReporteCobranzasRow](./reportecobranzasrow-properties-porformapago.md) – `undefined#/properties/porFormaPago`
 
 * [Untitled array in ReporteVentasListEnvelope](./reporteventaslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ReposicionOcCreatedEnvelope](./reposicionoccreatedenvelope-properties-data-properties-lines.md) – `undefined#/properties/data/properties/lines`
+
+* [Untitled array in ReposicionOcCreatedEnvelope](./reposicionoccreatedenvelope-properties-data-properties-skipped.md) – `undefined#/properties/data/properties/skipped`
+
+* [Untitled array in ReposicionOcPrefillEnvelope](./reposicionocprefillenvelope-properties-data-properties-prefill-properties-lines.md) – `undefined#/properties/data/properties/prefill/properties/lines`
+
+* [Untitled array in ReposicionOcPrefillEnvelope](./reposicionocprefillenvelope-properties-data-properties-skipped.md) – `undefined#/properties/data/properties/skipped`
+
+* [Untitled array in ReposicionOrdenCompraSugeridaInput](./reposicionordencomprasugeridainput-properties-articuloids.md) – `undefined#/properties/articuloIds`
 
 * [Untitled array in RetencionAplicadaListEnvelope](./retencionaplicadalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

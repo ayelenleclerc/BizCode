@@ -242,5 +242,15 @@
     "resync": "Sincronizar ahora",
     "productId": "ID producto WC",
     "publishing": "Publicando…"
+  },
+  "reposicionForecast": {
+    "title": "Predicción de reposición",
+    "loading": "Calculando estimado…",
+    "error": "No se pudo cargar el forecast (requiere módulo de compras).",
+    "insufficientData": "Datos insuficientes: menos de 30 unidades vendidas en la ventana.",
+    "daysRemaining": "Días estimados hasta agotar stock: {{days}}",
+    "suggestedQty": "Cantidad sugerida a pedir: {{qty}}",
+    "velocity": "Velocidad (u/día): {{velocity}}",
+    "openList": "Ver lista de reposición"
   }
 }

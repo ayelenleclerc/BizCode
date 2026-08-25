@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "type": "integer"
+    },
+    "codigo": {
+      "type": "integer"
+    },
+    "costoUnitario": {
+      "nullable": true,
+      "type": "number"
+    },
+    "daysRemaining": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "leadTimeDays": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "minimo": {
+      "type": "number"
+    },
+    "needsReplenishment": {
+      "type": "boolean"
+    },
+    "proveedorId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "insufficient_data"
+      ],
+      "type": "string"
+    },
+    "stock": {
+      "type": "number"
+    },
+    "suggestedOrderQty": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "tipo": {
+      "type": "string"
+    },
+    "unitsSoldInWindow": {
+      "type": "number"
+    },
+    "velocityPerDay": {
+      "nullable": true,
+      "type": "number"
+    },
+    "windowDays": {
+      "enum": [
+        30,
+        60,
+        90
+      ],
+      "type": "integer"
+    }
+  },
+  "required": [
+    "articuloId",
+    "codigo",
+    "descripcion",
+    "stock",
+    "minimo",
+    "tipo",
+    "status",
+    "windowDays",
+    "unitsSoldInWindow",
+    "needsReplenishment"
+  ],
+  "title": "ReplenishmentForecast",
+  "type": "object"
+}

@@ -61,6 +61,7 @@ import { ShippingCarrierConfigService } from './ShippingCarrierConfigService'
 import { SellerAlertService } from './SellerAlertService'
 import { PlantillaPedidoService } from './PlantillaPedidoService'
 import { SugerenciasPedidoService } from './SugerenciasPedidoService'
+import { ReplenishmentForecastService } from './ReplenishmentForecastService'
 
 export type DomainServices = {
   cliente: ClienteService
@@ -125,6 +126,7 @@ export type DomainServices = {
   sellerAlert: SellerAlertService
   plantillaPedido: PlantillaPedidoService
   sugerenciasPedido: SugerenciasPedidoService
+  replenishmentForecast: ReplenishmentForecastService
 }
 
 /**
@@ -196,5 +198,6 @@ export function createDomainServices(prisma: PrismaClient): DomainServices {
     sellerAlert: new SellerAlertService(prisma),
     plantillaPedido: new PlantillaPedidoService(prisma),
     sugerenciasPedido: new SugerenciasPedidoService(prisma),
+    replenishmentForecast: new ReplenishmentForecastService(prisma),
   }
 }

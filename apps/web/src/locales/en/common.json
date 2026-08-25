@@ -30,6 +30,7 @@
     "ordenesProduccion": "Production orders",
     "proveedores": "Suppliers",
     "compras": "Purchasing",
+    "reposicion": "Replenishment",
     "recuentos": "Inventory count",
     "logistica": "Logistics",
     "picking": "Picking",

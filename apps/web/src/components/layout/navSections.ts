@@ -186,6 +186,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'logistics.purchases',
   },
   {
+    key: 'reposicion',
+    path: '/catalogo/reposicion',
+    icon: '📉',
+    roles: ['owner', 'manager', 'warehouse_lead'],
+    moduleKey: 'logistics.purchases',
+  },
+  {
     key: 'recuentos',
     path: '/recuentos',
     icon: '📋',
@@ -301,6 +308,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'finanzas/conciliacion-bancaria', moduleKey: 'finance.bank_reconcile' },
   { path: 'admin/audit-log', moduleKey: 'admin.audit_log' },
   { path: 'compras', moduleKey: 'logistics.purchases' },
+  { path: 'catalogo/reposicion', moduleKey: 'logistics.purchases' },
   { path: 'recuentos', moduleKey: 'inventory.count' },
   { path: 'reportes', moduleKey: 'analytics.dashboard' },
 ]

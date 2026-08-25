@@ -1,14 +1,14 @@
 # OrdenCompraItemInput Schema
 
 ```txt
-undefined#/properties/items/items
+undefined#/properties/data/properties/lines/items
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                       |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [OrdenCompraUpdateInput.schema.json\*](../schema-json/OrdenCompraUpdateInput.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                                 |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [ReposicionOcCreatedEnvelope.schema.json\*](../schema-json/ReposicionOcCreatedEnvelope.schema.json "open original schema") |
 
 ## items Type
 

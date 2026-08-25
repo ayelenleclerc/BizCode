@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "data": {
+      "properties": {
+        "prefill": {
+          "properties": {
+            "lines": {
+              "items": {
+                "properties": {
+                  "articuloId": {
+                    "type": "integer"
+                  },
+                  "cantidad": {
+                    "type": "integer"
+                  },
+                  "costoUnitario": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "articuloId",
+                  "cantidad",
+                  "costoUnitario"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "proveedorId": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "proveedorId",
+            "lines"
+          ],
+          "type": "object"
+        },
+        "skipped": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "prefill",
+        "skipped"
+      ],
+      "type": "object"
+    },
+    "success": {
+      "const": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "success",
+    "data"
+  ],
+  "title": "ReposicionOcPrefillEnvelope",
+  "type": "object"
+}

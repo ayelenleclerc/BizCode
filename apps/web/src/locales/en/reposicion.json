@@ -1,0 +1,29 @@
+{
+  "title": "Suggested replenishment",
+  "subtitle": "Articles with low stock or estimated stock-out within ≤30 days (sales moving average, #198).",
+  "noAccess": "You do not have permission to view replenishment.",
+  "proveedorId": "Supplier ID",
+  "generateOc": "Generate suggested PO",
+  "generating": "Generating…",
+  "empty": "No articles need replenishment for the current horizon.",
+  "columns": {
+    "select": "Select",
+    "selectRow": "Select article {{codigo}}",
+    "codigo": "Code",
+    "descripcion": "Description",
+    "stock": "Stock",
+    "days": "Days remaining",
+    "qty": "Suggested qty",
+    "status": "Status"
+  },
+  "status": {
+    "ok": "OK",
+    "insufficient": "Insufficient data"
+  },
+  "errors": {
+    "proveedorRequired": "Enter a valid supplier ID.",
+    "selectArticles": "Select at least one article.",
+    "noLines": "Could not build suggested lines (missing data or cost).",
+    "generic": "Could not generate the suggested PO."
+  }
+}

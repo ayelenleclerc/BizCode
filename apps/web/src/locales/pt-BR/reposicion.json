@@ -1,0 +1,29 @@
+{
+  "title": "Reposição sugerida",
+  "subtitle": "Artigos com estoque baixo ou esgotamento estimado em ≤30 dias (média móvel de vendas, #198).",
+  "noAccess": "Você não tem permissão para ver reposição.",
+  "proveedorId": "ID fornecedor",
+  "generateOc": "Gerar OC sugerida",
+  "generating": "Gerando…",
+  "empty": "Não há artigos que precisem de reposição no horizonte atual.",
+  "columns": {
+    "select": "Selecionar",
+    "selectRow": "Selecionar artigo {{codigo}}",
+    "codigo": "Código",
+    "descripcion": "Descrição",
+    "stock": "Estoque",
+    "days": "Dias restantes",
+    "qty": "Qtd sugerida",
+    "status": "Status"
+  },
+  "status": {
+    "ok": "OK",
+    "insufficient": "Dados insuficientes"
+  },
+  "errors": {
+    "proveedorRequired": "Informe um ID de fornecedor válido.",
+    "selectArticles": "Selecione pelo menos um artigo.",
+    "noLines": "Não foi possível montar linhas sugeridas (faltam dados ou custo).",
+    "generic": "Não foi possível gerar a OC sugerida."
+  }
+}
