@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { depositosAPI, empresaAPI, facturasAPI, fidelizacionAPI, fiscalRetencionesAPI, listasPreciosAPI, type RetencionPreviewLineDTO } from '@/lib/api'
+import { depositosAPI, empresaAPI, facturasAPI, fidelizacionAPI, fiscalRetencionesAPI, listasPreciosAPI, ApiRequestFailedError, type RetencionPreviewLineDTO } from '@/lib/api'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
 import { Cliente, Articulo, FormaPago, allowsDecimalQuantity, type UnidadBase } from '@bizcode/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
@@ -77,6 +77,10 @@ export default function NuevaFacturaForm({
   const [selectedLineIdx, setSelectedLineIdx] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [anomalyWarnings, setAnomalyWarnings] = useState<
+    Array<{ tipo: string; severidad: string; descripcion: string }>
+  >([])
+  const [pendingDuplicateConfirm, setPendingDuplicateConfirm] = useState(false)
   const [totales, setTotales] = useState({ neto1: 0, neto2: 0, neto3: 0, iva1: 0, iva2: 0, total: 0 })
   const [agentePercepcion, setAgentePercepcion] = useState(false)
   const [applyPercepciones, setApplyPercepciones] = useState(false)
@@ -357,7 +361,7 @@ export default function NuevaFacturaForm({
     setLineas(newLineas)
   }
 
-  const handleGuardar = async () => {
+  const handleGuardar = async (opts?: { confirmAnomalies?: boolean }) => {
     if (!clienteId) {
       setError(t('errors.noCliente'))
       return
@@ -379,6 +383,10 @@ export default function NuevaFacturaForm({
 
     setLoading(true)
     setError(null)
+    if (!opts?.confirmAnomalies) {
+      setAnomalyWarnings([])
+      setPendingDuplicateConfirm(false)
+    }
 
     try {
       const percepcionesPayload = applyPercepciones
@@ -431,12 +439,26 @@ export default function NuevaFacturaForm({
         ...(Number.isInteger(puntosCanjeNum) && puntosCanjeNum > 0
           ? { puntosCanje: puntosCanjeNum }
           : {}),
+        ...(opts?.confirmAnomalies === true ? { confirmAnomalies: true } : {}),
       }
 
-      await facturasAPI.create(facturaData)
+      const created = await facturasAPI.create(facturaData)
+      if (created.warnings.length > 0) {
+        setAnomalyWarnings(created.warnings)
+      }
+      setPendingDuplicateConfirm(false)
       await Promise.resolve(onGuardada())
     } catch (err: unknown) {
-      setError((err as Error).message || t('errors.generic'))
+      if (
+        err instanceof ApiRequestFailedError &&
+        err.message === 'DUPLICATE_INVOICE_CONFIRM_REQUIRED'
+      ) {
+        setPendingDuplicateConfirm(true)
+        setAnomalyWarnings(err.warnings ?? [])
+        setError(t('anomaly.duplicateConfirmRequired'))
+      } else {
+        setError((err as Error).message || t('errors.generic'))
+      }
     } finally {
       setLoading(false)
     }
@@ -479,6 +501,54 @@ export default function NuevaFacturaForm({
               {t('creditLimitWarning.hint')}
             </p>
           </div>
+        </div>
+      )}
+
+      {(anomalyWarnings.length > 0 || pendingDuplicateConfirm) && (
+        <div
+          data-testid="factura-anomaly-warning"
+          role="alert"
+          aria-live="assertive"
+          className={`p-4 rounded mb-4 border ${
+            pendingDuplicateConfirm || anomalyWarnings.some((w) => w.severidad === 'critical')
+              ? 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-900 dark:text-red-100'
+              : 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-600 text-amber-900 dark:text-amber-100'
+          }`}
+        >
+          <p className="font-semibold text-sm">{t('anomaly.title')}</p>
+          <ul className="mt-2 list-disc list-inside text-sm space-y-1">
+            {anomalyWarnings.map((w) => (
+              <li key={`${w.tipo}-${w.descripcion}`}>
+                {t(`anomaly.tipos.${w.tipo}`, { defaultValue: w.descripcion })}
+              </li>
+            ))}
+          </ul>
+          {pendingDuplicateConfirm && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                data-testid="factura-anomaly-confirm"
+                className="px-3 py-1.5 text-sm rounded bg-red-700 text-white hover:bg-red-800 disabled:opacity-50"
+                disabled={loading}
+                onClick={() => void handleGuardar({ confirmAnomalies: true })}
+              >
+                {t('anomaly.confirmDuplicate')}
+              </button>
+              <button
+                type="button"
+                data-testid="factura-anomaly-dismiss"
+                className="px-3 py-1.5 text-sm rounded border border-slate-300 dark:border-slate-500"
+                disabled={loading}
+                onClick={() => {
+                  setPendingDuplicateConfirm(false)
+                  setAnomalyWarnings([])
+                  setError(null)
+                }}
+              >
+                {t('anomaly.cancelDuplicate')}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -890,7 +960,7 @@ export default function NuevaFacturaForm({
         <button
           type="button"
           data-testid="btn-save-factura"
-          onClick={handleGuardar}
+          onClick={() => void handleGuardar()}
           disabled={loading || lineas.length === 0 || !clienteId}
           className="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 disabled:bg-slate-400 dark:disabled:bg-slate-600 text-white rounded font-semibold transition"
         >

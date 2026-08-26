@@ -7,6 +7,13 @@
     "success": {
       "const": false,
       "type": "boolean"
+    },
+    "warnings": {
+      "description": "Optional structured warnings (e.g. billing anomalies",
+      "items": {
+        "$ref": "./FacturaAnomalyWarning.schema.json"
+      },
+      "type": "array"
     }
   },
   "required": [

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "error": {
+      "const": "DUPLICATE_INVOICE_CONFIRM_REQUIRED",
+      "type": "string"
+    },
+    "success": {
+      "const": false,
+      "type": "boolean"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "./FacturaAnomalyWarning.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "success",
+    "error",
+    "warnings"
+  ],
+  "title": "FacturaDuplicateConfirmErrorEnvelope",
+  "type": "object"
+}

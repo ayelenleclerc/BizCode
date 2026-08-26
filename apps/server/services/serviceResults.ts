@@ -2,6 +2,13 @@ export type ServiceFailure = {
   ok: false
   status: number
   error: string
+  /** @en Optional structured warnings (e.g. billing anomalies #200). */
+  warnings?: Array<{
+    tipo: string
+    severidad: string
+    descripcion: string
+    detalle?: Record<string, number | string | boolean | null>
+  }>
 }
 
 export type ServiceSuccess<T> = {

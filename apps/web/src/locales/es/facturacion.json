@@ -75,6 +75,18 @@
     "detail": "Balance actual: ${{balance}} + esta factura = ${{projected}} (límite: ${{limit}})",
     "hint": "Puede continuar registrando la venta o cancelarla."
   },
+  "anomaly": {
+    "title": "Anomalía de facturación detectada",
+    "duplicateConfirmRequired": "Se detectó una posible factura duplicada. Confirme para guardar de todos modos.",
+    "confirmDuplicate": "Confirmar y guardar",
+    "cancelDuplicate": "Cancelar",
+    "tipos": {
+      "factura_duplicada": "Posible duplicado: mismo cliente, total y fecha",
+      "monto_inusual": "Monto inusual respecto al historial del cliente",
+      "descuento_excesivo": "El descuento promedio ponderado supera el umbral configurado",
+      "cliente_nuevo_compra_grande": "Compra grande para cliente nuevo / con poco historial respecto al límite de crédito"
+    }
+  },
   "errors": {
     "noCliente": "Seleccione un cliente",
     "noItems": "Agregue al menos un artículo",

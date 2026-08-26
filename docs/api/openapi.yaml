@@ -4186,11 +4186,15 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '422':
-          description: Client suspended, insufficient stock, or other business rule
+          description: >
+            Client suspended, insufficient stock, duplicate invoice confirm required (#200),
+            or other business rule
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorEnvelope'
+                oneOf:
+                  - $ref: '#/components/schemas/ApiErrorEnvelope'
+                  - $ref: '#/components/schemas/FacturaDuplicateConfirmErrorEnvelope'
 
   /api/arca/config:
     get:
@@ -16918,6 +16922,11 @@ components:
           const: false
         error:
           type: string
+        warnings:
+          type: array
+          description: Optional structured warnings (e.g. billing anomalies #200).
+          items:
+            $ref: '#/components/schemas/FacturaAnomalyWarning'
 
     SetupOwnerInput:
       type: object
@@ -22100,6 +22109,32 @@ components:
           minimum: 1
           nullable: true
           description: Optional loyalty points to redeem as a negative invoice line (#250).
+        confirmAnomalies:
+          type: boolean
+          description: >
+            When true, acknowledges soft-blocked duplicate anomaly and proceeds with create (#200).
+            Required to create after HTTP 422 DUPLICATE_INVOICE_CONFIRM_REQUIRED.
+
+    FacturaAnomalyWarning:
+      type: object
+      required: [tipo, severidad, descripcion]
+      properties:
+        tipo:
+          type: string
+          enum:
+            - factura_duplicada
+            - monto_inusual
+            - descuento_excesivo
+            - cliente_nuevo_compra_grande
+        severidad:
+          type: string
+          enum: [warning, critical]
+        descripcion:
+          type: string
+        detalle:
+          type: object
+          additionalProperties: true
+          nullable: true
 
     FacturaListEnvelope:
       allOf:
@@ -22124,6 +22159,26 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/Factura'
+        warnings:
+          type: array
+          description: Soft billing anomaly warnings after successful create (#200).
+          items:
+            $ref: '#/components/schemas/FacturaAnomalyWarning'
+
+    FacturaDuplicateConfirmErrorEnvelope:
+      type: object
+      required: [success, error, warnings]
+      properties:
+        success:
+          type: boolean
+          const: false
+        error:
+          type: string
+          const: DUPLICATE_INVOICE_CONFIRM_REQUIRED
+        warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacturaAnomalyWarning'
 
     FacturaVoidBalanceCliente:
       type: object

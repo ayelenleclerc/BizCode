@@ -1,5 +1,10 @@
 import type { AxiosError, AxiosInstance } from 'axios'
-import type { ApiErrorPayload, Factura, JsonRecord } from '@bizcode/types'
+import type {
+  ApiErrorPayload,
+  Factura,
+  FacturaAnomalyWarningPayload,
+  JsonRecord,
+} from '@bizcode/types'
 import { api } from '../default-client'
 import { handleError } from '../errors'
 import type { NotaCreditoSnippetDTO } from './rest'
@@ -64,6 +69,11 @@ export type MercadoPagoRefundStatusDto = {
   refunds: MercadoPagoRefundDto[]
 }
 
+export type FacturaCreateResultDTO = {
+  data: Factura
+  warnings: FacturaAnomalyWarningPayload[]
+}
+
 export function createFacturasAPI(http: AxiosInstance) {
   return {
     list: async () => {
@@ -75,10 +85,17 @@ export function createFacturasAPI(http: AxiosInstance) {
       }
     },
 
-    create: async (data: JsonRecord) => {
+    create: async (data: JsonRecord): Promise<FacturaCreateResultDTO> => {
       try {
-        const response = await http.post('/facturas', data)
-        return response.data.data
+        const response = await http.post<{
+          success: boolean
+          data: Factura
+          warnings?: FacturaAnomalyWarningPayload[]
+        }>('/facturas', data)
+        return {
+          data: response.data.data,
+          warnings: response.data.warnings ?? [],
+        }
       } catch (error) {
         handleError(error as AxiosError<ApiErrorPayload>)
       }

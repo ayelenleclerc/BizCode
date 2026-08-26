@@ -7,6 +7,13 @@
     "success": {
       "const": true,
       "type": "boolean"
+    },
+    "warnings": {
+      "description": "Soft billing anomaly warnings after successful create (#200).",
+      "items": {
+        "$ref": "./FacturaAnomalyWarning.schema.json"
+      },
+      "type": "array"
     }
   },
   "required": [

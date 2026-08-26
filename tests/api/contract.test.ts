@@ -367,6 +367,10 @@ function buildPrisma(): PrismaClient {
       update: vi.fn().mockResolvedValue(facturaRow),
       aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
     },
+    anomaliaDetectada: {
+      createMany: vi.fn().mockResolvedValue({ count: 0 }),
+      findMany: vi.fn().mockResolvedValue([]),
+    },
     notaCredito: {
       count: vi.fn().mockResolvedValue(0),
       findMany: vi.fn().mockResolvedValue([]),

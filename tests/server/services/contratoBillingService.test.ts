@@ -52,7 +52,7 @@ describe('ContratoBillingService', () => {
   beforeEach(() => {
     facturaCreate = vi.fn().mockResolvedValue({
       ok: true,
-      data: { factura: { id: 50 }, updatedCliente: {}, stockBelowMinimum: [] },
+      data: { factura: { id: 50 }, updatedCliente: {}, stockBelowMinimum: [], warnings: [] },
     })
     prisma = {
       paramEmpresa: { findMany: vi.fn() },

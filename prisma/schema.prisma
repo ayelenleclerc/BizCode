@@ -101,6 +101,7 @@ model Cliente {
   updatedAt      DateTime      @updatedAt
 
   facturas           Factura[]
+  anomaliasDetectadas AnomaliaDetectada[]
   pedidos            Pedido[]
   plantillasPedido   PlantillaPedido[]
   visitasVendedor    VisitaVendedor[]
@@ -919,6 +920,7 @@ model Factura {
   /// @es Intentos de autorizaci\u00f3n fiscal multi-organismo (#378).
   /// @pt-BR Tentativas de autoriza\u00e7\u00e3o fiscal multi-organismo (#378).
   fiscalDocuments                  FiscalDocument[]
+  anomaliasDetectadas              AnomaliaDetectada[]
 
   @@unique([tenantId, tipo, prefijo, numero])
   @@index([tenantId])
@@ -928,6 +930,32 @@ model Factura {
   @@index([tenantId, contratoId])
   @@index([tenantId, depositoId])
   @@index([tenantId, tipoCambioId])
+}
+
+/// @en Detected billing anomaly for audit (#200 Fase 1).
+/// @es Anomalía de facturación detectada para auditoría (#200 Fase 1).
+/// @pt-BR Anomalia de faturamento detectada para auditoria (#200 Fase 1).
+model AnomaliaDetectada {
+  id          Int      @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  /// factura_duplicada | monto_inusual | descuento_excesivo | cliente_nuevo_compra_grande
+  tipo        String   @db.VarChar(60)
+  /// warning | critical
+  severidad   String   @db.VarChar(20)
+  facturaId   Int?
+  factura     Factura? @relation(fields: [facturaId], references: [id], onDelete: SetNull)
+  clienteId   Int?
+  cliente     Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  descripcion String   @db.VarChar(500)
+  detalle     Json?
+  confirmada  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, tipo])
+  @@index([tenantId, facturaId])
+  @@index([tenantId, clienteId])
 }
 
 /// Recurring service contract with scheduled invoicing (#245).
@@ -1804,6 +1832,7 @@ model Tenant {
   proveedorArticulos               ProveedorArticulo[]
   documentosCompraImportados       DocumentoCompraImportado[]
   facturas                         Factura[]
+  anomaliasDetectadas              AnomaliaDetectada[]
   notasCredito                     NotaCredito[]
   devolucionesEntrega              DevolucionEntrega[]
   pedidos                          Pedido[]

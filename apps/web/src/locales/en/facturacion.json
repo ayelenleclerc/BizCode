@@ -75,6 +75,18 @@
     "detail": "Current balance: ${{balance}} + this invoice = ${{projected}} (limit: ${{limit}})",
     "hint": "You may continue recording the sale or cancel it."
   },
+  "anomaly": {
+    "title": "Billing anomaly detected",
+    "duplicateConfirmRequired": "A possible duplicate invoice was detected. Confirm to save anyway.",
+    "confirmDuplicate": "Confirm and save",
+    "cancelDuplicate": "Cancel",
+    "tipos": {
+      "factura_duplicada": "Possible duplicate: same customer, total and date",
+      "monto_inusual": "Unusual amount versus this customer's history",
+      "descuento_excesivo": "Weighted average discount exceeds the configured threshold",
+      "cliente_nuevo_compra_grande": "Large purchase for a new / low-history customer relative to credit limit"
+    }
+  },
   "errors": {
     "noCliente": "Please select a customer",
     "noItems": "Please add at least one item",

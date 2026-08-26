@@ -1,7 +1,7 @@
 /**
  * @en Mutation ? AuditEvent.action matrix verification (issue #84). Each successful persistence path must emit an audit row.
- * @es Verificaciùn matriz mutaciùn ? AuditEvent.action (#84).
- * @pt-BR Verificaùùo mutaùùo ? AuditEvent.action (#84).
+ * @es Verificaci?n matriz mutaci?n ? AuditEvent.action (#84).
+ * @pt-BR Verifica??o muta??o ? AuditEvent.action (#84).
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
@@ -284,13 +284,17 @@ function basePrismaForMutations(): {
   }
   prisma.factura = {
     findMany: vi.fn().mockResolvedValue([]),
-    findFirst: vi.fn().mockResolvedValue(FACTURA_VOID_ROW),
+    findFirst: vi.fn().mockResolvedValue(null),
+    count: vi.fn().mockResolvedValue(0),
     create: vi.fn().mockResolvedValue({
       ...facturaCreated,
       include: undefined,
     }),
     update: vi.fn().mockResolvedValue({ ...FACTURA_VOID_ROW, estado: 'N' }),
     aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
+  }
+  prisma.anomaliaDetectada = {
+    createMany: vi.fn().mockResolvedValue({ count: 0 }),
   }
   prisma.facturaItem = { deleteMany: vi.fn().mockResolvedValue({ count: 0 }), createMany: vi.fn().mockResolvedValue({ count: 1 }) }
   prisma.notification = {

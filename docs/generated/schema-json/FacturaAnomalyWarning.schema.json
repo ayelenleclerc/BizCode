@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "descripcion": {
+      "type": "string"
+    },
+    "detalle": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "severidad": {
+      "enum": [
+        "warning",
+        "critical"
+      ],
+      "type": "string"
+    },
+    "tipo": {
+      "enum": [
+        "factura_duplicada",
+        "monto_inusual",
+        "descuento_excesivo",
+        "cliente_nuevo_compra_grande"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "tipo",
+    "severidad",
+    "descripcion"
+  ],
+  "title": "FacturaAnomalyWarning",
+  "type": "object"
+}

@@ -388,6 +388,10 @@
 
 * [Factura](./factura.md) – `-`
 
+* [FacturaAnomalyWarning](./facturaanomalywarning.md) – `-`
+
+* [FacturaDuplicateConfirmErrorEnvelope](./facturaduplicateconfirmerrorenvelope.md) – `-`
+
 * [FacturaEnvelope](./facturaenvelope.md) – `-`
 
 * [FacturaInput](./facturainput.md) – `-`
@@ -1600,6 +1604,8 @@
 
 * [Untitled object in EcommerceSyncLogListEnvelope](./ecommercesyncloglistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in FacturaAnomalyWarning](./facturaanomalywarning-properties-detalle.md) – `undefined#/properties/detalle`
+
 * [Untitled object in FacturaInput](./facturainput-properties-items-items.md "Catalog line requires articuloId") – `undefined#/properties/items/items`
 
 * [Untitled object in FacturaListEnvelope](./facturalistenvelope-allof-0.md) – `undefined#/allOf/0`
@@ -1882,6 +1888,8 @@
 
 * [Untitled array in AgingAr](./agingar-properties-buckets.md) – `undefined#/properties/buckets`
 
+* [Untitled array in ApiErrorEnvelope](./apierrorenvelope-properties-warnings.md "Optional structured warnings (e") – `undefined#/properties/warnings`
+
 * [Untitled array in AppUser](./appuser-properties-scopebranchids.md) – `undefined#/properties/scopeBranchIds`
 
 * [Untitled array in AppUser](./appuser-properties-scopechannels.md) – `undefined#/properties/scopeChannels`
@@ -2019,6 +2027,10 @@
 * [Untitled array in EstadoCredito](./estadocredito-properties-facturaspendientes.md) – `undefined#/properties/facturasPendientes`
 
 * [Untitled array in Factura](./factura-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in FacturaDuplicateConfirmErrorEnvelope](./facturaduplicateconfirmerrorenvelope-properties-warnings.md) – `undefined#/properties/warnings`
+
+* [Untitled array in FacturaEnvelope](./facturaenvelope-properties-warnings.md "Soft billing anomaly warnings after successful create (#200)") – `undefined#/properties/warnings`
 
 * [Untitled array in FacturaInput](./facturainput-properties-items.md) – `undefined#/properties/items`
 
