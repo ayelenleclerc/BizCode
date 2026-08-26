@@ -5451,9 +5451,17 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `integer`
 
+  - **`latitud`**
+
+    `number` — Optional WGS84 latitude for route maps (#199). No geocoder; set manually.
+
   - **`localidad`**
 
     `string`
+
+  - **`longitud`**
+
+    `number` — Optional WGS84 longitude for route maps (#199). No geocoder; set manually.
 
   - **`rsocial`**
 
@@ -5516,6 +5524,8 @@ Returns plan limits, enabled plan features, and current usage for the authentica
       "deliveryZoneId": 1,
       "cbu": "",
       "alias": "",
+      "latitud": -90,
+      "longitud": -180,
       "additionalProperty": "anything"
     }
   ],
@@ -5654,9 +5664,17 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   `string`
 
+- **`latitud`**
+
+  `number` — Optional WGS84 latitude (#199). Null clears the pin.
+
 - **`localidad`**
 
   `string`
+
+- **`longitud`**
+
+  `number` — Optional WGS84 longitude (#199). Null clears the pin.
 
 - **`suspended`**
 
@@ -5686,7 +5704,9 @@ Returns plan limits, enabled plan features, and current usage for the authentica
   "suspended": true,
   "deliveryZoneId": 1,
   "cbu": "",
-  "alias": ""
+  "alias": "",
+  "latitud": -90,
+  "longitud": -180
 }
 ```
 
@@ -5768,9 +5788,17 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `integer`
 
+  - **`latitud`**
+
+    `number` — Optional WGS84 latitude for route maps (#199). No geocoder; set manually.
+
   - **`localidad`**
 
     `string`
+
+  - **`longitud`**
+
+    `number` — Optional WGS84 longitude for route maps (#199). No geocoder; set manually.
 
   - **`rsocial`**
 
@@ -5820,6 +5848,8 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "deliveryZoneId": 1,
     "cbu": "",
     "alias": "",
+    "latitud": -90,
+    "longitud": -180,
     "additionalProperty": "anything"
   }
 }
@@ -6199,6 +6229,8 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "deliveryZoneId": 1,
     "cbu": "",
     "alias": "",
+    "latitud": -90,
+    "longitud": -180,
     "additionalProperty": "anything"
   }
 }
@@ -6333,9 +6365,17 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   `string`
 
+- **`latitud`**
+
+  `number` — Optional WGS84 latitude (#199). Null clears the pin.
+
 - **`localidad`**
 
   `string`
+
+- **`longitud`**
+
+  `number` — Optional WGS84 longitude (#199). Null clears the pin.
 
 - **`suspended`**
 
@@ -6365,7 +6405,9 @@ Returns plan limits, enabled plan features, and current usage for the authentica
   "suspended": true,
   "deliveryZoneId": 1,
   "cbu": "",
-  "alias": ""
+  "alias": "",
+  "latitud": -90,
+  "longitud": -180
 }
 ```
 
@@ -6447,9 +6489,17 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `integer`
 
+  - **`latitud`**
+
+    `number` — Optional WGS84 latitude for route maps (#199). No geocoder; set manually.
+
   - **`localidad`**
 
     `string`
+
+  - **`longitud`**
+
+    `number` — Optional WGS84 longitude for route maps (#199). No geocoder; set manually.
 
   - **`rsocial`**
 
@@ -6499,6 +6549,8 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "deliveryZoneId": 1,
     "cbu": "",
     "alias": "",
+    "latitud": -90,
+    "longitud": -180,
     "additionalProperty": "anything"
   }
 }
@@ -6827,9 +6879,17 @@ Requires body `{ "confirm": "ANONYMIZE" }`. Scrubs PII on Cliente, sets activo=f
 
     `integer`
 
+  - **`latitud`**
+
+    `number` — Optional WGS84 latitude for route maps (#199). No geocoder; set manually.
+
   - **`localidad`**
 
     `string`
+
+  - **`longitud`**
+
+    `number` — Optional WGS84 longitude for route maps (#199). No geocoder; set manually.
 
   - **`rsocial`**
 
@@ -6879,6 +6939,8 @@ Requires body `{ "confirm": "ANONYMIZE" }`. Scrubs PII on Cliente, sets activo=f
     "deliveryZoneId": 1,
     "cbu": "",
     "alias": "",
+    "latitud": -90,
+    "longitud": -180,
     "additionalProperty": "anything"
   }
 }
@@ -86132,6 +86194,349 @@ Requires `orders.dispatch`. `planned` → `on_route`; pending items' OEs → `in
 }
 ```
 
+### PARAMETERS /api/repartos/{id}/optimizar
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/repartos/{id}/optimizar`
+
+### Optimize stop order (haversine NN + 2-opt)
+
+- **Method:** `POST`
+- **Path:** `/api/repartos/{id}/optimizar`
+- **Tags:** repartos
+
+Requires `orders.dispatch`. Pure TypeScript TSP heuristic (#199): haversine distance, nearest-neighbor from the lowest-`secuencia` stop that has both `Cliente.latitud`/`longitud`, then 2-opt. Stops without coords are appended after geocoded ones (original relative order). Depot GPS is not used (Deposito has no lat/lng). Default `apply: false` returns a preview; `apply: true` rewrites `RepartoItem.secuencia` 1..n and writes audit `reparto_route_optimized`. Fewer than two stops with coords → `422 REPARTO_ROUTE_INSUFFICIENT_COORDS`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`apply`**
+
+  `boolean`, default: `false` — When true, rewrite RepartoItem.secuencia; when false (default), preview only (#199).
+
+**Example:**
+
+```json
+{
+  "apply": false
+}
+```
+
+#### Responses
+
+##### Status: 200 Preview or applied optimization
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`applied` (required)**
+
+    `boolean`
+
+  - **`distanceAfterKm` (required)**
+
+    `number`
+
+  - **`distanceBeforeKm` (required)**
+
+    `number`
+
+  - **`improvementPercent` (required)**
+
+    `number` — Percent improvement vs current geocoded order ((before-after)/before\*100).
+
+  - **`orderedItemIds` (required)**
+
+    `array` — Full new item id order (geocoded optimized first, then stops without coords).
+
+    **Items:**
+
+    `integer`
+
+  - **`reparto` (required)**
+
+    `object` — Updated reparto when applied; null on preview.
+
+  - **`skippedWithoutCoords` (required)**
+
+    `integer`
+
+  - **`stops` (required)**
+
+    `array` — Geocoded stops in suggested order (for Leaflet polyline).
+
+    **Items:**
+
+    - **`latitud` (required)**
+
+      `number`
+
+    - **`longitud` (required)**
+
+      `number`
+
+    - **`repartoItemId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`clienteRsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "applied": true,
+    "distanceBeforeKm": 0,
+    "distanceAfterKm": 0,
+    "improvementPercent": 1,
+    "orderedItemIds": [
+      1
+    ],
+    "stops": [
+      {
+        "repartoItemId": 1,
+        "secuencia": 1,
+        "latitud": 1,
+        "longitud": 1,
+        "clienteRsocial": ""
+      }
+    ],
+    "skippedWithoutCoords": 0,
+    "reparto": {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "choferId": 1,
+      "estado": "planned",
+      "vehiculo": "",
+      "observaciones": "",
+      "closedAt": "",
+      "chofer": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "ordenEntregaId": 1,
+          "secuencia": 1,
+          "estado": "pending",
+          "entregadoAt": "",
+          "motivoNoEntrega": "",
+          "receptorNombre": "",
+          "receptorDni": "",
+          "notasEntrega": "",
+          "hasPod": true,
+          "ordenEntrega": {
+            "id": 1,
+            "tenantId": 1,
+            "facturaId": 1,
+            "clienteId": 1,
+            "zonaId": 1,
+            "driverId": 1,
+            "pickerUserId": 1,
+            "pickingIniciadoAt": "",
+            "pickingListoAt": "",
+            "fecha": "",
+            "estado": "pending",
+            "nota": "",
+            "transportista": "correo_argentino",
+            "nroSeguimiento": "",
+            "estadoEnvio": "pending",
+            "ultimoEventoAt": "",
+            "trackingEventos": [
+              {
+                "at": "",
+                "status": "",
+                "description": "",
+                "location": ""
+              }
+            ],
+            "dispatchedAt": "",
+            "dispatchTimestampSource": "event",
+            "items": [
+              {
+                "id": 1,
+                "cantidad": 1,
+                "articulo": {
+                  "id": 1,
+                  "codigo": 1,
+                  "descripcion": ""
+                }
+              }
+            ],
+            "cliente": {
+              "additionalProperty": "anything"
+            },
+            "zona": {
+              "additionalProperty": "anything"
+            },
+            "driver": {
+              "additionalProperty": "anything"
+            },
+            "factura": {
+              "additionalProperty": "anything"
+            },
+            "picker": {
+              "additionalProperty": "anything"
+            },
+            "additionalProperty": "anything"
+          }
+        }
+      ],
+      "progress": {
+        "total": 0,
+        "delivered": 0,
+        "pending": 0
+      }
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 404 Route not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 422 Invalid state or insufficient coordinates
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": ""
+}
+```
+
 ### PARAMETERS /api/repartos/{id}/ubicacion
 
 - **Method:** `PARAMETERS`
@@ -102217,9 +102622,17 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `integer`
 
+* **`latitud`**
+
+  `number` — Optional WGS84 latitude for route maps (#199). No geocoder; set manually.
+
 * **`localidad`**
 
   `string`
+
+* **`longitud`**
+
+  `number` — Optional WGS84 longitude for route maps (#199). No geocoder; set manually.
 
 * **`rsocial`**
 
@@ -102263,6 +102676,8 @@ Rate-limited mutation; requires products.manage. USD only.
   "deliveryZoneId": 1,
   "cbu": "",
   "alias": "",
+  "latitud": -90,
+  "longitud": -180,
   "additionalProperty": "anything"
 }
 ```
@@ -102327,9 +102742,17 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`
 
+* **`latitud`**
+
+  `number` — Optional WGS84 latitude (#199). Null clears the pin.
+
 * **`localidad`**
 
   `string`
+
+* **`longitud`**
+
+  `number` — Optional WGS84 longitude (#199). Null clears the pin.
 
 * **`suspended`**
 
@@ -102359,7 +102782,9 @@ Rate-limited mutation; requires products.manage. USD only.
   "suspended": true,
   "deliveryZoneId": 1,
   "cbu": "",
-  "alias": ""
+  "alias": "",
+  "latitud": -90,
+  "longitud": -180
 }
 ```
 
@@ -102595,9 +103020,17 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `integer`
 
+  - **`latitud`**
+
+    `number` — Optional WGS84 latitude for route maps (#199). No geocoder; set manually.
+
   - **`localidad`**
 
     `string`
+
+  - **`longitud`**
+
+    `number` — Optional WGS84 longitude for route maps (#199). No geocoder; set manually.
 
   - **`rsocial`**
 
@@ -102647,6 +103080,8 @@ Rate-limited mutation; requires products.manage. USD only.
     "deliveryZoneId": 1,
     "cbu": "",
     "alias": "",
+    "latitud": -90,
+    "longitud": -180,
     "additionalProperty": "anything"
   }
 }
@@ -102692,6 +103127,8 @@ Rate-limited mutation; requires products.manage. USD only.
     "deliveryZoneId": 1,
     "cbu": "",
     "alias": "",
+    "latitud": -90,
+    "longitud": -180,
     "additionalProperty": "anything"
   }
 }
@@ -114894,6 +115331,419 @@ Rate-limited mutation; requires products.manage. USD only.
     "delivered": 0,
     "notDelivered": 0,
     "returned": 0
+  }
+}
+```
+
+### RepartoOptimizeInput
+
+- **Type:**`object`
+
+* **`apply`**
+
+  `boolean`, default: `false` — When true, rewrite RepartoItem.secuencia; when false (default), preview only (#199).
+
+**Example:**
+
+```json
+{
+  "apply": false
+}
+```
+
+### RepartoRouteOptimizeStop
+
+- **Type:**`object`
+
+* **`latitud` (required)**
+
+  `number`
+
+* **`longitud` (required)**
+
+  `number`
+
+* **`repartoItemId` (required)**
+
+  `integer`
+
+* **`secuencia` (required)**
+
+  `integer`
+
+* **`clienteRsocial`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "repartoItemId": 1,
+  "secuencia": 1,
+  "latitud": 1,
+  "longitud": 1,
+  "clienteRsocial": ""
+}
+```
+
+### RepartoRouteOptimizeResult
+
+- **Type:**`object`
+
+* **`applied` (required)**
+
+  `boolean`
+
+* **`distanceAfterKm` (required)**
+
+  `number`
+
+* **`distanceBeforeKm` (required)**
+
+  `number`
+
+* **`improvementPercent` (required)**
+
+  `number` — Percent improvement vs current geocoded order ((before-after)/before\*100).
+
+* **`orderedItemIds` (required)**
+
+  `array` — Full new item id order (geocoded optimized first, then stops without coords).
+
+  **Items:**
+
+  `integer`
+
+* **`reparto` (required)**
+
+  `object` — Updated reparto when applied; null on preview.
+
+* **`skippedWithoutCoords` (required)**
+
+  `integer`
+
+* **`stops` (required)**
+
+  `array` — Geocoded stops in suggested order (for Leaflet polyline).
+
+  **Items:**
+
+  - **`latitud` (required)**
+
+    `number`
+
+  - **`longitud` (required)**
+
+    `number`
+
+  - **`repartoItemId` (required)**
+
+    `integer`
+
+  - **`secuencia` (required)**
+
+    `integer`
+
+  - **`clienteRsocial`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "applied": true,
+  "distanceBeforeKm": 0,
+  "distanceAfterKm": 0,
+  "improvementPercent": 1,
+  "orderedItemIds": [
+    1
+  ],
+  "stops": [
+    {
+      "repartoItemId": 1,
+      "secuencia": 1,
+      "latitud": 1,
+      "longitud": 1,
+      "clienteRsocial": ""
+    }
+  ],
+  "skippedWithoutCoords": 0,
+  "reparto": {
+    "id": 1,
+    "tenantId": 1,
+    "fecha": "",
+    "choferId": 1,
+    "estado": "planned",
+    "vehiculo": "",
+    "observaciones": "",
+    "closedAt": "",
+    "chofer": {
+      "id": 1,
+      "username": "",
+      "role": ""
+    },
+    "items": [
+      {
+        "id": 1,
+        "ordenEntregaId": 1,
+        "secuencia": 1,
+        "estado": "pending",
+        "entregadoAt": "",
+        "motivoNoEntrega": "",
+        "receptorNombre": "",
+        "receptorDni": "",
+        "notasEntrega": "",
+        "hasPod": true,
+        "ordenEntrega": {
+          "id": 1,
+          "tenantId": 1,
+          "facturaId": 1,
+          "clienteId": 1,
+          "zonaId": 1,
+          "driverId": 1,
+          "pickerUserId": 1,
+          "pickingIniciadoAt": "",
+          "pickingListoAt": "",
+          "fecha": "",
+          "estado": "pending",
+          "nota": "",
+          "transportista": "correo_argentino",
+          "nroSeguimiento": "",
+          "estadoEnvio": "pending",
+          "ultimoEventoAt": "",
+          "trackingEventos": [
+            {
+              "at": "",
+              "status": "",
+              "description": "",
+              "location": ""
+            }
+          ],
+          "dispatchedAt": "",
+          "dispatchTimestampSource": "event",
+          "items": [
+            {
+              "id": 1,
+              "cantidad": 1,
+              "articulo": {
+                "id": 1,
+                "codigo": 1,
+                "descripcion": ""
+              }
+            }
+          ],
+          "cliente": {
+            "additionalProperty": "anything"
+          },
+          "zona": {
+            "additionalProperty": "anything"
+          },
+          "driver": {
+            "additionalProperty": "anything"
+          },
+          "factura": {
+            "additionalProperty": "anything"
+          },
+          "picker": {
+            "additionalProperty": "anything"
+          },
+          "additionalProperty": "anything"
+        }
+      }
+    ],
+    "progress": {
+      "total": 0,
+      "delivered": 0,
+      "pending": 0
+    }
+  }
+}
+```
+
+### RepartoOptimizeEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`applied` (required)**
+
+    `boolean`
+
+  - **`distanceAfterKm` (required)**
+
+    `number`
+
+  - **`distanceBeforeKm` (required)**
+
+    `number`
+
+  - **`improvementPercent` (required)**
+
+    `number` — Percent improvement vs current geocoded order ((before-after)/before\*100).
+
+  - **`orderedItemIds` (required)**
+
+    `array` — Full new item id order (geocoded optimized first, then stops without coords).
+
+    **Items:**
+
+    `integer`
+
+  - **`reparto` (required)**
+
+    `object` — Updated reparto when applied; null on preview.
+
+  - **`skippedWithoutCoords` (required)**
+
+    `integer`
+
+  - **`stops` (required)**
+
+    `array` — Geocoded stops in suggested order (for Leaflet polyline).
+
+    **Items:**
+
+    - **`latitud` (required)**
+
+      `number`
+
+    - **`longitud` (required)**
+
+      `number`
+
+    - **`repartoItemId` (required)**
+
+      `integer`
+
+    - **`secuencia` (required)**
+
+      `integer`
+
+    - **`clienteRsocial`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "applied": true,
+    "distanceBeforeKm": 0,
+    "distanceAfterKm": 0,
+    "improvementPercent": 1,
+    "orderedItemIds": [
+      1
+    ],
+    "stops": [
+      {
+        "repartoItemId": 1,
+        "secuencia": 1,
+        "latitud": 1,
+        "longitud": 1,
+        "clienteRsocial": ""
+      }
+    ],
+    "skippedWithoutCoords": 0,
+    "reparto": {
+      "id": 1,
+      "tenantId": 1,
+      "fecha": "",
+      "choferId": 1,
+      "estado": "planned",
+      "vehiculo": "",
+      "observaciones": "",
+      "closedAt": "",
+      "chofer": {
+        "id": 1,
+        "username": "",
+        "role": ""
+      },
+      "items": [
+        {
+          "id": 1,
+          "ordenEntregaId": 1,
+          "secuencia": 1,
+          "estado": "pending",
+          "entregadoAt": "",
+          "motivoNoEntrega": "",
+          "receptorNombre": "",
+          "receptorDni": "",
+          "notasEntrega": "",
+          "hasPod": true,
+          "ordenEntrega": {
+            "id": 1,
+            "tenantId": 1,
+            "facturaId": 1,
+            "clienteId": 1,
+            "zonaId": 1,
+            "driverId": 1,
+            "pickerUserId": 1,
+            "pickingIniciadoAt": "",
+            "pickingListoAt": "",
+            "fecha": "",
+            "estado": "pending",
+            "nota": "",
+            "transportista": "correo_argentino",
+            "nroSeguimiento": "",
+            "estadoEnvio": "pending",
+            "ultimoEventoAt": "",
+            "trackingEventos": [
+              {
+                "at": "",
+                "status": "",
+                "description": "",
+                "location": ""
+              }
+            ],
+            "dispatchedAt": "",
+            "dispatchTimestampSource": "event",
+            "items": [
+              {
+                "id": 1,
+                "cantidad": 1,
+                "articulo": {
+                  "id": 1,
+                  "codigo": 1,
+                  "descripcion": ""
+                }
+              }
+            ],
+            "cliente": {
+              "additionalProperty": "anything"
+            },
+            "zona": {
+              "additionalProperty": "anything"
+            },
+            "driver": {
+              "additionalProperty": "anything"
+            },
+            "factura": {
+              "additionalProperty": "anything"
+            },
+            "picker": {
+              "additionalProperty": "anything"
+            },
+            "additionalProperty": "anything"
+          }
+        }
+      ],
+      "progress": {
+        "total": 0,
+        "delivered": 0,
+        "pending": 0
+      }
+    }
   }
 }
 ```

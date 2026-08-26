@@ -41,6 +41,9 @@
     "domicilio": "Domicilio",
     "localidad": "Localidad",
     "cpost": "Código Postal",
+    "latitud": "Latitud",
+    "longitud": "Longitud",
+    "coordsHint": "Coordenadas opcionales (WGS84) para mapas de ruta. Sin geocodificador automático.",
     "telef": "Teléfono",
     "email": "Email",
     "activo": "Activo",
@@ -56,6 +59,8 @@
       "cuit": "CUIT inválido",
       "cbu": "CBU inválido",
       "rsocial": "Razón social mínimo 3 caracteres",
+      "latitud": "Latitud inválida (-90 a 90)",
+      "longitud": "Longitud inválida (-180 a 180)",
       "generic": "Error al guardar cliente"
     },
     "padron": {

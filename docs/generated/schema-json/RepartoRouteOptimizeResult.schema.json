@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "applied": {
+      "type": "boolean"
+    },
+    "distanceAfterKm": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "distanceBeforeKm": {
+      "minimum": 0,
+      "type": "number"
+    },
+    "improvementPercent": {
+      "description": "Percent improvement vs current geocoded order ((before-after)/before*100).",
+      "type": "number"
+    },
+    "orderedItemIds": {
+      "description": "Full new item id order (geocoded optimized first, then stops without coords).",
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "reparto": {
+      "description": "Updated reparto when applied; null on preview.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "./Reparto.schema.json"
+        }
+      ]
+    },
+    "skippedWithoutCoords": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "stops": {
+      "description": "Geocoded stops in suggested order (for Leaflet polyline).",
+      "items": {
+        "$ref": "./RepartoRouteOptimizeStop.schema.json"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "applied",
+    "distanceBeforeKm",
+    "distanceAfterKm",
+    "improvementPercent",
+    "orderedItemIds",
+    "stops",
+    "skippedWithoutCoords",
+    "reparto"
+  ],
+  "title": "RepartoRouteOptimizeResult",
+  "type": "object"
+}

@@ -31,7 +31,9 @@ undefined
 | [domicilio](#domicilio)           | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-domicilio.md "undefined#/properties/domicilio")           |
 | [email](#email)                   | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-email.md "undefined#/properties/email")                   |
 | [fantasia](#fantasia)             | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-fantasia.md "undefined#/properties/fantasia")             |
+| [latitud](#latitud)               | `number`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-latitud.md "undefined#/properties/latitud")               |
 | [localidad](#localidad)           | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-localidad.md "undefined#/properties/localidad")           |
+| [longitud](#longitud)             | `number`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-longitud.md "undefined#/properties/longitud")             |
 | [rsocial](#rsocial)               | `string`  | Required | cannot be null | [ClienteInput](clienteinput-properties-rsocial.md "undefined#/properties/rsocial")               |
 | [suspended](#suspended)           | `boolean` | Optional | cannot be null | [ClienteInput](clienteinput-properties-suspended.md "undefined#/properties/suspended")           |
 | [telef](#telef)                   | `string`  | Optional | cannot be null | [ClienteInput](clienteinput-properties-telef.md "undefined#/properties/telef")                   |
@@ -319,6 +321,30 @@ undefined
 
 **maximum length**: the maximum number of characters for this string is: `30`
 
+## latitud
+
+Optional WGS84 latitude (#199). Null clears the pin.
+
+`latitud`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [ClienteInput](clienteinput-properties-latitud.md "undefined#/properties/latitud")
+
+### latitud Type
+
+`number`
+
+### latitud Constraints
+
+**maximum**: the value of this number must smaller than or equal to: `90`
+
+**minimum**: the value of this number must greater than or equal to: `-90`
+
 ## localidad
 
 
@@ -340,6 +366,30 @@ undefined
 ### localidad Constraints
 
 **maximum length**: the maximum number of characters for this string is: `25`
+
+## longitud
+
+Optional WGS84 longitude (#199). Null clears the pin.
+
+`longitud`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [ClienteInput](clienteinput-properties-longitud.md "undefined#/properties/longitud")
+
+### longitud Type
+
+`number`
+
+### longitud Constraints
+
+**maximum**: the value of this number must smaller than or equal to: `180`
+
+**minimum**: the value of this number must greater than or equal to: `-180`
 
 ## rsocial
 

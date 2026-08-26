@@ -414,4 +414,179 @@ describe('API /api/repartos POD', () => {
     const res = await request(app).get('/api/repartos/1/items/10/pod').expect(200)
     expect(res.body.data.podMedia.firmaBase64).toBe(TEST_FIRMA)
   })
+
+  function buildOptimizeRepartoRow() {
+    const mkItem = (
+      id: number,
+      secuencia: number,
+      lat: number | null,
+      lng: number | null,
+      rsocial: string,
+    ) => ({
+      id,
+      repartoId: 1,
+      ordenEntregaId: id + 100,
+      secuencia,
+      estado: 'pending',
+      entregadoAt: null,
+      motivoNoEntrega: null,
+      receptorNombre: null,
+      receptorDni: null,
+      notasEntrega: null,
+      podMedia: null,
+      ordenEntrega: {
+        id: id + 100,
+        tenantId: 1,
+        clienteId: id,
+        estado: 'assigned',
+        fecha: new Date('2026-05-20'),
+        cliente: {
+          id,
+          codigo: id,
+          rsocial,
+          domicilio: null,
+          localidad: null,
+          telef: null,
+          latitud: lat,
+          longitud: lng,
+          balance: 0,
+        },
+        zona: null,
+        factura: null,
+      },
+    })
+    return {
+      ...repartoRow,
+      items: [
+        mkItem(1, 1, -34.6, -58.5, 'A'),
+        mkItem(2, 2, -34.5, -58.5, 'B'),
+        mkItem(3, 3, -34.6, -58.4, 'C'),
+        mkItem(4, 4, null, null, 'SinCoords'),
+      ],
+    }
+  }
+
+  it('POST /api/repartos/:id/optimizar returns 403 without orders.dispatch', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    const app = createApp(buildPrismaMock())
+    await request(app).post('/api/repartos/1/optimizar').send({ apply: false }).expect(403)
+  })
+
+  it('POST /api/repartos/:id/optimizar preview returns distances for logistics_planner', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const row = buildOptimizeRepartoRow()
+    const prisma = buildPrismaMock({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(row),
+        findFirstOrThrow: vi.fn().mockResolvedValue(row),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      repartoItem: {
+        findFirst: vi.fn(),
+        update: vi.fn().mockResolvedValue({}),
+        updateMany: vi.fn(),
+      },
+    })
+    prisma.$transaction = vi.fn(async (arg: unknown) => {
+      if (typeof arg === 'function') return (arg as (tx: typeof prisma) => Promise<unknown>)(prisma)
+      return arg
+    }) as PrismaClient['$transaction']
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/repartos/1/optimizar').send({}).expect(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data.applied).toBe(false)
+    expect(res.body.data.stops).toHaveLength(3)
+    expect(res.body.data.skippedWithoutCoords).toBe(1)
+    expect(res.body.data.orderedItemIds).toHaveLength(4)
+    expect(res.body.data.reparto).toBeNull()
+    expect(typeof res.body.data.distanceBeforeKm).toBe('number')
+    expect(typeof res.body.data.distanceAfterKm).toBe('number')
+  })
+
+  it('POST /api/repartos/:id/optimizar apply rewrites secuencia and audits', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const row = buildOptimizeRepartoRow()
+    const prisma = buildPrismaMock({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(row),
+        findFirstOrThrow: vi.fn().mockResolvedValue(row),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      repartoItem: {
+        findFirst: vi.fn(),
+        update: vi.fn().mockResolvedValue({}),
+        updateMany: vi.fn(),
+      },
+    })
+    prisma.$transaction = vi.fn(async (arg: unknown) => {
+      if (typeof arg === 'function') return (arg as (tx: typeof prisma) => Promise<unknown>)(prisma)
+      return arg
+    }) as PrismaClient['$transaction']
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/repartos/1/optimizar').send({ apply: true }).expect(200)
+    expect(res.body.data.applied).toBe(true)
+    expect(res.body.data.reparto).toBeTruthy()
+    expect(prisma.repartoItem.update).toHaveBeenCalled()
+    expect(prisma.auditEvent.create).toHaveBeenCalled()
+  })
+
+  it('POST /api/repartos/:id/optimizar returns 422 when fewer than 2 coords', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const row = {
+      ...repartoRow,
+      items: [
+        {
+          id: 1,
+          repartoId: 1,
+          ordenEntregaId: 5,
+          secuencia: 1,
+          estado: 'pending',
+          entregadoAt: null,
+          motivoNoEntrega: null,
+          receptorNombre: null,
+          receptorDni: null,
+          notasEntrega: null,
+          podMedia: null,
+          ordenEntrega: {
+            id: 5,
+            tenantId: 1,
+            clienteId: 1,
+            estado: 'assigned',
+            fecha: new Date(),
+            cliente: {
+              id: 1,
+              codigo: 1,
+              rsocial: 'Solo',
+              domicilio: null,
+              localidad: null,
+              telef: null,
+              latitud: -34.6,
+              longitud: -58.4,
+              balance: 0,
+            },
+            zona: null,
+            factura: null,
+          },
+        },
+      ],
+    }
+    const prisma = buildPrismaMock({
+      reparto: {
+        count: vi.fn(),
+        findMany: vi.fn(),
+        findFirst: vi.fn().mockResolvedValue(row),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+    })
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/repartos/1/optimizar').send({ apply: false }).expect(422)
+    expect(res.body.error).toBe('REPARTO_ROUTE_INSUFFICIENT_COORDS')
+  })
 })

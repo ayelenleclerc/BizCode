@@ -4,7 +4,7 @@ import type { AuthenticatedRequest } from '../auth'
 import { validateBody } from '../middleware/validateBody'
 import { hasPermission, type Permission } from '@bizcode/types'
 import { requireModule } from '../middleware/requireModule'
-import { devolucionEntregaRegisterBodySchema, repartoAddItemsBodySchema, repartoCreateBodySchema, repartoItemPodBodySchema, repartoUbicacionBodySchema } from '../schemas/domain'
+import { devolucionEntregaRegisterBodySchema, repartoAddItemsBodySchema, repartoCreateBodySchema, repartoItemPodBodySchema, repartoOptimizeBodySchema, repartoUbicacionBodySchema } from '../schemas/domain'
 import { GPS_VIEW_ROLES, POD_VIEW_ROLES } from '../services/RepartoService'
 import type { RepartoUbicacionService } from '../services/RepartoUbicacionService'
 import type { RepartoService, RepartoEstado } from '../services/RepartoService'
@@ -218,6 +218,40 @@ export function registerRepartosRoutes(app: Application, ctx: RestRouteContext):
         await writeAudit(authReq, 'reparto_item_added', 'reparto', String(result.data.id), {
           ordenEntregaIds: req.body.ordenEntregaIds,
         })
+        res.json({ success: true, data: result.data })
+      } catch (err: unknown) {
+        res.status(500).json({ success: false, error: errorMessage(err) })
+      }
+    },
+  )
+
+  app.post(
+    '/api/repartos/:id/optimizar',
+    requirePermission('orders.dispatch'),
+    validateBody(repartoOptimizeBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthenticatedRequest
+        const tenantId = getTenantId(req)
+        const id = Number.parseInt(String(req.params.id), 10)
+        if (!Number.isFinite(id) || id < 1) {
+          res.status(400).json({ success: false, error: 'Invalid id' })
+          return
+        }
+        const apply = req.body.apply === true
+        const result = await repartos.optimizeRoute(tenantId, id, apply)
+        if (!result.ok) {
+          res.status(result.status).json({ success: false, error: result.error })
+          return
+        }
+        if (apply) {
+          await writeAudit(authReq, 'reparto_route_optimized', 'reparto', String(id), {
+            distanceBeforeKm: result.data.distanceBeforeKm,
+            distanceAfterKm: result.data.distanceAfterKm,
+            improvementPercent: result.data.improvementPercent,
+            orderedItemIds: result.data.orderedItemIds,
+          })
+        }
         res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })

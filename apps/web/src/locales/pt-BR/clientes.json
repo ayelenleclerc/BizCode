@@ -41,6 +41,9 @@
     "domicilio": "Endereço",
     "localidad": "Cidade",
     "cpost": "CEP",
+    "latitud": "Latitude",
+    "longitud": "Longitude",
+    "coordsHint": "Coordenadas WGS84 opcionais para mapas de rota. Sem geocodificador automático.",
     "telef": "Telefone",
     "email": "E-mail",
     "activo": "Ativo",
@@ -56,6 +59,8 @@
       "cuit": "CNPJ/CPF inválido",
       "cbu": "CBU inválido",
       "rsocial": "Razão social deve ter pelo menos 3 caracteres",
+      "latitud": "Latitude inválida (-90 a 90)",
+      "longitud": "Longitude inválida (-180 a 180)",
       "generic": "Erro ao salvar cliente"
     },
     "padron": {

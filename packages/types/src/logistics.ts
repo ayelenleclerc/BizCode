@@ -227,6 +227,28 @@ export type RepartoCloseSummary = {
   returned: number
 }
 
+/** @en Stop pin returned by route optimize preview (#199). @es Pin de parada del preview de optimización (#199). @pt-BR Pin de parada do preview de otimização (#199). */
+export type RepartoRouteOptimizeStop = {
+  repartoItemId: number
+  secuencia: number
+  latitud: number
+  longitud: number
+  clienteRsocial: string | null
+}
+
+/** @en TSP optimize preview / apply result (#199). @es Resultado preview/aplicar de optimización TSP (#199). @pt-BR Resultado preview/aplicar de otimização TSP (#199). */
+export type RepartoRouteOptimizeResult = {
+  applied: boolean
+  distanceBeforeKm: number
+  distanceAfterKm: number
+  improvementPercent: number
+  orderedItemIds: number[]
+  stops: RepartoRouteOptimizeStop[]
+  skippedWithoutCoords: number
+  /** Present when `applied` is true. */
+  reparto: Reparto | null
+}
+
 export type RepartoUbicacionPoint = {
   lat: number
   lng: number

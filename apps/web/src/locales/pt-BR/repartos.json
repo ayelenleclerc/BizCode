@@ -38,7 +38,8 @@
     "moveUp": "Subir",
     "moveDown": "Descer",
     "addOrder": "Adicionar",
-    "removeOrder": "Remover"
+    "removeOrder": "Remover",
+    "optimize": "Otimizar ordem"
   },
   "form": {
     "chofer": "Motorista",
@@ -52,6 +53,23 @@
   "tracking": {
     "title": "Detalhe do reparto",
     "summaryClose": "Fechamento: {{pending}} pendentes marcados como não entregues."
+  },
+  "optimize": {
+    "title": "Otimizar ordem das paradas",
+    "subtitle": "Prévia com distância haversine (NN + 2-opt). Origem = primeira parada com coordenadas da ordem atual. Sem geocoder nem rotas de tráfego.",
+    "loading": "Calculando prévia…",
+    "distanceBefore": "Distância atual",
+    "distanceAfter": "Distância sugerida",
+    "improvement": "Melhoria",
+    "skipped": "Paradas sem coordenadas (no final)",
+    "accept": "Aplicar ordem",
+    "reject": "Descartar",
+    "applying": "Aplicando…",
+    "errors": {
+      "preview": "Não foi possível calcular a otimização.",
+      "apply": "Não foi possível aplicar a nova ordem.",
+      "insufficientCoords": "São necessárias pelo menos duas paradas com latitude e longitude no cliente."
+    }
   },
   "errors": {
     "load": "Não foi possível carregar os repartos.",

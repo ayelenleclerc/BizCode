@@ -55,6 +55,18 @@ export type ClienteInput = {
   cbu?: string | null
   /** @en Customer bank alias (#191). @es Alias bancario del cliente (#191). @pt-BR Alias bancário do cliente (#191). */
   alias?: string | null
+  /**
+   * @en Optional WGS84 latitude for route maps (#199); no geocoder.
+   * @es Latitud WGS84 opcional para mapas de ruta (#199); sin geocoder.
+   * @pt-BR Latitude WGS84 opcional para mapas de rota (#199); sem geocoder.
+   */
+  latitud?: number | null
+  /**
+   * @en Optional WGS84 longitude for route maps (#199); no geocoder.
+   * @es Longitud WGS84 opcional para mapas de ruta (#199); sin geocoder.
+   * @pt-BR Longitude WGS84 opcional para mapas de rota (#199); sem geocoder.
+   */
+  longitud?: number | null
 }
 
 /** @en Catalog item kind (#244). @es Tipo de ítem de catálogo (#244). @pt-BR Tipo de item de catálogo (#244). */
@@ -404,6 +416,12 @@ export type RepartoCreateInput = {
 export type RepartoUbicacionInput = {
   lat: number
   lng: number
+}
+
+/** @en Body for POST /api/repartos/:id/optimizar (#199). @es Body de POST /api/repartos/:id/optimizar (#199). @pt-BR Body de POST /api/repartos/:id/optimizar (#199). */
+export type RepartoOptimizeInput = {
+  /** When true, rewrite RepartoItem.secuencia; default false = preview only. */
+  apply?: boolean
 }
 
 export type StockAjusteInput = {

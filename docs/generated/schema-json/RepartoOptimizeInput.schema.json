@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "apply": {
+      "default": false,
+      "description": "When true, rewrite RepartoItem.secuencia; when false (default), preview only (#199).",
+      "type": "boolean"
+    }
+  },
+  "title": "RepartoOptimizeInput",
+  "type": "object"
+}

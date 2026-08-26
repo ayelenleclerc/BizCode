@@ -14539,6 +14539,60 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/repartos/{id}/optimizar:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    post:
+      tags: [repartos]
+      summary: Optimize stop order (haversine NN + 2-opt)
+      description: |
+        Requires `orders.dispatch`. Pure TypeScript TSP heuristic (#199): haversine distance,
+        nearest-neighbor from the lowest-`secuencia` stop that has both `Cliente.latitud`/`longitud`,
+        then 2-opt. Stops without coords are appended after geocoded ones (original relative order).
+        Depot GPS is not used (Deposito has no lat/lng). Default `apply: false` returns a preview;
+        `apply: true` rewrites `RepartoItem.secuencia` 1..n and writes audit `reparto_route_optimized`.
+        Fewer than two stops with coords → `422 REPARTO_ROUTE_INSUFFICIENT_COORDS`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepartoOptimizeInput'
+      responses:
+        '200':
+          description: Preview or applied optimization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepartoOptimizeEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: Invalid state or insufficient coordinates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/repartos/{id}/ubicacion:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -17486,6 +17540,18 @@ components:
           type: string
           nullable: true
           description: Bank alias used to match Mercado Pago/bank collections against this customer (#191).
+        latitud:
+          type: number
+          nullable: true
+          minimum: -90
+          maximum: 90
+          description: Optional WGS84 latitude for route maps (#199). No geocoder; set manually.
+        longitud:
+          type: number
+          nullable: true
+          minimum: -180
+          maximum: 180
+          description: Optional WGS84 longitude for route maps (#199). No geocoder; set manually.
 
     ClienteInput:
       type: object
@@ -17542,6 +17608,18 @@ components:
           type: string
           nullable: true
           maxLength: 60
+        latitud:
+          type: number
+          nullable: true
+          minimum: -90
+          maximum: 90
+          description: Optional WGS84 latitude (#199). Null clears the pin.
+        longitud:
+          type: number
+          nullable: true
+          minimum: -180
+          maximum: 180
+          description: Optional WGS84 longitude (#199). Null clears the pin.
 
     ClienteImportRowError:
       type: object
@@ -20965,6 +21043,83 @@ components:
           $ref: '#/components/schemas/Reparto'
         summary:
           $ref: '#/components/schemas/RepartoCloseSummary'
+
+    RepartoOptimizeInput:
+      type: object
+      properties:
+        apply:
+          type: boolean
+          default: false
+          description: When true, rewrite RepartoItem.secuencia; when false (default), preview only (#199).
+
+    RepartoRouteOptimizeStop:
+      type: object
+      required: [repartoItemId, secuencia, latitud, longitud]
+      properties:
+        repartoItemId:
+          type: integer
+        secuencia:
+          type: integer
+          minimum: 1
+        latitud:
+          type: number
+        longitud:
+          type: number
+        clienteRsocial:
+          type: string
+          nullable: true
+
+    RepartoRouteOptimizeResult:
+      type: object
+      required:
+        - applied
+        - distanceBeforeKm
+        - distanceAfterKm
+        - improvementPercent
+        - orderedItemIds
+        - stops
+        - skippedWithoutCoords
+        - reparto
+      properties:
+        applied:
+          type: boolean
+        distanceBeforeKm:
+          type: number
+          minimum: 0
+        distanceAfterKm:
+          type: number
+          minimum: 0
+        improvementPercent:
+          type: number
+          description: Percent improvement vs current geocoded order ((before-after)/before*100).
+        orderedItemIds:
+          type: array
+          items:
+            type: integer
+          description: Full new item id order (geocoded optimized first, then stops without coords).
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepartoRouteOptimizeStop'
+          description: Geocoded stops in suggested order (for Leaflet polyline).
+        skippedWithoutCoords:
+          type: integer
+          minimum: 0
+        reparto:
+          description: Updated reparto when applied; null on preview.
+          oneOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/Reparto'
+
+    RepartoOptimizeEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/RepartoRouteOptimizeResult'
 
     RepartoUbicacionInput:
       type: object

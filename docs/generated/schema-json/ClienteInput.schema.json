@@ -58,9 +58,23 @@
       "maxLength": 30,
       "type": "string"
     },
+    "latitud": {
+      "description": "Optional WGS84 latitude (#199). Null clears the pin.",
+      "maximum": 90,
+      "minimum": -90,
+      "nullable": true,
+      "type": "number"
+    },
     "localidad": {
       "maxLength": 25,
       "type": "string"
+    },
+    "longitud": {
+      "description": "Optional WGS84 longitude (#199). Null clears the pin.",
+      "maximum": 180,
+      "minimum": -180,
+      "nullable": true,
+      "type": "number"
     },
     "rsocial": {
       "maxLength": 30,
