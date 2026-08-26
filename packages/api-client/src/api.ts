@@ -98,6 +98,7 @@ export type {
   RepartoItemPodDetail,
   RepartoItemPodInput,
   RepartoItemRow,
+  RepartoRouteOptimizeResult,
   RepartoUbicacionPoint,
   TenantFeaturesData,
   TenantPlanSnapshot,

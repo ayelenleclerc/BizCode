@@ -4,6 +4,7 @@ import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import { ordenesEntregaAPI, repartosAPI, type OrdenEntrega, type Reparto, type RepartoCloseSummary } from '@/lib/api'
 import PodViewDialog from './PodViewDialog'
 import RepartosAvailableOrders from './RepartosAvailableOrders'
+import RepartoOptimizeDialog from './RepartoOptimizeDialog'
 
 type Props = {
   reparto: Reparto
@@ -21,6 +22,7 @@ export default function RepartosTrackingPanel({ reparto, canDispatch, onUpdated 
   const [closeSummary, setCloseSummary] = useState<RepartoCloseSummary | null>(null)
   const [podViewItemId, setPodViewItemId] = useState<number | null>(null)
   const [availableOrders, setAvailableOrders] = useState<OrdenEntrega[]>([])
+  const [optimizeOpen, setOptimizeOpen] = useState(false)
 
   const canEditStops =
     canDispatch && (reparto.estado === 'planned' || reparto.estado === 'on_route')
@@ -211,8 +213,28 @@ export default function RepartosTrackingPanel({ reparto, canDispatch, onUpdated 
         />
       )}
 
+      {optimizeOpen && (
+        <RepartoOptimizeDialog
+          open={optimizeOpen}
+          repartoId={reparto.id}
+          onClose={() => setOptimizeOpen(false)}
+          onApplied={(updated) => onUpdated(updated)}
+        />
+      )}
+
       {canDispatch && (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {canEditStops && (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => setOptimizeOpen(true)}
+              className="px-3 py-2 text-sm border border-blue-600 text-blue-700 dark:text-blue-300 rounded disabled:opacity-50"
+              data-testid="repartos-optimize-btn"
+            >
+              {t('actions.optimize')}
+            </button>
+          )}
           {reparto.estado === 'planned' && (
             <button
               type="button"

@@ -14,6 +14,7 @@ import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 import { notifyLogisticsPlannersForRepartoConflict } from './logisticsPlannerNotify'
 import { notifyDriverForRepartoEvent } from './driverPushNotify'
+import { optimizeStopOrder, type RouteStopCoord } from './repartoRouteOptimizeMath'
 
 export const POD_VIEW_ROLES = ['owner', 'manager', 'logistics_planner'] as const
 
@@ -601,6 +602,116 @@ export class RepartoService {
     })
 
     return { ok: true, data: withProgress(row) }
+  }
+
+  /**
+   * @en Preview or apply haversine NN+2-opt stop order (#199). Origin = lowest-secuencia stop with coords.
+   * @es Preview o aplica orden NN+2-opt haversine (#199). Origen = parada de menor secuencia con coords.
+   * @pt-BR Preview ou aplica ordem NN+2-opt haversine (#199). Origem = parada de menor sequência com coords.
+   */
+  async optimizeRoute(
+    tenantId: number,
+    id: number,
+    apply: boolean,
+  ): Promise<
+    ServiceResult<{
+      applied: boolean
+      distanceBeforeKm: number
+      distanceAfterKm: number
+      improvementPercent: number
+      orderedItemIds: number[]
+      stops: Array<{
+        repartoItemId: number
+        secuencia: number
+        latitud: number
+        longitud: number
+        clienteRsocial: string | null
+      }>
+      skippedWithoutCoords: number
+      reparto: RepartoListRow | null
+    }>
+  > {
+    const existing = await this.prisma.reparto.findFirst({
+      where: { id, tenantId },
+      include: repartoInclude,
+    })
+    if (!existing) {
+      return { ok: false, status: 404, error: 'REPARTO_NOT_FOUND' }
+    }
+    if (existing.estado !== 'planned' && existing.estado !== 'on_route') {
+      return { ok: false, status: 422, error: 'REPARTO_INVALID_STATE' }
+    }
+
+    const withCoords: RouteStopCoord[] = []
+    const withoutCoords: typeof existing.items = []
+    for (const item of existing.items) {
+      const lat = toCoord(item.ordenEntrega.cliente.latitud)
+      const lng = toCoord(item.ordenEntrega.cliente.longitud)
+      if (lat != null && lng != null) {
+        withCoords.push({ id: item.id, lat, lng, secuencia: item.secuencia })
+      } else {
+        withoutCoords.push(item)
+      }
+    }
+
+    if (withCoords.length < 2) {
+      return { ok: false, status: 422, error: 'REPARTO_ROUTE_INSUFFICIENT_COORDS' }
+    }
+
+    const math = optimizeStopOrder(withCoords)
+    const byId = new Map(existing.items.map((item) => [item.id, item]))
+    const orderedGeocoded = math.orderedIds.map((itemId) => byId.get(itemId)!).filter(Boolean)
+    const finalOrder = [...orderedGeocoded, ...withoutCoords.sort((a, b) => a.secuencia - b.secuencia)]
+
+    const stops = orderedGeocoded.map((item, index) => {
+      const lat = toCoord(item.ordenEntrega.cliente.latitud)!
+      const lng = toCoord(item.ordenEntrega.cliente.longitud)!
+      return {
+        repartoItemId: item.id,
+        secuencia: index + 1,
+        latitud: lat,
+        longitud: lng,
+        clienteRsocial: item.ordenEntrega.cliente.rsocial ?? null,
+      }
+    })
+
+    const payload = {
+      applied: false,
+      distanceBeforeKm: Math.round(math.distanceBeforeKm * 1000) / 1000,
+      distanceAfterKm: Math.round(math.distanceAfterKm * 1000) / 1000,
+      improvementPercent: Math.round(math.improvementRatio * 10000) / 100,
+      orderedItemIds: finalOrder.map((item) => item.id),
+      stops,
+      skippedWithoutCoords: withoutCoords.length,
+      reparto: null as RepartoListRow | null,
+    }
+
+    if (!apply) {
+      return { ok: true, data: payload }
+    }
+
+    const row = await this.prisma.$transaction(async (tx) => {
+      for (let index = 0; index < finalOrder.length; index += 1) {
+        const item = finalOrder[index]!
+        await tx.repartoItem.update({
+          where: { id: item.id },
+          data: { secuencia: index + 1 },
+        })
+      }
+      return tx.reparto.findFirstOrThrow({
+        where: { id, tenantId },
+        include: repartoInclude,
+      })
+    })
+
+    return {
+      ok: true,
+      data: {
+        ...payload,
+        applied: true,
+        reparto: withProgress(row),
+      },
+    }
   }
 
   async iniciar(tenantId: number, id: number): Promise<ServiceResult<RepartoListRow>> {

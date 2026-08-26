@@ -75,9 +75,23 @@
     "id": {
       "type": "integer"
     },
+    "latitud": {
+      "description": "Optional WGS84 latitude for route maps (#199). No geocoder; set manually.",
+      "maximum": 90,
+      "minimum": -90,
+      "nullable": true,
+      "type": "number"
+    },
     "localidad": {
       "nullable": true,
       "type": "string"
+    },
+    "longitud": {
+      "description": "Optional WGS84 longitude for route maps (#199). No geocoder; set manually.",
+      "maximum": 180,
+      "minimum": -180,
+      "nullable": true,
+      "type": "number"
     },
     "rsocial": {
       "type": "string"

@@ -38,7 +38,8 @@
     "moveUp": "Subir",
     "moveDown": "Bajar",
     "addOrder": "Agregar",
-    "removeOrder": "Quitar"
+    "removeOrder": "Quitar",
+    "optimize": "Optimizar orden"
   },
   "form": {
     "chofer": "Chofer",
@@ -52,6 +53,23 @@
   "tracking": {
     "title": "Detalle del reparto",
     "summaryClose": "Cierre: {{pending}} pendientes marcados no entregados."
+  },
+  "optimize": {
+    "title": "Optimizar orden de paradas",
+    "subtitle": "Vista previa con distancia haversine (NN + 2-opt). Origen = primera parada con coordenadas del orden actual. Sin geocoder ni rutas de tráfico.",
+    "loading": "Calculando vista previa…",
+    "distanceBefore": "Distancia actual",
+    "distanceAfter": "Distancia sugerida",
+    "improvement": "Mejora",
+    "skipped": "Paradas sin coordenadas (al final)",
+    "accept": "Aplicar orden",
+    "reject": "Descartar",
+    "applying": "Aplicando…",
+    "errors": {
+      "preview": "No se pudo calcular la optimización.",
+      "apply": "No se pudo aplicar el nuevo orden.",
+      "insufficientCoords": "Se necesitan al menos dos paradas con latitud y longitud en el cliente."
+    }
   },
   "errors": {
     "load": "No se pudieron cargar los repartos.",

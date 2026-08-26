@@ -11,6 +11,7 @@ import type {
   RepartoItemPodDetail,
   RepartoItemPodInput,
   RepartoItemRow,
+  RepartoRouteOptimizeResult,
   RepartoUbicacionPoint,
 } from '@bizcode/types'
 import { api } from '../default-client'
@@ -106,6 +107,20 @@ export function createRepartosAPI(http: AxiosInstance) {
       try {
         const response = await http.delete(`/repartos/${repartoId}/items/${itemId}`)
         return response.data.data as Reparto
+      } catch (error) {
+        handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
+    /**
+     * @en Preview or apply TSP stop order (#199).
+     * @es Preview o aplica orden TSP de paradas (#199).
+     * @pt-BR Preview ou aplica ordem TSP das paradas (#199).
+     */
+    optimizar: async (repartoId: number, body?: { apply?: boolean }) => {
+      try {
+        const response = await http.post(`/repartos/${repartoId}/optimizar`, body ?? {})
+        return response.data.data as RepartoRouteOptimizeResult
       } catch (error) {
         handleError(error as AxiosError<ApiErrorPayload>)
       }

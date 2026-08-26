@@ -35,7 +35,9 @@ undefined#/properties/data/anyOf/0
 | [email](#email)                   | `string`  | Optional | cannot be null | [Cliente](cliente-properties-email.md "undefined#/properties/email")                   |
 | [fantasia](#fantasia)             | `string`  | Optional | cannot be null | [Cliente](cliente-properties-fantasia.md "undefined#/properties/fantasia")             |
 | [id](#id)                         | `integer` | Optional | cannot be null | [Cliente](cliente-properties-id.md "undefined#/properties/id")                         |
+| [latitud](#latitud)               | `number`  | Optional | cannot be null | [Cliente](cliente-properties-latitud.md "undefined#/properties/latitud")               |
 | [localidad](#localidad)           | `string`  | Optional | cannot be null | [Cliente](cliente-properties-localidad.md "undefined#/properties/localidad")           |
+| [longitud](#longitud)             | `number`  | Optional | cannot be null | [Cliente](cliente-properties-longitud.md "undefined#/properties/longitud")             |
 | [rsocial](#rsocial)               | `string`  | Optional | cannot be null | [Cliente](cliente-properties-rsocial.md "undefined#/properties/rsocial")               |
 | [score](#score)                   | `integer` | Optional | cannot be null | [Cliente](cliente-properties-score.md "undefined#/properties/score")                   |
 | [suspended](#suspended)           | `boolean` | Optional | cannot be null | [Cliente](cliente-properties-suspended.md "undefined#/properties/suspended")           |
@@ -376,6 +378,30 @@ FK to DeliveryZone. Assign a delivery zone to this customer.
 
 `integer`
 
+## latitud
+
+Optional WGS84 latitude for route maps (#199). No geocoder; set manually.
+
+`latitud`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [Cliente](cliente-properties-latitud.md "undefined#/properties/latitud")
+
+### latitud Type
+
+`number`
+
+### latitud Constraints
+
+**maximum**: the value of this number must smaller than or equal to: `90`
+
+**minimum**: the value of this number must greater than or equal to: `-90`
+
 ## localidad
 
 
@@ -393,6 +419,30 @@ FK to DeliveryZone. Assign a delivery zone to this customer.
 ### localidad Type
 
 `string`
+
+## longitud
+
+Optional WGS84 longitude for route maps (#199). No geocoder; set manually.
+
+`longitud`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [Cliente](cliente-properties-longitud.md "undefined#/properties/longitud")
+
+### longitud Type
+
+`number`
+
+### longitud Constraints
+
+**maximum**: the value of this number must smaller than or equal to: `180`
+
+**minimum**: the value of this number must greater than or equal to: `-180`
 
 ## rsocial
 

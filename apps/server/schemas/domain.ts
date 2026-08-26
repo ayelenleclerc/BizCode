@@ -94,6 +94,8 @@ export const clienteBodySchema = z
     listaPrecioId: z.union([z.number(), z.null(), z.undefined()]).optional(),
     cbu: z.union([z.string(), z.null(), z.undefined()]).optional(),
     alias: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    latitud: z.union([z.number(), z.null(), z.undefined()]).optional(),
+    longitud: z.union([z.number(), z.null(), z.undefined()]).optional(),
   })
   .superRefine((data, ctx) => {
     if (typeof data.codigo !== 'number' || !Number.isInteger(data.codigo)) {
@@ -142,6 +144,14 @@ export const clienteBodySchema = z
     const lp = data.listaPrecioId
     if (lp !== undefined && lp !== null && (typeof lp !== 'number' || !Number.isInteger(lp) || lp < 1)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'listaPrecioId must be an integer', path: ['listaPrecioId'] })
+    }
+    const lat = data.latitud
+    if (lat !== undefined && lat !== null && (typeof lat !== 'number' || Number.isNaN(lat) || lat < -90 || lat > 90)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'latitud must be between -90 and 90', path: ['latitud'] })
+    }
+    const lng = data.longitud
+    if (lng !== undefined && lng !== null && (typeof lng !== 'number' || Number.isNaN(lng) || lng < -180 || lng > 180)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'longitud must be between -180 and 180', path: ['longitud'] })
     }
   })
   .transform((data): ClienteInput => {
@@ -215,6 +225,12 @@ export const clienteBodySchema = z
     const aliasTrim = trimOrUndef('alias')
     if (aliasTrim !== undefined) {
       out.alias = aliasTrim
+    }
+    if (data.latitud !== undefined) {
+      out.latitud = data.latitud
+    }
+    if (data.longitud !== undefined) {
+      out.longitud = data.longitud
     }
     return out
   })
@@ -2464,6 +2480,15 @@ export const repartoUbicacionBodySchema = z
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'lng must be between -180 and 180', path: ['lng'] })
     }
   })
+
+/** @en Body for POST /api/repartos/:id/optimizar (#199). @es Body de optimización de ruta (#199). @pt-BR Body de otimização de rota (#199). */
+export const repartoOptimizeBodySchema = z
+  .object({
+    apply: z.boolean().optional(),
+  })
+  .transform((body): { apply: boolean } => ({
+    apply: body.apply === true,
+  }))
 
 const libroIvaPeriodoString = z
   .string()

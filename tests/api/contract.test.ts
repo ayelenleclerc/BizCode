@@ -3348,6 +3348,52 @@ describe('API — contrato OpenAPI', () => {
     await assertMatchesOpenApi('/api/repartos/{id}/iniciar', 'post', '200', res.body)
   })
 
+  it('POST /api/repartos/{id}/optimizar', async () => {
+    process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const p = buildPrisma()
+    const mkItem = (id: number, secuencia: number, lat: number, lng: number) => ({
+      id,
+      ordenEntregaId: id + 100,
+      secuencia,
+      estado: 'pending',
+      entregadoAt: null,
+      motivoNoEntrega: null,
+      receptorNombre: null,
+      receptorDni: null,
+      notasEntrega: null,
+      podMedia: null,
+      ordenEntrega: {
+        ...repartoContractRow.items[0]!.ordenEntrega,
+        id: id + 100,
+        clienteId: id,
+        cliente: {
+          id,
+          codigo: id,
+          rsocial: `C${id}`,
+          domicilio: null,
+          localidad: null,
+          telef: null,
+          latitud: lat,
+          longitud: lng,
+          balance: 0,
+        },
+      },
+    })
+    const row = {
+      ...repartoContractRow,
+      items: [
+        mkItem(1, 1, -34.6, -58.5),
+        mkItem(2, 2, -34.5, -58.5),
+        mkItem(3, 3, -34.6, -58.4),
+      ],
+    }
+    vi.mocked(p.reparto.findFirst).mockResolvedValueOnce(row as never)
+    const app = createApp(p)
+    const res = await request(app).post('/api/repartos/1/optimizar').send({ apply: false }).expect(200)
+    await assertMatchesOpenApi('/api/repartos/{id}/optimizar', 'post', '200', res.body)
+  })
+
   it('POST /api/repartos/{id}/cerrar', async () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'logistics_planner'

@@ -41,6 +41,9 @@
     "domicilio": "Address",
     "localidad": "City",
     "cpost": "Postal Code",
+    "latitud": "Latitude",
+    "longitud": "Longitude",
+    "coordsHint": "Optional WGS84 coordinates for route maps. No automatic geocoder.",
     "telef": "Phone",
     "email": "Email",
     "activo": "Active",
@@ -56,6 +59,8 @@
       "cuit": "Invalid Tax ID",
       "cbu": "Invalid CBU",
       "rsocial": "Company name must be at least 3 characters",
+      "latitud": "Invalid latitude (-90 to 90)",
+      "longitud": "Invalid longitude (-180 to 180)",
       "generic": "Error saving customer"
     },
     "padron": {

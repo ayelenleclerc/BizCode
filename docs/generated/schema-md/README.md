@@ -1144,7 +1144,15 @@
 
 * [RepartoListEnvelope](./repartolistenvelope.md) – `-`
 
+* [RepartoOptimizeEnvelope](./repartooptimizeenvelope.md) – `-`
+
+* [RepartoOptimizeInput](./repartooptimizeinput.md) – `-`
+
 * [RepartoProgress](./repartoprogress.md) – `-`
+
+* [RepartoRouteOptimizeResult](./repartorouteoptimizeresult.md) – `-`
+
+* [RepartoRouteOptimizeStop](./repartorouteoptimizestop.md) – `-`
 
 * [RepartoUbicacion](./repartoubicacion.md) – `-`
 
@@ -2259,6 +2267,10 @@
 * [Untitled array in RepartoCreateInput](./repartocreateinput-properties-ordenentregaids.md) – `undefined#/properties/ordenEntregaIds`
 
 * [Untitled array in RepartoListEnvelope](./repartolistenvelope-allof-1-properties-data.md) – `undefined#/allOf/1/properties/data`
+
+* [Untitled array in RepartoRouteOptimizeResult](./repartorouteoptimizeresult-properties-ordereditemids.md "Full new item id order (geocoded optimized first, then stops without coords)") – `undefined#/properties/orderedItemIds`
+
+* [Untitled array in RepartoRouteOptimizeResult](./repartorouteoptimizeresult-properties-stops.md "Geocoded stops in suggested order (for Leaflet polyline)") – `undefined#/properties/stops`
 
 * [Untitled array in ReplenishmentForecastListEnvelope](./replenishmentforecastlistenvelope-properties-data.md) – `undefined#/properties/data`
 

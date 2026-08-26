@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteRsocial": {
+      "nullable": true,
+      "type": "string"
+    },
+    "latitud": {
+      "type": "number"
+    },
+    "longitud": {
+      "type": "number"
+    },
+    "repartoItemId": {
+      "type": "integer"
+    },
+    "secuencia": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "repartoItemId",
+    "secuencia",
+    "latitud",
+    "longitud"
+  ],
+  "title": "RepartoRouteOptimizeStop",
+  "type": "object"
+}

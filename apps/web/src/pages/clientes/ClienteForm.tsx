@@ -56,6 +56,17 @@ const clienteSchema = z.object({
     if (!Number.isFinite(n) || n <= 0) return undefined
     return Math.trunc(n)
   }, z.number().int().positive().optional().nullable()),
+  // Map pin (#199) — optional; empty clears coords (no geocoder).
+  latitud: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return null
+    const n = typeof val === 'number' ? val : Number(val)
+    return Number.isFinite(n) ? n : NaN
+  }, z.number().min(-90).max(90).nullable().optional()),
+  longitud: z.preprocess((val) => {
+    if (val === '' || val === null || val === undefined) return null
+    const n = typeof val === 'number' ? val : Number(val)
+    return Number.isFinite(n) ? n : NaN
+  }, z.number().min(-180).max(180).nullable().optional()),
 })
 
 type ClienteFormData = z.infer<typeof clienteSchema>
@@ -166,6 +177,8 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       setValue('suspended', cliente.suspended ?? false)
       setValue('deliveryZoneId', cliente.deliveryZoneId ?? null)
       setValue('listaPrecioId', cliente.listaPrecioId ?? null)
+      setValue('latitud', cliente.latitud != null ? Number(cliente.latitud) : null)
+      setValue('longitud', cliente.longitud != null ? Number(cliente.longitud) : null)
     }
   }, [cliente, setValue])
 
@@ -498,6 +511,46 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
               />
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="cliente-latitud" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.latitud')}
+              </label>
+              <input
+                id="cliente-latitud"
+                type="number"
+                step="any"
+                {...register('latitud')}
+                data-testid="cliente-latitud"
+                aria-describedby="cliente-coords-hint"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+              />
+              {errors.latitud && (
+                <p className="text-red-600 text-sm mt-1" role="alert">{t('form.errors.latitud')}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="cliente-longitud" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.longitud')}
+              </label>
+              <input
+                id="cliente-longitud"
+                type="number"
+                step="any"
+                {...register('longitud')}
+                data-testid="cliente-longitud"
+                aria-describedby="cliente-coords-hint"
+                className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
+              />
+              {errors.longitud && (
+                <p className="text-red-600 text-sm mt-1" role="alert">{t('form.errors.longitud')}</p>
+              )}
+            </div>
+          </div>
+          <p id="cliente-coords-hint" className="text-xs text-slate-500 dark:text-slate-400 -mt-2 mb-2">
+            {t('form.coordsHint')}
+          </p>
 
           <div className="grid grid-cols-2 gap-4">
             <div>

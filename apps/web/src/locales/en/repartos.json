@@ -38,7 +38,8 @@
     "moveUp": "Move up",
     "moveDown": "Move down",
     "addOrder": "Add",
-    "removeOrder": "Remove"
+    "removeOrder": "Remove",
+    "optimize": "Optimize order"
   },
   "form": {
     "chofer": "Driver",
@@ -52,6 +53,23 @@
   "tracking": {
     "title": "Route detail",
     "summaryClose": "Closed: {{pending}} pending marked not delivered."
+  },
+  "optimize": {
+    "title": "Optimize stop order",
+    "subtitle": "Preview with haversine distance (NN + 2-opt). Origin = first stop with coordinates in the current order. No geocoder or traffic routing.",
+    "loading": "Computing preview…",
+    "distanceBefore": "Current distance",
+    "distanceAfter": "Suggested distance",
+    "improvement": "Improvement",
+    "skipped": "Stops without coordinates (appended)",
+    "accept": "Apply order",
+    "reject": "Discard",
+    "applying": "Applying…",
+    "errors": {
+      "preview": "Could not compute optimization.",
+      "apply": "Could not apply the new order.",
+      "insufficientCoords": "At least two stops need customer latitude and longitude."
+    }
   },
   "errors": {
     "load": "Could not load delivery routes.",

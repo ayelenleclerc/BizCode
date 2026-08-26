@@ -1,20 +1,20 @@
 # Reparto Schema
 
 ```txt
-undefined#/allOf/1/properties/data/items
+undefined#/properties/reparto/oneOf/1
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                 |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [RepartoListEnvelope.schema.json\*](../schema-json/RepartoListEnvelope.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                               |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [RepartoRouteOptimizeResult.schema.json\*](../schema-json/RepartoRouteOptimizeResult.schema.json "open original schema") |
 
-## items Type
+## 1 Type
 
 `object` ([Reparto](reparto.md))
 
-# items Properties
+# 1 Properties
 
 | Property                        | Type      | Required | Nullable       | Defined by                                                                           |
 | :------------------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------- |
