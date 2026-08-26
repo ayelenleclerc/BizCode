@@ -97,7 +97,7 @@ export function createFacturasAPI(http: AxiosInstance) {
           warnings: response.data.warnings ?? [],
         }
       } catch (error) {
-        handleError(error as AxiosError<ApiErrorPayload>)
+        return handleError(error as AxiosError<ApiErrorPayload>)
       }
     },
 
