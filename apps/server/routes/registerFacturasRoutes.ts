@@ -76,11 +76,17 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
         const parsedValue = req.body as FacturaInput
         const result = await factura.create(tenantId, parsedValue, authReq.auth!.claims.userId)
         if (!result.ok) {
-          res.status(result.status).json({ success: false, error: result.error })
+          res.status(result.status).json({
+            success: false,
+            error: result.error,
+            ...(result.warnings != null && result.warnings.length > 0
+              ? { warnings: result.warnings }
+              : {}),
+          })
           return
         }
 
-        const { factura: createdFactura, updatedCliente, stockBelowMinimum } = result.data
+        const { factura: createdFactura, updatedCliente, stockBelowMinimum, warnings } = result.data
         if (
           updatedCliente.creditLimit !== null &&
           Number(updatedCliente.balance) > Number(updatedCliente.creditLimit)
@@ -115,7 +121,23 @@ export function registerFacturasRoutes(app: Application, ctx: RestRouteContext):
         }
 
         await writeAudit(req as AuthenticatedRequest, 'factura_create', 'factura', String(createdFactura.id))
-        res.json({ success: true, data: createdFactura })
+        if (warnings.length > 0) {
+          await writeAudit(
+            req as AuthenticatedRequest,
+            'factura_anomaly_detected',
+            'factura',
+            String(createdFactura.id),
+            {
+              tipos: warnings.map((w) => w.tipo),
+              confirmAnomalies: parsedValue.confirmAnomalies === true,
+            },
+          )
+        }
+        res.json({
+          success: true,
+          data: createdFactura,
+          ...(warnings.length > 0 ? { warnings } : {}),
+        })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })
       }

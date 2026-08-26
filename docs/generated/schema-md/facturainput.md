@@ -16,23 +16,24 @@ undefined
 
 # FacturaInput Properties
 
-| Property                      | Type      | Required | Nullable       | Defined by                                                                                   |
-| :---------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------- |
-| [clienteId](#clienteid)       | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-clienteid.md "undefined#/properties/clienteId")       |
-| [fecha](#fecha)               | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-fecha.md "undefined#/properties/fecha")               |
-| [formaPagoId](#formapagoid)   | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-formapagoid.md "undefined#/properties/formaPagoId")   |
-| [items](#items)               | `array`   | Required | cannot be null | [FacturaInput](facturainput-properties-items.md "undefined#/properties/items")               |
-| [iva1](#iva1)                 | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva1.md "undefined#/properties/iva1")                 |
-| [iva2](#iva2)                 | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva2.md "undefined#/properties/iva2")                 |
-| [neto1](#neto1)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto1.md "undefined#/properties/neto1")               |
-| [neto2](#neto2)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto2.md "undefined#/properties/neto2")               |
-| [neto3](#neto3)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto3.md "undefined#/properties/neto3")               |
-| [numero](#numero)             | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-numero.md "undefined#/properties/numero")             |
-| [percepciones](#percepciones) | `array`   | Optional | cannot be null | [FacturaInput](facturainput-properties-percepciones.md "undefined#/properties/percepciones") |
-| [prefijo](#prefijo)           | `string`  | Optional | cannot be null | [FacturaInput](facturainput-properties-prefijo.md "undefined#/properties/prefijo")           |
-| [puntosCanje](#puntoscanje)   | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-puntoscanje.md "undefined#/properties/puntosCanje")   |
-| [tipo](#tipo)                 | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-tipo.md "undefined#/properties/tipo")                 |
-| [total](#total)               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-total.md "undefined#/properties/total")               |
+| Property                              | Type      | Required | Nullable       | Defined by                                                                                           |
+| :------------------------------------ | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------- |
+| [clienteId](#clienteid)               | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-clienteid.md "undefined#/properties/clienteId")               |
+| [confirmAnomalies](#confirmanomalies) | `boolean` | Optional | cannot be null | [FacturaInput](facturainput-properties-confirmanomalies.md "undefined#/properties/confirmAnomalies") |
+| [fecha](#fecha)                       | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-fecha.md "undefined#/properties/fecha")                       |
+| [formaPagoId](#formapagoid)           | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-formapagoid.md "undefined#/properties/formaPagoId")           |
+| [items](#items)                       | `array`   | Required | cannot be null | [FacturaInput](facturainput-properties-items.md "undefined#/properties/items")                       |
+| [iva1](#iva1)                         | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva1.md "undefined#/properties/iva1")                         |
+| [iva2](#iva2)                         | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva2.md "undefined#/properties/iva2")                         |
+| [neto1](#neto1)                       | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto1.md "undefined#/properties/neto1")                       |
+| [neto2](#neto2)                       | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto2.md "undefined#/properties/neto2")                       |
+| [neto3](#neto3)                       | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto3.md "undefined#/properties/neto3")                       |
+| [numero](#numero)                     | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-numero.md "undefined#/properties/numero")                     |
+| [percepciones](#percepciones)         | `array`   | Optional | cannot be null | [FacturaInput](facturainput-properties-percepciones.md "undefined#/properties/percepciones")         |
+| [prefijo](#prefijo)                   | `string`  | Optional | cannot be null | [FacturaInput](facturainput-properties-prefijo.md "undefined#/properties/prefijo")                   |
+| [puntosCanje](#puntoscanje)           | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-puntoscanje.md "undefined#/properties/puntosCanje")           |
+| [tipo](#tipo)                         | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-tipo.md "undefined#/properties/tipo")                         |
+| [total](#total)                       | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-total.md "undefined#/properties/total")                       |
 
 ## clienteId
 
@@ -51,6 +52,24 @@ undefined
 ### clienteId Type
 
 `integer`
+
+## confirmAnomalies
+
+When true, acknowledges soft-blocked duplicate anomaly and proceeds with create (#200). Required to create after HTTP 422 DUPLICATE\_INVOICE\_CONFIRM\_REQUIRED.
+
+`confirmAnomalies`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [FacturaInput](facturainput-properties-confirmanomalies.md "undefined#/properties/confirmAnomalies")
+
+### confirmAnomalies Type
+
+`boolean`
 
 ## fecha
 

@@ -617,6 +617,7 @@ export const facturaBodySchema = z
     items: z.array(z.unknown()),
     percepciones: z.array(facturaPercepcionLineSchema).optional(),
     puntosCanje: z.number().int().min(1).nullable().optional(),
+    confirmAnomalies: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
     const f = data.fecha.trim()
@@ -813,6 +814,8 @@ export const facturaBodySchema = z
       ...(data.percepciones != null && data.percepciones.length > 0
         ? { percepciones: data.percepciones }
         : {}),
+      ...(data.puntosCanje !== undefined ? { puntosCanje: data.puntosCanje } : {}),
+      ...(data.confirmAnomalies === true ? { confirmAnomalies: true } : {}),
     }
     return out
   })

@@ -16,10 +16,11 @@ undefined
 
 # ApiErrorEnvelope Properties
 
-| Property            | Type      | Required | Nullable       | Defined by                                                                                 |
-| :------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------- |
-| [error](#error)     | `string`  | Required | cannot be null | [ApiErrorEnvelope](apierrorenvelope-properties-error.md "undefined#/properties/error")     |
-| [success](#success) | `boolean` | Required | cannot be null | [ApiErrorEnvelope](apierrorenvelope-properties-success.md "undefined#/properties/success") |
+| Property              | Type      | Required | Nullable       | Defined by                                                                                   |
+| :-------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------- |
+| [error](#error)       | `string`  | Required | cannot be null | [ApiErrorEnvelope](apierrorenvelope-properties-error.md "undefined#/properties/error")       |
+| [success](#success)   | `boolean` | Required | cannot be null | [ApiErrorEnvelope](apierrorenvelope-properties-success.md "undefined#/properties/success")   |
+| [warnings](#warnings) | `array`   | Optional | cannot be null | [ApiErrorEnvelope](apierrorenvelope-properties-warnings.md "undefined#/properties/warnings") |
 
 ## error
 
@@ -64,3 +65,21 @@ undefined
 ```json
 false
 ```
+
+## warnings
+
+Optional structured warnings (e.g. billing anomalies
+
+`warnings`
+
+* is optional
+
+* Type: `object[]` ([FacturaAnomalyWarning](facturaanomalywarning.md))
+
+* cannot be null
+
+* defined in: [ApiErrorEnvelope](apierrorenvelope-properties-warnings.md "undefined#/properties/warnings")
+
+### warnings Type
+
+`object[]` ([FacturaAnomalyWarning](facturaanomalywarning.md))

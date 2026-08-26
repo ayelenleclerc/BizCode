@@ -12,6 +12,7 @@ export class ApiRequestFailedError extends Error {
   readonly httpStatus: number | undefined
   readonly rateLimitReset: string | undefined
   readonly validation: ApiErrorPayload['validation']
+  readonly warnings: ApiErrorPayload['warnings']
 
   constructor(
     message: string,
@@ -21,6 +22,7 @@ export class ApiRequestFailedError extends Error {
       httpStatus?: number
       rateLimitReset?: string
       validation?: ApiErrorPayload['validation']
+      warnings?: ApiErrorPayload['warnings']
     },
   ) {
     super(message)
@@ -30,6 +32,7 @@ export class ApiRequestFailedError extends Error {
     this.httpStatus = options.httpStatus
     this.rateLimitReset = options.rateLimitReset
     this.validation = options.validation
+    this.warnings = options.warnings
   }
 }
 
@@ -47,6 +50,7 @@ export const handleError = (error: AxiosError<ApiErrorPayload>): never => {
       httpStatus: ax.response?.status,
       rateLimitReset,
       validation: data.validation,
+      warnings: data.warnings,
     })
   }
   throw new ApiRequestFailedError(ax.message || 'Unknown error', {

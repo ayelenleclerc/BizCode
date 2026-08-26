@@ -21,6 +21,7 @@ import { MeliStockSyncService } from './MeliStockSyncService'
 import { TiendanubeStockSyncService } from './TiendanubeStockSyncService'
 import { WooCommerceStockSyncService } from './WooCommerceStockSyncService'
 import { afipCodigoForUnidad, isUnidadBase, roundQty, validateQuantityForUom } from '../lib/uom'
+import { FacturaAnomalyService, type FacturaAnomalyWarning } from './FacturaAnomalyService'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -37,6 +38,8 @@ export type FacturaCreateResult = {
   factura: FacturaWithRelations
   updatedCliente: Pick<Cliente, 'id' | 'rsocial' | 'balance' | 'creditLimit'>
   stockBelowMinimum: StockBelowMinimumAlert[]
+  /** @en Soft anomaly warnings after successful create (#200). */
+  warnings: FacturaAnomalyWarning[]
 }
 export type FacturaVoidAuditContext = {
   userId: number | null
@@ -76,6 +79,7 @@ export class FacturaService {
   private readonly fidelizacionService: FidelizacionService
   private readonly loteService: LoteService
   private readonly turnoCajaService: TurnoCajaService
+  private readonly anomalyService: FacturaAnomalyService
 
   constructor(private readonly prisma: PrismaClient) {
     this.fiscalDocumentService = new FiscalDocumentService(prisma)
@@ -83,6 +87,7 @@ export class FacturaService {
     this.fidelizacionService = new FidelizacionService(prisma)
     this.loteService = new LoteService(prisma)
     this.turnoCajaService = new TurnoCajaService(prisma)
+    this.anomalyService = new FacturaAnomalyService(prisma)
   }
 
   async list(tenantId: number, take: number, skip: number): Promise<FacturaListResult> {
@@ -106,8 +111,38 @@ export class FacturaService {
     userId: number,
     options?: FacturaCreateOptions,
   ): Promise<ServiceResult<FacturaCreateResult>> {
-    const { items: inputItems, fecha, depositoId: inputDepositoId, puntosCanje, ...factura } = input
+    const {
+      items: inputItems,
+      fecha,
+      depositoId: inputDepositoId,
+      puntosCanje,
+      confirmAnomalies,
+      ...factura
+    } = input
     const clienteId = factura.clienteId
+    const confirm = confirmAnomalies === true
+
+    const anomalyLines = inputItems.map((it) => ({
+      cantidad: it.cantidad,
+      precio: it.precio,
+      dscto: it.dscto,
+    }))
+    const anomalyWarnings = await this.anomalyService.analyze({
+      tenantId,
+      clienteId,
+      fecha,
+      total: factura.total,
+      lines: anomalyLines,
+    })
+    const hasDuplicate = anomalyWarnings.some((w) => w.tipo === 'factura_duplicada')
+    if (hasDuplicate && !confirm) {
+      return {
+        ok: false,
+        status: 422,
+        error: 'DUPLICATE_INVOICE_CONFIRM_REQUIRED',
+        warnings: anomalyWarnings,
+      }
+    }
 
     let items = [...inputItems]
     let facturaTotals = { ...factura }
@@ -592,12 +627,23 @@ export class FacturaService {
       void wcStock.syncStockToWooCommerce(tenantId, articuloId).catch(() => undefined)
     }
 
+    if (anomalyWarnings.length > 0) {
+      await this.anomalyService.persist(
+        tenantId,
+        newFactura.id,
+        clienteId,
+        anomalyWarnings,
+        confirm,
+      )
+    }
+
     return {
       ok: true,
       data: {
         factura: newFactura,
         updatedCliente,
         stockBelowMinimum: stockEval.alerts,
+        warnings: anomalyWarnings,
       },
     }
   }

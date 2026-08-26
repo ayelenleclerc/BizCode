@@ -88,9 +88,12 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
     factura: {
       findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn().mockResolvedValue(null),
+      count: vi.fn().mockResolvedValue(0),
       create: vi.fn().mockResolvedValue(FACTURA_RESULT),
       aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
     },
+    anomaliaDetectada: { createMany: vi.fn().mockResolvedValue({ count: 0 }) },
     notification: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),
@@ -170,6 +173,8 @@ describe('POST /api/facturas — cliente suspended', () => {
       }),
       factura: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(null),
+        count: vi.fn().mockResolvedValue(0),
         create: vi.fn().mockResolvedValue(FACTURA_RESULT),
         aggregate: vi.fn(),
       },
@@ -184,6 +189,8 @@ describe('POST /api/facturas — cliente suspended', () => {
       },
       factura: {
         findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(null),
+        count: vi.fn().mockResolvedValue(0),
         create: vi.fn().mockResolvedValue(FACTURA_RESULT),
         aggregate: vi.fn(),
       },

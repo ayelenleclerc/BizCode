@@ -16,10 +16,11 @@ undefined
 
 # FacturaEnvelope Properties
 
-| Property            | Type      | Required | Nullable       | Defined by                                                                               |
-| :------------------ | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------- |
-| [data](#data)       | `object`  | Required | cannot be null | [FacturaEnvelope](factura.md "undefined#/properties/data")                               |
-| [success](#success) | `boolean` | Required | cannot be null | [FacturaEnvelope](facturaenvelope-properties-success.md "undefined#/properties/success") |
+| Property              | Type      | Required | Nullable       | Defined by                                                                                 |
+| :-------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------- |
+| [data](#data)         | `object`  | Required | cannot be null | [FacturaEnvelope](factura.md "undefined#/properties/data")                                 |
+| [success](#success)   | `boolean` | Required | cannot be null | [FacturaEnvelope](facturaenvelope-properties-success.md "undefined#/properties/success")   |
+| [warnings](#warnings) | `array`   | Optional | cannot be null | [FacturaEnvelope](facturaenvelope-properties-warnings.md "undefined#/properties/warnings") |
 
 ## data
 
@@ -64,3 +65,21 @@ undefined
 ```json
 true
 ```
+
+## warnings
+
+Soft billing anomaly warnings after successful create (#200).
+
+`warnings`
+
+* is optional
+
+* Type: `object[]` ([FacturaAnomalyWarning](facturaanomalywarning.md))
+
+* cannot be null
+
+* defined in: [FacturaEnvelope](facturaenvelope-properties-warnings.md "undefined#/properties/warnings")
+
+### warnings Type
+
+`object[]` ([FacturaAnomalyWarning](facturaanomalywarning.md))

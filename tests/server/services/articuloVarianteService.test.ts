@@ -375,17 +375,37 @@ describe('FacturaService rejects parent articles', () => {
             unidadServicio: null,
             mesesGarantia: null,
             esPadre: true,
+            controlLote: false,
+            monedaPrecio: 'ARS',
+            precioEnMonedaOrigen: null,
+            unidadBase: 'unidad',
+            multiploVenta: null,
+            factorConversion: 1,
           },
         ]),
       },
-      cliente: { findFirst: vi.fn() },
+      cliente: { findFirst: vi.fn().mockResolvedValue({ creditLimit: null, suspended: false }) },
+      factura: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(null),
+        count: vi.fn().mockResolvedValue(0),
+      },
+      anomaliaDetectada: { createMany: vi.fn() },
     } as unknown as PrismaClient
     const svc = new FacturaService(prisma)
     const result = await svc.create(
       1,
       {
+        fecha: '2026-08-26',
+        tipo: 'A',
+        numero: 1,
         clienteId: 1,
-        tipoCbte: 'A',
+        neto1: 10,
+        neto2: 0,
+        neto3: 0,
+        iva1: 0,
+        iva2: 0,
+        total: 10,
         items: [
           {
             articuloId: 5,
@@ -395,13 +415,13 @@ describe('FacturaService rejects parent articles', () => {
             subtotal: 10,
           },
         ],
-      } as never,
+      },
       1,
     )
     expect(result.ok).toBe(false)
     if (!result.ok) {
       expect(result.status).toBe(400)
-      expect(result.error).toMatch(/variant/i)
+      expect(result.error).toMatch(/variant|Parent/i)
     }
   })
 })

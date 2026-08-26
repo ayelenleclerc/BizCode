@@ -112,10 +112,16 @@ describe('FacturaService FX snapshot (#243)', () => {
         findUnique: vi.fn().mockResolvedValue(null),
       },
       factura: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(null),
+        count: vi.fn().mockResolvedValue(0),
         create: vi.fn().mockImplementation(async (args: { data: Record<string, unknown> }) => {
           createdData = args.data
           return createdFactura
         }),
+      },
+      anomaliaDetectada: {
+        createMany: vi.fn().mockResolvedValue({ count: 0 }),
       },
       $transaction: vi.fn().mockImplementation(async (fn: (tx: PrismaClient) => Promise<unknown>) => {
         const tx = {

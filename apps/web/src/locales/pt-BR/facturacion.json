@@ -75,6 +75,18 @@
     "detail": "Saldo atual: ${{balance}} + esta NF = ${{projected}} (limite: ${{limit}})",
     "hint": "Você pode continuar registrando a venda ou cancelá-la."
   },
+  "anomaly": {
+    "title": "Anomalia de faturamento detectada",
+    "duplicateConfirmRequired": "Foi detectada uma possível fatura duplicada. Confirme para salvar mesmo assim.",
+    "confirmDuplicate": "Confirmar e salvar",
+    "cancelDuplicate": "Cancelar",
+    "tipos": {
+      "factura_duplicada": "Possível duplicata: mesmo cliente, total e data",
+      "monto_inusual": "Valor incomum em relação ao histórico do cliente",
+      "descuento_excesivo": "O desconto médio ponderado supera o limiar configurado",
+      "cliente_nuevo_compra_grande": "Compra grande para cliente novo / com pouco histórico em relação ao limite de crédito"
+    }
+  },
   "errors": {
     "noCliente": "Selecione um cliente",
     "noItems": "Adicione pelo menos um produto",

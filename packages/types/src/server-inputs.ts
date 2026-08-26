@@ -262,6 +262,12 @@ export type FacturaInput = {
    * @pt-BR Pontos de fidelização a resgatar nesta fatura (#250).
    */
   puntosCanje?: number | null
+  /**
+   * @en Confirm soft-blocked duplicate anomaly and proceed with create (#200).
+   * @es Confirma anomalía de duplicado (bloqueo suave) y procede con el create (#200).
+   * @pt-BR Confirma anomalia de duplicata (bloqueio suave) e segue com o create (#200).
+   */
+  confirmAnomalies?: boolean
 }
 
 export type CobroRetencionInput = {

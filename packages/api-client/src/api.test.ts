@@ -693,7 +693,7 @@ describe('facturasAPI', () => {
     it('retorna factura creada', async () => {
       const factura = { id: 7, total: 121 }
       mockPost.mockResolvedValueOnce({ data: { data: factura } })
-      expect(await facturasAPI.create({ total: 121 })).toEqual(factura)
+      expect(await facturasAPI.create({ total: 121 })).toEqual({ data: factura, warnings: [] })
     })
 
     it('lanza error del servidor', async () => {

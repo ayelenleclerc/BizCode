@@ -4,6 +4,10 @@
     "clienteId": {
       "type": "integer"
     },
+    "confirmAnomalies": {
+      "description": "When true, acknowledges soft-blocked duplicate anomaly and proceeds with create (#200). Required to create after HTTP 422 DUPLICATE_INVOICE_CONFIRM_REQUIRED.\n",
+      "type": "boolean"
+    },
     "fecha": {
       "format": "date",
       "type": "string"
