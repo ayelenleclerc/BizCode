@@ -960,7 +960,7 @@ describe('notificationsAPI', () => {
 // ════════════════════════════════════════════════════════════
 describe('notifChannelsAPI', () => {
   it('retorna el estado de los canales en el happy path', async () => {
-    const status = { inApp: true, email: false, whatsapp: false }
+    const status = { inApp: true, email: false, whatsapp: false, atencionBot: false }
     mockGet.mockResolvedValueOnce({ data: { success: true, data: status } })
     expect(await notifChannelsAPI.status()).toEqual(status)
     expect(mockGet).toHaveBeenCalledWith('/notifications/channels')

@@ -228,7 +228,7 @@ vi.mock('@/lib/api', async () => {
       register: vi.fn(),
       suggestSlug: vi.fn().mockResolvedValue({ slug: 'demo' }),
     },
-    notifChannelsAPI: { status: vi.fn().mockResolvedValue({ inApp: true, email: false, whatsapp: false }) },
+    notifChannelsAPI: { status: vi.fn().mockResolvedValue({ inApp: true, email: false, whatsapp: false, atencionBot: false }) },
     zonasEntregaAPI: {
       list: vi.fn().mockResolvedValue([sampleZone]),
       create: vi.fn().mockResolvedValue(sampleZone),

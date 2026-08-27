@@ -191,7 +191,8 @@
       "contract_invoice_generated": "Invoice generated from contract",
       "contract_adjustment_due": "Contract price adjustment applied",
       "shipment_delivered": "Shipment delivered",
-      "reparto_sync_conflict": "Delivery route sync conflict"
+      "reparto_sync_conflict": "Delivery route sync conflict",
+      "atencion_bot_escalation": "WhatsApp care bot escalation"
     }
   },
   "notifChannels": {
@@ -200,6 +201,7 @@
     "inApp": "In-app",
     "email": "Email (SMTP)",
     "whatsapp": "WhatsApp (Twilio)",
+    "atencionBot": "Customer care WhatsApp bot",
     "active": "Active",
     "inactive": "Not configured",
     "loadError": "Could not load channel status"
