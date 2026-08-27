@@ -15,6 +15,27 @@ import { sanitizeLogField } from '../lib/sanitizeLogField'
 import { logger } from '../logger'
 import type { RestRouteContext } from './restRouteTypes'
 
+/** @en Fixed Twilio form keys for signature validation (no user-controlled property names). */
+const TWILIO_WHATSAPP_FORM_KEYS = [
+  'MessageSid',
+  'SmsSid',
+  'SmsMessageSid',
+  'AccountSid',
+  'MessagingServiceSid',
+  'From',
+  'To',
+  'Body',
+  'NumMedia',
+  'NumSegments',
+  'SmsStatus',
+  'MessageStatus',
+  'ApiVersion',
+  'ProfileName',
+  'WaId',
+  'ChannelMetadata',
+  'ReferralNumMedia',
+] as const
+
 function headerString(value: string | string[] | undefined): string | null {
   if (typeof value === 'string' && value.trim()) return value.trim()
   if (Array.isArray(value) && typeof value[0] === 'string' && value[0].trim()) {
@@ -28,6 +49,33 @@ function formParam(body: Record<string, unknown>, key: string): string {
   if (typeof v === 'string') return v
   if (typeof v === 'number' || typeof v === 'boolean') return String(v)
   return ''
+}
+
+/**
+ * @en Builds Twilio signature params from a fixed key allowlist (CodeQL-safe).
+ * @es Arma params de firma Twilio desde allowlist fija (seguro para CodeQL).
+ * @pt-BR Monta params de assinatura Twilio a partir de allowlist fixa (seguro para CodeQL).
+ */
+export function collectTwilioWhatsAppFormParams(body: Record<string, unknown>): Record<string, string> {
+  const params: Record<string, string> = Object.create(null) as Record<string, string>
+  for (const key of TWILIO_WHATSAPP_FORM_KEYS) {
+    const v = body[key]
+    if (typeof v === 'string') {
+      params[key] = v
+    } else if (typeof v === 'number' || typeof v === 'boolean') {
+      params[key] = String(v)
+    }
+  }
+  // MediaUrl0..9 / MediaContentType0..9 — fixed index keys, not user-named properties.
+  for (let i = 0; i < 10; i++) {
+    const urlKey = `MediaUrl${i}`
+    const typeKey = `MediaContentType${i}`
+    const urlVal = body[urlKey]
+    const typeVal = body[typeKey]
+    if (typeof urlVal === 'string') params[urlKey] = urlVal
+    if (typeof typeVal === 'string') params[typeKey] = typeVal
+  }
+  return params
 }
 
 /**
@@ -80,11 +128,7 @@ export function registerTwilioWhatsAppWebhookRoutes(app: Application, ctx: RestR
       }
 
       const body = (req.body ?? {}) as Record<string, unknown>
-      const params: Record<string, string> = {}
-      for (const [k, v] of Object.entries(body)) {
-        if (typeof v === 'string') params[k] = v
-        else if (typeof v === 'number' || typeof v === 'boolean') params[k] = String(v)
-      }
+      const params = collectTwilioWhatsAppFormParams(body)
 
       if (!validateTwilioWhatsAppSignature(req, params)) {
         logger.warn(
