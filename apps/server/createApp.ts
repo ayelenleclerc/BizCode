@@ -13,6 +13,7 @@ import { registerDashboardRoutes } from './dashboard'
 import { registerNotificationRoutes } from './notifications'
 import { registerPushNotificationRoutes } from './routes/registerPushNotificationRoutes'
 import { isSmtpConfigured, isTwilioConfigured } from './channels'
+import { modulesInclude } from './services/TenantConfigService'
 import { registerChatRoutes } from './chat'
 import { registerAuditEventRoutes } from './auditEvents'
 import { correlationId } from './middleware/correlationId'
@@ -177,6 +178,9 @@ export function createApp(prisma: PrismaClient): Application {
         inApp: true,
         email: isSmtpConfigured(),
         whatsapp: isTwilioConfigured(),
+        /** @en Care bot active only when Twilio env + tenant module `comms.whatsapp` (#201). */
+        atencionBot:
+          isTwilioConfigured() && modulesInclude(authReq.tenantModules, 'comms.whatsapp'),
       },
     })
   })

@@ -191,7 +191,8 @@
       "contract_invoice_generated": "Factura generada por contrato",
       "contract_adjustment_due": "Ajuste de precio de contrato aplicado",
       "shipment_delivered": "Envío entregado",
-      "reparto_sync_conflict": "Conflicto de sincronización de reparto"
+      "reparto_sync_conflict": "Conflicto de sincronización de reparto",
+      "atencion_bot_escalation": "Escalado del bot de atención WhatsApp"
     }
   },
   "notifChannels": {
@@ -200,6 +201,7 @@
     "inApp": "In-app",
     "email": "Email (SMTP)",
     "whatsapp": "WhatsApp (Twilio)",
+    "atencionBot": "Bot de atención WhatsApp",
     "active": "Activo",
     "inactive": "No configurado",
     "loadError": "No se pudo cargar el estado de los canales"

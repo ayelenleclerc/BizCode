@@ -120,6 +120,7 @@ model Cliente {
   configsComision    ConfigComision[]
   puntosFidelizacion PuntosFidelizacion?
   movimientosPuntos  MovimientoPuntos[]
+  atencionBotSessions AtencionBotSession[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -1912,6 +1913,30 @@ model Tenant {
   movimientosPuntos                MovimientoPuntos[]
   configFefo                       ConfigFefo?
   lotes                            Lote[]
+  atencionBotSessions              AtencionBotSession[]
+}
+
+/// @en Short-lived WhatsApp customer-care bot session (#201); TTL enforced in service (~30 min).
+/// @es Sesión corta del bot de atención WhatsApp (#201); TTL en servicio (~30 min).
+/// @pt-BR Sessão curta do bot de atendimento WhatsApp (#201); TTL no serviço (~30 min).
+model AtencionBotSession {
+  id          Int       @id @default(autoincrement())
+  /// Digits-only WhatsApp From (no whatsapp: prefix).
+  phoneDigits String    @unique @db.VarChar(20)
+  tenantId    Int?
+  tenant      Tenant?   @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  clienteId   Int?
+  cliente     Cliente?  @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  /// en | es | pt-BR
+  locale      String    @default("es") @db.VarChar(10)
+  /// await_cuit | null when identity resolved
+  pendingStep String?   @db.VarChar(40)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([updatedAt])
+  @@index([tenantId])
+  @@index([clienteId])
 }
 
 /// Idempotent Mercado Pago payment webhook processing (#176).

@@ -49,6 +49,7 @@ export const NOTIFICATION_TYPES = [
   'reparto_assigned',
   'reparto_stop_added',
   'reparto_stop_removed',
+  'atencion_bot_escalation',
 ] as const
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number]

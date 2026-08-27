@@ -360,6 +360,14 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
           ? `${payload.rsocial}${payload.pedidoId != null ? ` — pedido #${payload.pedidoId}` : ''}`
           : type,
       }
+    case 'atencion_bot_escalation': {
+      const detail = payload.detail ? `\n${payload.detail}` : ''
+      const preview = payload.preview ? `\nMensaje: ${payload.preview}` : ''
+      return {
+        subject: `[BizCode] Escalado bot WhatsApp — ${rsocial}`,
+        text: `Un cliente solicitó atención humana vía WhatsApp.${preview}${detail}`,
+      }
+    }
   }
 }
 

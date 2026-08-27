@@ -30,6 +30,7 @@ const TIENDANUBE_OAUTH_DEFAULT = 10
 const TIENDANUBE_WEBHOOK_DEFAULT = 120
 const WOOCOMMERCE_HTTP_DEFAULT = 10
 const WOOCOMMERCE_WEBHOOK_DEFAULT = 120
+const TWILIO_WHATSAPP_WEBHOOK_DEFAULT = 120
 
 function parsePositiveInt(raw: string | undefined, defaultValue: number): number {
   if (!raw?.trim()) {
@@ -340,6 +341,21 @@ export const woocommerceWebhookHttpRateLimiter = createRouteLimiter({
   ),
   skipUnless: () => true,
   storePrefix: 'wc-webhook',
+})
+
+/**
+ * @en Per-IP rate limit for Twilio WhatsApp inbound webhook (#201; default 120 req/15 min).
+ * @es Límite por IP para webhook inbound Twilio WhatsApp (#201; 120 req/15 min por defecto).
+ * @pt-BR Limite por IP para webhook inbound Twilio WhatsApp (#201; 120 req/15 min padrão).
+ */
+export const twilioWhatsAppWebhookHttpRateLimiter = createRouteLimiter({
+  windowMs: FIFTEEN_MINUTES_MS,
+  limit: parsePositiveInt(
+    process.env.HTTP_RATE_LIMIT_TWILIO_WHATSAPP_WEBHOOK,
+    TWILIO_WHATSAPP_WEBHOOK_DEFAULT,
+  ),
+  skipUnless: () => true,
+  storePrefix: 'twilio-wa-webhook',
 })
 
 /**

@@ -96,6 +96,8 @@ tags:
     description: B2B customer self-service portal (#240)
   - name: mercadopago
     description: Mercado Pago online payments integration (#174+)
+  - name: twilio-whatsapp
+    description: Twilio WhatsApp inbound webhook for customer-care bot (#201)
   - name: meli
     description: Mercado Libre OAuth connection per tenant (#183)
   - name: tiendanube
@@ -9306,6 +9308,64 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/webhooks/twilio/whatsapp:
+    post:
+      tags: [twilio-whatsapp]
+      summary: Twilio WhatsApp inbound webhook — customer-care bot (#201)
+      description: |
+        Public endpoint (no JWT). Validates `X-Twilio-Signature` with `TWILIO_AUTH_TOKEN`.
+        Expects `application/x-www-form-urlencoded` Twilio fields (`From`, `Body`, …).
+        Keyword MVP intents: balance, order status, pay link (via payment provider checkout), escalate to owner/manager.
+        Replies via existing Twilio outbound (`sendWhatsAppMessage`). Bot inactive when Twilio env is incomplete or tenant module `comms.whatsapp` is off.
+        Does **not** use OpenAI or Meta Cloud API. Rate-limited per IP. Optional `WEBHOOK_IP_ALLOWLIST`.
+      security: []
+      parameters:
+        - name: X-Twilio-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Twilio request signature (HMAC).
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [From, Body]
+              properties:
+                From:
+                  type: string
+                  description: WhatsApp sender (e.g. whatsapp:+54911…)
+                  example: 'whatsapp:+5491155551234'
+                Body:
+                  type: string
+                  description: Inbound message text
+                  example: 'saldo'
+                MessageSid:
+                  type: string
+                AccountSid:
+                  type: string
+      responses:
+        '200':
+          description: Accepted (empty body; outbound reply sent asynchronously via Twilio REST)
+          content:
+            text/plain:
+              schema:
+                type: string
+        '403':
+          description: Invalid Twilio signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '503':
+          description: Twilio not configured (`TWILIO_*` env incomplete)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+
   /api/webhooks/mercadopago:
     post:
       tags: [mercadopago]
@@ -11916,7 +11976,7 @@ paths:
                     const: true
                   data:
                     type: object
-                    required: [inApp, email, whatsapp]
+                    required: [inApp, email, whatsapp, atencionBot]
                     properties:
                       inApp:
                         type: boolean
@@ -11924,6 +11984,9 @@ paths:
                         type: boolean
                       whatsapp:
                         type: boolean
+                      atencionBot:
+                        type: boolean
+                        description: True when Twilio env is configured and tenant module `comms.whatsapp` is enabled (#201 care bot).
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 

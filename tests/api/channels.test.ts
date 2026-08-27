@@ -122,11 +122,16 @@ describe('GET /api/notifications/channels', () => {
     delete process.env.TWILIO_WHATSAPP_FROM
   })
 
-  it('reports inApp:true, email:false, whatsapp:false when no env vars set', async () => {
+  it('reports inApp:true, email:false, whatsapp:false, atencionBot:false when no env vars set', async () => {
     const app = createApp(buildPrismaMock())
     const res = await request(app).get('/api/notifications/channels').expect(200)
     expect(res.body.success).toBe(true)
-    expect(res.body.data).toEqual({ inApp: true, email: false, whatsapp: false })
+    expect(res.body.data).toEqual({
+      inApp: true,
+      email: false,
+      whatsapp: false,
+      atencionBot: false,
+    })
   })
 
   it('reports email:true when SMTP vars are all set', async () => {
@@ -140,6 +145,7 @@ describe('GET /api/notifications/channels', () => {
     const res = await request(app).get('/api/notifications/channels').expect(200)
     expect(res.body.data.email).toBe(true)
     expect(res.body.data.whatsapp).toBe(false)
+    expect(res.body.data.atencionBot).toBe(false)
   })
 
   it('reports email:true when SMTP_URL is set', async () => {
@@ -159,6 +165,22 @@ describe('GET /api/notifications/channels', () => {
     const res = await request(app).get('/api/notifications/channels').expect(200)
     expect(res.body.data.email).toBe(false)
     expect(res.body.data.whatsapp).toBe(true)
+    // Default test modules do not include `comms.whatsapp`
+    expect(res.body.data.atencionBot).toBe(false)
+  })
+
+  it('reports atencionBot:true when Twilio is configured and comms.whatsapp is enabled', async () => {
+    process.env.TWILIO_ACCOUNT_SID = 'ACtest'
+    process.env.TWILIO_AUTH_TOKEN = 'token'
+    process.env.TWILIO_WHATSAPP_FROM = '+14155238886'
+    process.env.BIZCODE_TEST_MODULES = 'comms.whatsapp'
+
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).get('/api/notifications/channels').expect(200)
+    expect(res.body.data.whatsapp).toBe(true)
+    expect(res.body.data.atencionBot).toBe(true)
+
+    delete process.env.BIZCODE_TEST_MODULES
   })
 
   it('returns 401 when not authenticated', async () => {

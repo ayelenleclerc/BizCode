@@ -92420,6 +92420,165 @@ Creates a Mercado Pago instore dynamic QR for the invoice outstanding balance (A
 }
 ```
 
+### Twilio WhatsApp inbound webhook — customer-care bot (#201)
+
+- **Method:** `POST`
+- **Path:** `/api/webhooks/twilio/whatsapp`
+- **Tags:** twilio-whatsapp
+
+Public endpoint (no JWT). Validates `X-Twilio-Signature` with `TWILIO_AUTH_TOKEN`. Expects `application/x-www-form-urlencoded` Twilio fields (`From`, `Body`, …). Keyword MVP intents: balance, order status, pay link (via payment provider checkout), escalate to owner/manager. Replies via existing Twilio outbound (`sendWhatsAppMessage`). Bot inactive when Twilio env is incomplete or tenant module `comms.whatsapp` is off. Does **not** use OpenAI or Meta Cloud API. Rate-limited per IP. Optional `WEBHOOK_IP_ALLOWLIST`.
+
+#### Request Body
+
+##### Content-Type: application/x-www-form-urlencoded
+
+- **`Body` (required)**
+
+  `string` — Inbound message text
+
+- **`From` (required)**
+
+  `string` — WhatsApp sender (e.g. whatsapp:+54911…)
+
+- **`AccountSid`**
+
+  `string`
+
+- **`MessageSid`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "From": "whatsapp:+5491155551234",
+  "Body": "saldo",
+  "MessageSid": "",
+  "AccountSid": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Accepted (empty body; outbound reply sent asynchronously via Twilio REST)
+
+###### Content-Type: text/plain
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 403 Invalid Twilio signature
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 503 Twilio not configured (\`TWILIO\_\*\` env incomplete)
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
 ### Mercado Pago payment webhook (#176)
 
 - **Method:** `POST`
@@ -113433,6 +113592,10 @@ Returns boolean flags for each channel. No sensitive values are exposed.
 
   `object`
 
+  - **`atencionBot` (required)**
+
+    `boolean` — True when Twilio env is configured and tenant module \`comms.whatsapp\` is enabled (#201 care bot).
+
   - **`email` (required)**
 
     `boolean`
@@ -113457,7 +113620,8 @@ Returns boolean flags for each channel. No sensitive values are exposed.
   "data": {
     "inApp": true,
     "email": true,
-    "whatsapp": true
+    "whatsapp": true,
+    "atencionBot": true
   }
 }
 ```

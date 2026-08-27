@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { notifChannelsAPI } from '@/lib/api'
 
-type ChannelStatus = { inApp: boolean; email: boolean; whatsapp: boolean }
+type ChannelStatus = { inApp: boolean; email: boolean; whatsapp: boolean; atencionBot: boolean }
 
 function ChannelRow({ label, active }: { label: string; active: boolean }) {
   const { t } = useTranslation('common')
@@ -15,6 +15,7 @@ function ChannelRow({ label, active }: { label: string; active: boolean }) {
             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
             : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
         }`}
+        data-testid={active ? 'channel-active' : 'channel-inactive'}
       >
         {active ? t('notifChannels.active') : t('notifChannels.inactive')}
       </span>
@@ -35,7 +36,10 @@ export default function NotifChannelsPanel() {
   }, [])
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-5">
+    <div
+      className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-5"
+      data-testid="notif-channels-panel"
+    >
       <h2 className="text-base font-semibold text-slate-800 dark:text-slate-200 mb-1">
         {t('notifChannels.title')}
       </h2>
@@ -50,6 +54,7 @@ export default function NotifChannelsPanel() {
           <ChannelRow label={t('notifChannels.inApp')} active={status.inApp} />
           <ChannelRow label={t('notifChannels.email')} active={status.email} />
           <ChannelRow label={t('notifChannels.whatsapp')} active={status.whatsapp} />
+          <ChannelRow label={t('notifChannels.atencionBot')} active={status.atencionBot} />
         </div>
       )}
     </div>
