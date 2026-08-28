@@ -1,0 +1,59 @@
+{
+  "title": "Farmacia",
+  "loadError": "No se pudieron cargar los datos de farmacia",
+  "complianceNotice": "Registro local únicamente. Este módulo no envía información al Sistema Nacional de Trazabilidad de ANMAT y el libro de psicotrópicos no es el formato oficial de presentación ante SEDRONAR.",
+  "tabs": {
+    "recetas": "Recetas",
+    "libro": "Libro de psicotrópicos",
+    "serial": "Serial de lote"
+  },
+  "recetas": {
+    "title": "Recetas de dispensación",
+    "numero": "Número de receta",
+    "fecha": "Fecha de receta",
+    "medico": "Profesional",
+    "matricula": "Matrícula",
+    "clienteId": "ID de cliente (opcional)",
+    "observaciones": "Observaciones",
+    "factura": "Factura",
+    "sinFactura": "Sin asociar",
+    "save": "Registrar receta",
+    "saveOk": "Receta registrada",
+    "saveError": "No se pudo registrar la receta",
+    "empty": "Todavía no hay recetas registradas"
+  },
+  "libro": {
+    "title": "Libro interno de psicotrópicos",
+    "hint": "Traza interna de auditoría. Solo se pueden asentar artículos marcados como psicotrópicos.",
+    "articuloId": "ID de artículo",
+    "articulo": "Artículo",
+    "lote": "Lote",
+    "tipo": "Tipo de asiento",
+    "tipos": {
+      "ingreso": "Ingreso",
+      "egreso": "Egreso",
+      "ajuste": "Ajuste"
+    },
+    "cantidad": "Cantidad",
+    "referencia": "Referencia",
+    "fecha": "Fecha",
+    "save": "Agregar asiento",
+    "saveOk": "Asiento agregado",
+    "saveError": "No se pudo agregar el asiento",
+    "invalid": "Ingresá un ID de artículo válido y una cantidad distinta de cero",
+    "export": "Exportar CSV",
+    "exportError": "No se pudo exportar el libro",
+    "empty": "Todavía no hay asientos en el libro"
+  },
+  "serial": {
+    "title": "Serial unitario de lote",
+    "hint": "El serial y el contenido DataMatrix se guardan tal cual; no se parsean ni se envían a ANMAT.",
+    "loteId": "ID de lote",
+    "serialUnidad": "Serial unitario",
+    "codigoDatamatrix": "Contenido DataMatrix",
+    "save": "Guardar serial",
+    "saveOk": "Serial guardado",
+    "saveError": "No se pudo guardar el serial",
+    "invalid": "Ingresá un ID de lote válido"
+  }
+}

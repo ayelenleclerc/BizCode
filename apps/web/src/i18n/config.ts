@@ -23,6 +23,7 @@ import ordenesTrabajoEs from '@/locales/es/ordenesTrabajo.json'
 import garantiasEs from '@/locales/es/garantias.json'
 import fidelizacionEs from '@/locales/es/fidelizacion.json'
 import lotesEs from '@/locales/es/lotes.json'
+import farmaciaEs from '@/locales/es/farmacia.json'
 import cajaEs from '@/locales/es/caja.json'
 import finanzasEs from '@/locales/es/finanzas.json'
 import reportesEs from '@/locales/es/reportes.json'
@@ -67,6 +68,7 @@ import ordenesTrabajoEn from '@/locales/en/ordenesTrabajo.json'
 import garantiasEn from '@/locales/en/garantias.json'
 import fidelizacionEn from '@/locales/en/fidelizacion.json'
 import lotesEn from '@/locales/en/lotes.json'
+import farmaciaEn from '@/locales/en/farmacia.json'
 import cajaEn from '@/locales/en/caja.json'
 import finanzasEn from '@/locales/en/finanzas.json'
 import reportesEn from '@/locales/en/reportes.json'
@@ -111,6 +113,7 @@ import ordenesTrabajoPt from '@/locales/pt-BR/ordenesTrabajo.json'
 import garantiasPt from '@/locales/pt-BR/garantias.json'
 import fidelizacionPt from '@/locales/pt-BR/fidelizacion.json'
 import lotesPt from '@/locales/pt-BR/lotes.json'
+import farmaciaPt from '@/locales/pt-BR/farmacia.json'
 import cajaPt from '@/locales/pt-BR/caja.json'
 import finanzasPt from '@/locales/pt-BR/finanzas.json'
 import reportesPt from '@/locales/pt-BR/reportes.json'
@@ -146,7 +149,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'reposicion', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'fidelizacion', 'lotes', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones', 'tiposCambio', 'formulasProduccion', 'ordenesProduccion', 'privacidad', 'saas', 'visitas'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'reposicion', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'fidelizacion', 'lotes', 'farmacia', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones', 'tiposCambio', 'formulasProduccion', 'ordenesProduccion', 'privacidad', 'saas', 'visitas'],
     resources: {
       es: {
         common: commonEs,
@@ -165,6 +168,7 @@ i18n
         garantias: garantiasEs,
         fidelizacion: fidelizacionEs,
         lotes: lotesEs,
+        farmacia: farmaciaEs,
         caja: cajaEs,
         zonasEntrega: zonasEntregaEs,
         chat: chatEs,
@@ -210,6 +214,7 @@ i18n
         garantias: garantiasEn,
         fidelizacion: fidelizacionEn,
         lotes: lotesEn,
+        farmacia: farmaciaEn,
         caja: cajaEn,
         zonasEntrega: zonasEntregaEn,
         chat: chatEn,
@@ -255,6 +260,7 @@ i18n
         garantias: garantiasPt,
         fidelizacion: fidelizacionPt,
         lotes: lotesPt,
+        farmacia: farmaciaPt,
         caja: cajaPt,
         zonasEntrega: zonasEntregaPt,
         chat: chatPt,

@@ -35,6 +35,10 @@
       "minLength": 3,
       "type": "string"
     },
+    "esPsicotropico": {
+      "description": "Pharmacy vertical — psychotropic tracked in the internal book (#204).",
+      "type": "boolean"
+    },
     "factorConversion": {
       "description": "Purchase-to-base conversion factor (#203). Default 1.",
       "exclusiveMinimum": 0,
@@ -85,6 +89,10 @@
     "precioLista2": {
       "minimum": 0.01,
       "type": "number"
+    },
+    "requiereReceta": {
+      "description": "Pharmacy vertical — prescription-only article (#204).",
+      "type": "boolean"
     },
     "rubroId": {
       "type": "integer"

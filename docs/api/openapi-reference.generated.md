@@ -19400,6 +19400,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
     `string`
 
+  - **`esPsicotropico`**
+
+    `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
   - **`factorConversion`**
 
     `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -19439,6 +19443,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   - **`precioLista2`**
 
     `number`
+
+  - **`requiereReceta`**
+
+    `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
   - **`rubro`**
 
@@ -19533,6 +19541,8 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
       "unidadServicio": "hora",
       "mesesGarantia": 1,
       "controlLote": true,
+      "requiereReceta": true,
+      "esPsicotropico": true,
       "unidadBase": "unidad",
       "unidadCompra": "",
       "factorConversion": 1,
@@ -19777,6 +19787,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
   `boolean` — Lot control opt-in (#202).
 
+- **`esPsicotropico`**
+
+  `boolean` — Pharmacy vertical — psychotropic tracked in the internal book (#204).
+
 - **`factorConversion`**
 
   `number` — Purchase-to-base conversion factor (#203). Default 1.
@@ -19800,6 +19814,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 - **`precioEnMonedaOrigen`**
 
   `number` — Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
+
+- **`requiereReceta`**
+
+  `boolean` — Pharmacy vertical — prescription-only article (#204).
 
 - **`tipo`**
 
@@ -19835,6 +19853,8 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   "unidadServicio": "hora",
   "mesesGarantia": 1,
   "controlLote": true,
+  "requiereReceta": true,
+  "esPsicotropico": true,
   "unidadBase": "unidad",
   "unidadCompra": "",
   "factorConversion": 1,
@@ -19890,6 +19910,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
     `string`
 
+  - **`esPsicotropico`**
+
+    `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
   - **`factorConversion`**
 
     `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -19929,6 +19953,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   - **`precioLista2`**
 
     `number`
+
+  - **`requiereReceta`**
+
+    `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
   - **`rubro`**
 
@@ -20010,6 +20038,8 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
     "unidadServicio": "hora",
     "mesesGarantia": 1,
     "controlLote": true,
+    "requiereReceta": true,
+    "esPsicotropico": true,
     "unidadBase": "unidad",
     "unidadCompra": "",
     "factorConversion": 1,
@@ -20290,6 +20320,8 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
     "unidadServicio": "hora",
     "mesesGarantia": 1,
     "controlLote": true,
+    "requiereReceta": true,
+    "esPsicotropico": true,
     "unidadBase": "unidad",
     "unidadCompra": "",
     "factorConversion": 1,
@@ -20530,6 +20562,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
   `boolean` — Lot control opt-in (#202).
 
+- **`esPsicotropico`**
+
+  `boolean` — Pharmacy vertical — psychotropic tracked in the internal book (#204).
+
 - **`factorConversion`**
 
   `number` — Purchase-to-base conversion factor (#203). Default 1.
@@ -20553,6 +20589,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 - **`precioEnMonedaOrigen`**
 
   `number` — Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
+
+- **`requiereReceta`**
+
+  `boolean` — Pharmacy vertical — prescription-only article (#204).
 
 - **`tipo`**
 
@@ -20588,6 +20628,8 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   "unidadServicio": "hora",
   "mesesGarantia": 1,
   "controlLote": true,
+  "requiereReceta": true,
+  "esPsicotropico": true,
   "unidadBase": "unidad",
   "unidadCompra": "",
   "factorConversion": 1,
@@ -20643,6 +20685,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
 
     `string`
 
+  - **`esPsicotropico`**
+
+    `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
   - **`factorConversion`**
 
     `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -20682,6 +20728,10 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
   - **`precioLista2`**
 
     `number`
+
+  - **`requiereReceta`**
+
+    `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
   - **`rubro`**
 
@@ -20763,6 +20813,8 @@ Lightweight stock status for multiple articles (#256). Requires `orders.create` 
     "unidadServicio": "hora",
     "mesesGarantia": 1,
     "controlLote": true,
+    "requiereReceta": true,
+    "esPsicotropico": true,
     "unidadBase": "unidad",
     "unidadCompra": "",
     "factorConversion": 1,
@@ -40906,6 +40958,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `string`
 
+      - **`esPsicotropico`**
+
+        `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
       - **`factorConversion`**
 
         `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -40945,6 +41001,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
       - **`precioLista2`**
 
         `number`
+
+      - **`requiereReceta`**
+
+        `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
       - **`rubro`**
 
@@ -41144,6 +41204,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
             "unidadServicio": "hora",
             "mesesGarantia": 1,
             "controlLote": true,
+            "requiereReceta": true,
+            "esPsicotropico": true,
             "unidadBase": "unidad",
             "unidadCompra": "",
             "factorConversion": 1,
@@ -41463,6 +41525,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
   `integer` — Optional loyalty points to redeem as a negative invoice line (#250).
 
+- **`recetaId`**
+
+  `integer` — Prescription backing the dispensing of prescription-only articles (#204). With module \`vertical.pharmacy\` enabled, invoicing an article flagged \`requiereReceta\` without this field fails with HTTP 422 \`PRESCRIPTION\_REQUIRED:\<articuloIds>\`.
+
 **Example:**
 
 ```json
@@ -41500,7 +41566,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
     }
   ],
   "puntosCanje": 1,
-  "confirmAnomalies": true
+  "confirmAnomalies": true,
+  "recetaId": 1
 }
 ```
 
@@ -41584,6 +41651,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
         `string`
 
+      - **`esPsicotropico`**
+
+        `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
       - **`factorConversion`**
 
         `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -41623,6 +41694,10 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
       - **`precioLista2`**
 
         `number`
+
+      - **`requiereReceta`**
+
+        `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
       - **`rubro`**
 
@@ -41831,6 +41906,8 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
           "unidadServicio": "hora",
           "mesesGarantia": 1,
           "controlLote": true,
+          "requiereReceta": true,
+          "esPsicotropico": true,
           "unidadBase": "unidad",
           "unidadCompra": "",
           "factorConversion": 1,
@@ -73247,6 +73324,2411 @@ Requires module `inventory.lots` and `products.read`.
 }
 ```
 
+### PARAMETERS /api/farmacia/recetas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/recetas`
+
+### List dispensing prescriptions (#204)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/recetas`
+- **Tags:** farmacia
+
+Requires module `vertical.pharmacy` and `products.read`.
+
+#### Responses
+
+##### Status: 200 Prescriptions list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fechaReceta` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`matricula` (required)**
+
+    `string`
+
+  - **`medicoNombre` (required)**
+
+    `string`
+
+  - **`numeroReceta` (required)**
+
+    `string`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "numeroReceta": "",
+      "medicoNombre": "",
+      "matricula": "",
+      "fechaReceta": "",
+      "observaciones": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "cliente": {
+        "id": 1,
+        "rsocial": ""
+      }
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Register a dispensing prescription (#204)
+
+- **Method:** `POST`
+- **Path:** `/api/farmacia/recetas`
+- **Tags:** farmacia
+
+Requires module `vertical.pharmacy` and `inventory.adjust`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`fechaReceta` (required)**
+
+  `string`, format: `date`
+
+- **`matricula` (required)**
+
+  `string`
+
+- **`medicoNombre` (required)**
+
+  `string`
+
+- **`numeroReceta` (required)**
+
+  `string`
+
+- **`clienteId`**
+
+  `integer`
+
+- **`facturaId`**
+
+  `integer`
+
+- **`observaciones`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "clienteId": 1,
+  "numeroReceta": "",
+  "medicoNombre": "",
+  "matricula": "",
+  "fechaReceta": "",
+  "observaciones": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created prescription
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — Prescription recorded locally when dispensing controlled articles (#204).
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fechaReceta` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`matricula` (required)**
+
+    `string`
+
+  - **`medicoNombre` (required)**
+
+    `string`
+
+  - **`numeroReceta` (required)**
+
+    `string`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "numeroReceta": "",
+    "medicoNombre": "",
+    "matricula": "",
+    "fechaReceta": "",
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "cliente": {
+      "id": 1,
+      "rsocial": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 409 Resource conflict
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/recetas/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/recetas/{id}`
+
+### Get a dispensing prescription (#204)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/recetas/{id}`
+- **Tags:** farmacia
+
+Requires module `vertical.pharmacy` and `products.read`.
+
+#### Responses
+
+##### Status: 200 Prescription
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — Prescription recorded locally when dispensing controlled articles (#204).
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fechaReceta` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`matricula` (required)**
+
+    `string`
+
+  - **`medicoNombre` (required)**
+
+    `string`
+
+  - **`numeroReceta` (required)**
+
+    `string`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "numeroReceta": "",
+    "medicoNombre": "",
+    "matricula": "",
+    "fechaReceta": "",
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "cliente": {
+      "id": 1,
+      "rsocial": ""
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/libro-psicotropicos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/libro-psicotropicos`
+
+### List internal psychotropic book entries (#204)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/libro-psicotropicos`
+- **Tags:** farmacia
+
+Requires module `vertical.pharmacy` and `products.read`. Internal audit trail only; not the official SEDRONAR filing.
+
+#### Responses
+
+##### Status: 200 Book entries
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`loteId` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`recetaId` (required)**
+
+    `integer`
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ingreso", "egreso", "ajuste"`
+
+  - **`articulo`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`id`**
+
+      `integer`
+
+  - **`lote`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nroLote`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "loteId": 1,
+      "recetaId": 1,
+      "tipo": "ingreso",
+      "cantidad": 1,
+      "referencia": "",
+      "observaciones": "",
+      "createdAt": "",
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      },
+      "lote": {
+        "id": 1,
+        "nroLote": ""
+      }
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Add an internal psychotropic book entry (#204)
+
+- **Method:** `POST`
+- **Path:** `/api/farmacia/libro-psicotropicos`
+- **Tags:** farmacia
+
+Requires module `vertical.pharmacy` and `inventory.adjust`. The article must be flagged `esPsicotropico`, otherwise the request is rejected with `ARTICLE_NOT_PSYCHOTROPIC`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`cantidad` (required)**
+
+  `number` — Non-zero; must be positive for \`ingreso\` and \`egreso\`.
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"ingreso", "egreso", "ajuste"`
+
+- **`loteId`**
+
+  `integer`
+
+- **`observaciones`**
+
+  `string`
+
+- **`recetaId`**
+
+  `integer`
+
+- **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "loteId": 1,
+  "recetaId": 1,
+  "tipo": "ingreso",
+  "cantidad": 1,
+  "referencia": "",
+  "observaciones": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Created book entry
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — Internal psychotropic book entry (#204). Internal audit trail, not the official SEDRONAR filing format.
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`loteId` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`recetaId` (required)**
+
+    `integer`
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ingreso", "egreso", "ajuste"`
+
+  - **`articulo`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`id`**
+
+      `integer`
+
+  - **`lote`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nroLote`**
+
+      `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "loteId": 1,
+    "recetaId": 1,
+    "tipo": "ingreso",
+    "cantidad": 1,
+    "referencia": "",
+    "observaciones": "",
+    "createdAt": "",
+    "articulo": {
+      "id": 1,
+      "codigo": 1,
+      "descripcion": ""
+    },
+    "lote": {
+      "id": 1,
+      "nroLote": ""
+    }
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 Semantically invalid request
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/libro-psicotropicos/export
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/libro-psicotropicos/export`
+
+### Export the internal psychotropic book as CSV (#204)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/libro-psicotropicos/export`
+- **Tags:** farmacia
+
+Requires module `vertical.pharmacy` and `products.read`. Internal CSV export; it is not the official SEDRONAR filing format.
+
+#### Responses
+
+##### Status: 200 CSV export
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/lotes/{id}/serial
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/lotes/{id}/serial`
+
+### Store the unit serial / DataMatrix payload on a lot (#204)
+
+- **Method:** `PUT`
+- **Path:** `/api/farmacia/lotes/{id}/serial`
+- **Tags:** farmacia
+
+Requires module `vertical.pharmacy` and `inventory.adjust`. Values are stored verbatim; no GS1/DataMatrix parsing and no ANMAT SNT submission are performed.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`codigoDatamatrix`**
+
+  `string`
+
+- **`serialUnidad`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "serialUnidad": "",
+  "codigoDatamatrix": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated lot serial
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`codigoDatamatrix` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`serialUnidad` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "serialUnidad": "",
+    "codigoDatamatrix": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
 ### PARAMETERS /api/garantias
 
 - **Method:** `PARAMETERS`
@@ -90464,6 +92946,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
 
           `string`
 
+        - **`esPsicotropico`**
+
+          `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
         - **`factorConversion`**
 
           `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -90503,6 +92989,10 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
         - **`precioLista2`**
 
           `number`
+
+        - **`requiereReceta`**
+
+          `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
         - **`rubro`**
 
@@ -90754,6 +93244,8 @@ Sets `estado` to `N` (anulada), reverses the customer balance by the invoice tot
             "unidadServicio": "hora",
             "mesesGarantia": 1,
             "controlLote": true,
+            "requiereReceta": true,
+            "esPsicotropico": true,
             "unidadBase": "unidad",
             "unidadCompra": "",
             "factorConversion": 1,
@@ -173418,6 +175910,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`
 
+* **`esPsicotropico`**
+
+  `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
 * **`factorConversion`**
 
   `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -173457,6 +175953,10 @@ Rate-limited mutation; requires products.manage. USD only.
 * **`precioLista2`**
 
   `number`
+
+* **`requiereReceta`**
+
+  `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
 * **`rubro`**
 
@@ -173532,6 +176032,8 @@ Rate-limited mutation; requires products.manage. USD only.
   "unidadServicio": "hora",
   "mesesGarantia": 1,
   "controlLote": true,
+  "requiereReceta": true,
+  "esPsicotropico": true,
   "unidadBase": "unidad",
   "unidadCompra": "",
   "factorConversion": 1,
@@ -173606,6 +176108,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `boolean` — Lot control opt-in (#202).
 
+* **`esPsicotropico`**
+
+  `boolean` — Pharmacy vertical — psychotropic tracked in the internal book (#204).
+
 * **`factorConversion`**
 
   `number` — Purchase-to-base conversion factor (#203). Default 1.
@@ -173629,6 +176135,10 @@ Rate-limited mutation; requires products.manage. USD only.
 * **`precioEnMonedaOrigen`**
 
   `number` — Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC (#243).
+
+* **`requiereReceta`**
+
+  `boolean` — Pharmacy vertical — prescription-only article (#204).
 
 * **`tipo`**
 
@@ -173664,6 +176174,8 @@ Rate-limited mutation; requires products.manage. USD only.
   "unidadServicio": "hora",
   "mesesGarantia": 1,
   "controlLote": true,
+  "requiereReceta": true,
+  "esPsicotropico": true,
   "unidadBase": "unidad",
   "unidadCompra": "",
   "factorConversion": 1,
@@ -173723,6 +176235,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`
 
+  - **`esPsicotropico`**
+
+    `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
   - **`factorConversion`**
 
     `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -173762,6 +176278,10 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`precioLista2`**
 
     `number`
+
+  - **`requiereReceta`**
+
+    `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
   - **`rubro`**
 
@@ -173843,6 +176363,8 @@ Rate-limited mutation; requires products.manage. USD only.
     "unidadServicio": "hora",
     "mesesGarantia": 1,
     "controlLote": true,
+    "requiereReceta": true,
+    "esPsicotropico": true,
     "unidadBase": "unidad",
     "unidadCompra": "",
     "factorConversion": 1,
@@ -173898,6 +176420,8 @@ Rate-limited mutation; requires products.manage. USD only.
     "unidadServicio": "hora",
     "mesesGarantia": 1,
     "controlLote": true,
+    "requiereReceta": true,
+    "esPsicotropico": true,
     "unidadBase": "unidad",
     "unidadCompra": "",
     "factorConversion": 1,
@@ -179561,6 +182085,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
       `string`
 
+    - **`esPsicotropico`**
+
+      `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
     - **`factorConversion`**
 
       `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -179600,6 +182128,10 @@ Rate-limited mutation; requires products.manage. USD only.
     - **`precioLista2`**
 
       `number`
+
+    - **`requiereReceta`**
+
+      `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
     - **`rubro`**
 
@@ -179780,6 +182312,8 @@ Rate-limited mutation; requires products.manage. USD only.
         "unidadServicio": "hora",
         "mesesGarantia": 1,
         "controlLote": true,
+        "requiereReceta": true,
+        "esPsicotropico": true,
         "unidadBase": "unidad",
         "unidadCompra": "",
         "factorConversion": 1,
@@ -179845,6 +182379,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string`
 
+  - **`esPsicotropico`**
+
+    `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
   - **`factorConversion`**
 
     `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -179884,6 +182422,10 @@ Rate-limited mutation; requires products.manage. USD only.
   - **`precioLista2`**
 
     `number`
+
+  - **`requiereReceta`**
+
+    `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
   - **`rubro`**
 
@@ -180009,6 +182551,8 @@ Rate-limited mutation; requires products.manage. USD only.
     "unidadServicio": "hora",
     "mesesGarantia": 1,
     "controlLote": true,
+    "requiereReceta": true,
+    "esPsicotropico": true,
     "unidadBase": "unidad",
     "unidadCompra": "",
     "factorConversion": 1,
@@ -182710,6 +185254,10 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
 
   `integer` — Optional loyalty points to redeem as a negative invoice line (#250).
 
+* **`recetaId`**
+
+  `integer` — Prescription backing the dispensing of prescription-only articles (#204). With module \`vertical.pharmacy\` enabled, invoicing an article flagged \`requiereReceta\` without this field fails with HTTP 422 \`PRESCRIPTION\_REQUIRED:\<articuloIds>\`.
+
 **Example:**
 
 ```json
@@ -182747,7 +185295,8 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
     }
   ],
   "puntosCanje": 1,
-  "confirmAnomalies": true
+  "confirmAnomalies": true,
+  "recetaId": 1
 }
 ```
 
@@ -182868,6 +185417,10 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
 
         `string`
 
+      - **`esPsicotropico`**
+
+        `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
       - **`factorConversion`**
 
         `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -182907,6 +185460,10 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
       - **`precioLista2`**
 
         `number`
+
+      - **`requiereReceta`**
+
+        `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
       - **`rubro`**
 
@@ -183115,6 +185672,8 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
           "unidadServicio": "hora",
           "mesesGarantia": 1,
           "controlLote": true,
+          "requiereReceta": true,
+          "esPsicotropico": true,
           "unidadBase": "unidad",
           "unidadCompra": "",
           "factorConversion": 1,
@@ -187782,6 +190341,10 @@ Originating invoice header (selected columns)
 
         `string`
 
+      - **`esPsicotropico`**
+
+        `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
       - **`factorConversion`**
 
         `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -187821,6 +190384,10 @@ Originating invoice header (selected columns)
       - **`precioLista2`**
 
         `number`
+
+      - **`requiereReceta`**
+
+        `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
       - **`rubro`**
 
@@ -188066,6 +190633,8 @@ Originating invoice header (selected columns)
           "unidadServicio": "hora",
           "mesesGarantia": 1,
           "controlLote": true,
+          "requiereReceta": true,
+          "esPsicotropico": true,
           "unidadBase": "unidad",
           "unidadCompra": "",
           "factorConversion": 1,
@@ -188197,6 +190766,10 @@ Originating invoice header (selected columns)
 
           `string`
 
+        - **`esPsicotropico`**
+
+          `boolean` — Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.
+
         - **`factorConversion`**
 
           `number` — 1 purchase unit equals factorConversion base units (#203). Default 1.
@@ -188236,6 +190809,10 @@ Originating invoice header (selected columns)
         - **`precioLista2`**
 
           `number`
+
+        - **`requiereReceta`**
+
+          `boolean` — Pharmacy vertical — dispensing requires a registered prescription (#204).
 
         - **`rubro`**
 
@@ -188487,6 +191064,8 @@ Originating invoice header (selected columns)
             "unidadServicio": "hora",
             "mesesGarantia": 1,
             "controlLote": true,
+            "requiereReceta": true,
+            "esPsicotropico": true,
             "unidadBase": "unidad",
             "unidadCompra": "",
             "factorConversion": 1,
@@ -199696,6 +202275,760 @@ Originating invoice header (selected columns)
         "clienteRsocial": ""
       }
     ]
+  }
+}
+```
+
+### RecetaDispensacion
+
+- **Type:**`object`
+
+Prescription recorded locally when dispensing controlled articles (#204).
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+- **`facturaId` (required)**
+
+  `integer`
+
+- **`fechaReceta` (required)**
+
+  `string`, format: `date`
+
+- **`id` (required)**
+
+  `integer`
+
+- **`matricula` (required)**
+
+  `string`
+
+- **`medicoNombre` (required)**
+
+  `string`
+
+- **`numeroReceta` (required)**
+
+  `string`
+
+- **`observaciones` (required)**
+
+  `string`
+
+- **`tenantId` (required)**
+
+  `integer`
+
+- **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+- **`cliente`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`rsocial`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "facturaId": 1,
+  "clienteId": 1,
+  "numeroReceta": "",
+  "medicoNombre": "",
+  "matricula": "",
+  "fechaReceta": "",
+  "observaciones": "",
+  "createdAt": "",
+  "updatedAt": "",
+  "cliente": {
+    "id": 1,
+    "rsocial": ""
+  }
+}
+```
+
+### RecetaDispensacionCreateInput
+
+- **Type:**`object`
+
+* **`fechaReceta` (required)**
+
+  `string`, format: `date`
+
+* **`matricula` (required)**
+
+  `string`
+
+* **`medicoNombre` (required)**
+
+  `string`
+
+* **`numeroReceta` (required)**
+
+  `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`observaciones`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "clienteId": 1,
+  "numeroReceta": "",
+  "medicoNombre": "",
+  "matricula": "",
+  "fechaReceta": "",
+  "observaciones": ""
+}
+```
+
+### RecetaDispensacionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object` — Prescription recorded locally when dispensing controlled articles (#204).
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fechaReceta` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`matricula` (required)**
+
+    `string`
+
+  - **`medicoNombre` (required)**
+
+    `string`
+
+  - **`numeroReceta` (required)**
+
+    `string`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "numeroReceta": "",
+    "medicoNombre": "",
+    "matricula": "",
+    "fechaReceta": "",
+    "observaciones": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "cliente": {
+      "id": 1,
+      "rsocial": ""
+    }
+  }
+}
+```
+
+### RecetaDispensacionListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fechaReceta` (required)**
+
+    `string`, format: `date`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`matricula` (required)**
+
+    `string`
+
+  - **`medicoNombre` (required)**
+
+    `string`
+
+  - **`numeroReceta` (required)**
+
+    `string`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`cliente`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`rsocial`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "numeroReceta": "",
+      "medicoNombre": "",
+      "matricula": "",
+      "fechaReceta": "",
+      "observaciones": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "cliente": {
+        "id": 1,
+        "rsocial": ""
+      }
+    }
+  ]
+}
+```
+
+### LibroPsicotropicoTipo
+
+- **Type:**`string`
+
+**Example:**
+
+### LibroPsicotropicoMovimiento
+
+- **Type:**`object`
+
+Internal psychotropic book entry (#204). Internal audit trail, not the official SEDRONAR filing format.
+
+- **`articuloId` (required)**
+
+  `integer`
+
+- **`cantidad` (required)**
+
+  `number`
+
+- **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+- **`id` (required)**
+
+  `integer`
+
+- **`loteId` (required)**
+
+  `integer`
+
+- **`observaciones` (required)**
+
+  `string`
+
+- **`recetaId` (required)**
+
+  `integer`
+
+- **`referencia` (required)**
+
+  `string`
+
+- **`tenantId` (required)**
+
+  `integer`
+
+- **`tipo` (required)**
+
+  `string`, possible values: `"ingreso", "egreso", "ajuste"`
+
+- **`articulo`**
+
+  `object`
+
+  - **`codigo`**
+
+    `integer`
+
+  - **`descripcion`**
+
+    `string`
+
+  - **`id`**
+
+    `integer`
+
+- **`lote`**
+
+  `object`
+
+  - **`id`**
+
+    `integer`
+
+  - **`nroLote`**
+
+    `string`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "articuloId": 1,
+  "loteId": 1,
+  "recetaId": 1,
+  "tipo": "ingreso",
+  "cantidad": 1,
+  "referencia": "",
+  "observaciones": "",
+  "createdAt": "",
+  "articulo": {
+    "id": 1,
+    "codigo": 1,
+    "descripcion": ""
+  },
+  "lote": {
+    "id": 1,
+    "nroLote": ""
+  }
+}
+```
+
+### LibroPsicotropicoCreateInput
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `number` — Non-zero; must be positive for \`ingreso\` and \`egreso\`.
+
+* **`tipo` (required)**
+
+  `string`, possible values: `"ingreso", "egreso", "ajuste"`
+
+* **`loteId`**
+
+  `integer`
+
+* **`observaciones`**
+
+  `string`
+
+* **`recetaId`**
+
+  `integer`
+
+* **`referencia`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "articuloId": 1,
+  "loteId": 1,
+  "recetaId": 1,
+  "tipo": "ingreso",
+  "cantidad": 1,
+  "referencia": "",
+  "observaciones": ""
+}
+```
+
+### LibroPsicotropicoEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object` — Internal psychotropic book entry (#204). Internal audit trail, not the official SEDRONAR filing format.
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`loteId` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`recetaId` (required)**
+
+    `integer`
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ingreso", "egreso", "ajuste"`
+
+  - **`articulo`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`id`**
+
+      `integer`
+
+  - **`lote`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nroLote`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "articuloId": 1,
+    "loteId": 1,
+    "recetaId": 1,
+    "tipo": "ingreso",
+    "cantidad": 1,
+    "referencia": "",
+    "observaciones": "",
+    "createdAt": "",
+    "articulo": {
+      "id": 1,
+      "codigo": 1,
+      "descripcion": ""
+    },
+    "lote": {
+      "id": 1,
+      "nroLote": ""
+    }
+  }
+}
+```
+
+### LibroPsicotropicoListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`loteId` (required)**
+
+    `integer`
+
+  - **`observaciones` (required)**
+
+    `string`
+
+  - **`recetaId` (required)**
+
+    `integer`
+
+  - **`referencia` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"ingreso", "egreso", "ajuste"`
+
+  - **`articulo`**
+
+    `object`
+
+    - **`codigo`**
+
+      `integer`
+
+    - **`descripcion`**
+
+      `string`
+
+    - **`id`**
+
+      `integer`
+
+  - **`lote`**
+
+    `object`
+
+    - **`id`**
+
+      `integer`
+
+    - **`nroLote`**
+
+      `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "articuloId": 1,
+      "loteId": 1,
+      "recetaId": 1,
+      "tipo": "ingreso",
+      "cantidad": 1,
+      "referencia": "",
+      "observaciones": "",
+      "createdAt": "",
+      "articulo": {
+        "id": 1,
+        "codigo": 1,
+        "descripcion": ""
+      },
+      "lote": {
+        "id": 1,
+        "nroLote": ""
+      }
+    }
+  ]
+}
+```
+
+### LoteSerialUpdateInput
+
+- **Type:**`object`
+
+Operator-entered unit serial / DataMatrix payload; stored verbatim (#204).
+
+- **`codigoDatamatrix`**
+
+  `string`
+
+- **`serialUnidad`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "serialUnidad": "",
+  "codigoDatamatrix": ""
+}
+```
+
+### LoteSerialEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`codigoDatamatrix` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`serialUnidad` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "serialUnidad": "",
+    "codigoDatamatrix": ""
   }
 }
 ```

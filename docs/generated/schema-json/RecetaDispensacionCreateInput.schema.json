@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "facturaId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "fechaReceta": {
+      "format": "date",
+      "type": "string"
+    },
+    "matricula": {
+      "maxLength": 40,
+      "minLength": 1,
+      "type": "string"
+    },
+    "medicoNombre": {
+      "maxLength": 120,
+      "minLength": 1,
+      "type": "string"
+    },
+    "numeroReceta": {
+      "maxLength": 40,
+      "minLength": 1,
+      "type": "string"
+    },
+    "observaciones": {
+      "maxLength": 500,
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "required": [
+    "numeroReceta",
+    "medicoNombre",
+    "matricula",
+    "fechaReceta"
+  ],
+  "title": "RecetaDispensacionCreateInput",
+  "type": "object"
+}

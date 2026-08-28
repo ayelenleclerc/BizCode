@@ -100,27 +100,28 @@ model Cliente {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  facturas           Factura[]
+  facturas            Factura[]
   anomaliasDetectadas AnomaliaDetectada[]
-  pedidos            Pedido[]
-  plantillasPedido   PlantillaPedido[]
-  visitasVendedor    VisitaVendedor[]
-  rutaParadas        RutaParada[]
-  contratos          Contrato[]
-  ordenesTrabajo     OrdenTrabajo[]
-  garantias          Garantia[]
-  cobros             Cobro[]
-  ordenesEntrega     OrdenEntrega[]
-  remitos            Remito[]
-  cheques            Cheque[]
-  movimientosCC      MovimientoClienteCC[]
-  recibosCobro       ReciboCobro[]
-  portalMagicLinks   PortalMagicLink[]
-  portalSessions     PortalSession[]
-  configsComision    ConfigComision[]
-  puntosFidelizacion PuntosFidelizacion?
-  movimientosPuntos  MovimientoPuntos[]
+  pedidos             Pedido[]
+  plantillasPedido    PlantillaPedido[]
+  visitasVendedor     VisitaVendedor[]
+  rutaParadas         RutaParada[]
+  contratos           Contrato[]
+  ordenesTrabajo      OrdenTrabajo[]
+  garantias           Garantia[]
+  cobros              Cobro[]
+  ordenesEntrega      OrdenEntrega[]
+  remitos             Remito[]
+  cheques             Cheque[]
+  movimientosCC       MovimientoClienteCC[]
+  recibosCobro        ReciboCobro[]
+  portalMagicLinks    PortalMagicLink[]
+  portalSessions      PortalSession[]
+  configsComision     ConfigComision[]
+  puntosFidelizacion  PuntosFidelizacion?
+  movimientosPuntos   MovimientoPuntos[]
   atencionBotSessions AtencionBotSession[]
+  recetasDispensacion RecetaDispensacion[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -309,6 +310,14 @@ model Articulo {
   /// @es Si es true, los movimientos de stock requieren lote / FEFO (#202).
   /// @pt-BR Se true, os movimentos de estoque exigem lote / FEFO (#202).
   controlLote          Boolean            @default(false)
+  /// @en Pharmacy vertical: dispensing requires a registered prescription (#204).
+  /// @es Vertical farmacia: la dispensación exige receta registrada (#204).
+  /// @pt-BR Vertical farmácia: a dispensação exige receita registrada (#204).
+  requiereReceta       Boolean            @default(false)
+  /// @en Pharmacy vertical: psychotropic/narcotic tracked in the internal book (#204); not a SEDRONAR filing.
+  /// @es Vertical farmacia: psicotrópico/estupefaciente registrado en libro interno (#204); no es presentación SEDRONAR.
+  /// @pt-BR Vertical farmácia: psicotrópico registrado no livro interno (#204); não é declaração SEDRONAR.
+  esPsicotropico       Boolean            @default(false)
   /// @en Base stock/sale unit catalog (#203).
   /// @es Unidad base de stock/venta del catálogo (#203).
   /// @pt-BR Unidade base de estoque/venda do catálogo (#203).
@@ -350,33 +359,34 @@ model Articulo {
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
-  facturaItems           FacturaItem[]
+  facturaItems            FacturaItem[]
   devolucionEntregaLineas DevolucionEntregaLinea[]
-  pedidoItems            PedidoItem[]
-  plantillaPedidoItems   PlantillaPedidoItem[]
-  contratoItems          ContratoItem[]
-  ordenTrabajoItems      OrdenTrabajoItem[]
-  remitoItems            RemitoItem[]
-  stockAjustes           StockAjuste[]
-  stockDepositos         StockDeposito[]
-  transferenciaItems     TransferenciaDepositoItem[]
-  ordenCompraItems       OrdenCompraItem[]
-  recuentoItems          RecuentoItem[]
-  proveedorArticulos     ProveedorArticulo[]
-  garantias              Garantia[]
-  listaPrecioItems       ListaPrecioItem[]
-  atributoValores        ArticuloAtributoValor[]
-  imagenes               ArticuloImagen[]
-  ofertas                ArticuloOferta[]
-  meliPublicacion        MeliPublicacion?
-  tiendanubePublicacion  TiendanubePublicacion?
-  wooCommercePublicacion WooCommercePublicacion?
-  formulasComoProducto   FormulaProduccion[]         @relation("FormulaProducto")
-  formulasComoInsumo     FormulaInsumo[]             @relation("FormulaInsumoArticulo")
-  ordenesProduccion      OrdenProduccion[]           @relation("OrdenProduccionProducto")
-  ordenProduccionInsumos OrdenProduccionInsumo[]     @relation("OrdenProduccionInsumoArticulo")
-  reservasProduccion     StockReservaProduccion[]    @relation("StockReservaProduccionArticulo")
-  lotes                  Lote[]
+  pedidoItems             PedidoItem[]
+  plantillaPedidoItems    PlantillaPedidoItem[]
+  contratoItems           ContratoItem[]
+  ordenTrabajoItems       OrdenTrabajoItem[]
+  remitoItems             RemitoItem[]
+  stockAjustes            StockAjuste[]
+  stockDepositos          StockDeposito[]
+  transferenciaItems      TransferenciaDepositoItem[]
+  ordenCompraItems        OrdenCompraItem[]
+  recuentoItems           RecuentoItem[]
+  proveedorArticulos      ProveedorArticulo[]
+  garantias               Garantia[]
+  listaPrecioItems        ListaPrecioItem[]
+  atributoValores         ArticuloAtributoValor[]
+  imagenes                ArticuloImagen[]
+  ofertas                 ArticuloOferta[]
+  meliPublicacion         MeliPublicacion?
+  tiendanubePublicacion   TiendanubePublicacion?
+  wooCommercePublicacion  WooCommercePublicacion?
+  librosPsicotropicos     LibroPsicotropicoMovimiento[]
+  formulasComoProducto    FormulaProduccion[]           @relation("FormulaProducto")
+  formulasComoInsumo      FormulaInsumo[]               @relation("FormulaInsumoArticulo")
+  ordenesProduccion       OrdenProduccion[]             @relation("OrdenProduccionProducto")
+  ordenProduccionInsumos  OrdenProduccionInsumo[]       @relation("OrdenProduccionInsumoArticulo")
+  reservasProduccion      StockReservaProduccion[]      @relation("StockReservaProduccionArticulo")
+  lotes                   Lote[]
 
   @@unique([tenantId, codigo])
   @@unique([tenantId, codigoBarras])
@@ -900,6 +910,7 @@ model Factura {
   tipoCambioFecha  DateTime?
 
   items                            FacturaItem[]
+  recetasDispensacion              RecetaDispensacion[]
   ordenesEntrega                   OrdenEntrega[]
   ordenesTrabajo                   OrdenTrabajo[]
   garantias                        Garantia[]
@@ -1248,27 +1259,27 @@ model OrdenTrabajoItem {
 
 /// Credit note issued when voiding an invoice (GitHub #146, ADR-0012).
 model NotaCredito {
-  id                 Int                  @id @default(autoincrement())
-  tenantId           Int
-  tenant             Tenant               @relation(fields: [tenantId], references: [id])
-  facturaOrigenId    Int
-  facturaOrigen      Factura              @relation(fields: [facturaOrigenId], references: [id])
-  motivo             String               @db.VarChar(500)
-  monto              Decimal              @db.Decimal(14, 2)
-  cae                String?              @db.VarChar(20)
-  caeVto             DateTime?
+  id                  Int                  @id @default(autoincrement())
+  tenantId            Int
+  tenant              Tenant               @relation(fields: [tenantId], references: [id])
+  facturaOrigenId     Int
+  facturaOrigen       Factura              @relation(fields: [facturaOrigenId], references: [id])
+  motivo              String               @db.VarChar(500)
+  monto               Decimal              @db.Decimal(14, 2)
+  cae                 String?              @db.VarChar(20)
+  caeVto              DateTime?
   /// pending | issued | failed | not_required (ADR-0012)
-  estadoCae          String               @default("pending") @db.VarChar(20)
-  createdById        Int?
-  createdBy          AppUser?             @relation("NotaCreditoCreatedBy", fields: [createdById], references: [id])
-  createdAt          DateTime             @default(now())
-  movimientoCC       MovimientoClienteCC?
-  mercadoPagoRefunds MercadoPagoRefund[]
+  estadoCae           String               @default("pending") @db.VarChar(20)
+  createdById         Int?
+  createdBy           AppUser?             @relation("NotaCreditoCreatedBy", fields: [createdById], references: [id])
+  createdAt           DateTime             @default(now())
+  movimientoCC        MovimientoClienteCC?
+  mercadoPagoRefunds  MercadoPagoRefund[]
   devolucionesEntrega DevolucionEntrega[]
   /// @en Fiscal e-invoicing authorization attempts across providers (#378).
   /// @es Intentos de autorizaci\u00f3n fiscal multi-organismo (#378).
   /// @pt-BR Tentativas de autoriza\u00e7\u00e3o fiscal multi-organismo (#378).
-  fiscalDocuments    FiscalDocument[]
+  fiscalDocuments     FiscalDocument[]
 
   @@index([tenantId, createdAt])
   @@index([tenantId, facturaOrigenId])
@@ -1328,26 +1339,26 @@ model Pedido {
 /// @es Agenda diaria de visitas del vendedor de campo (#170). Optimización/feriados: #267.
 /// @pt-BR Agenda diária de visitas do vendedor de campo (#170). Otimização/feriados: #267.
 model VisitaVendedor {
-  id               Int       @id @default(autoincrement())
+  id               Int          @id @default(autoincrement())
   tenantId         Int
-  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+  tenant           Tenant       @relation(fields: [tenantId], references: [id])
   vendedorId       Int
-  vendedor         AppUser   @relation(fields: [vendedorId], references: [id])
+  vendedor         AppUser      @relation(fields: [vendedorId], references: [id])
   clienteId        Int
-  cliente          Cliente   @relation(fields: [clienteId], references: [id])
+  cliente          Cliente      @relation(fields: [clienteId], references: [id])
   /// Planned calendar day (date-only, stored as UTC midnight).
-  fechaPlanificada DateTime  @db.Date
+  fechaPlanificada DateTime     @db.Date
   /// pendiente | completada | no_visitada
-  estadoPlan       String    @default("pendiente") @db.VarChar(20)
+  estadoPlan       String       @default("pendiente") @db.VarChar(20)
   /// venta | sin_pedido | cliente_ausente | otro
-  resultado        String?   @db.VarChar(20)
-  notasVisita      String?   @db.VarChar(500)
+  resultado        String?      @db.VarChar(20)
+  notasVisita      String?      @db.VarChar(500)
   pedidoId         Int?
-  pedido           Pedido?   @relation(fields: [pedidoId], references: [id], onDelete: SetNull)
-  orden            Int       @default(0)
+  pedido           Pedido?      @relation(fields: [pedidoId], references: [id], onDelete: SetNull)
+  orden            Int          @default(0)
   duracionMinutos  Int?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
   rutaParadas      RutaParada[]
 
   @@index([tenantId, vendedorId, fechaPlanificada])
@@ -1395,14 +1406,14 @@ model Feriado {
 /// @es Ruta diaria ordenada del vendedor (#267). Resultados de visita en VisitaVendedor (#170).
 /// @pt-BR Rota diária ordenada do vendedor (#267). Resultados de visita em VisitaVendedor (#170).
 model RutaVendedor {
-  id         Int         @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   tenantId   Int
-  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  tenant     Tenant       @relation(fields: [tenantId], references: [id])
   vendedorId Int
-  vendedor   AppUser     @relation(fields: [vendedorId], references: [id])
-  fecha      DateTime    @db.Date
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  vendedor   AppUser      @relation(fields: [vendedorId], references: [id])
+  fecha      DateTime     @db.Date
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
   paradas    RutaParada[]
 
   @@unique([tenantId, vendedorId, fecha])
@@ -1413,19 +1424,19 @@ model RutaVendedor {
 /// @es Parada de la ruta diaria del vendedor (#267).
 /// @pt-BR Parada da rota diária do vendedor (#267).
 model RutaParada {
-  id        Int            @id @default(autoincrement())
+  id        Int             @id @default(autoincrement())
   rutaId    Int
-  ruta      RutaVendedor   @relation(fields: [rutaId], references: [id], onDelete: Cascade)
+  ruta      RutaVendedor    @relation(fields: [rutaId], references: [id], onDelete: Cascade)
   clienteId Int
-  cliente   Cliente        @relation(fields: [clienteId], references: [id])
-  orden     Int            @default(0)
+  cliente   Cliente         @relation(fields: [clienteId], references: [id])
+  orden     Int             @default(0)
   /// pendiente | visitado | postergado | no_visitado
-  estado    String         @default("pendiente") @db.VarChar(20)
-  motivo    String?        @db.VarChar(200)
+  estado    String          @default("pendiente") @db.VarChar(20)
+  motivo    String?         @db.VarChar(200)
   visitaId  Int?
   visita    VisitaVendedor? @relation(fields: [visitaId], references: [id], onDelete: SetNull)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 
   @@index([rutaId, orden])
   @@index([clienteId])
@@ -1566,18 +1577,18 @@ model PedidoItem {
 /// @es Plantilla de pedido por cliente para repetir/cargar en App Seller (#253).
 /// @pt-BR Modelo de pedido por cliente para repetir/carregar no App Seller (#253).
 model PlantillaPedido {
-  id         Int      @id @default(autoincrement())
+  id         Int                   @id @default(autoincrement())
   tenantId   Int
-  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  tenant     Tenant                @relation(fields: [tenantId], references: [id])
   clienteId  Int
-  cliente    Cliente  @relation(fields: [clienteId], references: [id])
+  cliente    Cliente               @relation(fields: [clienteId], references: [id])
   vendedorId Int?
-  vendedor   AppUser? @relation(fields: [vendedorId], references: [id])
-  nombre     String   @db.VarChar(80)
-  activa     Boolean  @default(true)
+  vendedor   AppUser?              @relation(fields: [vendedorId], references: [id])
+  nombre     String                @db.VarChar(80)
+  activa     Boolean               @default(true)
   items      PlantillaPedidoItem[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
 
   @@index([tenantId, clienteId])
   @@index([tenantId, vendedorId])
@@ -1640,7 +1651,7 @@ model FacturaItem {
 
   createdAt DateTime @default(now())
 
-  garantias Garantia[]
+  garantias               Garantia[]
   devolucionEntregaLineas DevolucionEntregaLinea[]
 
   @@index([loteId])
@@ -1782,18 +1793,18 @@ model PadronA4Cache {
 }
 
 model Tenant {
-  id              Int      @id @default(autoincrement())
-  name            String   @db.VarChar(80)
-  slug            String   @unique @db.VarChar(80)
-  active          Boolean  @default(true)
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(80)
+  slug            String    @unique @db.VarChar(80)
+  active          Boolean   @default(true)
   /// @en When true, tenant users cannot login or use API; platform super_admin can still manage (#222).
   /// @es Si es true, usuarios del tenant no pueden login ni usar API; el super_admin de plataforma sí gestiona (#222).
   /// @pt-BR Se true, usuários do tenant não fazem login nem usam API; o super_admin da plataforma ainda gerencia (#222).
-  maintenanceMode Boolean  @default(false)
+  maintenanceMode Boolean   @default(false)
   /// @en SaaS subscription status (#180/#182): `trial` | `active` | `suspended_trial` | `suspended_payment`.
   /// @es Estado de suscripción SaaS (#180/#182): `trial` | `active` | `suspended_trial` | `suspended_payment`.
   /// @pt-BR Status de assinatura SaaS (#180/#182): `trial` | `active` | `suspended_trial` | `suspended_payment`.
-  saasStatus      String   @default("active") @db.VarChar(32)
+  saasStatus      String    @default("active") @db.VarChar(32)
   /// @en End of self-service trial window (#180); null when not on trial.
   /// @es Fin de la ventana de trial self-service (#180); null si no está en trial.
   /// @pt-BR Fim da janela de trial self-service (#180); null se não estiver em trial.
@@ -1801,13 +1812,13 @@ model Tenant {
   /// @en Contact email from SaaS registration (#180); used for trial reminders.
   /// @es Email de contacto del registro SaaS (#180); recordatorios de trial.
   /// @pt-BR E-mail de contato do registro SaaS (#180); lembretes de trial.
-  contactEmail    String?  @db.VarChar(120)
+  contactEmail    String?   @db.VarChar(120)
   /// @en Contact phone from SaaS registration (#180).
   /// @es Teléfono de contacto del registro SaaS (#180).
   /// @pt-BR Telefone de contato do registro SaaS (#180).
-  contactPhone    String?  @db.VarChar(40)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  contactPhone    String?   @db.VarChar(40)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   users                            AppUser[]
   auditEvents                      AuditEvent[]
@@ -1914,25 +1925,27 @@ model Tenant {
   configFefo                       ConfigFefo?
   lotes                            Lote[]
   atencionBotSessions              AtencionBotSession[]
+  recetasDispensacion              RecetaDispensacion[]
+  librosPsicotropicos              LibroPsicotropicoMovimiento[]
 }
 
 /// @en Short-lived WhatsApp customer-care bot session (#201); TTL enforced in service (~30 min).
 /// @es Sesión corta del bot de atención WhatsApp (#201); TTL en servicio (~30 min).
 /// @pt-BR Sessão curta do bot de atendimento WhatsApp (#201); TTL no serviço (~30 min).
 model AtencionBotSession {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   /// Digits-only WhatsApp From (no whatsapp: prefix).
-  phoneDigits String    @unique @db.VarChar(20)
+  phoneDigits String   @unique @db.VarChar(20)
   tenantId    Int?
-  tenant      Tenant?   @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
   clienteId   Int?
-  cliente     Cliente?  @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  cliente     Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
   /// en | es | pt-BR
-  locale      String    @default("es") @db.VarChar(10)
+  locale      String   @default("es") @db.VarChar(10)
   /// await_cuit | null when identity resolved
-  pendingStep String?   @db.VarChar(40)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  pendingStep String?  @db.VarChar(40)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([updatedAt])
   @@index([tenantId])
@@ -2538,42 +2551,42 @@ model TenantPlan {
 /// @es Suscripción SaaS de plataforma por tenant (#182). Separada del Mercado Pago del tenant (ADR-0019).
 /// @pt-BR Assinatura SaaS de plataforma por tenant (#182). Separada do Mercado Pago do tenant (ADR-0019).
 model SaasSubscription {
-  id                   Int       @id @default(autoincrement())
-  tenantId             Int       @unique
-  tenant               Tenant    @relation(fields: [tenantId], references: [id])
-  planKey              String    @db.VarChar(20)
+  id                  Int           @id @default(autoincrement())
+  tenantId            Int           @unique
+  tenant              Tenant        @relation(fields: [tenantId], references: [id])
+  planKey             String        @db.VarChar(20)
   /// pending | authorized | cancelled
-  status               String    @db.VarChar(32)
-  mpPreapprovalId      String?   @unique @db.VarChar(80)
-  initPoint            String?   @db.VarChar(500)
-  mock                 Boolean   @default(false)
-  paymentRetryCount    Int       @default(0)
-  lastPaymentFailedAt  DateTime?
-  cancelReason         String?   @db.VarChar(200)
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  invoices             SaasInvoice[]
+  status              String        @db.VarChar(32)
+  mpPreapprovalId     String?       @unique @db.VarChar(80)
+  initPoint           String?       @db.VarChar(500)
+  mock                Boolean       @default(false)
+  paymentRetryCount   Int           @default(0)
+  lastPaymentFailedAt DateTime?
+  cancelReason        String?       @db.VarChar(200)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  invoices            SaasInvoice[]
 }
 
 /// @en Platform SaaS invoice period for a tenant (#182). Not a business Factura.
 /// @es Factura de cobro SaaS de plataforma (#182). No es Factura de negocio.
 /// @pt-BR Fatura de cobrança SaaS da plataforma (#182). Não é Factura de negócio.
 model SaasInvoice {
-  id             Int       @id @default(autoincrement())
+  id             Int               @id @default(autoincrement())
   tenantId       Int
-  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  tenant         Tenant            @relation(fields: [tenantId], references: [id])
   subscriptionId Int?
   subscription   SaasSubscription? @relation(fields: [subscriptionId], references: [id])
-  planKey        String    @db.VarChar(20)
+  planKey        String            @db.VarChar(20)
   periodStart    DateTime
   periodEnd      DateTime
-  amount         Decimal   @db.Decimal(14, 2)
-  currency       String    @default("ARS") @db.VarChar(8)
+  amount         Decimal           @db.Decimal(14, 2)
+  currency       String            @default("ARS") @db.VarChar(8)
   /// pending | paid | failed
-  status         String    @db.VarChar(20)
-  mpPaymentId    String?   @unique @db.VarChar(80)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  status         String            @db.VarChar(20)
+  mpPaymentId    String?           @unique @db.VarChar(80)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 
   @@index([tenantId, createdAt])
   @@index([subscriptionId])
@@ -2591,48 +2604,48 @@ model SaasWebhookEvent {
 }
 
 model TenantConfig {
-  id                    Int      @id @default(autoincrement())
-  tenantId              Int      @unique
-  tenant                Tenant   @relation(fields: [tenantId], references: [id])
-  businessType          String   @default("ambos") @db.VarChar(20)
-  rubros                String[] @default([])
-  plan                  String   @default("starter") @db.VarChar(20)
-  modules               String[]
-  integrations          String[] @default([])
+  id                           Int      @id @default(autoincrement())
+  tenantId                     Int      @unique
+  tenant                       Tenant   @relation(fields: [tenantId], references: [id])
+  businessType                 String   @default("ambos") @db.VarChar(20)
+  rubros                       String[] @default([])
+  plan                         String   @default("starter") @db.VarChar(20)
+  modules                      String[]
+  integrations                 String[] @default([])
   /// @en Default commission accrual mode for new configs (#237).
   /// @es Modo de devengo de comisión por defecto para configs nuevas (#237).
   /// @pt-BR Modo de apropriação de comissão padrão para novas configs (#237).
   /// porcentaje_cobrado | porcentaje_facturado | importe_fijo_por_venta
-  comisionesModoDevengo String   @default("porcentaje_cobrado") @db.VarChar(40)
+  comisionesModoDevengo        String   @default("porcentaje_cobrado") @db.VarChar(40)
   /// @en Preferred FX rate type for USD/EUR catalog prices (#243).
   /// @es Tipo de TC preferido para precios USD/EUR de catálogo (#243).
   /// @pt-BR Tipo de câmbio preferido para preços USD/EUR de catálogo (#243).
   /// oficial | mep | ccl | blue | manual
-  tipoCambioPreferido   String   @default("oficial") @db.VarChar(20)
+  tipoCambioPreferido          String   @default("oficial") @db.VarChar(20)
   /// @en Seller action when credit limit is exceeded (#256). warn | block
   /// @es Acción Seller al superar límite de crédito (#256). warn | block
   /// @pt-BR Ação Seller ao superar limite de crédito (#256). warn | block
-  sellerCreditOverLimitAction String @default("block") @db.VarChar(10)
+  sellerCreditOverLimitAction  String   @default("block") @db.VarChar(10)
   /// @en Seller action when overdue debt exists (#256). warn | block
   /// @es Acción Seller con deuda vencida (#256). warn | block
   /// @pt-BR Ação Seller com dívida vencida (#256). warn | block
-  sellerCreditOverdueAction String @default("warn") @db.VarChar(10)
+  sellerCreditOverdueAction    String   @default("warn") @db.VarChar(10)
   /// @en Seller action when line stock is zero (#256). warn | block
   /// @es Acción Seller con stock cero en línea (#256). warn | block
   /// @pt-BR Ação Seller com estoque zero na linha (#256). warn | block
-  sellerStockZeroAction String @default("warn") @db.VarChar(10)
+  sellerStockZeroAction        String   @default("warn") @db.VarChar(10)
   /// @en Cap order qty to available stock in Seller app (#256).
   /// @es Limitar cantidad del pedido al stock disponible en Seller (#256).
   /// @pt-BR Limitar a quantidade do pedido ao estoque disponível no Seller (#256).
-  sellerStockCapQtyToAvailable Boolean @default(true)
+  sellerStockCapQtyToAvailable Boolean  @default(true)
   /// @en Optional Seller WhatsApp order-confirmation template (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
   /// @es Plantilla opcional WhatsApp de confirmación Seller (#265). Variables {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
   /// @pt-BR Modelo opcional WhatsApp de confirmação Seller (#265). Variáveis {{numero}} {{fecha}} {{items}} {{total}} {{empresa}}.
-  sellerWhatsappTemplate String? @db.VarChar(1024)
-  updatedById           Int?
-  updatedBy             AppUser? @relation("TenantConfigUpdatedBy", fields: [updatedById], references: [id])
-  updatedAt             DateTime @updatedAt
-  createdAt             DateTime @default(now())
+  sellerWhatsappTemplate       String?  @db.VarChar(1024)
+  updatedById                  Int?
+  updatedBy                    AppUser? @relation("TenantConfigUpdatedBy", fields: [updatedById], references: [id])
+  updatedAt                    DateTime @updatedAt
+  createdAt                    DateTime @default(now())
 
   @@index([tenantId])
 }
@@ -2754,8 +2767,8 @@ model Reparto {
   updatedAt     DateTime  @updatedAt
   closedAt      DateTime?
 
-  items              RepartoItem[]
-  ubicaciones        RepartoUbicacion[]
+  items               RepartoItem[]
+  ubicaciones         RepartoUbicacion[]
   devolucionesEntrega DevolucionEntrega[]
 
   @@index([tenantId, fecha])
@@ -2778,22 +2791,22 @@ model RepartoUbicacion {
 }
 
 model RepartoItem {
-  id              Int          @id @default(autoincrement())
-  repartoId       Int
-  reparto         Reparto      @relation(fields: [repartoId], references: [id], onDelete: Cascade)
-  ordenEntregaId  Int
-  ordenEntrega    OrdenEntrega @relation(fields: [ordenEntregaId], references: [id])
-  secuencia       Int
+  id                Int                @id @default(autoincrement())
+  repartoId         Int
+  reparto           Reparto            @relation(fields: [repartoId], references: [id], onDelete: Cascade)
+  ordenEntregaId    Int
+  ordenEntrega      OrdenEntrega       @relation(fields: [ordenEntregaId], references: [id])
+  secuencia         Int
   /// pending | delivered | not_delivered | returned
-  estado          String       @default("pending") @db.VarChar(20)
-  entregadoAt     DateTime?
+  estado            String             @default("pending") @db.VarChar(20)
+  entregadoAt       DateTime?
   /// ausente | rechazo | domicilio_incorrecto | producto_dañado | otro
-  motivoNoEntrega String?      @db.VarChar(30)
-  receptorNombre  String?      @db.VarChar(120)
-  receptorDni     String?      @db.VarChar(20)
-  notasEntrega    String?      @db.VarChar(500)
+  motivoNoEntrega   String?            @db.VarChar(30)
+  receptorNombre    String?            @db.VarChar(120)
+  receptorDni       String?            @db.VarChar(20)
+  notasEntrega      String?            @db.VarChar(500)
   /// { firmaBase64?, fotoBase64? } — MVP POD media (#142)
-  podMedia        Json?
+  podMedia          Json?
   devolucionEntrega DevolucionEntrega?
 
   @@index([repartoId])
@@ -2804,29 +2817,29 @@ model RepartoItem {
 /// @es Devolución de parada registrada por el chofer; stock/NC solo en rendición (#163).
 /// @pt-BR Devolução da parada registrada pelo motorista; estoque/NC só na prestação (#163).
 model DevolucionEntrega {
-  id              Int      @id @default(autoincrement())
-  tenantId        Int
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
-  repartoId       Int
-  reparto         Reparto  @relation(fields: [repartoId], references: [id], onDelete: Cascade)
-  repartoItemId   Int      @unique
-  repartoItem     RepartoItem @relation(fields: [repartoItemId], references: [id], onDelete: Cascade)
+  id             Int                      @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant                   @relation(fields: [tenantId], references: [id])
+  repartoId      Int
+  reparto        Reparto                  @relation(fields: [repartoId], references: [id], onDelete: Cascade)
+  repartoItemId  Int                      @unique
+  repartoItem    RepartoItem              @relation(fields: [repartoItemId], references: [id], onDelete: Cascade)
   /// rechazo | producto_dañado
-  motivo          String   @db.VarChar(30)
-  motivoDetalle   String?  @db.VarChar(500)
-  fotoBase64      String?  @db.Text
+  motivo         String                   @db.VarChar(30)
+  motivoDetalle  String?                  @db.VarChar(500)
+  fotoBase64     String?                  @db.Text
   /// registered | remitted
-  estado          String   @default("registered") @db.VarChar(20)
-  registeredById  Int
-  registeredBy    AppUser  @relation("DevolucionEntregaRegisteredBy", fields: [registeredById], references: [id])
-  remittedAt      DateTime?
-  remittedById    Int?
-  remittedBy      AppUser? @relation("DevolucionEntregaRemittedBy", fields: [remittedById], references: [id])
-  notaCreditoId   Int?
-  notaCredito     NotaCredito? @relation(fields: [notaCreditoId], references: [id], onDelete: SetNull)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  lineas          DevolucionEntregaLinea[]
+  estado         String                   @default("registered") @db.VarChar(20)
+  registeredById Int
+  registeredBy   AppUser                  @relation("DevolucionEntregaRegisteredBy", fields: [registeredById], references: [id])
+  remittedAt     DateTime?
+  remittedById   Int?
+  remittedBy     AppUser?                 @relation("DevolucionEntregaRemittedBy", fields: [remittedById], references: [id])
+  notaCreditoId  Int?
+  notaCredito    NotaCredito?             @relation(fields: [notaCreditoId], references: [id], onDelete: SetNull)
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  lineas         DevolucionEntregaLinea[]
 
   @@index([tenantId, repartoId, estado])
   @@index([tenantId, registeredById])
@@ -2877,48 +2890,48 @@ model AppUser {
   notifications                  Notification[]
   devicePushTokens               DevicePushToken[]
   pushNotificationPreference     PushNotificationPreference?
-  chatMessagesSent               ChatMessage[]              @relation("ChatMessageSender")
-  chatMessagesReceived           ChatMessage[]              @relation("ChatMessageRecipient")
-  ordenesEntregaDriver           OrdenEntrega[]             @relation("OrdenEntregaDriver")
-  ordenesEntregaPicker           OrdenEntrega[]             @relation("OrdenEntregaPicker")
-  repartosChofer                 Reparto[]                  @relation("RepartoChofer")
-  devolucionesEntregaRegistered  DevolucionEntrega[]        @relation("DevolucionEntregaRegisteredBy")
-  devolucionesEntregaRemitted    DevolucionEntrega[]        @relation("DevolucionEntregaRemittedBy")
+  chatMessagesSent               ChatMessage[]               @relation("ChatMessageSender")
+  chatMessagesReceived           ChatMessage[]               @relation("ChatMessageRecipient")
+  ordenesEntregaDriver           OrdenEntrega[]              @relation("OrdenEntregaDriver")
+  ordenesEntregaPicker           OrdenEntrega[]              @relation("OrdenEntregaPicker")
+  repartosChofer                 Reparto[]                   @relation("RepartoChofer")
+  devolucionesEntregaRegistered  DevolucionEntrega[]         @relation("DevolucionEntregaRegisteredBy")
+  devolucionesEntregaRemitted    DevolucionEntrega[]         @relation("DevolucionEntregaRemittedBy")
   pedidosVendedor                Pedido[]
   plantillasPedido               PlantillaPedido[]
   visitasVendedor                VisitaVendedor[]
   vendedorZonas                  VendedorZona[]
   rutasVendedor                  RutaVendedor[]
   stockAjustes                   StockAjuste[]
-  recuentosOperados              Recuento[]                 @relation("RecuentoOperador")
-  depositosResponsable           Deposito[]                 @relation("DepositoResponsable")
-  transferenciasSolicitadas      TransferenciaDeposito[]    @relation("TransferenciaSolicitadoPor")
-  transferenciasAprobadas        TransferenciaDeposito[]    @relation("TransferenciaAprobadoPor")
-  tenantConfigsUpdated           TenantConfig[]             @relation("TenantConfigUpdatedBy")
-  tenantConfigHistory            TenantConfigHistory[]      @relation("TenantConfigHistoryChangedBy")
-  tenantPlansChanged             TenantPlan[]               @relation("TenantPlanChangedBy")
-  notasCreditoCreated            NotaCredito[]              @relation("NotaCreditoCreatedBy")
+  recuentosOperados              Recuento[]                  @relation("RecuentoOperador")
+  depositosResponsable           Deposito[]                  @relation("DepositoResponsable")
+  transferenciasSolicitadas      TransferenciaDeposito[]     @relation("TransferenciaSolicitadoPor")
+  transferenciasAprobadas        TransferenciaDeposito[]     @relation("TransferenciaAprobadoPor")
+  tenantConfigsUpdated           TenantConfig[]              @relation("TenantConfigUpdatedBy")
+  tenantConfigHistory            TenantConfigHistory[]       @relation("TenantConfigHistoryChangedBy")
+  tenantPlansChanged             TenantPlan[]                @relation("TenantPlanChangedBy")
+  notasCreditoCreated            NotaCredito[]               @relation("NotaCreditoCreatedBy")
   movimientosProveedorCC         MovimientoProveedorCC[]
   movimientosClienteCC           MovimientoClienteCC[]
   recibosPago                    ReciboPago[]
   recibosCobro                   ReciboCobro[]
   documentosCompraImportados     DocumentoCompraImportado[]
   chequeMovimientos              ChequeMov[]
-  presentacionesRetencion        PresentacionRetencion[]    @relation("PresentacionRetencionCreatedBy")
-  mercadoPagoRefundsCreated      MercadoPagoRefund[]        @relation("MercadoPagoRefundCreatedBy")
-  mercadoPagoChargebacksResolved MercadoPagoChargeback[]    @relation("MercadoPagoChargebackResolvedBy")
-  ordenesTrabajoTecnico          OrdenTrabajo[]             @relation("OrdenTrabajoTecnico")
-  garantiaUsos                   GarantiaUso[]              @relation("GarantiaUsoUser")
-  turnosCajaCajero               TurnoCaja[]                @relation("TurnoCajaCajero")
-  movimientosCaja                MovimientoCaja[]           @relation("MovimientoCajaUser")
-  configsComision                ConfigComision[]           @relation("ConfigComisionVendedor")
-  liquidacionesComision          LiquidacionComision[]      @relation("LiquidacionComisionVendedor")
-  liquidacionesComisionAprobadas LiquidacionComision[]      @relation("LiquidacionComisionAprobadoPor")
-  importJobs                     ImportJob[]                @relation("ImportJobCreatedBy")
+  presentacionesRetencion        PresentacionRetencion[]     @relation("PresentacionRetencionCreatedBy")
+  mercadoPagoRefundsCreated      MercadoPagoRefund[]         @relation("MercadoPagoRefundCreatedBy")
+  mercadoPagoChargebacksResolved MercadoPagoChargeback[]     @relation("MercadoPagoChargebackResolvedBy")
+  ordenesTrabajoTecnico          OrdenTrabajo[]              @relation("OrdenTrabajoTecnico")
+  garantiaUsos                   GarantiaUso[]               @relation("GarantiaUsoUser")
+  turnosCajaCajero               TurnoCaja[]                 @relation("TurnoCajaCajero")
+  movimientosCaja                MovimientoCaja[]            @relation("MovimientoCajaUser")
+  configsComision                ConfigComision[]            @relation("ConfigComisionVendedor")
+  liquidacionesComision          LiquidacionComision[]       @relation("LiquidacionComisionVendedor")
+  liquidacionesComisionAprobadas LiquidacionComision[]       @relation("LiquidacionComisionAprobadoPor")
+  importJobs                     ImportJob[]                 @relation("ImportJobCreatedBy")
   periodosBancariosLock          PeriodoBancarioLock[]
-  tiposCambio                    TipoCambio[]               @relation("TipoCambioCreatedBy")
-  ordenesProduccion              OrdenProduccion[]          @relation("OrdenProduccionOperador")
-  movimientosPuntos              MovimientoPuntos[]         @relation("MovimientoPuntosUser")
+  tiposCambio                    TipoCambio[]                @relation("TipoCambioCreatedBy")
+  ordenesProduccion              OrdenProduccion[]           @relation("OrdenProduccionOperador")
+  movimientosPuntos              MovimientoPuntos[]          @relation("MovimientoPuntosUser")
 
   @@unique([tenantId, username])
 }
@@ -3459,6 +3472,14 @@ model Lote {
   proveedorId       Int?
   proveedor         Proveedor? @relation(fields: [proveedorId], references: [id], onDelete: SetNull)
   nroLote           String     @db.VarChar(60)
+  /// @en Pharmacy vertical: unit serial captured locally at receipt/dispensing (#204); no ANMAT SNT round-trip.
+  /// @es Vertical farmacia: serial unitario capturado localmente al ingreso/dispensación (#204); sin envío al SNT de ANMAT.
+  /// @pt-BR Vertical farmácia: serial unitário capturado localmente na entrada/dispensação (#204); sem envio ao SNT da ANMAT.
+  serialUnidad      String?    @db.VarChar(60)
+  /// @en Pharmacy vertical: raw GS1/DataMatrix payload typed or pasted by the operator (#204); not parsed.
+  /// @es Vertical farmacia: contenido GS1/DataMatrix tipeado o pegado por el operador (#204); no se parsea.
+  /// @pt-BR Vertical farmácia: conteúdo GS1/DataMatrix digitado ou colado pelo operador (#204); não é parseado.
+  codigoDatamatrix  String?    @db.VarChar(200)
   fechaVencimiento  DateTime   @db.Date
   fechaIngreso      DateTime   @default(now())
   stockInicial      Decimal    @db.Decimal(14, 4)
@@ -3472,11 +3493,70 @@ model Lote {
   pedidoItems  PedidoItem[]
   stockAjustes StockAjuste[]
 
+  librosPsicotropicos LibroPsicotropicoMovimiento[]
+
   @@unique([tenantId, articuloId, depositoId, nroLote])
   @@index([tenantId])
   @@index([tenantId, articuloId, depositoId, fechaVencimiento])
   @@index([tenantId, fechaVencimiento])
   @@index([tenantId, activo, stockActual])
+}
+
+/// @en Prescription recorded when dispensing controlled articles (#204); local record, no ANMAT SNT submission.
+/// @es Receta registrada al dispensar artículos controlados (#204); registro local, sin envío al SNT de ANMAT.
+/// @pt-BR Receita registrada ao dispensar artigos controlados (#204); registro local, sem envio ao SNT da ANMAT.
+model RecetaDispensacion {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  facturaId     Int?
+  factura       Factura? @relation(fields: [facturaId], references: [id], onDelete: SetNull)
+  clienteId     Int?
+  cliente       Cliente? @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  numeroReceta  String   @db.VarChar(40)
+  medicoNombre  String   @db.VarChar(120)
+  matricula     String   @db.VarChar(40)
+  fechaReceta   DateTime @db.Date
+  observaciones String?  @db.VarChar(500)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  movimientos LibroPsicotropicoMovimiento[]
+
+  @@unique([tenantId, numeroReceta])
+  @@index([tenantId])
+  @@index([tenantId, facturaId])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, fechaReceta])
+}
+
+/// @en Internal psychotropic movement book entry (#204); CSV-exportable, not the official SEDRONAR filing format.
+/// @es Asiento del libro interno de psicotrópicos (#204); exportable a CSV, no es el formato oficial de SEDRONAR.
+/// @pt-BR Lançamento do livro interno de psicotrópicos (#204); exportável em CSV, não é o formato oficial do SEDRONAR.
+model LibroPsicotropicoMovimiento {
+  id            Int                 @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant              @relation(fields: [tenantId], references: [id])
+  articuloId    Int
+  articulo      Articulo            @relation(fields: [articuloId], references: [id], onDelete: Restrict)
+  loteId        Int?
+  lote          Lote?               @relation(fields: [loteId], references: [id], onDelete: SetNull)
+  recetaId      Int?
+  receta        RecetaDispensacion? @relation(fields: [recetaId], references: [id], onDelete: SetNull)
+  /// ingreso | egreso | ajuste
+  tipo          String              @db.VarChar(10)
+  cantidad      Decimal             @db.Decimal(14, 4)
+  /// @en Free-form origin reference such as `factura:123` or `ajuste:45`.
+  /// @es Referencia libre de origen, p. ej. `factura:123` o `ajuste:45`.
+  /// @pt-BR Referência livre de origem, p. ex. `factura:123` ou `ajuste:45`.
+  referencia    String?             @db.VarChar(60)
+  observaciones String?             @db.VarChar(300)
+  createdAt     DateTime            @default(now())
+
+  @@index([tenantId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, articuloId, createdAt])
+  @@index([tenantId, tipo])
 }
 
 /// @en Current loyalty points balance per customer (#250).

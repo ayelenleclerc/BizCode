@@ -128,6 +128,11 @@ tags:
     description: In-app notifications
   - name: audit
     description: Audit event history (read-only)
+  - name: farmacia
+    description: >-
+      Pharmacy vertical MVP (#204, module `vertical.pharmacy`) — prescriptions, internal
+      psychotropic movement book and lot unit serial capture. The book is an internal audit
+      trail: it is not the official SEDRONAR filing format, and no ANMAT SNT web service is called.
   - name: modules
     description: Platform module catalog and feature-flag metadata
   - name: platform
@@ -7205,6 +7210,264 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoteTrazabilidadEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/recetas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [farmacia]
+      summary: List dispensing prescriptions (#204)
+      description: Requires module `vertical.pharmacy` and `products.read`.
+      parameters:
+        - name: facturaId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: clienteId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Prescriptions list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecetaDispensacionListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [farmacia]
+      summary: Register a dispensing prescription (#204)
+      description: Requires module `vertical.pharmacy` and `inventory.adjust`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecetaDispensacionCreateInput'
+      responses:
+        '201':
+          description: Created prescription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecetaDispensacionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/recetas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [farmacia]
+      summary: Get a dispensing prescription (#204)
+      description: Requires module `vertical.pharmacy` and `products.read`.
+      responses:
+        '200':
+          description: Prescription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecetaDispensacionEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/libro-psicotropicos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [farmacia]
+      summary: List internal psychotropic book entries (#204)
+      description: >-
+        Requires module `vertical.pharmacy` and `products.read`. Internal audit trail only;
+        not the official SEDRONAR filing.
+      parameters:
+        - name: articuloId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: tipo
+          in: query
+          schema:
+            $ref: '#/components/schemas/LibroPsicotropicoTipo'
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Book entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibroPsicotropicoListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [farmacia]
+      summary: Add an internal psychotropic book entry (#204)
+      description: >-
+        Requires module `vertical.pharmacy` and `inventory.adjust`. The article must be flagged
+        `esPsicotropico`, otherwise the request is rejected with `ARTICLE_NOT_PSYCHOTROPIC`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibroPsicotropicoCreateInput'
+      responses:
+        '201':
+          description: Created book entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibroPsicotropicoEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/libro-psicotropicos/export:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [farmacia]
+      summary: Export the internal psychotropic book as CSV (#204)
+      description: >-
+        Requires module `vertical.pharmacy` and `products.read`. Internal CSV export;
+        it is not the official SEDRONAR filing format.
+      parameters:
+        - name: articuloId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: tipo
+          in: query
+          schema:
+            $ref: '#/components/schemas/LibroPsicotropicoTipo'
+        - name: desde
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: hasta
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: CSV export
+          content:
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/lotes/{id}/serial:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    put:
+      tags: [farmacia]
+      summary: Store the unit serial / DataMatrix payload on a lot (#204)
+      description: >-
+        Requires module `vertical.pharmacy` and `inventory.adjust`. Values are stored verbatim;
+        no GS1/DataMatrix parsing and no ANMAT SNT submission are performed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoteSerialUpdateInput'
+      responses:
+        '200':
+          description: Updated lot serial
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoteSerialEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -19848,6 +20111,14 @@ components:
         controlLote:
           type: boolean
           description: When true, stock movements require lot tracking / FEFO (#202).
+        requiereReceta:
+          type: boolean
+          description: Pharmacy vertical — dispensing requires a registered prescription (#204).
+        esPsicotropico:
+          type: boolean
+          description: >-
+            Pharmacy vertical — tracked in the internal psychotropic book (#204);
+            not a SEDRONAR filing.
         unidadBase:
           type: string
           enum: [unidad, kg, gramo, litro, metro, m2, m3, rollo, caja]
@@ -19934,6 +20205,12 @@ components:
         controlLote:
           type: boolean
           description: Lot control opt-in (#202).
+        requiereReceta:
+          type: boolean
+          description: Pharmacy vertical — prescription-only article (#204).
+        esPsicotropico:
+          type: boolean
+          description: Pharmacy vertical — psychotropic tracked in the internal book (#204).
         unidadBase:
           type: string
           enum: [unidad, kg, gramo, litro, metro, m2, m3, rollo, caja]
@@ -22177,6 +22454,14 @@ components:
           description: >
             When true, acknowledges soft-blocked duplicate anomaly and proceeds with create (#200).
             Required to create after HTTP 422 DUPLICATE_INVOICE_CONFIRM_REQUIRED.
+        recetaId:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: >
+            Prescription backing the dispensing of prescription-only articles (#204). With module
+            `vertical.pharmacy` enabled, invoicing an article flagged `requiereReceta` without this
+            field fails with HTTP 422 `PRESCRIPTION_REQUIRED:<articuloIds>`.
 
     FacturaAnomalyWarning:
       type: object
@@ -26671,6 +26956,272 @@ components:
           const: true
         data:
           $ref: '#/components/schemas/LoteTrazabilidad'
+
+    RecetaDispensacion:
+      type: object
+      description: Prescription recorded locally when dispensing controlled articles (#204).
+      required:
+        [
+          id,
+          tenantId,
+          facturaId,
+          clienteId,
+          numeroReceta,
+          medicoNombre,
+          matricula,
+          fechaReceta,
+          observaciones,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        facturaId:
+          type: integer
+          nullable: true
+        clienteId:
+          type: integer
+          nullable: true
+        numeroReceta:
+          type: string
+          maxLength: 40
+        medicoNombre:
+          type: string
+          maxLength: 120
+        matricula:
+          type: string
+          maxLength: 40
+        fechaReceta:
+          type: string
+          format: date
+        observaciones:
+          type: string
+          maxLength: 500
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        cliente:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            rsocial:
+              type: string
+
+    RecetaDispensacionCreateInput:
+      type: object
+      required: [numeroReceta, medicoNombre, matricula, fechaReceta]
+      properties:
+        facturaId:
+          type: integer
+          minimum: 1
+          nullable: true
+        clienteId:
+          type: integer
+          minimum: 1
+          nullable: true
+        numeroReceta:
+          type: string
+          minLength: 1
+          maxLength: 40
+        medicoNombre:
+          type: string
+          minLength: 1
+          maxLength: 120
+        matricula:
+          type: string
+          minLength: 1
+          maxLength: 40
+        fechaReceta:
+          type: string
+          format: date
+        observaciones:
+          type: string
+          maxLength: 500
+          nullable: true
+
+    RecetaDispensacionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/RecetaDispensacion'
+
+    RecetaDispensacionListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecetaDispensacion'
+
+    LibroPsicotropicoTipo:
+      type: string
+      enum: [ingreso, egreso, ajuste]
+
+    LibroPsicotropicoMovimiento:
+      type: object
+      description: >-
+        Internal psychotropic book entry (#204). Internal audit trail, not the official
+        SEDRONAR filing format.
+      required:
+        [
+          id,
+          tenantId,
+          articuloId,
+          loteId,
+          recetaId,
+          tipo,
+          cantidad,
+          referencia,
+          observaciones,
+          createdAt,
+        ]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        articuloId:
+          type: integer
+        loteId:
+          type: integer
+          nullable: true
+        recetaId:
+          type: integer
+          nullable: true
+        tipo:
+          $ref: '#/components/schemas/LibroPsicotropicoTipo'
+        cantidad:
+          type: number
+        referencia:
+          type: string
+          maxLength: 60
+          nullable: true
+        observaciones:
+          type: string
+          maxLength: 300
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        articulo:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            codigo:
+              type: integer
+            descripcion:
+              type: string
+        lote:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            nroLote:
+              type: string
+
+    LibroPsicotropicoCreateInput:
+      type: object
+      required: [articuloId, tipo, cantidad]
+      properties:
+        articuloId:
+          type: integer
+          minimum: 1
+        loteId:
+          type: integer
+          minimum: 1
+          nullable: true
+        recetaId:
+          type: integer
+          minimum: 1
+          nullable: true
+        tipo:
+          $ref: '#/components/schemas/LibroPsicotropicoTipo'
+        cantidad:
+          type: number
+          description: Non-zero; must be positive for `ingreso` and `egreso`.
+        referencia:
+          type: string
+          maxLength: 60
+          nullable: true
+        observaciones:
+          type: string
+          maxLength: 300
+          nullable: true
+
+    LibroPsicotropicoEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/LibroPsicotropicoMovimiento'
+
+    LibroPsicotropicoListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LibroPsicotropicoMovimiento'
+
+    LoteSerialUpdateInput:
+      type: object
+      description: Operator-entered unit serial / DataMatrix payload; stored verbatim (#204).
+      properties:
+        serialUnidad:
+          type: string
+          maxLength: 60
+          nullable: true
+        codigoDatamatrix:
+          type: string
+          maxLength: 200
+          nullable: true
+
+    LoteSerialEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [id, serialUnidad, codigoDatamatrix]
+          properties:
+            id:
+              type: integer
+            serialUnidad:
+              type: string
+              nullable: true
+            codigoDatamatrix:
+              type: string
+              nullable: true
 
     MovimientoPuntos:
       type: object

@@ -409,6 +409,14 @@ export const MODULE_CATALOG = {
     plan: 'enterprise',
     price: 5000,
   },
+  'vertical.pharmacy': {
+    label: 'Vertical Farmacia',
+    required: false,
+    requiredInProd: false,
+    dependencies: ['inventory.lots'],
+    plan: 'enterprise',
+    price: 4000,
+  },
   'platform.white_label': {
     label: 'White-label',
     required: false,
