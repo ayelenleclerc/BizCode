@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+
 import { Decimal } from '@prisma/client/runtime/library'
 import { ClienteCuentaCorrienteService } from '../../../apps/server/services/ClienteCuentaCorrienteService'
 import { ValidationAppError } from '../../../apps/server/errors/AppError'
@@ -310,5 +311,140 @@ describe('ClienteCuentaCorrienteService', () => {
     const svc = new ClienteCuentaCorrienteService(db as never)
     await expect(svc.createAjuste(1, 1, 1, 10, '   ')).rejects.toBeInstanceOf(ValidationAppError)
     await expect(svc.createAjuste(1, 1, 1, 0, 'ok')).rejects.toBeInstanceOf(ValidationAppError)
+  })
+
+  describe('saldo por moneda (#206)', () => {
+    it('registra los asientos en ARS por defecto', async () => {
+      const db = buildDb()
+      const svc = new ClienteCuentaCorrienteService(db as never)
+      await svc.recordMovimiento({
+        tenantId: 1,
+        clienteId: 1,
+        tipo: 'factura',
+        monto: 100,
+        fecha: new Date('2026-01-01'),
+        usuarioId: 1,
+      })
+      expect(db._movimientos[0]).toMatchObject({ moneda: 'ARS' })
+    })
+
+    it('lleva un saldo corrido independiente por moneda', async () => {
+      const db = buildDb()
+      const svc = new ClienteCuentaCorrienteService(db as never)
+      await svc.recordMovimiento({
+        tenantId: 1,
+        clienteId: 1,
+        tipo: 'factura',
+        monto: 100,
+        fecha: new Date('2026-01-01'),
+        usuarioId: 1,
+      })
+      await svc.recordMovimiento({
+        tenantId: 1,
+        clienteId: 1,
+        tipo: 'factura',
+        monto: 250,
+        moneda: 'usd',
+        fecha: new Date('2026-01-02'),
+        usuarioId: 1,
+      })
+
+      expect((await svc.getLastSaldo(1, 1)).toNumber()).toBe(100)
+      expect((await svc.getLastSaldo(1, 1, 'USD')).toNumber()).toBe(250)
+    })
+
+    it('no sincroniza Cliente.balance con asientos en moneda extranjera', async () => {
+      const db = buildDb()
+      const svc = new ClienteCuentaCorrienteService(db as never)
+      await svc.recordMovimiento({
+        tenantId: 1,
+        clienteId: 1,
+        tipo: 'factura',
+        monto: 250,
+        moneda: 'USD',
+        fecha: new Date('2026-01-02'),
+        usuarioId: 1,
+      })
+      expect(db.cliente.updateMany).not.toHaveBeenCalled()
+    })
+
+    it('getSaldo devuelve el desglose por moneda', async () => {
+      const db = buildDb()
+      const svc = new ClienteCuentaCorrienteService(db as never)
+      await svc.recordMovimiento({
+        tenantId: 1,
+        clienteId: 1,
+        tipo: 'factura',
+        monto: 100,
+        fecha: new Date('2026-01-01'),
+        usuarioId: 1,
+      })
+      await svc.recordMovimiento({
+        tenantId: 1,
+        clienteId: 1,
+        tipo: 'factura',
+        monto: 250,
+        moneda: 'USD',
+        fecha: new Date('2026-01-02'),
+        usuarioId: 1,
+      })
+
+      const saldo = await svc.getSaldo(1, 1)
+      expect(saldo?.saldo).toBe('100.00')
+      expect(saldo?.saldosPorMoneda).toEqual([
+        { moneda: 'ARS', saldo: '100.00' },
+        { moneda: 'USD', saldo: '250.00' },
+      ])
+    })
+
+    it('recordFromFactura usa la moneda de la operación exportada', async () => {
+      const db = buildDb()
+      const svc = new ClienteCuentaCorrienteService(db as never)
+      await svc.recordFromFactura(
+        1,
+        {
+          id: 77,
+          clienteId: 1,
+          tipo: 'A',
+          prefijo: '0001',
+          numero: 5,
+          total: new Decimal(1500000),
+          totalMonedaOperacion: new Decimal(1500),
+          monedaOperacion: 'USD',
+          fecha: new Date('2026-02-01'),
+          estado: 'A',
+        } as never,
+        1,
+      )
+      expect(db._movimientos[0]).toMatchObject({ moneda: 'USD' })
+      expect((db._movimientos[0] as unknown as { monto: Decimal }).monto.toNumber()).toBe(1500)
+    })
+
+    it('recordFromFactura mantiene ARS para facturas sin datos de exportación', async () => {
+      const db = buildDb()
+      const svc = new ClienteCuentaCorrienteService(db as never)
+      await svc.recordFromFactura(
+        1,
+        {
+          id: 78,
+          clienteId: 1,
+          tipo: 'B',
+          prefijo: '0001',
+          numero: 6,
+          total: new Decimal(500),
+          fecha: new Date('2026-02-02'),
+          estado: 'A',
+        } as never,
+        1,
+      )
+      expect(db._movimientos[0]).toMatchObject({ moneda: 'ARS' })
+    })
+
+    it('getAntiguedad expone la moneda de los tramos', async () => {
+      const db = buildDb()
+      const svc = new ClienteCuentaCorrienteService(db as never)
+      const result = await svc.getAntiguedad(1, 1, new Date('2026-06-01'), 'usd')
+      expect(result?.moneda).toBe('USD')
+    })
   })
 })

@@ -25,6 +25,8 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findFirst: vi.fn().mockResolvedValue({
         saldoPost: { toString: () => '200.00', greaterThan: (x: { toString: () => string }) => Number(200) > Number(x.toString()) },
       }),
+      // Per-currency balance breakdown (#206).
+      findMany: vi.fn().mockResolvedValue([]),
     },
     factura: {
       findMany: vi.fn().mockResolvedValue([]),

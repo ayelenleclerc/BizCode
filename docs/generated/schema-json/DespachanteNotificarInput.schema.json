@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Customs broker contact (#206). When omitted the values already stored on the order are used; the request fails with 422 when neither the body nor the order provides an email.",
+  "properties": {
+    "despachanteEmail": {
+      "format": "email",
+      "maxLength": 160,
+      "nullable": true,
+      "type": "string"
+    },
+    "despachanteNombre": {
+      "maxLength": 120,
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "DespachanteNotificarInput",
+  "type": "object"
+}

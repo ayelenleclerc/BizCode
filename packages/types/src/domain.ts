@@ -1,3 +1,5 @@
+import type { SaldoPorMoneda } from './exportacion'
+
 export interface Cliente {
   id: number
   codigo: number
@@ -162,10 +164,18 @@ export interface ClienteCuentaCorrienteSaldo {
   saldo: string
   creditLimit: string | null
   excedeLimite: boolean
+  /**
+   * @en Running balance per currency (#206); `saldo` and the credit limit stay in local currency.
+   * @es Saldo corrido por moneda (#206); `saldo` y el límite de crédito siguen en moneda local.
+   * @pt-BR Saldo corrente por moeda (#206); `saldo` e o limite de crédito seguem em moeda local.
+   */
+  saldosPorMoneda: SaldoPorMoneda[]
 }
 
 export interface ClienteCuentaCorrienteAntiguedad {
   clienteId: number
+  /** @en Currency of the buckets (#206). @es Moneda de los tramos (#206). @pt-BR Moeda das faixas (#206). */
+  moneda: string
   buckets: Array<{ label: '0-30' | '31-60' | '61-90' | '+90'; total: string }>
   totalPendiente: string
 }

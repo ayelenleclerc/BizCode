@@ -909,6 +909,23 @@ model Factura {
   tipoCambioTipo   String?     @db.VarChar(20)
   tipoCambioFecha  DateTime?
 
+  /// @en Export vertical (#206): ISO-4217 currency the operation is denominated in; null means local currency.
+  /// @es Vertical exportación (#206): moneda ISO-4217 en que se denomina la operación; null es moneda local.
+  /// @pt-BR Vertical exportação (#206): moeda ISO-4217 em que a operação é denominada; null é moeda local.
+  monedaOperacion      String?  @db.VarChar(3)
+  /// @en Export vertical (#206): total expressed in `monedaOperacion`; `total` stays in local currency.
+  /// @es Vertical exportación (#206): total expresado en `monedaOperacion`; `total` sigue en moneda local.
+  /// @pt-BR Vertical exportação (#206): total expresso em `monedaOperacion`; `total` permanece em moeda local.
+  totalMonedaOperacion Decimal? @db.Decimal(14, 2)
+  /// @en Export vertical (#206): Incoterms 2020 delivery term; informational, no AFIP type E filing.
+  /// @es Vertical exportación (#206): término de entrega Incoterms 2020; informativo, sin comprobante AFIP tipo E.
+  /// @pt-BR Vertical exportação (#206): termo de entrega Incoterms 2020; informativo, sem comprovante AFIP tipo E.
+  incoterm             String?  @db.VarChar(3)
+  /// @en Export vertical (#206): ISO-3166-1 alpha-2 destination country.
+  /// @es Vertical exportación (#206): país de destino ISO-3166-1 alpha-2.
+  /// @pt-BR Vertical exportação (#206): país de destino ISO-3166-1 alpha-2.
+  paisDestino          String?  @db.VarChar(2)
+
   items                            FacturaItem[]
   recetasDispensacion              RecetaDispensacion[]
   ordenesEntrega                   OrdenEntrega[]
@@ -942,6 +959,7 @@ model Factura {
   @@index([tenantId, contratoId])
   @@index([tenantId, depositoId])
   @@index([tenantId, tipoCambioId])
+  @@index([tenantId, monedaOperacion])
 }
 
 /// @en Detected billing anomaly for audit (#200 Fase 1).
@@ -1320,6 +1338,19 @@ model Pedido {
   /// @es Días de plazo cuando condicionCobro es plazo (#169).
   /// @pt-BR Dias de prazo quando condicionCobro é plazo (#169).
   plazoDias        Int?
+  /// @en Export vertical (#206): Incoterms 2020 delivery term agreed with the buyer.
+  /// @es Vertical exportación (#206): término de entrega Incoterms 2020 acordado con el comprador.
+  /// @pt-BR Vertical exportação (#206): termo de entrega Incoterms 2020 acordado com o comprador.
+  incoterm         String?           @db.VarChar(3)
+  /// @en Export vertical (#206): ISO-3166-1 alpha-2 destination country.
+  /// @es Vertical exportación (#206): país de destino ISO-3166-1 alpha-2.
+  /// @pt-BR Vertical exportação (#206): país de destino ISO-3166-1 alpha-2.
+  paisDestino      String?           @db.VarChar(2)
+  /// @en Export vertical (#206): customs broker contact notified by email; no customs filing is performed.
+  /// @es Vertical exportación (#206): contacto del despachante de aduana avisado por email; no se hace despacho.
+  /// @pt-BR Vertical exportação (#206): contato do despachante aduaneiro avisado por email; não há despacho.
+  despachanteNombre String?          @db.VarChar(120)
+  despachanteEmail  String?          @db.VarChar(160)
   remito           Remito?
   items            PedidoItem[]
   meliOrden        MeliOrden?
@@ -3047,6 +3078,10 @@ model MovimientoClienteCC {
   referencia          String?            @db.VarChar(40)
   /// Positive increases customer debt; negative reduces debt.
   monto               Decimal            @db.Decimal(14, 2)
+  /// @en Export vertical (#206): ISO-4217 currency of this entry; running balance is kept per currency.
+  /// @es Vertical exportación (#206): moneda ISO-4217 del asiento; el saldo corrido se lleva por moneda.
+  /// @pt-BR Vertical exportação (#206): moeda ISO-4217 do lançamento; o saldo corrente é mantido por moeda.
+  moneda              String             @default("ARS") @db.VarChar(3)
   saldoPost           Decimal            @db.Decimal(14, 2)
   fecha               DateTime
   usuarioId           Int
@@ -3068,6 +3103,7 @@ model MovimientoClienteCC {
 
   @@index([tenantId, clienteId, fecha])
   @@index([tenantId, clienteId])
+  @@index([tenantId, clienteId, moneda, fecha])
 }
 
 /// Customer payment receipt (#233).

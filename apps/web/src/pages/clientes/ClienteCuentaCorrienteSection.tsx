@@ -4,7 +4,11 @@ import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
 import { ApiRequestFailedError, clientesAPI } from '@/lib/api'
 import ClienteReciboCobroSection from './ClienteReciboCobroSection'
-import type { ClienteCuentaCorrienteAntiguedad, MovimientoClienteCCTipo } from '@bizcode/types'
+import type {
+  ClienteCuentaCorrienteAntiguedad,
+  MovimientoClienteCCTipo,
+  SaldoPorMoneda,
+} from '@bizcode/types'
 import ClienteDeudaChart from './ClienteDeudaChart'
 
 const PAGE_SIZE = 25
@@ -38,6 +42,7 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
     null,
   )
   const [antiguedad, setAntiguedad] = useState<ClienteCuentaCorrienteAntiguedad | null>(null)
+  const [saldosPorMoneda, setSaldosPorMoneda] = useState<SaldoPorMoneda[]>([])
   const [filterTipo, setFilterTipo] = useState('')
   const [filterFrom, setFilterFrom] = useState('')
   const [filterTo, setFilterTo] = useState('')
@@ -64,12 +69,14 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
       if (filterTipo) params.tipo = filterTipo
       if (filterFrom) params.desde = new Date(filterFrom).toISOString()
       if (filterTo) params.hasta = new Date(`${filterTo}T23:59:59`).toISOString()
-      const [cc, ant] = await Promise.all([
+      const [cc, ant, saldo] = await Promise.all([
         clientesAPI.cuentaCorriente(clienteId, params),
         clientesAPI.cuentaCorrienteAntiguedad(clienteId),
+        clientesAPI.cuentaCorrienteSaldo(clienteId),
       ])
       setData(cc ?? null)
       setAntiguedad(ant ?? null)
+      setSaldosPorMoneda(saldo?.saldosPorMoneda ?? [])
     } catch (err) {
       if (err instanceof ApiRequestFailedError) {
         setError(err.message)
@@ -78,6 +85,7 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
       }
       setData(null)
       setAntiguedad(null)
+      setSaldosPorMoneda([])
     } finally {
       setLoading(false)
     }
@@ -202,6 +210,34 @@ export default function ClienteCuentaCorrienteSection({ clienteId }: Props) {
           </p>
         ) : null}
       </div>
+
+      <IfModule flag="vertical.export">
+        {saldosPorMoneda.length > 0 ? (
+          <div
+            className="rounded border border-slate-200 dark:border-slate-600 p-3"
+            data-testid="cliente-cc-saldos-moneda"
+          >
+            <h3 className="text-sm font-semibold mb-2">{t('cc.saldosPorMonedaTitle')}</h3>
+            <p className="text-xs text-slate-500 mb-2">{t('cc.saldosPorMonedaHint')}</p>
+            <ul className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+              {saldosPorMoneda.map((s) => (
+                <li
+                  key={s.moneda}
+                  className="rounded bg-slate-100 dark:bg-slate-800 px-2 py-1"
+                  data-testid={`cliente-cc-saldo-moneda-${s.moneda}`}
+                >
+                  <span className="block text-xs text-slate-500">{s.moneda}</span>
+                  <span className="font-mono">{s.saldo}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500" data-testid="cliente-cc-saldos-moneda-empty">
+            {t('cc.saldosPorMonedaEmpty')}
+          </p>
+        )}
+      </IfModule>
 
       {antiguedad ? (
         <div className="rounded border border-slate-200 dark:border-slate-600 p-3" data-testid="cliente-cc-antiguedad">

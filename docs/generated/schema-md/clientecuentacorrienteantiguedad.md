@@ -20,6 +20,7 @@ undefined#/properties/data
 | :-------------------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------------------- |
 | [buckets](#buckets)               | `array`   | Required | cannot be null | [ClienteCuentaCorrienteAntiguedad](clientecuentacorrienteantiguedad-properties-buckets.md "undefined#/properties/buckets")               |
 | [clienteId](#clienteid)           | `integer` | Required | cannot be null | [ClienteCuentaCorrienteAntiguedad](clientecuentacorrienteantiguedad-properties-clienteid.md "undefined#/properties/clienteId")           |
+| [moneda](#moneda)                 | `string`  | Required | cannot be null | [ClienteCuentaCorrienteAntiguedad](clientecuentacorrienteantiguedad-properties-moneda.md "undefined#/properties/moneda")                 |
 | [totalPendiente](#totalpendiente) | `string`  | Required | cannot be null | [ClienteCuentaCorrienteAntiguedad](clientecuentacorrienteantiguedad-properties-totalpendiente.md "undefined#/properties/totalPendiente") |
 
 ## buckets
@@ -57,6 +58,30 @@ undefined#/properties/data
 ### clienteId Type
 
 `integer`
+
+## moneda
+
+Currency the buckets are expressed in (#206).
+
+`moneda`
+
+* is required
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [ClienteCuentaCorrienteAntiguedad](clientecuentacorrienteantiguedad-properties-moneda.md "undefined#/properties/moneda")
+
+### moneda Type
+
+`string`
+
+### moneda Constraints
+
+**maximum length**: the maximum number of characters for this string is: `3`
+
+**minimum length**: the minimum number of characters for this string is: `3`
 
 ## totalPendiente
 

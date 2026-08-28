@@ -417,6 +417,14 @@ export const MODULE_CATALOG = {
     plan: 'enterprise',
     price: 4000,
   },
+  'vertical.export': {
+    label: 'Vertical Exportacion',
+    required: false,
+    requiredInProd: false,
+    dependencies: ['catalog.multicurrency'],
+    plan: 'enterprise',
+    price: 4000,
+  },
   'platform.white_label': {
     label: 'White-label',
     required: false,

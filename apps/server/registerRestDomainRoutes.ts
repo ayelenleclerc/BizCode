@@ -87,6 +87,7 @@ import { registerGarantiasRoutes } from './routes/registerGarantiasRoutes'
 import { registerFidelizacionRoutes } from './routes/registerFidelizacionRoutes'
 import { registerLotesRoutes } from './routes/registerLotesRoutes'
 import { registerFarmaciaRoutes } from './routes/registerFarmaciaRoutes'
+import { registerExportacionRoutes } from './routes/registerExportacionRoutes'
 import { registerCajaRoutes } from './routes/registerCajaRoutes'
 import { registerListasPreciosRoutes } from './routes/registerListasPreciosRoutes'
 import { registerCategoriasArticuloRoutes } from './routes/registerCategoriasArticuloRoutes'
@@ -176,6 +177,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerFidelizacionRoutes(app, ctx)
   registerLotesRoutes(app, ctx)
   registerFarmaciaRoutes(app, ctx)
+  registerExportacionRoutes(app, ctx)
   registerCajaRoutes(app, ctx)
   registerListasPreciosRoutes(app, ctx)
   registerCategoriasArticuloRoutes(app, ctx)

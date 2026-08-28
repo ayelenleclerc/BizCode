@@ -131,5 +131,18 @@
       "precio": "Invalid price",
       "generic": "Could not create order"
     }
+  },
+  "export": {
+    "title": "Export data (#206)",
+    "hint": "Informational fields stored on the order. No customs declaration is filed.",
+    "incoterm": "Incoterm 2020",
+    "incotermNone": "Not specified",
+    "paisDestino": "Destination country",
+    "despachanteNombre": "Customs broker",
+    "despachanteEmail": "Broker email",
+    "notifyDespachante": "Notify broker",
+    "notifying": "Notifying...",
+    "notifyOk": "The customs broker was notified by email.",
+    "notifySmtpMissing": "Email is not configured; the notification could not be sent."
   }
 }

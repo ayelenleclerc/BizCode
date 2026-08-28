@@ -16,15 +16,16 @@ undefined
 
 # ReporteVentasRow Properties
 
-| Property            | Type      | Required | Nullable       | Defined by                                                                                 |
-| :------------------ | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------- |
-| [count](#count)     | `integer` | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-count.md "undefined#/properties/count")     |
-| [iva1](#iva1)       | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-iva1.md "undefined#/properties/iva1")       |
-| [iva2](#iva2)       | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-iva2.md "undefined#/properties/iva2")       |
-| [neto1](#neto1)     | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-neto1.md "undefined#/properties/neto1")     |
-| [neto2](#neto2)     | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-neto2.md "undefined#/properties/neto2")     |
-| [periodo](#periodo) | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-periodo.md "undefined#/properties/periodo") |
-| [total](#total)     | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-total.md "undefined#/properties/total")     |
+| Property                | Type      | Required | Nullable       | Defined by                                                                                     |
+| :---------------------- | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------- |
+| [count](#count)         | `integer` | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-count.md "undefined#/properties/count")         |
+| [iva1](#iva1)           | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-iva1.md "undefined#/properties/iva1")           |
+| [iva2](#iva2)           | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-iva2.md "undefined#/properties/iva2")           |
+| [neto1](#neto1)         | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-neto1.md "undefined#/properties/neto1")         |
+| [neto2](#neto2)         | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-neto2.md "undefined#/properties/neto2")         |
+| [periodo](#periodo)     | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-periodo.md "undefined#/properties/periodo")     |
+| [porMoneda](#pormoneda) | `array`   | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-pormoneda.md "undefined#/properties/porMoneda") |
+| [total](#total)         | `string`  | Required | cannot be null | [ReporteVentasRow](reporteventasrow-properties-total.md "undefined#/properties/total")         |
 
 ## count
 
@@ -137,6 +138,24 @@ Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
 ### periodo Type
 
 `string`
+
+## porMoneda
+
+Breakdown by operation currency (#206).
+
+`porMoneda`
+
+* is required
+
+* Type: `object[]` ([ReporteVentasPorMoneda](reporteventaspormoneda.md))
+
+* cannot be null
+
+* defined in: [ReporteVentasRow](reporteventasrow-properties-pormoneda.md "undefined#/properties/porMoneda")
+
+### porMoneda Type
+
+`object[]` ([ReporteVentasPorMoneda](reporteventaspormoneda.md))
 
 ## total
 

@@ -12,13 +12,22 @@
       "type": "boolean"
     },
     "saldo": {
+      "description": "Local-currency balance; drives the credit limit check.",
       "type": "string"
+    },
+    "saldosPorMoneda": {
+      "description": "Running balance per currency (#206).",
+      "items": {
+        "$ref": "./SaldoPorMoneda.schema.json"
+      },
+      "type": "array"
     }
   },
   "required": [
     "clienteId",
     "saldo",
-    "excedeLimite"
+    "excedeLimite",
+    "saldosPorMoneda"
   ],
   "title": "ClienteCuentaCorrienteSaldo",
   "type": "object"

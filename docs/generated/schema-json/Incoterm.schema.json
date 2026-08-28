@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Incoterms 2020 delivery term (#206).",
+  "enum": [
+    "EXW",
+    "FCA",
+    "CPT",
+    "CIP",
+    "DAP",
+    "DPU",
+    "DDP",
+    "FAS",
+    "FOB",
+    "CFR",
+    "CIF"
+  ],
+  "title": "Incoterm",
+  "type": "string"
+}

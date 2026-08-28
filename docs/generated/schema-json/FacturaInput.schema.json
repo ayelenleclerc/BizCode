@@ -16,6 +16,14 @@
       "nullable": true,
       "type": "integer"
     },
+    "incoterm": {
+      "allOf": [
+        {
+          "$ref": "./Incoterm.schema.json"
+        }
+      ],
+      "nullable": true
+    },
     "items": {
       "items": {
         "description": "Catalog line requires articuloId. Ad-hoc service line omits articuloId and requires\ndescripcion + condIva (#244).\n",
@@ -80,6 +88,16 @@
     "iva2": {
       "type": "number"
     },
+    "monedaOperacion": {
+      "description": "Export vertical (#206, module `vertical.export`). Currency the operation is denominated in. A non-local currency requires `totalMonedaOperacion` and `tipoCambioOperacion`; otherwise the request fails with 422. `total` stays in local currency and the AFIP circuit is untouched (no type E voucher, no `MonId`/`MonCotiz`).",
+      "enum": [
+        "ARS",
+        "USD",
+        "EUR"
+      ],
+      "nullable": true,
+      "type": "string"
+    },
     "neto1": {
       "type": "number"
     },
@@ -91,6 +109,13 @@
     },
     "numero": {
       "type": "integer"
+    },
+    "paisDestino": {
+      "description": "ISO-3166-1 alpha-2 destination country (#206).",
+      "maxLength": 2,
+      "minLength": 2,
+      "nullable": true,
+      "type": "string"
     },
     "percepciones": {
       "items": {
@@ -120,8 +145,19 @@
       ],
       "type": "string"
     },
+    "tipoCambioOperacion": {
+      "description": "Exchange rate applied to the operation; persisted in the invoice FX snapshot.",
+      "exclusiveMinimum": 0,
+      "nullable": true,
+      "type": "number"
+    },
     "total": {
       "description": "Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).",
+      "type": "number"
+    },
+    "totalMonedaOperacion": {
+      "exclusiveMinimum": 0,
+      "nullable": true,
       "type": "number"
     }
   },

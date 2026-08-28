@@ -148,7 +148,10 @@
       "percepcion": "Percepção",
       "cheque_rechazado": "Cheque rejeitado",
       "ajuste": "Ajuste manual"
-    }
+    },
+    "saldosPorMonedaTitle": "Saldo por moeda (#206)",
+    "saldosPorMonedaHint": "Os saldos em moeda estrangeira são mantidos separadamente; o limite de crédito aplica-se à moeda local.",
+    "saldosPorMonedaEmpty": "Ainda não há lançamentos."
   },
   "recibos": {
     "title": "Recibos de cobrança",

@@ -16,12 +16,13 @@ undefined#/properties/data
 
 # data Properties
 
-| Property                      | Type      | Required | Nullable       | Defined by                                                                                                                 |
-| :---------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------- |
-| [clienteId](#clienteid)       | `integer` | Required | cannot be null | [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-clienteid.md "undefined#/properties/clienteId")       |
-| [creditLimit](#creditlimit)   | `string`  | Optional | cannot be null | [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-creditlimit.md "undefined#/properties/creditLimit")   |
-| [excedeLimite](#excedelimite) | `boolean` | Required | cannot be null | [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-excedelimite.md "undefined#/properties/excedeLimite") |
-| [saldo](#saldo)               | `string`  | Required | cannot be null | [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-saldo.md "undefined#/properties/saldo")               |
+| Property                            | Type      | Required | Nullable       | Defined by                                                                                                                       |
+| :---------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------- |
+| [clienteId](#clienteid)             | `integer` | Required | cannot be null | [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-clienteid.md "undefined#/properties/clienteId")             |
+| [creditLimit](#creditlimit)         | `string`  | Optional | cannot be null | [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-creditlimit.md "undefined#/properties/creditLimit")         |
+| [excedeLimite](#excedelimite)       | `boolean` | Required | cannot be null | [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-excedelimite.md "undefined#/properties/excedeLimite")       |
+| [saldo](#saldo)                     | `string`  | Required | cannot be null | [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-saldo.md "undefined#/properties/saldo")                     |
+| [saldosPorMoneda](#saldospormoneda) | `array`   | Required | cannot be null | [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-saldospormoneda.md "undefined#/properties/saldosPorMoneda") |
 
 ## clienteId
 
@@ -79,7 +80,7 @@ undefined#/properties/data
 
 ## saldo
 
-
+Local-currency balance; drives the credit limit check.
 
 `saldo`
 
@@ -94,3 +95,21 @@ undefined#/properties/data
 ### saldo Type
 
 `string`
+
+## saldosPorMoneda
+
+Running balance per currency (#206).
+
+`saldosPorMoneda`
+
+* is required
+
+* Type: `object[]` ([SaldoPorMoneda](saldopormoneda.md))
+
+* cannot be null
+
+* defined in: [ClienteCuentaCorrienteSaldo](clientecuentacorrientesaldo-properties-saldospormoneda.md "undefined#/properties/saldosPorMoneda")
+
+### saldosPorMoneda Type
+
+`object[]` ([SaldoPorMoneda](saldopormoneda.md))

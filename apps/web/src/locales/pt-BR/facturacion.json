@@ -273,5 +273,17 @@
         "exceedsBalance": "O valor excede o saldo reembolsável."
       }
     }
+  },
+  "export": {
+    "title": "Operação de exportação (#206)",
+    "hint": "Somente registro local: moeda, taxa, Incoterm e destino são salvos na fatura. O circuito AFIP não muda (sem comprovante tipo E).",
+    "moneda": "Moeda da operação",
+    "tipoCambio": "Taxa de câmbio",
+    "incoterm": "Incoterm 2020",
+    "incotermNone": "Não especificado",
+    "paisDestino": "País de destino",
+    "paisDestinoPlaceholder": "BR",
+    "rateUnavailable": "Nenhuma cotação vigente encontrada; informe a taxa manualmente.",
+    "rateRequired": "É necessária uma taxa de câmbio para faturar em {{moneda}}."
   }
 }

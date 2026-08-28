@@ -10,12 +10,19 @@
     "clienteId": {
       "type": "integer"
     },
+    "moneda": {
+      "description": "Currency the buckets are expressed in (#206).",
+      "maxLength": 3,
+      "minLength": 3,
+      "type": "string"
+    },
     "totalPendiente": {
       "type": "string"
     }
   },
   "required": [
     "clienteId",
+    "moneda",
     "buckets",
     "totalPendiente"
   ],

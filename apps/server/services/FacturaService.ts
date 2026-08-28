@@ -23,6 +23,7 @@ import { TiendanubeStockSyncService } from './TiendanubeStockSyncService'
 import { WooCommerceStockSyncService } from './WooCommerceStockSyncService'
 import { afipCodigoForUnidad, isUnidadBase, roundQty, validateQuantityForUom } from '../lib/uom'
 import { FacturaAnomalyService, type FacturaAnomalyWarning } from './FacturaAnomalyService'
+import { normalizeExportFields } from './exportOperationMath'
 
 type FacturaWithRelations = Prisma.FacturaGetPayload<{ include: { cliente: true; items: true } }>
 
@@ -122,6 +123,11 @@ export class FacturaService {
       puntosCanje,
       confirmAnomalies,
       recetaId,
+      monedaOperacion,
+      totalMonedaOperacion,
+      tipoCambioOperacion,
+      incoterm,
+      paisDestino,
       ...factura
     } = input
     const clienteId = factura.clienteId
@@ -216,6 +222,16 @@ export class FacturaService {
       recetaId,
     )
     if (!dispensacion.ok) return dispensacion
+
+    // Export vertical (#206): local record of currency, Incoterm and destination; no AFIP type E filing.
+    const exportFields = normalizeExportFields({
+      monedaOperacion,
+      totalMonedaOperacion,
+      tipoCambioValor: tipoCambioOperacion,
+      incoterm,
+      paisDestino,
+    })
+    if (!exportFields.ok) return exportFields
 
     // @en Decimal(14,4) columns arrive as Prisma Decimal; normalize to number once for downstream arithmetic (#203).
     // @es Las columnas Decimal(14,4) llegan como Prisma Decimal; se normalizan a number una vez para la aritmética posterior (#203).
@@ -501,6 +517,26 @@ export class FacturaService {
                   tipoCambioTipo: primaryFx.tipo,
                   tipoCambioFecha: primaryFx.fecha,
                 }
+              : {}),
+            ...(exportFields.data.monedaOperacion != null
+              ? {
+                  monedaOperacion: exportFields.data.monedaOperacion,
+                  totalMonedaOperacion: new Decimal(exportFields.data.totalMonedaOperacion ?? 0),
+                }
+              : {}),
+            // The operation rate wins over the catalog FX snapshot when the invoice is denominated abroad (#206).
+            ...(exportFields.data.tipoCambioValor != null
+              ? {
+                  tipoCambioValor: new Decimal(exportFields.data.tipoCambioValor),
+                  tipoCambioMoneda: exportFields.data.monedaOperacion,
+                  tipoCambioFecha: facturaFechaToPrismaDate(fecha),
+                }
+              : {}),
+            ...(exportFields.data.incoterm != null
+              ? { incoterm: exportFields.data.incoterm }
+              : {}),
+            ...(exportFields.data.paisDestino != null
+              ? { paisDestino: exportFields.data.paisDestino }
               : {}),
             items: { create: itemsForCreate },
           } as Prisma.FacturaUncheckedCreateInput,

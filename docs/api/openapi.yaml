@@ -133,6 +133,12 @@ tags:
       Pharmacy vertical MVP (#204, module `vertical.pharmacy`) — prescriptions, internal
       psychotropic movement book and lot unit serial capture. The book is an internal audit
       trail: it is not the official SEDRONAR filing format, and no ANMAT SNT web service is called.
+  - name: exportacion
+    description: >-
+      Export vertical MVP (#206, module `vertical.export`) — operation currency with an explicit
+      exchange rate, Incoterms 2020, destination country, per-currency customer balances and
+      customs broker notification. Local record only: no AFIP type E voucher (`CbteTipo=19`),
+      no `MonId`/`MonCotiz`, no MULC settlement and no customs declaration.
   - name: modules
     description: Platform module catalog and feature-flag metadata
   - name: platform
@@ -7474,6 +7480,69 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/exportacion/incoterms:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [exportacion]
+      summary: List the Incoterms 2020 rule set (#206)
+      description: Requires module `vertical.export` and `products.read`.
+      responses:
+        '200':
+          description: Incoterms catalog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncotermsEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/pedidos/{id}/notificar-despachante:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [exportacion]
+      summary: Email the customs broker the order detail (#206)
+      description: >-
+        Requires module `vertical.export` and `orders.create`. Stores the broker contact on the
+        order and sends a plain-text summary. No customs declaration is filed. When SMTP is not
+        configured the response returns `enviado: false` and the attempt is still audited.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DespachanteNotificarInput'
+      responses:
+        '200':
+          description: Notification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DespachanteNotificacionEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -18610,8 +18679,13 @@ components:
 
     ReporteVentasRow:
       type: object
-      required: [periodo, count, total, neto1, neto2, iva1, iva2]
+      required: [periodo, count, total, neto1, neto2, iva1, iva2, porMoneda]
       properties:
+        porMoneda:
+          type: array
+          description: Breakdown by operation currency (#206).
+          items:
+            $ref: '#/components/schemas/ReporteVentasPorMoneda'
         periodo:
           type: string
           description: Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
@@ -18993,17 +19067,23 @@ components:
 
     ClienteCuentaCorrienteSaldo:
       type: object
-      required: [clienteId, saldo, excedeLimite]
+      required: [clienteId, saldo, excedeLimite, saldosPorMoneda]
       properties:
         clienteId:
           type: integer
         saldo:
           type: string
+          description: Local-currency balance; drives the credit limit check.
         creditLimit:
           type: string
           nullable: true
         excedeLimite:
           type: boolean
+        saldosPorMoneda:
+          type: array
+          description: Running balance per currency (#206).
+          items:
+            $ref: '#/components/schemas/SaldoPorMoneda'
 
     ClienteCuentaCorrienteAntiguedadBucket:
       type: object
@@ -19017,10 +19097,15 @@ components:
 
     ClienteCuentaCorrienteAntiguedad:
       type: object
-      required: [clienteId, buckets, totalPendiente]
+      required: [clienteId, moneda, buckets, totalPendiente]
       properties:
         clienteId:
           type: integer
+        moneda:
+          type: string
+          description: Currency the buckets are expressed in (#206).
+          minLength: 3
+          maxLength: 3
         buckets:
           type: array
           items:
@@ -22408,6 +22493,34 @@ components:
         total:
           type: number
           description: Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
+        monedaOperacion:
+          type: string
+          nullable: true
+          enum: [ARS, USD, EUR]
+          description: >-
+            Export vertical (#206, module `vertical.export`). Currency the operation is denominated
+            in. A non-local currency requires `totalMonedaOperacion` and `tipoCambioOperacion`;
+            otherwise the request fails with 422. `total` stays in local currency and the AFIP
+            circuit is untouched (no type E voucher, no `MonId`/`MonCotiz`).
+        totalMonedaOperacion:
+          type: number
+          nullable: true
+          exclusiveMinimum: 0
+        tipoCambioOperacion:
+          type: number
+          nullable: true
+          exclusiveMinimum: 0
+          description: Exchange rate applied to the operation; persisted in the invoice FX snapshot.
+        incoterm:
+          allOf:
+            - $ref: '#/components/schemas/Incoterm'
+          nullable: true
+        paisDestino:
+          type: string
+          nullable: true
+          minLength: 2
+          maxLength: 2
+          description: ISO-3166-1 alpha-2 destination country (#206).
         percepciones:
           type: array
           items:
@@ -25118,6 +25231,26 @@ components:
           minimum: 1
           nullable: true
           description: Required when condicionCobro is plazo (#169).
+        incoterm:
+          allOf:
+            - $ref: '#/components/schemas/Incoterm'
+          nullable: true
+        paisDestino:
+          type: string
+          nullable: true
+          minLength: 2
+          maxLength: 2
+          description: ISO-3166-1 alpha-2 destination country (#206).
+        despachanteNombre:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: Customs broker name; requires `despachanteEmail` (#206).
+        despachanteEmail:
+          type: string
+          format: email
+          maxLength: 160
+          nullable: true
         items:
           type: array
           minItems: 1
@@ -27222,6 +27355,89 @@ components:
             codigoDatamatrix:
               type: string
               nullable: true
+
+    Incoterm:
+      type: string
+      description: Incoterms 2020 delivery term (#206).
+      enum: [EXW, FCA, CPT, CIP, DAP, DPU, DDP, FAS, FOB, CFR, CIF]
+
+    IncotermsEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Incoterm'
+
+    DespachanteNotificarInput:
+      type: object
+      description: >-
+        Customs broker contact (#206). When omitted the values already stored on the order are used;
+        the request fails with 422 when neither the body nor the order provides an email.
+      properties:
+        despachanteNombre:
+          type: string
+          maxLength: 120
+          nullable: true
+        despachanteEmail:
+          type: string
+          format: email
+          maxLength: 160
+          nullable: true
+
+    DespachanteNotificacionEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required: [pedidoId, despachanteEmail, enviado]
+          properties:
+            pedidoId:
+              type: integer
+            despachanteEmail:
+              type: string
+              format: email
+            enviado:
+              type: boolean
+              description: False when SMTP is not configured; the attempt is audited anyway.
+
+    SaldoPorMoneda:
+      type: object
+      required: [moneda, saldo]
+      description: Customer running balance for a single currency (#206).
+      properties:
+        moneda:
+          type: string
+          minLength: 3
+          maxLength: 3
+        saldo:
+          type: string
+
+    ReporteVentasPorMoneda:
+      type: object
+      required: [moneda, count, total, totalLocal]
+      description: Sales breakdown by operation currency (#206).
+      properties:
+        moneda:
+          type: string
+          minLength: 3
+          maxLength: 3
+        count:
+          type: integer
+        total:
+          type: string
+          description: Amount in the original currency.
+        totalLocal:
+          type: string
+          description: Equivalent in local currency.
 
     MovimientoPuntos:
       type: object

@@ -62,9 +62,11 @@ vi.mock('@/components/CanAccess', () => ({
   CanAccess: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
+const { enabledModules } = vi.hoisted(() => ({ enabledModules: new Set<string>() }))
+
 vi.mock('@/contexts/FeatureFlagsContext', () => ({
   useFeatureFlags: () => ({
-    hasModule: () => false,
+    hasModule: (flag: string) => enabledModules.has(flag),
     modules: [],
     loading: false,
   }),
@@ -74,15 +76,17 @@ vi.mock('./ClienteReciboCobroSection', () => ({
   default: () => null,
 }))
 
-const { mockCuentaCorriente, mockAntiguedad } = vi.hoisted(() => ({
+const { mockCuentaCorriente, mockAntiguedad, mockSaldo } = vi.hoisted(() => ({
   mockCuentaCorriente: vi.fn(),
   mockAntiguedad: vi.fn(),
+  mockSaldo: vi.fn(),
 }))
 
 vi.mock('@/lib/api', () => ({
   clientesAPI: {
     cuentaCorriente: mockCuentaCorriente,
     cuentaCorrienteAntiguedad: mockAntiguedad,
+    cuentaCorrienteSaldo: mockSaldo,
     cuentaCorrienteAjuste: vi.fn(),
     cuentaCorrienteEnviar: vi.fn(),
   },
@@ -118,9 +122,18 @@ describe('ClienteCuentaCorrienteSection', () => {
   beforeEach(() => {
     mockCuentaCorriente.mockReset()
     mockAntiguedad.mockReset()
+    mockSaldo.mockReset()
+    mockSaldo.mockResolvedValue({
+      clienteId: 1,
+      saldo: '800.00',
+      creditLimit: '500.00',
+      excedeLimite: true,
+      saldosPorMoneda: [{ moneda: 'ARS', saldo: '800.00' }],
+    })
     mockCuentaCorriente.mockResolvedValue(defaultMockCc)
     mockAntiguedad.mockResolvedValue({
       clienteId: 1,
+      moneda: 'ARS',
       buckets: [{ label: '0-30', total: '800.00' }],
       totalPendiente: '800.00',
     })
@@ -153,6 +166,55 @@ describe('ClienteCuentaCorrienteSection', () => {
         1,
         expect.objectContaining({ limit: 25, offset: 25 }),
       )
+    })
+  })
+
+  describe('saldo por moneda (#206)', () => {
+    it('oculta el panel cuando vertical.export está desactivado', async () => {
+      render(<ClienteCuentaCorrienteSection clienteId={1} />)
+      await waitFor(() => {
+        expect(screen.getByTestId('cliente-cc-saldo')).toBeInTheDocument()
+      })
+      expect(screen.queryByTestId('cliente-cc-saldos-moneda')).not.toBeInTheDocument()
+    })
+
+    it('muestra un saldo por cada moneda con el módulo activo', async () => {
+      enabledModules.add('vertical.export')
+      mockSaldo.mockResolvedValue({
+        clienteId: 1,
+        saldo: '800.00',
+        creditLimit: '500.00',
+        excedeLimite: true,
+        saldosPorMoneda: [
+          { moneda: 'ARS', saldo: '800.00' },
+          { moneda: 'USD', saldo: '250.00' },
+        ],
+      })
+
+      render(<ClienteCuentaCorrienteSection clienteId={1} />)
+      await waitFor(() => {
+        expect(screen.getByTestId('cliente-cc-saldos-moneda')).toBeInTheDocument()
+      })
+      expect(screen.getByTestId('cliente-cc-saldo-moneda-ARS')).toHaveTextContent('800.00')
+      expect(screen.getByTestId('cliente-cc-saldo-moneda-USD')).toHaveTextContent('250.00')
+      enabledModules.delete('vertical.export')
+    })
+
+    it('muestra el estado vacío cuando no hay movimientos', async () => {
+      enabledModules.add('vertical.export')
+      mockSaldo.mockResolvedValue({
+        clienteId: 1,
+        saldo: '0.00',
+        creditLimit: null,
+        excedeLimite: false,
+        saldosPorMoneda: [],
+      })
+
+      render(<ClienteCuentaCorrienteSection clienteId={1} />)
+      await waitFor(() => {
+        expect(screen.getByTestId('cliente-cc-saldos-moneda-empty')).toBeInTheDocument()
+      })
+      enabledModules.delete('vertical.export')
     })
   })
 })

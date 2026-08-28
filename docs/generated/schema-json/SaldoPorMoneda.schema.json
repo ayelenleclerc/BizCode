@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Customer running balance for a single currency (#206).",
+  "properties": {
+    "moneda": {
+      "maxLength": 3,
+      "minLength": 3,
+      "type": "string"
+    },
+    "saldo": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "moneda",
+    "saldo"
+  ],
+  "title": "SaldoPorMoneda",
+  "type": "object"
+}

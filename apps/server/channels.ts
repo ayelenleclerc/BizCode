@@ -412,6 +412,24 @@ async function sendEmail(
   }
 }
 
+/**
+ * @en Notifies the customs broker about an export order (#206); no customs filing is performed.
+ *     Returns false when SMTP is not configured so the caller can surface it.
+ * @es Avisa al despachante sobre un pedido de exportación (#206); no se realiza despacho aduanero.
+ *     Devuelve false si SMTP no está configurado para que el llamador lo informe.
+ * @pt-BR Notifica o despachante sobre um pedido de exportação (#206); não há despacho aduaneiro.
+ *     Retorna false quando o SMTP não está configurado para que o chamador possa informar.
+ */
+export async function sendDespachanteNotificationEmail(
+  to: string,
+  subject: string,
+  body: string,
+): Promise<boolean> {
+  if (!isSmtpConfigured()) return false
+  await sendEmail([to], subject, body)
+  return true
+}
+
 // ─── Twilio / WhatsApp helpers ────────────────────────────────────────────────
 
 export function isTwilioConfigured(): boolean {
