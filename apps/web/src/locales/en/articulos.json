@@ -75,6 +75,11 @@
     "mesesGarantiaHint": "Empty or 0 = no warranty. Invoicing registers the warranty automatically.",
     "controlLote": "Lot / FEFO control",
     "controlLoteHint": "Requires lot and expiry on receive; assigns FEFO when invoicing.",
+    "farmaciaLegend": "Pharmacy vertical",
+    "requiereReceta": "Prescription required",
+    "requiereRecetaHint": "Invoicing this article requires a registered prescription.",
+    "esPsicotropico": "Psychotropic",
+    "esPsicotropicoHint": "Outflows are recorded in the internal book. This is not a SEDRONAR filing.",
     "activo": "Active",
     "tipo": "Type",
     "tipoOptions": {

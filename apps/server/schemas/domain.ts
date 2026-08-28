@@ -256,6 +256,9 @@ export const articuloBodySchema = z
       .optional(),
     mesesGarantia: z.union([z.number(), z.null()]).optional(),
     controlLote: z.boolean().optional(),
+    /** @en Pharmacy vertical flags (#204). @es Flags del vertical farmacia (#204). @pt-BR Flags do vertical farmácia (#204). */
+    requiereReceta: z.boolean().optional(),
+    esPsicotropico: z.boolean().optional(),
     /** @en Base unit of measure for stock/quantity rules (#203). @es Unidad base de stock/cantidad (#203). @pt-BR Unidade base de estoque/quantidade (#203). */
     unidadBase: z.enum(UNIDAD_BASE_VALUES).optional(),
     unidadCompra: z.union([z.string(), z.null()]).optional(),
@@ -404,6 +407,8 @@ export const articuloBodySchema = z
         unidadServicio: tipo === 'servicio' ? (data.unidadServicio ?? null) : null,
         mesesGarantia: tipo === 'servicio' ? null : (data.mesesGarantia ?? null),
         controlLote: tipo === 'servicio' ? false : (data.controlLote ?? false),
+        requiereReceta: tipo === 'servicio' ? false : (data.requiereReceta ?? false),
+        esPsicotropico: tipo === 'servicio' ? false : (data.esPsicotropico ?? false),
         unidadBase: data.unidadBase,
         unidadCompra: data.unidadCompra ?? null,
         factorConversion: data.factorConversion ?? 1,
@@ -3756,6 +3761,55 @@ export const loteListQuerySchema = z.object({
 
 export const trazabilidadQuerySchema = z.object({
   loteId: z.coerce.number().int().min(1),
+})
+
+/**
+ * @en Pharmacy vertical schemas (#204): prescriptions, internal psychotropic book and lot serial capture.
+ * @es Schemas del vertical farmacia (#204): recetas, libro interno de psicotrópicos y serial de lote.
+ * @pt-BR Schemas do vertical farmácia (#204): receitas, livro interno de psicotrópicos e serial do lote.
+ */
+const dateOnly = z
+  .string()
+  .trim()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'must be a YYYY-MM-DD date')
+
+export const recetaCreateBodySchema = z.object({
+  facturaId: z.number().int().min(1).nullable().optional(),
+  clienteId: z.number().int().min(1).nullable().optional(),
+  numeroReceta: z.string().trim().min(1).max(40),
+  medicoNombre: z.string().trim().min(1).max(120),
+  matricula: z.string().trim().min(1).max(40),
+  fechaReceta: dateOnly,
+  observaciones: z.string().trim().max(500).nullable().optional(),
+})
+
+export const recetaListQuerySchema = z.object({
+  facturaId: z.coerce.number().int().min(1).optional(),
+  clienteId: z.coerce.number().int().min(1).optional(),
+  desde: dateOnly.optional(),
+  hasta: dateOnly.optional(),
+})
+
+export const libroPsicotropicoCreateBodySchema = z.object({
+  articuloId: z.number().int().min(1),
+  loteId: z.number().int().min(1).nullable().optional(),
+  recetaId: z.number().int().min(1).nullable().optional(),
+  tipo: z.enum(['ingreso', 'egreso', 'ajuste']),
+  cantidad: z.number().finite(),
+  referencia: z.string().trim().max(60).nullable().optional(),
+  observaciones: z.string().trim().max(300).nullable().optional(),
+})
+
+export const libroPsicotropicoListQuerySchema = z.object({
+  articuloId: z.coerce.number().int().min(1).optional(),
+  tipo: z.enum(['ingreso', 'egreso', 'ajuste']).optional(),
+  desde: dateOnly.optional(),
+  hasta: dateOnly.optional(),
+})
+
+export const loteSerialUpdateBodySchema = z.object({
+  serialUnidad: z.string().trim().max(60).nullable().optional(),
+  codigoDatamatrix: z.string().trim().max(200).nullable().optional(),
 })
 
 export const visitaCreateBodySchema = z

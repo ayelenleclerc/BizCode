@@ -27,6 +27,10 @@
     "descripcion": {
       "type": "string"
     },
+    "esPsicotropico": {
+      "description": "Pharmacy vertical — tracked in the internal psychotropic book (#204); not a SEDRONAR filing.",
+      "type": "boolean"
+    },
     "factorConversion": {
       "description": "1 purchase unit equals factorConversion base units (#203). Default 1.",
       "type": "number"
@@ -72,6 +76,10 @@
     },
     "precioLista2": {
       "type": "number"
+    },
+    "requiereReceta": {
+      "description": "Pharmacy vertical — dispensing requires a registered prescription (#204).",
+      "type": "boolean"
     },
     "rubro": {
       "$ref": "./Rubro.schema.json"

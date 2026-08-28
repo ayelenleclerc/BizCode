@@ -518,6 +518,18 @@ export const fefoMutationHttpRateLimiter = createRouteLimiter({
 })
 
 /**
+ * @en Per-IP rate limit for pharmacy prescription/book mutations (#204); visible to CodeQL.
+ * @es Límite por IP para mutaciones de recetas/libro de farmacia (#204); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações de receitas/livro da farmácia (#204); visível ao CodeQL.
+ */
+export const farmaciaMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'mut-farmacia',
+})
+
+/**
  * @en Per-IP rate limit for fiscal/ARCA authorize & auth mutations (#378); visible to CodeQL.
  * @es Límite por IP para mutaciones de autorización fiscal/ARCA (#378); visible a CodeQL.
  * @pt-BR Limite por IP para mutações de autorização fiscal/ARCA (#378); visível ao CodeQL.

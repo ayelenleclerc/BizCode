@@ -75,6 +75,11 @@
     "mesesGarantiaHint": "Vacío o 0 = sin garantía. Al facturar se registra la garantía automáticamente.",
     "controlLote": "Control de lote / FEFO",
     "controlLoteHint": "Exige lote y vencimiento en recepción; asigna FEFO al facturar.",
+    "farmaciaLegend": "Vertical farmacia",
+    "requiereReceta": "Requiere receta",
+    "requiereRecetaHint": "Facturar este artículo exige una receta registrada.",
+    "esPsicotropico": "Psicotrópico",
+    "esPsicotropicoHint": "Los egresos se asientan en el libro interno. No es una presentación ante SEDRONAR.",
     "activo": "Activo",
     "tipo": "Tipo",
     "tipoOptions": {

@@ -524,6 +524,16 @@
 
 * [LibroIvaVentasPreviewEnvelope](./libroivaventaspreviewenvelope.md) – `-`
 
+* [LibroPsicotropicoCreateInput](./libropsicotropicocreateinput.md) – `-`
+
+* [LibroPsicotropicoEnvelope](./libropsicotropicoenvelope.md) – `-`
+
+* [LibroPsicotropicoListEnvelope](./libropsicotropicolistenvelope.md) – `-`
+
+* [LibroPsicotropicoMovimiento](./libropsicotropicomovimiento.md "Internal psychotropic book entry (#204)") – `-`
+
+* [LibroPsicotropicoTipo](./libropsicotropicotipo.md) – `-`
+
 * [LiquidacionComision](./liquidacioncomision.md) – `-`
 
 * [LiquidacionComisionDetalle](./liquidacioncomisiondetalle.md) – `-`
@@ -593,6 +603,10 @@
 * [LoteEnvelope](./loteenvelope.md) – `-`
 
 * [LoteListEnvelope](./lotelistenvelope.md) – `-`
+
+* [LoteSerialEnvelope](./loteserialenvelope.md) – `-`
+
+* [LoteSerialUpdateInput](./loteserialupdateinput.md "Operator-entered unit serial / DataMatrix payload; stored verbatim (#204)") – `-`
 
 * [LoteTrazabilidad](./lotetrazabilidad.md) – `-`
 
@@ -1047,6 +1061,14 @@
 * [PushTokenRegisterInput](./pushtokenregisterinput.md) – `-`
 
 * [RecalcFxResult](./recalcfxresult.md) – `-`
+
+* [RecetaDispensacion](./recetadispensacion.md "Prescription recorded locally when dispensing controlled articles (#204)") – `-`
+
+* [RecetaDispensacionCreateInput](./recetadispensacioncreateinput.md) – `-`
+
+* [RecetaDispensacionEnvelope](./recetadispensacionenvelope.md) – `-`
+
+* [RecetaDispensacionListEnvelope](./recetadispensacionlistenvelope.md) – `-`
 
 * [ReciboCobro](./recibocobro.md) – `-`
 
@@ -1638,6 +1660,10 @@
 
 * [Untitled object in HealthResponse](./healthresponse-properties-db.md) – `undefined#/properties/db`
 
+* [Untitled object in LibroPsicotropicoMovimiento](./libropsicotropicomovimiento-properties-articulo.md) – `undefined#/properties/articulo`
+
+* [Untitled object in LibroPsicotropicoMovimiento](./libropsicotropicomovimiento-properties-lote.md) – `undefined#/properties/lote`
+
 * [Untitled object in LiquidacionComisionListEnvelope](./liquidacioncomisionlistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in LiquidacionGenerarEnvelope](./liquidaciongenerarenvelope-properties-data.md) – `undefined#/properties/data`
@@ -1647,6 +1673,8 @@
 * [Untitled object in ListaPrecioItemInput](./listaprecioiteminput-properties-escalonados-items.md) – `undefined#/properties/escalonados/items`
 
 * [Untitled object in ListaPrecioListEnvelope](./listapreciolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in LoteSerialEnvelope](./loteserialenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in LoteTrazabilidad](./lotetrazabilidad-properties-facturas-items.md) – `undefined#/properties/facturas/items`
 
@@ -1771,6 +1799,8 @@
 * [Untitled object in PushTokenDeleteEnvelope](./pushtokendeleteenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in PushTokenEnvelope](./pushtokenenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled object in RecetaDispensacion](./recetadispensacion-properties-cliente.md) – `undefined#/properties/cliente`
 
 * [Untitled object in ReciboCobro](./recibocobro-properties-cliente.md) – `undefined#/properties/cliente`
 
@@ -2074,6 +2104,8 @@
 
 * [Untitled array in LibroIvaVentasPreview](./libroivaventaspreview-properties-totalsbyalicuota.md) – `undefined#/properties/totalsByAlicuota`
 
+* [Untitled array in LibroPsicotropicoListEnvelope](./libropsicotropicolistenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled array in LiquidacionComision](./liquidacioncomision-properties-detalle.md) – `undefined#/properties/detalle`
 
 * [Untitled array in LiquidacionComisionListEnvelope](./liquidacioncomisionlistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
@@ -2229,6 +2261,8 @@
 * [Untitled array in PushPreferencesEnvelope](./pushpreferencesenvelope-properties-data-properties-mutedtypes.md) – `undefined#/properties/data/properties/mutedTypes`
 
 * [Untitled array in PushPreferencesInput](./pushpreferencesinput-properties-mutedtypes.md) – `undefined#/properties/mutedTypes`
+
+* [Untitled array in RecetaDispensacionListEnvelope](./recetadispensacionlistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ReciboCobro](./recibocobro-properties-formas.md) – `undefined#/properties/formas`
 

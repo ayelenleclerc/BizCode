@@ -1,0 +1,59 @@
+{
+  "title": "Pharmacy",
+  "loadError": "Could not load pharmacy data",
+  "complianceNotice": "Local record only. This module does not submit to the ANMAT National Traceability System and the psychotropic book is not the official SEDRONAR filing format.",
+  "tabs": {
+    "recetas": "Prescriptions",
+    "libro": "Psychotropic book",
+    "serial": "Lot serial"
+  },
+  "recetas": {
+    "title": "Dispensing prescriptions",
+    "numero": "Prescription number",
+    "fecha": "Prescription date",
+    "medico": "Prescriber",
+    "matricula": "License number",
+    "clienteId": "Customer ID (optional)",
+    "observaciones": "Notes",
+    "factura": "Invoice",
+    "sinFactura": "Not linked",
+    "save": "Register prescription",
+    "saveOk": "Prescription registered",
+    "saveError": "Could not register the prescription",
+    "empty": "No prescriptions registered yet"
+  },
+  "libro": {
+    "title": "Internal psychotropic book",
+    "hint": "Internal audit trail. Only articles flagged as psychotropic can be booked.",
+    "articuloId": "Article ID",
+    "articulo": "Article",
+    "lote": "Lot",
+    "tipo": "Entry type",
+    "tipos": {
+      "ingreso": "Inflow",
+      "egreso": "Outflow",
+      "ajuste": "Adjustment"
+    },
+    "cantidad": "Quantity",
+    "referencia": "Reference",
+    "fecha": "Date",
+    "save": "Add entry",
+    "saveOk": "Entry added",
+    "saveError": "Could not add the entry",
+    "invalid": "Enter a valid article ID and a non-zero quantity",
+    "export": "Export CSV",
+    "exportError": "Could not export the book",
+    "empty": "No entries in the book yet"
+  },
+  "serial": {
+    "title": "Lot unit serial",
+    "hint": "The serial and DataMatrix payload are stored verbatim; they are not parsed or submitted to ANMAT.",
+    "loteId": "Lot ID",
+    "serialUnidad": "Unit serial",
+    "codigoDatamatrix": "DataMatrix payload",
+    "save": "Save serial",
+    "saveOk": "Serial saved",
+    "saveError": "Could not save the serial",
+    "invalid": "Enter a valid lot ID"
+  }
+}

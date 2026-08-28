@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Operator-entered unit serial / DataMatrix payload; stored verbatim (#204).",
+  "properties": {
+    "codigoDatamatrix": {
+      "maxLength": 200,
+      "nullable": true,
+      "type": "string"
+    },
+    "serialUnidad": {
+      "maxLength": 60,
+      "nullable": true,
+      "type": "string"
+    }
+  },
+  "title": "LoteSerialUpdateInput",
+  "type": "object"
+}

@@ -1,0 +1,59 @@
+{
+  "title": "Farmácia",
+  "loadError": "Não foi possível carregar os dados da farmácia",
+  "complianceNotice": "Somente registro local. Este módulo não envia informações ao Sistema Nacional de Rastreabilidade da ANMAT e o livro de psicotrópicos não é o formato oficial de declaração ao SEDRONAR.",
+  "tabs": {
+    "recetas": "Receitas",
+    "libro": "Livro de psicotrópicos",
+    "serial": "Serial do lote"
+  },
+  "recetas": {
+    "title": "Receitas de dispensação",
+    "numero": "Número da receita",
+    "fecha": "Data da receita",
+    "medico": "Profissional",
+    "matricula": "Registro profissional",
+    "clienteId": "ID do cliente (opcional)",
+    "observaciones": "Observações",
+    "factura": "Fatura",
+    "sinFactura": "Não vinculada",
+    "save": "Registrar receita",
+    "saveOk": "Receita registrada",
+    "saveError": "Não foi possível registrar a receita",
+    "empty": "Ainda não há receitas registradas"
+  },
+  "libro": {
+    "title": "Livro interno de psicotrópicos",
+    "hint": "Trilha interna de auditoria. Só é possível lançar artigos marcados como psicotrópicos.",
+    "articuloId": "ID do artigo",
+    "articulo": "Artigo",
+    "lote": "Lote",
+    "tipo": "Tipo de lançamento",
+    "tipos": {
+      "ingreso": "Entrada",
+      "egreso": "Saída",
+      "ajuste": "Ajuste"
+    },
+    "cantidad": "Quantidade",
+    "referencia": "Referência",
+    "fecha": "Data",
+    "save": "Adicionar lançamento",
+    "saveOk": "Lançamento adicionado",
+    "saveError": "Não foi possível adicionar o lançamento",
+    "invalid": "Informe um ID de artigo válido e uma quantidade diferente de zero",
+    "export": "Exportar CSV",
+    "exportError": "Não foi possível exportar o livro",
+    "empty": "Ainda não há lançamentos no livro"
+  },
+  "serial": {
+    "title": "Serial unitário do lote",
+    "hint": "O serial e o conteúdo DataMatrix são salvos como informados; não são analisados nem enviados à ANMAT.",
+    "loteId": "ID do lote",
+    "serialUnidad": "Serial unitário",
+    "codigoDatamatrix": "Conteúdo DataMatrix",
+    "save": "Salvar serial",
+    "saveOk": "Serial salvo",
+    "saveError": "Não foi possível salvar o serial",
+    "invalid": "Informe um ID de lote válido"
+  }
+}

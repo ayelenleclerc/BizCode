@@ -77,6 +77,9 @@ const articuloSchema = z
       return Math.trunc(n)
     }, z.number().int().positive().nullable()),
     controlLote: z.boolean().optional().default(false),
+    // Pharmacy vertical flags (#204): no-op for tenants without `vertical.pharmacy`.
+    requiereReceta: z.boolean().optional().default(false),
+    esPsicotropico: z.boolean().optional().default(false),
     // UoM fields (#203): optional at the schema level so they stay a no-op for tenants
     // without the `inventory.uom` module (submit strips them entirely, see onSubmit).
     unidadBase: z.preprocess((val) => {
@@ -153,6 +156,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const { hasModule } = useFeatureFlags()
   const multicurrencyEnabled = hasModule('catalog.multicurrency')
   const fefoEnabled = hasModule('inventory.fefo')
+  const pharmacyEnabled = hasModule('vertical.pharmacy')
   const uomEnabled = hasModule('inventory.uom')
   const [loading, setLoading] = useState(false)
   const [categorias, setCategorias] = useState<CategoriaArticuloRow[]>([])
@@ -199,6 +203,8 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       stock: 0,
       mesesGarantia: null,
       controlLote: false,
+      requiereReceta: false,
+      esPsicotropico: false,
       categoriaId: null,
       monedaPrecio: 'ARS',
       precioEnMonedaOrigen: null,
@@ -257,6 +263,8 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       setValue('minimo', articulo.minimo)
       setValue('mesesGarantia', articulo.mesesGarantia ?? null)
       setValue('controlLote', articulo.controlLote ?? false)
+      setValue('requiereReceta', articulo.requiereReceta ?? false)
+      setValue('esPsicotropico', articulo.esPsicotropico ?? false)
       // UoM (#203): reflect stored values even when the module is currently disabled, so
       // re-enabling it later doesn't lose data already persisted for this articulo.
       setValue('unidadBase', (articulo.unidadBase as UnidadBase | undefined) ?? 'unidad')
@@ -372,13 +380,33 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               volumenM3: data.volumenM3 ?? null,
             }
           : normalizedWithoutUom
+
+      // @en Pharmacy flags (#204) are omitted when `vertical.pharmacy` is off or the item is a service, so saves never clobber stored values.
+      // @es Los flags de farmacia (#204) se omiten si `vertical.pharmacy` está deshabilitado o el ítem es un servicio, para que el guardado nunca sobrescriba valores almacenados.
+      // @pt-BR Os flags de farmácia (#204) são omitidos quando `vertical.pharmacy` está desabilitado ou o item é um serviço, para que o salvamento nunca sobrescreva valores armazenados.
+      const {
+        requiereReceta: _omitRequiereReceta,
+        esPsicotropico: _omitEsPsicotropico,
+        ...normalizedWithoutPharmacy
+      } = normalized
+      void _omitRequiereReceta
+      void _omitEsPsicotropico
+      const normalizedFinal =
+        pharmacyEnabled && data.tipo !== 'servicio'
+          ? {
+              ...normalizedWithoutPharmacy,
+              requiereReceta: data.requiereReceta ?? false,
+              esPsicotropico: data.esPsicotropico ?? false,
+            }
+          : normalizedWithoutPharmacy
+
       let result: Articulo
       if (articulo) {
-        const { stock: _omitStock, ...payload } = normalized
+        const { stock: _omitStock, ...payload } = normalizedFinal
         void _omitStock
         result = await articulosAPI.update(articulo.id, payload)
       } else {
-        result = await articulosAPI.create(normalized)
+        result = await articulosAPI.create(normalizedFinal)
       }
       onGuardado(result)
     } catch (err: unknown) {
@@ -1026,6 +1054,54 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
                 <p className="text-sm text-slate-600 dark:text-slate-400">{t('form.controlLoteHint')}</p>
               </div>
             </div>
+          ) : null}
+
+          {pharmacyEnabled && tipoWatch !== 'servicio' ? (
+            <fieldset className="space-y-3">
+              <legend className="text-slate-700 dark:text-slate-300 font-semibold">
+                {t('form.farmaciaLegend')}
+              </legend>
+              <div className="flex items-start gap-2">
+                <input
+                  id="articulo-requiere-receta"
+                  type="checkbox"
+                  {...register('requiereReceta')}
+                  data-testid="articulo-requiere-receta"
+                  className="mt-1"
+                />
+                <div>
+                  <label
+                    htmlFor="articulo-requiere-receta"
+                    className="block text-slate-700 dark:text-slate-300 font-semibold"
+                  >
+                    {t('form.requiereReceta')}
+                  </label>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {t('form.requiereRecetaHint')}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <input
+                  id="articulo-es-psicotropico"
+                  type="checkbox"
+                  {...register('esPsicotropico')}
+                  data-testid="articulo-es-psicotropico"
+                  className="mt-1"
+                />
+                <div>
+                  <label
+                    htmlFor="articulo-es-psicotropico"
+                    className="block text-slate-700 dark:text-slate-300 font-semibold"
+                  >
+                    {t('form.esPsicotropico')}
+                  </label>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {t('form.esPsicotropicoHint')}
+                  </p>
+                </div>
+              </div>
+            </fieldset>
           ) : null}
 
           {showComparador && articulo && showComparadorAccess && (

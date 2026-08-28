@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Internal psychotropic book entry (#204). Internal audit trail, not the official SEDRONAR filing format.",
+  "properties": {
+    "articulo": {
+      "nullable": true,
+      "properties": {
+        "codigo": {
+          "type": "integer"
+        },
+        "descripcion": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "articuloId": {
+      "type": "integer"
+    },
+    "cantidad": {
+      "type": "number"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "lote": {
+      "nullable": true,
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "nroLote": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "loteId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "observaciones": {
+      "maxLength": 300,
+      "nullable": true,
+      "type": "string"
+    },
+    "recetaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "referencia": {
+      "maxLength": 60,
+      "nullable": true,
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipo": {
+      "$ref": "./LibroPsicotropicoTipo.schema.json"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "articuloId",
+    "loteId",
+    "recetaId",
+    "tipo",
+    "cantidad",
+    "referencia",
+    "observaciones",
+    "createdAt"
+  ],
+  "title": "LibroPsicotropicoMovimiento",
+  "type": "object"
+}

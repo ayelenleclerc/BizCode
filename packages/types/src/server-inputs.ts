@@ -98,6 +98,10 @@ export type ArticuloInput = {
   mesesGarantia?: number | null
   /** @en Lot control opt-in (#202). @es Opt-in control de lote (#202). @pt-BR Opt-in controle de lote (#202). */
   controlLote?: boolean
+  /** @en Prescription-only article (#204). @es Artículo bajo receta (#204). @pt-BR Artigo sob receita (#204). */
+  requiereReceta?: boolean
+  /** @en Psychotropic tracked in the internal book (#204). @es Psicotrópico registrado en libro interno (#204). @pt-BR Psicotrópico registrado no livro interno (#204). */
+  esPsicotropico?: boolean
   /** @en Base unit of measure for stock/quantity rules (#203). @es Unidad de medida base para reglas de stock/cantidad (#203). @pt-BR Unidade de medida base para regras de estoque/quantidade (#203). */
   unidadBase?: 'unidad' | 'kg' | 'gramo' | 'litro' | 'metro' | 'm2' | 'm3' | 'rollo' | 'caja'
   /** @en Purchase unit label, may differ from unidadBase (#203). @es Etiqueta de unidad de compra, puede diferir de unidadBase (#203). @pt-BR Rótulo da unidade de compra, pode diferir de unidadBase (#203). */
@@ -268,6 +272,12 @@ export type FacturaInput = {
    * @pt-BR Confirma anomalia de duplicata (bloqueio suave) e segue com o create (#200).
    */
   confirmAnomalies?: boolean
+  /**
+   * @en Prescription backing the dispensing of prescription-only articles (#204); required by `vertical.pharmacy`.
+   * @es Receta que respalda la dispensación de artículos bajo receta (#204); exigida por `vertical.pharmacy`.
+   * @pt-BR Receita que respalda a dispensação de artigos sob receita (#204); exigida por `vertical.pharmacy`.
+   */
+  recetaId?: number | null
 }
 
 export type CobroRetencionInput = {

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "cantidad": {
+      "description": "Non-zero; must be positive for `ingreso` and `egreso`.",
+      "type": "number"
+    },
+    "loteId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "observaciones": {
+      "maxLength": 300,
+      "nullable": true,
+      "type": "string"
+    },
+    "recetaId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "referencia": {
+      "maxLength": 60,
+      "nullable": true,
+      "type": "string"
+    },
+    "tipo": {
+      "$ref": "./LibroPsicotropicoTipo.schema.json"
+    }
+  },
+  "required": [
+    "articuloId",
+    "tipo",
+    "cantidad"
+  ],
+  "title": "LibroPsicotropicoCreateInput",
+  "type": "object"
+}

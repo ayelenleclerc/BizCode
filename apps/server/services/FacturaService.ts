@@ -16,6 +16,7 @@ import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { GarantiaService } from './GarantiaService'
 import { FidelizacionService } from './FidelizacionService'
 import { LoteService } from './LoteService'
+import { FarmaciaService } from './FarmaciaService'
 import { TurnoCajaService } from './TurnoCajaService'
 import { MeliStockSyncService } from './MeliStockSyncService'
 import { TiendanubeStockSyncService } from './TiendanubeStockSyncService'
@@ -80,6 +81,8 @@ export class FacturaService {
   private readonly loteService: LoteService
   private readonly turnoCajaService: TurnoCajaService
   private readonly anomalyService: FacturaAnomalyService
+  /** @en Pharmacy dispensing gate and psychotropic book, active only with `vertical.pharmacy` (#204). */
+  private readonly farmaciaService: FarmaciaService
 
   constructor(private readonly prisma: PrismaClient) {
     this.fiscalDocumentService = new FiscalDocumentService(prisma)
@@ -88,6 +91,7 @@ export class FacturaService {
     this.loteService = new LoteService(prisma)
     this.turnoCajaService = new TurnoCajaService(prisma)
     this.anomalyService = new FacturaAnomalyService(prisma)
+    this.farmaciaService = new FarmaciaService(prisma)
   }
 
   async list(tenantId: number, take: number, skip: number): Promise<FacturaListResult> {
@@ -117,6 +121,7 @@ export class FacturaService {
       depositoId: inputDepositoId,
       puntosCanje,
       confirmAnomalies,
+      recetaId,
       ...factura
     } = input
     const clienteId = factura.clienteId
@@ -179,6 +184,8 @@ export class FacturaService {
               unidadServicio: true,
               mesesGarantia: true,
               controlLote: true,
+              requiereReceta: true,
+              esPsicotropico: true,
               esPadre: true,
               monedaPrecio: true,
               precioEnMonedaOrigen: true,
@@ -202,6 +209,13 @@ export class FacturaService {
         error: 'Parent articles cannot be sold; select a variant instead',
       }
     }
+
+    const dispensacion = await this.farmaciaService.assertDispensacionAllowed(
+      tenantId,
+      articulosRaw.map((a) => ({ id: a.id, requiereReceta: a.requiereReceta })),
+      recetaId,
+    )
+    if (!dispensacion.ok) return dispensacion
 
     // @en Decimal(14,4) columns arrive as Prisma Decimal; normalize to number once for downstream arithmetic (#203).
     // @es Las columnas Decimal(14,4) llegan como Prisma Decimal; se normalizan a number una vez para la aritmética posterior (#203).
@@ -625,6 +639,24 @@ export class FacturaService {
       void meliStock.syncStockToMeli(tenantId, articuloId).catch(() => undefined)
       void tnStock.syncStockToTiendanube(tenantId, articuloId).catch(() => undefined)
       void wcStock.syncStockToWooCommerce(tenantId, articuloId).catch(() => undefined)
+    }
+
+    try {
+      if (await this.farmaciaService.isPharmacyEnabled(tenantId)) {
+        await this.farmaciaService.recordDispensacion(tenantId, {
+          facturaId: newFactura.id,
+          recetaId: recetaId ?? null,
+          items: newFactura.items
+            .filter((it): it is typeof it & { articuloId: number } => it.articuloId != null)
+            .map((it) => ({
+              articuloId: it.articuloId,
+              cantidad: Number(it.cantidad),
+              loteId: it.loteId ?? null,
+            })),
+        })
+      }
+    } catch {
+      /* Pharmacy book posting must not fail invoice create */
     }
 
     if (anomalyWarnings.length > 0) {

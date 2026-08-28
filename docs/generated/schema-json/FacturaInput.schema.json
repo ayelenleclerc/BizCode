@@ -107,6 +107,12 @@
       "nullable": true,
       "type": "integer"
     },
+    "recetaId": {
+      "description": "Prescription backing the dispensing of prescription-only articles (#204). With module `vertical.pharmacy` enabled, invoicing an article flagged `requiereReceta` without this field fails with HTTP 422 `PRESCRIPTION_REQUIRED:<articuloIds>`.\n",
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
     "tipo": {
       "enum": [
         "A",

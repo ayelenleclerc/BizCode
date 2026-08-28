@@ -25,6 +25,7 @@ undefined
 | [controlLote](#controllote)                   | `boolean` | Optional | cannot be null | [ArticuloInput](articuloinput-properties-controllote.md "undefined#/properties/controlLote")                   |
 | [costo](#costo)                               | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-costo.md "undefined#/properties/costo")                               |
 | [descripcion](#descripcion)                   | `string`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-descripcion.md "undefined#/properties/descripcion")                   |
+| [esPsicotropico](#espsicotropico)             | `boolean` | Optional | cannot be null | [ArticuloInput](articuloinput-properties-espsicotropico.md "undefined#/properties/esPsicotropico")             |
 | [factorConversion](#factorconversion)         | `number`  | Optional | cannot be null | [ArticuloInput](articuloinput-properties-factorconversion.md "undefined#/properties/factorConversion")         |
 | [mesesGarantia](#mesesgarantia)               | `integer` | Optional | cannot be null | [ArticuloInput](articuloinput-properties-mesesgarantia.md "undefined#/properties/mesesGarantia")               |
 | [minimo](#minimo)                             | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-minimo.md "undefined#/properties/minimo")                             |
@@ -34,6 +35,7 @@ undefined
 | [precioEnMonedaOrigen](#precioenmonedaorigen) | `number`  | Optional | cannot be null | [ArticuloInput](articuloinput-properties-precioenmonedaorigen.md "undefined#/properties/precioEnMonedaOrigen") |
 | [precioLista1](#preciolista1)                 | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-preciolista1.md "undefined#/properties/precioLista1")                 |
 | [precioLista2](#preciolista2)                 | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-preciolista2.md "undefined#/properties/precioLista2")                 |
+| [requiereReceta](#requierereceta)             | `boolean` | Optional | cannot be null | [ArticuloInput](articuloinput-properties-requierereceta.md "undefined#/properties/requiereReceta")             |
 | [rubroId](#rubroid)                           | `integer` | Required | cannot be null | [ArticuloInput](articuloinput-properties-rubroid.md "undefined#/properties/rubroId")                           |
 | [stock](#stock)                               | `number`  | Required | cannot be null | [ArticuloInput](articuloinput-properties-stock.md "undefined#/properties/stock")                               |
 | [tipo](#tipo)                                 | `string`  | Optional | cannot be null | [ArticuloInput](articuloinput-properties-tipo.md "undefined#/properties/tipo")                                 |
@@ -196,6 +198,24 @@ Lot control opt-in (#202).
 **maximum length**: the maximum number of characters for this string is: `30`
 
 **minimum length**: the minimum number of characters for this string is: `3`
+
+## esPsicotropico
+
+Pharmacy vertical — psychotropic tracked in the internal book (#204).
+
+`esPsicotropico`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [ArticuloInput](articuloinput-properties-espsicotropico.md "undefined#/properties/esPsicotropico")
+
+### esPsicotropico Type
+
+`boolean`
 
 ## factorConversion
 
@@ -408,6 +428,24 @@ Required when monedaPrecio is USD or EUR; drives ARS precioLista1 via current TC
 ### precioLista2 Constraints
 
 **minimum**: the value of this number must greater than or equal to: `0.01`
+
+## requiereReceta
+
+Pharmacy vertical — prescription-only article (#204).
+
+`requiereReceta`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [ArticuloInput](articuloinput-properties-requierereceta.md "undefined#/properties/requiereReceta")
+
+### requiereReceta Type
+
+`boolean`
 
 ## rubroId
 

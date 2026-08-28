@@ -116,6 +116,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     moduleKey: 'inventory.fefo',
   },
   {
+    key: 'farmacia',
+    path: '/farmacia',
+    icon: '💊',
+    roles: ['owner', 'manager', 'warehouse_lead', 'backoffice'],
+    moduleKey: 'vertical.pharmacy',
+  },
+  {
     key: 'transferenciasDeposito',
     path: '/transferencias-deposito',
     icon: '🔁',
@@ -289,6 +296,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'categorias-articulo', moduleKey: 'catalog.variants' },
   { path: 'depositos', moduleKey: 'inventory.warehouses' },
   { path: 'lotes', moduleKey: 'inventory.fefo' },
+  { path: 'farmacia', moduleKey: 'vertical.pharmacy' },
   { path: 'transferencias-deposito', moduleKey: 'inventory.warehouses' },
   { path: 'comisiones/config', moduleKey: 'finance.commissions' },
   { path: 'comisiones/liquidaciones', moduleKey: 'finance.commissions' },

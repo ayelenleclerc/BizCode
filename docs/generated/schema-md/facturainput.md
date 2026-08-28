@@ -32,6 +32,7 @@ undefined
 | [percepciones](#percepciones)         | `array`   | Optional | cannot be null | [FacturaInput](facturainput-properties-percepciones.md "undefined#/properties/percepciones")         |
 | [prefijo](#prefijo)                   | `string`  | Optional | cannot be null | [FacturaInput](facturainput-properties-prefijo.md "undefined#/properties/prefijo")                   |
 | [puntosCanje](#puntoscanje)           | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-puntoscanje.md "undefined#/properties/puntosCanje")           |
+| [recetaId](#recetaid)                 | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-recetaid.md "undefined#/properties/recetaId")                 |
 | [tipo](#tipo)                         | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-tipo.md "undefined#/properties/tipo")                         |
 | [total](#total)                       | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-total.md "undefined#/properties/total")                       |
 
@@ -292,6 +293,28 @@ Optional loyalty points to redeem as a negative invoice line (#250).
 `integer`
 
 ### puntosCanje Constraints
+
+**minimum**: the value of this number must greater than or equal to: `1`
+
+## recetaId
+
+Prescription backing the dispensing of prescription-only articles (#204). With module `vertical.pharmacy` enabled, invoicing an article flagged `requiereReceta` without this field fails with HTTP 422 `PRESCRIPTION_REQUIRED:<articuloIds>`.
+
+`recetaId`
+
+* is optional
+
+* Type: `integer`
+
+* cannot be null
+
+* defined in: [FacturaInput](facturainput-properties-recetaid.md "undefined#/properties/recetaId")
+
+### recetaId Type
+
+`integer`
+
+### recetaId Constraints
 
 **minimum**: the value of this number must greater than or equal to: `1`
 
