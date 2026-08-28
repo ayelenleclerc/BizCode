@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { pedidosAPI, remitosAPI, type PedidoRow } from '@/lib/api'
+import { exportacionAPI, pedidosAPI, remitosAPI, type PedidoRow } from '@/lib/api'
+import { INCOTERMS_2020 } from '@bizcode/types'
 import { CanAccess } from '@/components/CanAccess'
 import IfIntegration from '@/components/IfIntegration'
 import IfModule from '@/components/IfModule'
@@ -47,6 +48,12 @@ export default function PedidosPage() {
   const [createDescripcion, setCreateDescripcion] = useState('')
   const [createCantidad, setCreateCantidad] = useState('1')
   const [createPrecio, setCreatePrecio] = useState('0')
+  const [createIncoterm, setCreateIncoterm] = useState('')
+  const [createPaisDestino, setCreatePaisDestino] = useState('')
+  const [createDespachanteNombre, setCreateDespachanteNombre] = useState('')
+  const [createDespachanteEmail, setCreateDespachanteEmail] = useState('')
+  const [notifyingId, setNotifyingId] = useState<number | null>(null)
+  const [notifyMsg, setNotifyMsg] = useState<string | null>(null)
   const [createError, setCreateError] = useState<string | null>(null)
   const [createSaving, setCreateSaving] = useState(false)
   const listShortcuts = useGlobalListShortcuts()
@@ -129,17 +136,49 @@ export default function PedidosPage() {
             dscto: 0,
           },
         ],
+        // Export vertical (#206): informational fields, ignored when the module is off.
+        ...(createIncoterm ? { incoterm: createIncoterm } : {}),
+        ...(createPaisDestino.trim() ? { paisDestino: createPaisDestino.trim() } : {}),
+        ...(createDespachanteNombre.trim()
+          ? { despachanteNombre: createDespachanteNombre.trim() }
+          : {}),
+        ...(createDespachanteEmail.trim()
+          ? { despachanteEmail: createDespachanteEmail.trim() }
+          : {}),
       })
       setShowCreate(false)
       setCreateClienteId('')
       setCreateDescripcion('')
       setCreateCantidad('1')
       setCreatePrecio('0')
+      setCreateIncoterm('')
+      setCreatePaisDestino('')
+      setCreateDespachanteNombre('')
+      setCreateDespachanteEmail('')
       await loadPedidos()
     } catch (error) {
       setCreateError(error instanceof Error ? error.message : t('create.errors.generic'))
     } finally {
       setCreateSaving(false)
+    }
+  }
+
+  /**
+   * @en Emails the customs broker stored on the order (#206); reports when SMTP is unavailable.
+   * @es Avisa por email al despachante guardado en el pedido (#206); informa si SMTP no está disponible.
+   * @pt-BR Notifica por email o despachante salvo no pedido (#206); informa se o SMTP não está disponível.
+   */
+  const handleNotifyDespachante = async (id: number, e?: MouseEvent) => {
+    e?.stopPropagation()
+    setNotifyingId(id)
+    setNotifyMsg(null)
+    try {
+      const res = await exportacionAPI.notificarDespachante(id, {})
+      setNotifyMsg(res.enviado ? t('export.notifyOk') : t('export.notifySmtpMissing'))
+    } catch (error) {
+      setNotifyMsg(error instanceof Error ? error.message : t('create.errors.generic'))
+    } finally {
+      setNotifyingId(null)
     }
   }
 
@@ -167,6 +206,17 @@ export default function PedidosPage() {
             </CanAccess>
           ) : null}
         </header>
+
+        {notifyMsg ? (
+          <p
+            role="status"
+            aria-live="polite"
+            className="mb-4 rounded border border-slate-200 dark:border-slate-600 px-3 py-2 text-sm"
+            data-testid="pedidos-notify-despachante-msg"
+          >
+            {notifyMsg}
+          </p>
+        ) : null}
 
         {showCreate ? (
           <div
@@ -225,6 +275,73 @@ export default function PedidosPage() {
                   />
                 </label>
               </div>
+              <IfModule flag="vertical.export">
+                <fieldset
+                  className="rounded border border-slate-200 dark:border-slate-600 p-3 space-y-2"
+                  data-testid="pedidos-create-export"
+                >
+                  <legend className="px-1 text-sm font-semibold">{t('export.title')}</legend>
+                  <p className="text-xs text-slate-500">{t('export.hint')}</p>
+                  <div className="flex gap-2">
+                    <label className="block text-sm flex-1" htmlFor="pedidos-create-incoterm">
+                      {t('export.incoterm')}
+                      <select
+                        id="pedidos-create-incoterm"
+                        className="mt-1 w-full border rounded px-2 py-1 dark:bg-slate-800"
+                        value={createIncoterm}
+                        onChange={(e) => setCreateIncoterm(e.target.value)}
+                        data-testid="pedidos-create-incoterm"
+                      >
+                        <option value="">{t('export.incotermNone')}</option>
+                        {INCOTERMS_2020.map((code) => (
+                          <option key={code} value={code}>
+                            {code}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="block text-sm flex-1" htmlFor="pedidos-create-pais">
+                      {t('export.paisDestino')}
+                      <input
+                        id="pedidos-create-pais"
+                        className="mt-1 w-full border rounded px-2 py-1 uppercase dark:bg-slate-800"
+                        maxLength={2}
+                        value={createPaisDestino}
+                        onChange={(e) => setCreatePaisDestino(e.target.value.toUpperCase())}
+                        data-testid="pedidos-create-pais-destino"
+                      />
+                    </label>
+                  </div>
+                  <div className="flex gap-2">
+                    <label className="block text-sm flex-1" htmlFor="pedidos-create-despachante">
+                      {t('export.despachanteNombre')}
+                      <input
+                        id="pedidos-create-despachante"
+                        className="mt-1 w-full border rounded px-2 py-1 dark:bg-slate-800"
+                        maxLength={120}
+                        value={createDespachanteNombre}
+                        onChange={(e) => setCreateDespachanteNombre(e.target.value)}
+                        data-testid="pedidos-create-despachante-nombre"
+                      />
+                    </label>
+                    <label
+                      className="block text-sm flex-1"
+                      htmlFor="pedidos-create-despachante-email"
+                    >
+                      {t('export.despachanteEmail')}
+                      <input
+                        id="pedidos-create-despachante-email"
+                        type="email"
+                        className="mt-1 w-full border rounded px-2 py-1 dark:bg-slate-800"
+                        maxLength={160}
+                        value={createDespachanteEmail}
+                        onChange={(e) => setCreateDespachanteEmail(e.target.value)}
+                        data-testid="pedidos-create-despachante-email"
+                      />
+                    </label>
+                  </div>
+                </fieldset>
+              </IfModule>
               {createError ? (
                 <p className="text-sm text-red-600" role="alert" data-testid="pedidos-create-error">
                   {createError}
@@ -485,6 +602,21 @@ export default function PedidosPage() {
                                   </button>
                                 </CanAccess>
                               ) : null}
+                              <IfModule flag="vertical.export">
+                                <CanAccess permission="orders.create">
+                                  <button
+                                    type="button"
+                                    className="px-2 py-1 text-xs rounded bg-indigo-600 text-white disabled:opacity-50"
+                                    data-testid={`pedido-notificar-despachante-${p.id}`}
+                                    disabled={notifyingId === p.id}
+                                    onClick={(e) => void handleNotifyDespachante(p.id, e)}
+                                  >
+                                    {notifyingId === p.id
+                                      ? t('export.notifying')
+                                      : t('export.notifyDespachante')}
+                                  </button>
+                                </CanAccess>
+                              </IfModule>
                               {remitoAllowed(p.estado) ? (
                                 <IfModule flag="fiscal.remito">
                                   <CanAccess permission="sales.create">

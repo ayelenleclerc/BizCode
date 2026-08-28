@@ -320,6 +320,10 @@
 
 * [DepositoPatchInput](./depositopatchinput.md) – `-`
 
+* [DespachanteNotificacionEnvelope](./despachantenotificacionenvelope.md) – `-`
+
+* [DespachanteNotificarInput](./despachantenotificarinput.md "Customs broker contact (#206)") – `-`
+
 * [DevolucionEntrega](./devolucionentrega.md) – `-`
 
 * [DevolucionEntregaEnvelope](./devolucionentregaenvelope.md) – `-`
@@ -513,6 +517,10 @@
 * [ImportJob](./importjob.md) – `-`
 
 * [ImportJobEnvelope](./importjobenvelope.md) – `-`
+
+* [Incoterm](./incoterm.md "Incoterms 2020 delivery term (#206)") – `-`
+
+* [IncotermsEnvelope](./incotermsenvelope.md) – `-`
 
 * [LibroIvaComprasPreview](./libroivacompraspreview.md) – `-`
 
@@ -1202,6 +1210,8 @@
 
 * [ReporteVentasListEnvelope](./reporteventaslistenvelope.md) – `-`
 
+* [ReporteVentasPorMoneda](./reporteventaspormoneda.md "Sales breakdown by operation currency (#206)") – `-`
+
 * [ReporteVentasRow](./reporteventasrow.md) – `-`
 
 * [ReposicionOcCreatedEnvelope](./reposicionoccreatedenvelope.md) – `-`
@@ -1281,6 +1291,8 @@
 * [SaasTrialEnvelope](./saastrialenvelope.md) – `-`
 
 * [SaasTrialStatus](./saastrialstatus.md) – `-`
+
+* [SaldoPorMoneda](./saldopormoneda.md "Customer running balance for a single currency (#206)") – `-`
 
 * [SellerAlertAction](./selleralertaction.md) – `-`
 
@@ -1613,6 +1625,8 @@
 * [Untitled object in DeliveryZoneListEnvelope](./deliveryzonelistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in DepositoListEnvelope](./depositolistenvelope-allof-0.md) – `undefined#/allOf/0`
+
+* [Untitled object in DespachanteNotificacionEnvelope](./despachantenotificacionenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in DevolucionEntregaRegisterInput](./devolucionentregaregisterinput-properties-lineas-items.md) – `undefined#/properties/lineas/items`
 
@@ -1984,6 +1998,8 @@
 
 * [Untitled array in ClienteCuentaCorrienteAntiguedad](./clientecuentacorrienteantiguedad-properties-buckets.md) – `undefined#/properties/buckets`
 
+* [Untitled array in ClienteCuentaCorrienteSaldo](./clientecuentacorrientesaldo-properties-saldospormoneda.md "Running balance per currency (#206)") – `undefined#/properties/saldosPorMoneda`
+
 * [Untitled array in ClienteImportResult](./clienteimportresult-properties-errors.md) – `undefined#/properties/errors`
 
 * [Untitled array in ClienteListEnvelope](./clientelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
@@ -2099,6 +2115,8 @@
 * [Untitled array in Garantia](./garantia-properties-usos.md) – `undefined#/properties/usos`
 
 * [Untitled array in GarantiaListEnvelope](./garantialistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in IncotermsEnvelope](./incotermsenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in LibroIvaComprasPreview](./libroivacompraspreview-properties-totalsbyalicuota.md) – `undefined#/properties/totalsByAlicuota`
 
@@ -2325,6 +2343,8 @@
 * [Untitled array in ReporteCobranzasRow](./reportecobranzasrow-properties-porformapago.md) – `undefined#/properties/porFormaPago`
 
 * [Untitled array in ReporteVentasListEnvelope](./reporteventaslistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ReporteVentasRow](./reporteventasrow-properties-pormoneda.md "Breakdown by operation currency (#206)") – `undefined#/properties/porMoneda`
 
 * [Untitled array in ReposicionOcCreatedEnvelope](./reposicionoccreatedenvelope-properties-data-properties-lines.md) – `undefined#/properties/data/properties/lines`
 

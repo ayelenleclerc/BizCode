@@ -131,5 +131,18 @@
       "precio": "Preço inválido",
       "generic": "Não foi possível criar o pedido"
     }
+  },
+  "export": {
+    "title": "Dados de exportação (#206)",
+    "hint": "Campos informativos salvos no pedido. Não é feito despacho aduaneiro.",
+    "incoterm": "Incoterm 2020",
+    "incotermNone": "Não especificado",
+    "paisDestino": "País de destino",
+    "despachanteNombre": "Despachante",
+    "despachanteEmail": "Email do despachante",
+    "notifyDespachante": "Avisar o despachante",
+    "notifying": "Avisando...",
+    "notifyOk": "O despachante foi avisado por email.",
+    "notifySmtpMissing": "O email não está configurado; o aviso não pôde ser enviado."
   }
 }

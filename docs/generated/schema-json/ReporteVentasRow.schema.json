@@ -21,6 +21,13 @@
       "description": "Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)",
       "type": "string"
     },
+    "porMoneda": {
+      "description": "Breakdown by operation currency (#206).",
+      "items": {
+        "$ref": "./ReporteVentasPorMoneda.schema.json"
+      },
+      "type": "array"
+    },
     "total": {
       "type": "string"
     }
@@ -32,7 +39,8 @@
     "neto1",
     "neto2",
     "iva1",
-    "iva2"
+    "iva2",
+    "porMoneda"
   ],
   "title": "ReporteVentasRow",
   "type": "object"

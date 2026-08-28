@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Sales breakdown by operation currency (#206).",
+  "properties": {
+    "count": {
+      "type": "integer"
+    },
+    "moneda": {
+      "maxLength": 3,
+      "minLength": 3,
+      "type": "string"
+    },
+    "total": {
+      "description": "Amount in the original currency.",
+      "type": "string"
+    },
+    "totalLocal": {
+      "description": "Equivalent in local currency.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "moneda",
+    "count",
+    "total",
+    "totalLocal"
+  ],
+  "title": "ReporteVentasPorMoneda",
+  "type": "object"
+}

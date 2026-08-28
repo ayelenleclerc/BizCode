@@ -7,7 +7,10 @@ import type {
   PrismaClient,
 } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
+import type { SaldoPorMoneda } from '@bizcode/types'
+import { LOCAL_CURRENCY } from '@bizcode/types'
 import { NotFoundAppError, ValidationAppError } from '../errors/AppError'
+import { groupSaldosByMoneda } from './exportOperationMath'
 import {
   AGING_BUCKET_LABELS,
   bucketLabelForDaysPastDue,
@@ -43,6 +46,12 @@ export type MovimientoClienteCCRow = {
   tipo: MovimientoClienteCCTipo
   referencia: string | null
   monto: string
+  /**
+   * @en ISO-4217 currency of the entry; foreign balances never mix with the local one (#206).
+   * @es Moneda ISO-4217 del asiento; los saldos extranjeros no se mezclan con el local (#206).
+   * @pt-BR Moeda ISO-4217 do lançamento; saldos estrangeiros não se misturam com o local (#206).
+   */
+  moneda: string
   saldoPost: string
   fecha: string
   usuarioId: number
@@ -78,6 +87,12 @@ export type ClienteCuentaCorrienteSaldoResult = {
   saldo: string
   creditLimit: string | null
   excedeLimite: boolean
+  /**
+   * @en Running balance per currency (#206); the local currency drives `saldo` and the credit limit.
+   * @es Saldo corrido por moneda (#206); la moneda local es la que alimenta `saldo` y el límite de crédito.
+   * @pt-BR Saldo corrente por moeda (#206); a moeda local alimenta `saldo` e o limite de crédito.
+   */
+  saldosPorMoneda: SaldoPorMoneda[]
 }
 
 export type ClienteCuentaCorrienteAntiguedadBucket = {
@@ -87,6 +102,12 @@ export type ClienteCuentaCorrienteAntiguedadBucket = {
 
 export type ClienteCuentaCorrienteAntiguedadResult = {
   clienteId: number
+  /**
+   * @en Currency the buckets are expressed in (#206).
+   * @es Moneda en que se expresan los tramos (#206).
+   * @pt-BR Moeda em que as faixas são expressas (#206).
+   */
+  moneda: string
   buckets: ClienteCuentaCorrienteAntiguedadBucket[]
   totalPendiente: string
 }
@@ -139,6 +160,7 @@ export class ClienteCuentaCorrienteService {
       tipo: row.tipo as MovimientoClienteCCTipo,
       referencia: row.referencia,
       monto: decimalToMoneyString(row.monto),
+      moneda: row.moneda,
       saldoPost: decimalToMoneyString(row.saldoPost),
       fecha: row.fecha.toISOString(),
       usuarioId: row.usuarioId,
@@ -156,13 +178,37 @@ export class ClienteCuentaCorrienteService {
     return saldo.greaterThan(creditLimit)
   }
 
-  async getLastSaldo(tenantId: number, clienteId: number): Promise<Decimal> {
+  /**
+   * @en Running balance for a currency; defaults to the local one so pre-#206 callers are unaffected.
+   * @es Saldo corrido de una moneda; por defecto la local, para no afectar a los llamadores previos a #206.
+   * @pt-BR Saldo corrente de uma moeda; por padrão a local, para não afetar chamadores anteriores a #206.
+   */
+  async getLastSaldo(
+    tenantId: number,
+    clienteId: number,
+    moneda: string = LOCAL_CURRENCY,
+  ): Promise<Decimal> {
     const last = await this.db.movimientoClienteCC.findFirst({
-      where: { tenantId, clienteId },
+      where: { tenantId, clienteId, moneda },
       orderBy: [{ fecha: 'desc' }, { id: 'desc' }],
       select: { saldoPost: true },
     })
     return last?.saldoPost ?? new Decimal(0)
+  }
+
+  /**
+   * @en Aggregates the ledger by currency so a USD invoice never contaminates the ARS balance (#206).
+   * @es Agrega el libro por moneda para que una factura en USD no contamine el saldo en ARS (#206).
+   * @pt-BR Agrega o razão por moeda para que uma fatura em USD não contamine o saldo em ARS (#206).
+   */
+  async getSaldosPorMoneda(tenantId: number, clienteId: number): Promise<SaldoPorMoneda[]> {
+    const movimientos = await this.db.movimientoClienteCC.findMany({
+      where: { tenantId, clienteId },
+      select: { moneda: true, monto: true },
+    })
+    return groupSaldosByMoneda(
+      movimientos.map((m) => ({ moneda: m.moneda, monto: m.monto.toNumber() })),
+    ).map((row) => ({ moneda: row.moneda, saldo: row.saldo.toFixed(2) }))
   }
 
   private async syncClienteBalance(
@@ -181,6 +227,12 @@ export class ClienteCuentaCorrienteService {
     clienteId: number
     tipo: MovimientoClienteCCTipo
     monto: number | Decimal
+    /**
+     * @en ISO-4217 currency of the entry; defaults to the local currency (#206).
+     * @es Moneda ISO-4217 del asiento; por defecto la moneda local (#206).
+     * @pt-BR Moeda ISO-4217 do lançamento; por padrão a moeda local (#206).
+     */
+    moneda?: string | null
     referencia?: string | null
     fecha: Date
     usuarioId: number
@@ -215,7 +267,8 @@ export class ClienteCuentaCorrienteService {
     }
 
     const montoDec = toDecimal(params.monto)
-    const prev = await this.getLastSaldo(params.tenantId, params.clienteId)
+    const moneda = params.moneda?.trim().toUpperCase() || LOCAL_CURRENCY
+    const prev = await this.getLastSaldo(params.tenantId, params.clienteId, moneda)
     const saldoPost = prev.plus(montoDec)
 
     const mov = await this.db.movimientoClienteCC.create({
@@ -225,6 +278,7 @@ export class ClienteCuentaCorrienteService {
         tipo: params.tipo,
         referencia: params.referencia ?? null,
         monto: montoDec,
+        moneda,
         saldoPost,
         fecha: params.fecha,
         usuarioId: params.usuarioId,
@@ -238,7 +292,8 @@ export class ClienteCuentaCorrienteService {
       },
     })
 
-    if (!params.skipBalanceSync) {
+    // Cliente.balance mirrors the local-currency ledger only (#206).
+    if (!params.skipBalanceSync && moneda === LOCAL_CURRENCY) {
       await this.syncClienteBalance(params.tenantId, params.clienteId, saldoPost)
     }
 
@@ -247,18 +302,26 @@ export class ClienteCuentaCorrienteService {
 
   async recordFromFactura(
     tenantId: number,
-    factura: Pick<Factura, 'id' | 'clienteId' | 'tipo' | 'prefijo' | 'numero' | 'total' | 'fecha' | 'estado'>,
+    factura: Pick<Factura, 'id' | 'clienteId' | 'tipo' | 'prefijo' | 'numero' | 'total' | 'fecha' | 'estado'> &
+      Partial<Pick<Factura, 'monedaOperacion' | 'totalMonedaOperacion'>>,
     usuarioId: number,
   ): Promise<MovimientoClienteCC> {
     if (factura.estado !== 'A') {
       throw new ValidationAppError('Factura must be active to post ledger movement')
     }
     const ref = `${factura.tipo}-${factura.prefijo}-${factura.numero}`
+    // Export invoices post in their own currency so balances stay separated (#206).
+    const moneda = factura.monedaOperacion ?? LOCAL_CURRENCY
+    const monto =
+      moneda !== LOCAL_CURRENCY && factura.totalMonedaOperacion != null
+        ? factura.totalMonedaOperacion
+        : factura.total
     return this.recordMovimiento({
       tenantId,
       clienteId: factura.clienteId,
       tipo: 'factura',
-      monto: factura.total,
+      monto,
+      moneda,
       referencia: ref,
       fecha: factura.fecha,
       usuarioId,
@@ -376,7 +439,10 @@ export class ClienteCuentaCorrienteService {
     })
     if (!cliente) return null
 
-    const saldo = await this.getLastSaldo(tenantId, clienteId)
+    const [saldo, saldosPorMoneda] = await Promise.all([
+      this.getLastSaldo(tenantId, clienteId),
+      this.getSaldosPorMoneda(tenantId, clienteId),
+    ])
     const limite = cliente.creditLimit
 
     return {
@@ -384,6 +450,7 @@ export class ClienteCuentaCorrienteService {
       saldo: decimalToMoneyString(saldo),
       creditLimit: limite != null ? decimalToMoneyString(limite) : null,
       excedeLimite: this.computeExcedeLimite(saldo, limite),
+      saldosPorMoneda,
     }
   }
 
@@ -508,10 +575,16 @@ export class ClienteCuentaCorrienteService {
     return this.mapToLegacyCuentaCorriente(cliente, movimientos)
   }
 
+  /**
+   * @en Aging is computed per currency (#206); the local currency also covers invoices with no export data.
+   * @es La antigüedad se calcula por moneda (#206); la local abarca además las facturas sin datos de exportación.
+   * @pt-BR A antiguidade é calculada por moeda (#206); a local abrange também faturas sem dados de exportação.
+   */
   async getAntiguedad(
     tenantId: number,
     clienteId: number,
     asOf: Date = new Date(),
+    moneda: string = LOCAL_CURRENCY,
   ): Promise<ClienteCuentaCorrienteAntiguedadResult | null> {
     const cliente = await this.db.cliente.findFirst({
       where: { id: clienteId, tenantId },
@@ -519,10 +592,24 @@ export class ClienteCuentaCorrienteService {
     })
     if (!cliente) return null
 
-    const facturas = await this.db.factura.findMany({
-      where: { tenantId, clienteId, estado: 'A' },
-      select: { id: true, total: true, fecha: true },
+    const normalizedMoneda = moneda.trim().toUpperCase() || LOCAL_CURRENCY
+    const isLocal = normalizedMoneda === LOCAL_CURRENCY
+    const rows = await this.db.factura.findMany({
+      where: {
+        tenantId,
+        clienteId,
+        estado: 'A',
+        ...(isLocal
+          ? { OR: [{ monedaOperacion: null }, { monedaOperacion: LOCAL_CURRENCY }] }
+          : { monedaOperacion: normalizedMoneda }),
+      },
+      select: { id: true, total: true, totalMonedaOperacion: true, fecha: true },
     })
+    const facturas = rows.map((row) => ({
+      id: row.id,
+      fecha: row.fecha,
+      total: isLocal ? row.total : (row.totalMonedaOperacion ?? row.total),
+    }))
 
     const facturaIds = facturas.map((f) => f.id)
     const allocations =
@@ -567,6 +654,7 @@ export class ClienteCuentaCorrienteService {
 
     return {
       clienteId: cliente.id,
+      moneda: normalizedMoneda,
       buckets,
       totalPendiente: totalPendiente.toFixed(2),
     }

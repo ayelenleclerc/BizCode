@@ -1,5 +1,20 @@
 import { Prisma, type PrismaClient } from '@prisma/client'
+import { LOCAL_CURRENCY } from '@bizcode/types'
 import { endOfDay, periodKeyForDate, type ReportesAgrupar } from '../reportesPeriodUtils'
+
+export type ReporteVentasMonedaRow = {
+  /**
+   * @en ISO-4217 currency the invoices were denominated in; local currency covers non-export invoices (#206).
+   * @es Moneda ISO-4217 en que se denominaron las facturas; la local cubre las no exportadas (#206).
+   * @pt-BR Moeda ISO-4217 em que as faturas foram denominadas; a local cobre as não exportadas (#206).
+   */
+  moneda: string
+  count: number
+  /** @en Amount in the original currency. @es Importe en la moneda original. @pt-BR Valor na moeda original. */
+  total: string
+  /** @en Equivalent in local currency. @es Equivalente en moneda local. @pt-BR Equivalente em moeda local. */
+  totalLocal: string
+}
 
 export type ReporteVentasRow = {
   periodo: string
@@ -9,6 +24,12 @@ export type ReporteVentasRow = {
   neto2: string
   iva1: string
   iva2: string
+  /**
+   * @en Breakdown by operation currency (#206); a single local-currency row when no export invoices exist.
+   * @es Desglose por moneda de la operación (#206); una sola fila local si no hay facturas de exportación.
+   * @pt-BR Detalhamento por moeda da operação (#206); uma única linha local se não houver faturas de exportação.
+   */
+  porMoneda: ReporteVentasMonedaRow[]
 }
 
 export type StockCriticoRow = {
@@ -45,23 +66,53 @@ export class ReportesOperacionalesService {
         neto2: true,
         iva1: true,
         iva2: true,
+        monedaOperacion: true,
+        totalMonedaOperacion: true,
       },
     })
 
-    const buckets = new Map<
-      string,
-      { count: number; total: number; neto1: number; neto2: number; iva1: number; iva2: number }
-    >()
+    type PeriodBucket = {
+      count: number
+      total: number
+      neto1: number
+      neto2: number
+      iva1: number
+      iva2: number
+      porMoneda: Map<string, { count: number; total: number; totalLocal: number }>
+    }
+
+    const buckets = new Map<string, PeriodBucket>()
 
     for (const f of facturas) {
       const key = periodKeyForDate(f.fecha, agrupar)
-      const row = buckets.get(key) ?? { count: 0, total: 0, neto1: 0, neto2: 0, iva1: 0, iva2: 0 }
+      const row: PeriodBucket = buckets.get(key) ?? {
+        count: 0,
+        total: 0,
+        neto1: 0,
+        neto2: 0,
+        iva1: 0,
+        iva2: 0,
+        porMoneda: new Map(),
+      }
+      const totalLocal = f.total.toNumber()
       row.count += 1
-      row.total += f.total.toNumber()
+      row.total += totalLocal
       row.neto1 += f.neto1.toNumber()
       row.neto2 += f.neto2.toNumber()
       row.iva1 += f.iva1.toNumber()
       row.iva2 += f.iva2.toNumber()
+
+      const moneda = f.monedaOperacion ?? LOCAL_CURRENCY
+      const originalTotal =
+        moneda !== LOCAL_CURRENCY && f.totalMonedaOperacion != null
+          ? f.totalMonedaOperacion.toNumber()
+          : totalLocal
+      const currencyRow = row.porMoneda.get(moneda) ?? { count: 0, total: 0, totalLocal: 0 }
+      currencyRow.count += 1
+      currencyRow.total += originalTotal
+      currencyRow.totalLocal += totalLocal
+      row.porMoneda.set(moneda, currencyRow)
+
       buckets.set(key, row)
     }
 
@@ -75,6 +126,16 @@ export class ReportesOperacionalesService {
         neto2: row.neto2.toFixed(2),
         iva1: row.iva1.toFixed(2),
         iva2: row.iva2.toFixed(2),
+        porMoneda: [...row.porMoneda.entries()]
+          .sort(([a], [b]) =>
+            a === LOCAL_CURRENCY ? -1 : b === LOCAL_CURRENCY ? 1 : a.localeCompare(b),
+          )
+          .map(([moneda, currencyRow]) => ({
+            moneda,
+            count: currencyRow.count,
+            total: currencyRow.total.toFixed(2),
+            totalLocal: currencyRow.totalLocal.toFixed(2),
+          })),
       }))
   }
 

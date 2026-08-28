@@ -16,25 +16,30 @@ undefined
 
 # FacturaInput Properties
 
-| Property                              | Type      | Required | Nullable       | Defined by                                                                                           |
-| :------------------------------------ | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------- |
-| [clienteId](#clienteid)               | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-clienteid.md "undefined#/properties/clienteId")               |
-| [confirmAnomalies](#confirmanomalies) | `boolean` | Optional | cannot be null | [FacturaInput](facturainput-properties-confirmanomalies.md "undefined#/properties/confirmAnomalies") |
-| [fecha](#fecha)                       | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-fecha.md "undefined#/properties/fecha")                       |
-| [formaPagoId](#formapagoid)           | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-formapagoid.md "undefined#/properties/formaPagoId")           |
-| [items](#items)                       | `array`   | Required | cannot be null | [FacturaInput](facturainput-properties-items.md "undefined#/properties/items")                       |
-| [iva1](#iva1)                         | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva1.md "undefined#/properties/iva1")                         |
-| [iva2](#iva2)                         | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva2.md "undefined#/properties/iva2")                         |
-| [neto1](#neto1)                       | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto1.md "undefined#/properties/neto1")                       |
-| [neto2](#neto2)                       | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto2.md "undefined#/properties/neto2")                       |
-| [neto3](#neto3)                       | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto3.md "undefined#/properties/neto3")                       |
-| [numero](#numero)                     | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-numero.md "undefined#/properties/numero")                     |
-| [percepciones](#percepciones)         | `array`   | Optional | cannot be null | [FacturaInput](facturainput-properties-percepciones.md "undefined#/properties/percepciones")         |
-| [prefijo](#prefijo)                   | `string`  | Optional | cannot be null | [FacturaInput](facturainput-properties-prefijo.md "undefined#/properties/prefijo")                   |
-| [puntosCanje](#puntoscanje)           | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-puntoscanje.md "undefined#/properties/puntosCanje")           |
-| [recetaId](#recetaid)                 | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-recetaid.md "undefined#/properties/recetaId")                 |
-| [tipo](#tipo)                         | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-tipo.md "undefined#/properties/tipo")                         |
-| [total](#total)                       | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-total.md "undefined#/properties/total")                       |
+| Property                                      | Type      | Required | Nullable       | Defined by                                                                                                   |
+| :-------------------------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------- |
+| [clienteId](#clienteid)                       | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-clienteid.md "undefined#/properties/clienteId")                       |
+| [confirmAnomalies](#confirmanomalies)         | `boolean` | Optional | cannot be null | [FacturaInput](facturainput-properties-confirmanomalies.md "undefined#/properties/confirmAnomalies")         |
+| [fecha](#fecha)                               | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-fecha.md "undefined#/properties/fecha")                               |
+| [formaPagoId](#formapagoid)                   | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-formapagoid.md "undefined#/properties/formaPagoId")                   |
+| [incoterm](#incoterm)                         | Merged    | Optional | cannot be null | [FacturaInput](facturainput-properties-incoterm.md "undefined#/properties/incoterm")                         |
+| [items](#items)                               | `array`   | Required | cannot be null | [FacturaInput](facturainput-properties-items.md "undefined#/properties/items")                               |
+| [iva1](#iva1)                                 | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva1.md "undefined#/properties/iva1")                                 |
+| [iva2](#iva2)                                 | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-iva2.md "undefined#/properties/iva2")                                 |
+| [monedaOperacion](#monedaoperacion)           | `string`  | Optional | cannot be null | [FacturaInput](facturainput-properties-monedaoperacion.md "undefined#/properties/monedaOperacion")           |
+| [neto1](#neto1)                               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto1.md "undefined#/properties/neto1")                               |
+| [neto2](#neto2)                               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto2.md "undefined#/properties/neto2")                               |
+| [neto3](#neto3)                               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-neto3.md "undefined#/properties/neto3")                               |
+| [numero](#numero)                             | `integer` | Required | cannot be null | [FacturaInput](facturainput-properties-numero.md "undefined#/properties/numero")                             |
+| [paisDestino](#paisdestino)                   | `string`  | Optional | cannot be null | [FacturaInput](facturainput-properties-paisdestino.md "undefined#/properties/paisDestino")                   |
+| [percepciones](#percepciones)                 | `array`   | Optional | cannot be null | [FacturaInput](facturainput-properties-percepciones.md "undefined#/properties/percepciones")                 |
+| [prefijo](#prefijo)                           | `string`  | Optional | cannot be null | [FacturaInput](facturainput-properties-prefijo.md "undefined#/properties/prefijo")                           |
+| [puntosCanje](#puntoscanje)                   | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-puntoscanje.md "undefined#/properties/puntosCanje")                   |
+| [recetaId](#recetaid)                         | `integer` | Optional | cannot be null | [FacturaInput](facturainput-properties-recetaid.md "undefined#/properties/recetaId")                         |
+| [tipo](#tipo)                                 | `string`  | Required | cannot be null | [FacturaInput](facturainput-properties-tipo.md "undefined#/properties/tipo")                                 |
+| [tipoCambioOperacion](#tipocambiooperacion)   | `number`  | Optional | cannot be null | [FacturaInput](facturainput-properties-tipocambiooperacion.md "undefined#/properties/tipoCambioOperacion")   |
+| [total](#total)                               | `number`  | Required | cannot be null | [FacturaInput](facturainput-properties-total.md "undefined#/properties/total")                               |
+| [totalMonedaOperacion](#totalmonedaoperacion) | `number`  | Optional | cannot be null | [FacturaInput](facturainput-properties-totalmonedaoperacion.md "undefined#/properties/totalMonedaOperacion") |
 
 ## clienteId
 
@@ -112,6 +117,28 @@ When true, acknowledges soft-blocked duplicate anomaly and proceeds with create 
 
 `integer`
 
+## incoterm
+
+
+
+`incoterm`
+
+* is optional
+
+* Type: merged type ([Details](facturainput-properties-incoterm.md))
+
+* cannot be null
+
+* defined in: [FacturaInput](facturainput-properties-incoterm.md "undefined#/properties/incoterm")
+
+### incoterm Type
+
+merged type ([Details](facturainput-properties-incoterm.md))
+
+all of
+
+* [Incoterm](incoterm.md "check type definition")
+
 ## items
 
 
@@ -165,6 +192,34 @@ When true, acknowledges soft-blocked duplicate anomaly and proceeds with create 
 ### iva2 Type
 
 `number`
+
+## monedaOperacion
+
+Export vertical (#206, module `vertical.export`). Currency the operation is denominated in. A non-local currency requires `totalMonedaOperacion` and `tipoCambioOperacion`; otherwise the request fails with 422. `total` stays in local currency and the AFIP circuit is untouched (no type E voucher, no `MonId`/`MonCotiz`).
+
+`monedaOperacion`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [FacturaInput](facturainput-properties-monedaoperacion.md "undefined#/properties/monedaOperacion")
+
+### monedaOperacion Type
+
+`string`
+
+### monedaOperacion Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value   | Explanation |
+| :------ | :---------- |
+| `"ARS"` |             |
+| `"USD"` |             |
+| `"EUR"` |             |
 
 ## neto1
 
@@ -237,6 +292,30 @@ When true, acknowledges soft-blocked duplicate anomaly and proceeds with create 
 ### numero Type
 
 `integer`
+
+## paisDestino
+
+ISO-3166-1 alpha-2 destination country (#206).
+
+`paisDestino`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [FacturaInput](facturainput-properties-paisdestino.md "undefined#/properties/paisDestino")
+
+### paisDestino Type
+
+`string`
+
+### paisDestino Constraints
+
+**maximum length**: the maximum number of characters for this string is: `2`
+
+**minimum length**: the minimum number of characters for this string is: `2`
 
 ## percepciones
 
@@ -345,6 +424,28 @@ Prescription backing the dispensing of prescription-only articles (#204). With m
 | `"A"` |             |
 | `"B"` |             |
 
+## tipoCambioOperacion
+
+Exchange rate applied to the operation; persisted in the invoice FX snapshot.
+
+`tipoCambioOperacion`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [FacturaInput](facturainput-properties-tipocambiooperacion.md "undefined#/properties/tipoCambioOperacion")
+
+### tipoCambioOperacion Type
+
+`number`
+
+### tipoCambioOperacion Constraints
+
+**minimum (exclusive)**: the value of this number must be greater than: `0`
+
 ## total
 
 Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
@@ -362,3 +463,25 @@ Must equal netos + IVA + sum(percepciones) when percepciones are sent (#229).
 ### total Type
 
 `number`
+
+## totalMonedaOperacion
+
+
+
+`totalMonedaOperacion`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [FacturaInput](facturainput-properties-totalmonedaoperacion.md "undefined#/properties/totalMonedaOperacion")
+
+### totalMonedaOperacion Type
+
+`number`
+
+### totalMonedaOperacion Constraints
+
+**minimum (exclusive)**: the value of this number must be greater than: `0`

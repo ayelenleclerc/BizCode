@@ -11,6 +11,7 @@ import {
 } from '../lib/pedidoStateMachine'
 import { FacturaService } from './FacturaService'
 import type { ServiceResult } from './serviceResults'
+import { normalizeDespachanteInput, normalizeExportFields } from './exportOperationMath'
 import { createNotification } from '../notifications'
 
 const pedidoInclude = {
@@ -255,6 +256,18 @@ export class PedidoService {
       return resolved
     }
 
+    // Export vertical (#206): Incoterm, destination and customs broker are informational fields.
+    const exportFields = normalizeExportFields({
+      incoterm: input.incoterm,
+      paisDestino: input.paisDestino,
+    })
+    if (!exportFields.ok) return exportFields
+    const despachante = normalizeDespachanteInput({
+      despachanteNombre: input.despachanteNombre,
+      despachanteEmail: input.despachanteEmail,
+    })
+    if (!despachante.ok) return despachante
+
     const total = computePedidoTotal(input.items)
     const pedido = await this.prisma.pedido.create({
       data: {
@@ -264,6 +277,16 @@ export class PedidoService {
         estado: 'draft',
         total,
         validUntil: parseValidUntil(input.validUntil),
+        ...(exportFields.data.incoterm != null ? { incoterm: exportFields.data.incoterm } : {}),
+        ...(exportFields.data.paisDestino != null
+          ? { paisDestino: exportFields.data.paisDestino }
+          : {}),
+        ...(despachante.data.despachanteNombre != null
+          ? { despachanteNombre: despachante.data.despachanteNombre }
+          : {}),
+        ...(despachante.data.despachanteEmail != null
+          ? { despachanteEmail: despachante.data.despachanteEmail }
+          : {}),
         ...(input.depositoId != null ? { depositoId: input.depositoId } : {}),
         ...(input.observaciones !== undefined ? { observaciones: input.observaciones } : {}),
         ...(input.condicionCobro !== undefined ? { condicionCobro: input.condicionCobro } : {}),

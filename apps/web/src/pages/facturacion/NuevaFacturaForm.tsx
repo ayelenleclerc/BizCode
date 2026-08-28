@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
-import { depositosAPI, empresaAPI, facturasAPI, fidelizacionAPI, fiscalRetencionesAPI, listasPreciosAPI, ApiRequestFailedError, type RetencionPreviewLineDTO } from '@/lib/api'
+import { depositosAPI, empresaAPI, facturasAPI, fidelizacionAPI, fiscalRetencionesAPI, listasPreciosAPI, tiposCambioAPI, ApiRequestFailedError, type RetencionPreviewLineDTO } from '@/lib/api'
+import { INCOTERMS_2020, LOCAL_CURRENCY, OPERATION_CURRENCIES, type MonedaFx } from '@bizcode/types'
 import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
 import { Cliente, Articulo, FormaPago, allowsDecimalQuantity, type UnidadBase } from '@bizcode/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
@@ -93,6 +94,13 @@ export default function NuevaFacturaForm({
   const fefoModule = hasModule('inventory.fefo')
   const warehousesModule = hasModule('inventory.warehouses')
   const uomModule = hasModule('inventory.uom')
+  const exportModule = hasModule('vertical.export')
+  const [monedaOperacion, setMonedaOperacion] = useState<string>(LOCAL_CURRENCY)
+  const [tipoCambioOperacion, setTipoCambioOperacion] = useState('')
+  const [incoterm, setIncoterm] = useState('')
+  const [paisDestino, setPaisDestino] = useState('')
+  const [tipoCambioLoading, setTipoCambioLoading] = useState(false)
+  const [tipoCambioError, setTipoCambioError] = useState(false)
   const [fefoDefaultDepositoId, setFefoDefaultDepositoId] = useState<number | null>(null)
   const [puntosCanje, setPuntosCanje] = useState('')
   const [loyaltySaldo, setLoyaltySaldo] = useState<{
@@ -103,6 +111,32 @@ export default function NuevaFacturaForm({
   const { t: tf } = useTranslation('fidelizacion')
 
   const cliente = clientes.find((c) => c.id === clienteId)
+
+  // Export vertical (#206): prefill the operation rate with the current FX quote of the chosen currency.
+  useEffect(() => {
+    if (!exportModule || monedaOperacion === LOCAL_CURRENCY) {
+      setTipoCambioOperacion('')
+      setTipoCambioError(false)
+      return
+    }
+    let cancelled = false
+    setTipoCambioLoading(true)
+    setTipoCambioError(false)
+    void tiposCambioAPI
+      .getVigente({ moneda: monedaOperacion as MonedaFx })
+      .then((row) => {
+        if (!cancelled) setTipoCambioOperacion(String(row.valor))
+      })
+      .catch(() => {
+        if (!cancelled) setTipoCambioError(true)
+      })
+      .finally(() => {
+        if (!cancelled) setTipoCambioLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [exportModule, monedaOperacion])
 
   useEffect(() => {
     if (!loyaltyModule || !clienteId) {
@@ -381,6 +415,23 @@ export default function NuevaFacturaForm({
       }
     }
 
+    // Export vertical (#206): a foreign currency needs an explicit rate before the request is sent.
+    const exportPayload: Record<string, string | number> = {}
+    if (exportModule) {
+      if (incoterm) exportPayload.incoterm = incoterm
+      if (paisDestino.trim()) exportPayload.paisDestino = paisDestino.trim()
+      if (monedaOperacion !== LOCAL_CURRENCY) {
+        const rate = Number.parseFloat(tipoCambioOperacion)
+        if (!Number.isFinite(rate) || rate <= 0) {
+          setError(t('export.rateRequired', { moneda: monedaOperacion }))
+          return
+        }
+        exportPayload.monedaOperacion = monedaOperacion
+        exportPayload.tipoCambioOperacion = rate
+        exportPayload.totalMonedaOperacion = Math.round((totales.total / rate) * 100) / 100
+      }
+    }
+
     setLoading(true)
     setError(null)
     if (!opts?.confirmAnomalies) {
@@ -440,6 +491,7 @@ export default function NuevaFacturaForm({
           ? { puntosCanje: puntosCanjeNum }
           : {}),
         ...(opts?.confirmAnomalies === true ? { confirmAnomalies: true } : {}),
+        ...exportPayload,
       }
 
       const created = await facturasAPI.create(facturaData)
@@ -631,6 +683,120 @@ export default function NuevaFacturaForm({
           </select>
         </div>
       </div>
+
+      {exportModule ? (
+        <fieldset
+          className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-4 rounded border border-slate-200 dark:border-slate-600 p-4"
+          data-testid="factura-export-panel"
+        >
+          <legend className="px-1 text-sm font-semibold">{t('export.title')}</legend>
+          <p className="col-span-2 sm:col-span-4 -mt-2 text-xs text-slate-500">
+            {t('export.hint')}
+          </p>
+
+          <div>
+            <label
+              htmlFor="factura-moneda-operacion"
+              className="text-slate-700 dark:text-slate-300 font-semibold text-sm"
+            >
+              {t('export.moneda')}
+            </label>
+            <select
+              id="factura-moneda-operacion"
+              data-testid="factura-moneda-operacion"
+              value={monedaOperacion}
+              onChange={(e) => setMonedaOperacion(e.target.value)}
+              className="w-full px-2 py-1 bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 text-sm"
+            >
+              {OPERATION_CURRENCIES.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="factura-tipo-cambio-operacion"
+              className="text-slate-700 dark:text-slate-300 font-semibold text-sm"
+            >
+              {t('export.tipoCambio')}
+              {monedaOperacion !== LOCAL_CURRENCY ? ' *' : ''}
+            </label>
+            <input
+              id="factura-tipo-cambio-operacion"
+              data-testid="factura-tipo-cambio-operacion"
+              type="number"
+              step="0.0001"
+              min="0"
+              value={tipoCambioOperacion}
+              disabled={monedaOperacion === LOCAL_CURRENCY}
+              aria-required={monedaOperacion !== LOCAL_CURRENCY}
+              aria-describedby={tipoCambioError ? 'factura-tipo-cambio-error' : undefined}
+              onChange={(e) => setTipoCambioOperacion(e.target.value)}
+              className="w-full px-2 py-1 bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 text-sm disabled:opacity-50"
+            />
+            {tipoCambioLoading ? (
+              <p className="text-xs text-slate-500 mt-1" data-testid="factura-tipo-cambio-loading">
+                {tc('status.loading')}
+              </p>
+            ) : null}
+            {tipoCambioError ? (
+              <p
+                id="factura-tipo-cambio-error"
+                role="alert"
+                className="text-xs text-amber-700 dark:text-amber-400 mt-1"
+                data-testid="factura-tipo-cambio-error"
+              >
+                {t('export.rateUnavailable')}
+              </p>
+            ) : null}
+          </div>
+
+          <div>
+            <label
+              htmlFor="factura-incoterm"
+              className="text-slate-700 dark:text-slate-300 font-semibold text-sm"
+            >
+              {t('export.incoterm')}
+            </label>
+            <select
+              id="factura-incoterm"
+              data-testid="factura-incoterm"
+              value={incoterm}
+              onChange={(e) => setIncoterm(e.target.value)}
+              className="w-full px-2 py-1 bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 text-sm"
+            >
+              <option value="">{t('export.incotermNone')}</option>
+              {INCOTERMS_2020.map((code) => (
+                <option key={code} value={code}>
+                  {code}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="factura-pais-destino"
+              className="text-slate-700 dark:text-slate-300 font-semibold text-sm"
+            >
+              {t('export.paisDestino')}
+            </label>
+            <input
+              id="factura-pais-destino"
+              data-testid="factura-pais-destino"
+              type="text"
+              maxLength={2}
+              value={paisDestino}
+              placeholder={t('export.paisDestinoPlaceholder')}
+              onChange={(e) => setPaisDestino(e.target.value.toUpperCase())}
+              className="w-full px-2 py-1 bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 text-sm uppercase"
+            />
+          </div>
+        </fieldset>
+      ) : null}
 
       {loyaltyModule && loyaltySaldo && loyaltySaldo.puntos > 0 ? (
         <div

@@ -273,5 +273,17 @@
         "exceedsBalance": "Amount exceeds the refundable balance."
       }
     }
+  },
+  "export": {
+    "title": "Export operation (#206)",
+    "hint": "Local record only: currency, rate, Incoterm and destination are stored on the invoice. The AFIP circuit is unchanged (no type E voucher).",
+    "moneda": "Operation currency",
+    "tipoCambio": "Exchange rate",
+    "incoterm": "Incoterm 2020",
+    "incotermNone": "Not specified",
+    "paisDestino": "Destination country",
+    "paisDestinoPlaceholder": "BR",
+    "rateUnavailable": "No current quote found; enter the rate manually.",
+    "rateRequired": "An exchange rate is required to invoice in {{moneda}}."
   }
 }

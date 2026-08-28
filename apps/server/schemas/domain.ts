@@ -623,6 +623,12 @@ export const facturaBodySchema = z
     percepciones: z.array(facturaPercepcionLineSchema).optional(),
     puntosCanje: z.number().int().min(1).nullable().optional(),
     confirmAnomalies: z.boolean().optional(),
+    recetaId: z.number().int().min(1).nullable().optional(),
+    monedaOperacion: z.union([z.string(), z.null()]).optional(),
+    totalMonedaOperacion: z.union([z.number(), z.null()]).optional(),
+    tipoCambioOperacion: z.union([z.number(), z.null()]).optional(),
+    incoterm: z.union([z.string(), z.null()]).optional(),
+    paisDestino: z.union([z.string(), z.null()]).optional(),
   })
   .superRefine((data, ctx) => {
     const f = data.fecha.trim()
@@ -1564,6 +1570,10 @@ export const pedidoBodySchema = z
       .union([z.enum(['contado', 'cuenta_corriente', 'plazo']), z.null()])
       .optional(),
     plazoDias: z.union([z.number(), z.null()]).optional(),
+    incoterm: z.union([z.string(), z.null()]).optional(),
+    paisDestino: z.union([z.string(), z.null()]).optional(),
+    despachanteNombre: z.union([z.string(), z.null()]).optional(),
+    despachanteEmail: z.union([z.string(), z.null()]).optional(),
   })
   .superRefine((data, ctx) => {
     if (!Number.isInteger(data.clienteId) || data.clienteId < 1) {
@@ -1623,8 +1633,22 @@ export const pedidoBodySchema = z
       observaciones,
       condicionCobro: data.condicionCobro,
       plazoDias,
+      incoterm: data.incoterm,
+      paisDestino: data.paisDestino,
+      despachanteNombre: data.despachanteNombre,
+      despachanteEmail: data.despachanteEmail,
     }
   })
+
+/**
+ * @en Customs broker contact update on an order (#206); email is required to notify.
+ * @es Actualización del contacto del despachante en un pedido (#206); el email es obligatorio para avisar.
+ * @pt-BR Atualização do contato do despachante em um pedido (#206); o email é obrigatório para notificar.
+ */
+export const despachanteNotificarBodySchema = z.object({
+  despachanteNombre: z.union([z.string(), z.null()]).optional(),
+  despachanteEmail: z.union([z.string(), z.null()]).optional(),
+})
 
 export const pedidoInvoiceBodySchema = z
   .object({

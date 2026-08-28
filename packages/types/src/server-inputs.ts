@@ -278,6 +278,20 @@ export type FacturaInput = {
    * @pt-BR Receita que respalda a dispensação de artigos sob receita (#204); exigida por `vertical.pharmacy`.
    */
   recetaId?: number | null
+  /**
+   * @en Export vertical (#206): ISO-4217 currency the operation is denominated in; requires `vertical.export`.
+   * @es Vertical exportación (#206): moneda ISO-4217 de la operación; requiere `vertical.export`.
+   * @pt-BR Vertical exportação (#206): moeda ISO-4217 da operação; requer `vertical.export`.
+   */
+  monedaOperacion?: string | null
+  /** @en Total in `monedaOperacion` (#206). @es Total en `monedaOperacion` (#206). @pt-BR Total em `monedaOperacion` (#206). */
+  totalMonedaOperacion?: number | null
+  /** @en Operation exchange rate (#206). @es Tipo de cambio de la operación (#206). @pt-BR Taxa de câmbio da operação (#206). */
+  tipoCambioOperacion?: number | null
+  /** @en Incoterms 2020 term (#206). @es Término Incoterms 2020 (#206). @pt-BR Termo Incoterms 2020 (#206). */
+  incoterm?: string | null
+  /** @en ISO-3166-1 alpha-2 destination (#206). @es Destino ISO-3166-1 alpha-2 (#206). @pt-BR Destino ISO-3166-1 alpha-2 (#206). */
+  paisDestino?: string | null
 }
 
 export type CobroRetencionInput = {
@@ -528,6 +542,14 @@ export type PedidoInput = {
   condicionCobro?: PedidoCondicionCobro | null
   /** @en Days when condicionCobro is plazo (#169). @es Días si condición es plazo (#169). @pt-BR Dias se condição é plazo (#169). */
   plazoDias?: number | null
+  /** @en Incoterms 2020 term (#206). @es Término Incoterms 2020 (#206). @pt-BR Termo Incoterms 2020 (#206). */
+  incoterm?: string | null
+  /** @en ISO-3166-1 alpha-2 destination (#206). @es Destino ISO-3166-1 alpha-2 (#206). @pt-BR Destino ISO-3166-1 alpha-2 (#206). */
+  paisDestino?: string | null
+  /** @en Customs broker name (#206). @es Nombre del despachante (#206). @pt-BR Nome do despachante (#206). */
+  despachanteNombre?: string | null
+  /** @en Customs broker email (#206). @es Email del despachante (#206). @pt-BR Email do despachante (#206). */
+  despachanteEmail?: string | null
 }
 
 export type PedidoInvoiceInput = {

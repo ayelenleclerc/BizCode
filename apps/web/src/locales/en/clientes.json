@@ -148,7 +148,10 @@
       "percepcion": "Perception",
       "cheque_rechazado": "Rejected cheque",
       "ajuste": "Manual adjustment"
-    }
+    },
+    "saldosPorMonedaTitle": "Balance by currency (#206)",
+    "saldosPorMonedaHint": "Foreign-currency balances are tracked separately; the credit limit applies to the local currency.",
+    "saldosPorMonedaEmpty": "No ledger entries yet."
   },
   "recibos": {
     "title": "Payment receipts",

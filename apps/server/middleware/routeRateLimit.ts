@@ -530,6 +530,18 @@ export const farmaciaMutationHttpRateLimiter = createRouteLimiter({
 })
 
 /**
+ * @en Per-IP rate limit for export-vertical mutations (#206); visible to CodeQL.
+ * @es Límite por IP para mutaciones del vertical exportación (#206); visible a CodeQL.
+ * @pt-BR Limite por IP para mutações do vertical exportação (#206); visível ao CodeQL.
+ */
+export const exportacionMutationHttpRateLimiter = createRouteLimiter({
+  windowMs: MINUTE_MS,
+  limit: parsePositiveInt(process.env.HTTP_RATE_LIMIT_PER_MINUTE, API_AUTHENTICATED_DEFAULT),
+  skipUnless: () => true,
+  storePrefix: 'mut-exportacion',
+})
+
+/**
  * @en Per-IP rate limit for fiscal/ARCA authorize & auth mutations (#378); visible to CodeQL.
  * @es Límite por IP para mutaciones de autorización fiscal/ARCA (#378); visible a CodeQL.
  * @pt-BR Limite por IP para mutações de autorização fiscal/ARCA (#378); visível ao CodeQL.

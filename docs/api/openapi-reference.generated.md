@@ -11579,7 +11579,21 @@ Current AR balance and credit-limit flag (#232, #168). Requires module `finance.
 
   - **`saldo` (required)**
 
-    `string`
+    `string` — Local-currency balance; drives the credit limit check.
+
+  - **`saldosPorMoneda` (required)**
+
+    `array` — Running balance per currency (#206).
+
+    **Items:**
+
+    - **`moneda` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
 
   - **`creditLimit`**
 
@@ -11598,7 +11612,13 @@ Current AR balance and credit-limit flag (#232, #168). Requires module `finance.
     "clienteId": 1,
     "saldo": "",
     "creditLimit": "",
-    "excedeLimite": true
+    "excedeLimite": true,
+    "saldosPorMoneda": [
+      {
+        "moneda": "",
+        "saldo": ""
+      }
+    ]
   }
 }
 ```
@@ -11907,6 +11927,10 @@ Current AR balance and credit-limit flag (#232, #168). Requires module `finance.
 
     `integer`
 
+  - **`moneda` (required)**
+
+    `string` — Currency the buckets are expressed in (#206).
+
   - **`totalPendiente` (required)**
 
     `string`
@@ -11922,6 +11946,7 @@ Current AR balance and credit-limit flag (#232, #168). Requires module `finance.
   "success": true,
   "data": {
     "clienteId": 1,
+    "moneda": "",
     "buckets": [
       {
         "label": "0-30",
@@ -41495,6 +41520,18 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
   `integer`
 
+- **`incoterm`**
+
+  `object`
+
+- **`monedaOperacion`**
+
+  `string`, possible values: `"ARS", "USD", "EUR"` — Export vertical (#206, module \`vertical.export\`). Currency the operation is denominated in. A non-local currency requires \`totalMonedaOperacion\` and \`tipoCambioOperacion\`; otherwise the request fails with 422. \`total\` stays in local currency and the AFIP circuit is untouched (no type E voucher, no \`MonId\`/\`MonCotiz\`).
+
+- **`paisDestino`**
+
+  `string` — ISO-3166-1 alpha-2 destination country (#206).
+
 - **`percepciones`**
 
   `array`
@@ -41529,6 +41566,14 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 
   `integer` — Prescription backing the dispensing of prescription-only articles (#204). With module \`vertical.pharmacy\` enabled, invoicing an article flagged \`requiereReceta\` without this field fails with HTTP 422 \`PRESCRIPTION\_REQUIRED:\<articuloIds>\`.
 
+- **`tipoCambioOperacion`**
+
+  `number` — Exchange rate applied to the operation; persisted in the invoice FX snapshot.
+
+- **`totalMonedaOperacion`**
+
+  `number`
+
 **Example:**
 
 ```json
@@ -41545,6 +41590,11 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
   "iva1": 1,
   "iva2": 1,
   "total": 1,
+  "monedaOperacion": "ARS",
+  "totalMonedaOperacion": 1,
+  "tipoCambioOperacion": 1,
+  "incoterm": "EXW",
+  "paisDestino": "",
   "percepciones": [
     {
       "regimenId": 1,
@@ -52638,9 +52688,25 @@ Requires `orders.create`. Initial estado is `draft`.
 
   `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
 
+- **`despachanteEmail`**
+
+  `string`, format: `email`
+
+- **`despachanteNombre`**
+
+  `string` — Customs broker name; requires \`despachanteEmail\` (#206).
+
+- **`incoterm`**
+
+  `object`
+
 - **`observaciones`**
 
   `string` — Warehouse notes (#169).
+
+- **`paisDestino`**
+
+  `string` — ISO-3166-1 alpha-2 destination country (#206).
 
 - **`plazoDias`**
 
@@ -52664,6 +52730,10 @@ Requires `orders.create`. Initial estado is `draft`.
   "observaciones": "",
   "condicionCobro": "contado",
   "plazoDias": 1,
+  "incoterm": "EXW",
+  "paisDestino": "",
+  "despachanteNombre": "",
+  "despachanteEmail": "",
   "items": [
     {
       "articuloId": 1,
@@ -53484,9 +53554,25 @@ Requires `orders.create`.
 
   `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
 
+- **`despachanteEmail`**
+
+  `string`, format: `email`
+
+- **`despachanteNombre`**
+
+  `string` — Customs broker name; requires \`despachanteEmail\` (#206).
+
+- **`incoterm`**
+
+  `object`
+
 - **`observaciones`**
 
   `string` — Warehouse notes (#169).
+
+- **`paisDestino`**
+
+  `string` — ISO-3166-1 alpha-2 destination country (#206).
 
 - **`plazoDias`**
 
@@ -53510,6 +53596,10 @@ Requires `orders.create`.
   "observaciones": "",
   "condicionCobro": "contado",
   "plazoDias": 1,
+  "incoterm": "EXW",
+  "paisDestino": "",
+  "despachanteNombre": "",
+  "despachanteEmail": "",
   "items": [
     {
       "articuloId": 1,
@@ -75624,6 +75714,598 @@ Requires module `vertical.pharmacy` and `inventory.adjust`. Values are stored ve
 ```
 
 ##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/exportacion/incoterms
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/exportacion/incoterms`
+
+### List the Incoterms 2020 rule set (#206)
+
+- **Method:** `GET`
+- **Path:** `/api/exportacion/incoterms`
+- **Tags:** exportacion
+
+Requires module `vertical.export` and `products.read`.
+
+#### Responses
+
+##### Status: 200 Incoterms catalog
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"EXW", "FCA", "CPT", "CIP", "DAP", "DPU", "DDP", "FAS", "FOB", "CFR", "CIF"` — Incoterms 2020 delivery term (#206).
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    "EXW"
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/pedidos/{id}/notificar-despachante
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/pedidos/{id}/notificar-despachante`
+
+### Email the customs broker the order detail (#206)
+
+- **Method:** `POST`
+- **Path:** `/api/pedidos/{id}/notificar-despachante`
+- **Tags:** exportacion
+
+Requires module `vertical.export` and `orders.create`. Stores the broker contact on the order and sends a plain-text summary. No customs declaration is filed. When SMTP is not configured the response returns `enviado: false` and the attempt is still audited.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`despachanteEmail`**
+
+  `string`, format: `email`
+
+- **`despachanteNombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "despachanteNombre": "",
+  "despachanteEmail": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Notification result
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`despachanteEmail` (required)**
+
+    `string`, format: `email`
+
+  - **`enviado` (required)**
+
+    `boolean` — False when SMTP is not configured; the attempt is audited anyway.
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidoId": 1,
+    "despachanteEmail": "",
+    "enviado": true
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 Semantically invalid request
 
 ###### Content-Type: application/json
 
@@ -113572,6 +114254,28 @@ Aggregates active invoices (`estado = A`) in the date range using server local c
 
     `string` — Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
 
+  - **`porMoneda` (required)**
+
+    `array` — Breakdown by operation currency (#206).
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`moneda` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string` — Amount in the original currency.
+
+    - **`totalLocal` (required)**
+
+      `string` — Equivalent in local currency.
+
   - **`total` (required)**
 
     `string`
@@ -113587,6 +114291,14 @@ Aggregates active invoices (`estado = A`) in the date range using server local c
   "success": true,
   "data": [
     {
+      "porMoneda": [
+        {
+          "moneda": "",
+          "count": 1,
+          "total": "",
+          "totalLocal": ""
+        }
+      ],
       "periodo": "",
       "count": 0,
       "total": "",
@@ -170755,6 +171467,28 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string` — Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
 
+* **`porMoneda` (required)**
+
+  `array` — Breakdown by operation currency (#206).
+
+  **Items:**
+
+  - **`count` (required)**
+
+    `integer`
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`total` (required)**
+
+    `string` — Amount in the original currency.
+
+  - **`totalLocal` (required)**
+
+    `string` — Equivalent in local currency.
+
 * **`total` (required)**
 
   `string`
@@ -170763,6 +171497,14 @@ Rate-limited mutation; requires products.manage. USD only.
 
 ```json
 {
+  "porMoneda": [
+    {
+      "moneda": "",
+      "count": 1,
+      "total": "",
+      "totalLocal": ""
+    }
+  ],
   "periodo": "",
   "count": 0,
   "total": "",
@@ -170807,6 +171549,28 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `string` — Bucket key (YYYY-MM-DD, YYYY-MM, or week Monday date)
 
+  - **`porMoneda` (required)**
+
+    `array` — Breakdown by operation currency (#206).
+
+    **Items:**
+
+    - **`count` (required)**
+
+      `integer`
+
+    - **`moneda` (required)**
+
+      `string`
+
+    - **`total` (required)**
+
+      `string` — Amount in the original currency.
+
+    - **`totalLocal` (required)**
+
+      `string` — Equivalent in local currency.
+
   - **`total` (required)**
 
     `string`
@@ -170822,6 +171586,14 @@ Rate-limited mutation; requires products.manage. USD only.
   "success": true,
   "data": [
     {
+      "porMoneda": [
+        {
+          "moneda": "",
+          "count": 1,
+          "total": "",
+          "totalLocal": ""
+        }
+      ],
       "periodo": "",
       "count": 0,
       "total": "",
@@ -171977,7 +172749,21 @@ Rate-limited mutation; requires products.manage. USD only.
 
 * **`saldo` (required)**
 
-  `string`
+  `string` — Local-currency balance; drives the credit limit check.
+
+* **`saldosPorMoneda` (required)**
+
+  `array` — Running balance per currency (#206).
+
+  **Items:**
+
+  - **`moneda` (required)**
+
+    `string`
+
+  - **`saldo` (required)**
+
+    `string`
 
 * **`creditLimit`**
 
@@ -171990,7 +172776,13 @@ Rate-limited mutation; requires products.manage. USD only.
   "clienteId": 1,
   "saldo": "",
   "creditLimit": "",
-  "excedeLimite": true
+  "excedeLimite": true,
+  "saldosPorMoneda": [
+    {
+      "moneda": "",
+      "saldo": ""
+    }
+  ]
 }
 ```
 
@@ -172037,6 +172829,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `integer`
 
+* **`moneda` (required)**
+
+  `string` — Currency the buckets are expressed in (#206).
+
 * **`totalPendiente` (required)**
 
   `string`
@@ -172046,6 +172842,7 @@ Rate-limited mutation; requires products.manage. USD only.
 ```json
 {
   "clienteId": 1,
+  "moneda": "",
   "buckets": [
     {
       "label": "0-30",
@@ -173899,7 +174696,21 @@ Rate-limited mutation; requires products.manage. USD only.
 
   - **`saldo` (required)**
 
-    `string`
+    `string` — Local-currency balance; drives the credit limit check.
+
+  - **`saldosPorMoneda` (required)**
+
+    `array` — Running balance per currency (#206).
+
+    **Items:**
+
+    - **`moneda` (required)**
+
+      `string`
+
+    - **`saldo` (required)**
+
+      `string`
 
   - **`creditLimit`**
 
@@ -173918,7 +174729,13 @@ Rate-limited mutation; requires products.manage. USD only.
     "clienteId": 1,
     "saldo": "",
     "creditLimit": "",
-    "excedeLimite": true
+    "excedeLimite": true,
+    "saldosPorMoneda": [
+      {
+        "moneda": "",
+        "saldo": ""
+      }
+    ]
   }
 }
 ```
@@ -173949,6 +174766,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
     `integer`
 
+  - **`moneda` (required)**
+
+    `string` — Currency the buckets are expressed in (#206).
+
   - **`totalPendiente` (required)**
 
     `string`
@@ -173964,6 +174785,7 @@ Rate-limited mutation; requires products.manage. USD only.
   "success": true,
   "data": {
     "clienteId": 1,
+    "moneda": "",
     "buckets": [
       {
         "label": "0-30",
@@ -185224,6 +186046,18 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
 
   `integer`
 
+* **`incoterm`**
+
+  `object`
+
+* **`monedaOperacion`**
+
+  `string`, possible values: `"ARS", "USD", "EUR"` — Export vertical (#206, module \`vertical.export\`). Currency the operation is denominated in. A non-local currency requires \`totalMonedaOperacion\` and \`tipoCambioOperacion\`; otherwise the request fails with 422. \`total\` stays in local currency and the AFIP circuit is untouched (no type E voucher, no \`MonId\`/\`MonCotiz\`).
+
+* **`paisDestino`**
+
+  `string` — ISO-3166-1 alpha-2 destination country (#206).
+
 * **`percepciones`**
 
   `array`
@@ -185258,6 +186092,14 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
 
   `integer` — Prescription backing the dispensing of prescription-only articles (#204). With module \`vertical.pharmacy\` enabled, invoicing an article flagged \`requiereReceta\` without this field fails with HTTP 422 \`PRESCRIPTION\_REQUIRED:\<articuloIds>\`.
 
+* **`tipoCambioOperacion`**
+
+  `number` — Exchange rate applied to the operation; persisted in the invoice FX snapshot.
+
+* **`totalMonedaOperacion`**
+
+  `number`
+
 **Example:**
 
 ```json
@@ -185274,6 +186116,11 @@ Reconciliation view of a bank movement (#191). This is a narrower projection tha
   "iva1": 1,
   "iva2": 1,
   "total": 1,
+  "monedaOperacion": "ARS",
+  "totalMonedaOperacion": 1,
+  "tipoCambioOperacion": 1,
+  "incoterm": "EXW",
+  "paisDestino": "",
   "percepciones": [
     {
       "regimenId": 1,
@@ -196600,9 +197447,25 @@ Originating invoice header (selected columns)
 
   `string`, possible values: `"contado", "cuenta_corriente", "plazo", null` — Intended collection terms (#169).
 
+* **`despachanteEmail`**
+
+  `string`, format: `email`
+
+* **`despachanteNombre`**
+
+  `string` — Customs broker name; requires \`despachanteEmail\` (#206).
+
+* **`incoterm`**
+
+  `object`
+
 * **`observaciones`**
 
   `string` — Warehouse notes (#169).
+
+* **`paisDestino`**
+
+  `string` — ISO-3166-1 alpha-2 destination country (#206).
 
 * **`plazoDias`**
 
@@ -196626,6 +197489,10 @@ Originating invoice header (selected columns)
   "observaciones": "",
   "condicionCobro": "contado",
   "plazoDias": 1,
+  "incoterm": "EXW",
+  "paisDestino": "",
+  "despachanteNombre": "",
+  "despachanteEmail": "",
   "items": [
     {
       "articuloId": 1,
@@ -203030,6 +203897,157 @@ Operator-entered unit serial / DataMatrix payload; stored verbatim (#204).
     "serialUnidad": "",
     "codigoDatamatrix": ""
   }
+}
+```
+
+### Incoterm
+
+- **Type:**`string`
+
+Incoterms 2020 delivery term (#206).
+
+**Example:**
+
+### IncotermsEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`, possible values: `"EXW", "FCA", "CPT", "CIP", "DAP", "DPU", "DDP", "FAS", "FOB", "CFR", "CIF"` — Incoterms 2020 delivery term (#206).
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    "EXW"
+  ]
+}
+```
+
+### DespachanteNotificarInput
+
+- **Type:**`object`
+
+Customs broker contact (#206). When omitted the values already stored on the order are used; the request fails with 422 when neither the body nor the order provides an email.
+
+- **`despachanteEmail`**
+
+  `string`, format: `email`
+
+- **`despachanteNombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "despachanteNombre": "",
+  "despachanteEmail": ""
+}
+```
+
+### DespachanteNotificacionEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`despachanteEmail` (required)**
+
+    `string`, format: `email`
+
+  - **`enviado` (required)**
+
+    `boolean` — False when SMTP is not configured; the attempt is audited anyway.
+
+  - **`pedidoId` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pedidoId": 1,
+    "despachanteEmail": "",
+    "enviado": true
+  }
+}
+```
+
+### SaldoPorMoneda
+
+- **Type:**`object`
+
+Customer running balance for a single currency (#206).
+
+- **`moneda` (required)**
+
+  `string`
+
+- **`saldo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "moneda": "",
+  "saldo": ""
+}
+```
+
+### ReporteVentasPorMoneda
+
+- **Type:**`object`
+
+Sales breakdown by operation currency (#206).
+
+- **`count` (required)**
+
+  `integer`
+
+- **`moneda` (required)**
+
+  `string`
+
+- **`total` (required)**
+
+  `string` — Amount in the original currency.
+
+- **`totalLocal` (required)**
+
+  `string` — Equivalent in local currency.
+
+**Example:**
+
+```json
+{
+  "moneda": "",
+  "count": 1,
+  "total": "",
+  "totalLocal": ""
 }
 ```
 
