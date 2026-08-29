@@ -37,6 +37,18 @@
     "rsocial": "Company Name",
     "fantasia": "Trade Name",
     "cuit": "Tax ID",
+    "taxId": {
+      "cuit": {
+        "label": "Tax ID (CUIT)",
+        "placeholder": "20-12345678-9",
+        "invalid": "Invalid CUIT"
+      },
+      "rut": {
+        "label": "Tax ID (RUT)",
+        "placeholder": "01-234567-8908",
+        "invalid": "Invalid RUT"
+      }
+    },
     "condIva": "VAT Status",
     "domicilio": "Address",
     "localidad": "City",

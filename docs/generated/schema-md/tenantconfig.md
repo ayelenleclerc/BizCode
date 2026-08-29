@@ -16,15 +16,16 @@ undefined#/properties/data
 
 # data Properties
 
-| Property                      | Type      | Required | Nullable       | Defined by                                                                                   |
-| :---------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------- |
-| [businessType](#businesstype) | `string`  | Required | cannot be null | [TenantConfig](tenantconfig-properties-businesstype.md "undefined#/properties/businessType") |
-| [integrations](#integrations) | `array`   | Required | cannot be null | [TenantConfig](tenantconfig-properties-integrations.md "undefined#/properties/integrations") |
-| [modules](#modules)           | `array`   | Required | cannot be null | [TenantConfig](tenantconfig-properties-modules.md "undefined#/properties/modules")           |
-| [plan](#plan)                 | `string`  | Required | cannot be null | [TenantConfig](tenantconfig-properties-plan.md "undefined#/properties/plan")                 |
-| [rubros](#rubros)             | `array`   | Required | cannot be null | [TenantConfig](tenantconfig-properties-rubros.md "undefined#/properties/rubros")             |
-| [tenantId](#tenantid)         | `integer` | Required | cannot be null | [TenantConfig](tenantconfig-properties-tenantid.md "undefined#/properties/tenantId")         |
-| [updatedAt](#updatedat)       | `string`  | Required | cannot be null | [TenantConfig](tenantconfig-properties-updatedat.md "undefined#/properties/updatedAt")       |
+| Property                                  | Type      | Required | Nullable       | Defined by                                                                                   |
+| :---------------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------- |
+| [businessType](#businesstype)             | `string`  | Required | cannot be null | [TenantConfig](tenantconfig-properties-businesstype.md "undefined#/properties/businessType") |
+| [integrations](#integrations)             | `array`   | Required | cannot be null | [TenantConfig](tenantconfig-properties-integrations.md "undefined#/properties/integrations") |
+| [jurisdiccionFiscal](#jurisdiccionfiscal) | `string`  | Required | cannot be null | [TenantConfig](fiscaljurisdictioncode.md "undefined#/properties/jurisdiccionFiscal")         |
+| [modules](#modules)                       | `array`   | Required | cannot be null | [TenantConfig](tenantconfig-properties-modules.md "undefined#/properties/modules")           |
+| [plan](#plan)                             | `string`  | Required | cannot be null | [TenantConfig](tenantconfig-properties-plan.md "undefined#/properties/plan")                 |
+| [rubros](#rubros)                         | `array`   | Required | cannot be null | [TenantConfig](tenantconfig-properties-rubros.md "undefined#/properties/rubros")             |
+| [tenantId](#tenantid)                     | `integer` | Required | cannot be null | [TenantConfig](tenantconfig-properties-tenantid.md "undefined#/properties/tenantId")         |
+| [updatedAt](#updatedat)                   | `string`  | Required | cannot be null | [TenantConfig](tenantconfig-properties-updatedat.md "undefined#/properties/updatedAt")       |
 
 ## businessType
 
@@ -71,6 +72,33 @@ undefined#/properties/data
 ### integrations Type
 
 `string[]`
+
+## jurisdiccionFiscal
+
+Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.
+
+`jurisdiccionFiscal`
+
+* is required
+
+* Type: `string` ([FiscalJurisdictionCode](fiscaljurisdictioncode.md))
+
+* cannot be null
+
+* defined in: [TenantConfig](fiscaljurisdictioncode.md "undefined#/properties/jurisdiccionFiscal")
+
+### jurisdiccionFiscal Type
+
+`string` ([FiscalJurisdictionCode](fiscaljurisdictioncode.md))
+
+### jurisdiccionFiscal Constraints
+
+**enum**: the value of this property must be equal to one of the following values:
+
+| Value  | Explanation |
+| :----- | :---------- |
+| `"AR"` |             |
+| `"UY"` |             |
 
 ## modules
 

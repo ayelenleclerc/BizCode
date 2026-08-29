@@ -10,6 +10,7 @@ import type {
   OrdenTrabajoUpdateInput,
 } from '@bizcode/types'
 import { calculateInvoice, calculateItemSubtotal } from '../../web/src/lib/invoice'
+import { getTenantJurisdiction } from './tenantJurisdiction'
 import { dispatchNotification } from '../channels'
 import type { ServiceResult } from './serviceResults'
 import { FacturaService } from './FacturaService'
@@ -529,6 +530,7 @@ export class OrdenTrabajoService {
         articuloIva: item.condIva,
       })),
       orden.cliente.condIva,
+      await getTenantJurisdiction(this.prisma, tenantId),
     )
 
     const result = await this.facturaService.create(

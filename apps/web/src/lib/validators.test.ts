@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest'
 import {
   validateCUIT,
   formatCUIT,
+  formatTaxId,
   validateCBU,
+  validateTaxId,
   calculateIVA,
   validateCode,
   validatePrice,
@@ -105,6 +107,36 @@ describe('calculateIVA', () => {
   it('devuelve el resultado con 2 decimales', () => {
     // 50.5 * 21 / 100 = 10.605 → 10.61
     expect(calculateIVA(50.5, '21')).toBe(10.61)
+  })
+
+  it('calcula las alícuotas uruguayas (#207)', () => {
+    expect(calculateIVA(100, '22')).toBe(22)
+    expect(calculateIVA(100, '10')).toBe(10)
+  })
+})
+
+describe('validateTaxId / formatTaxId (#207)', () => {
+  const VALID_RUT = '012345678908'
+
+  it('valida con el algoritmo de CUIT en Argentina', () => {
+    expect(validateTaxId(VALID_CUIT, 'AR')).toBe(true)
+    expect(validateTaxId(VALID_RUT, 'AR')).toBe(false)
+  })
+
+  it('valida con el algoritmo de RUT en Uruguay', () => {
+    expect(validateTaxId(VALID_RUT, 'UY')).toBe(true)
+    expect(validateTaxId(VALID_CUIT, 'UY')).toBe(false)
+  })
+
+  it('cae a Argentina ante una jurisdicción desconocida o ausente', () => {
+    expect(validateTaxId(VALID_CUIT, 'ZZ')).toBe(true)
+    expect(validateTaxId(VALID_CUIT, undefined)).toBe(true)
+  })
+
+  it('formatea según la convención de cada jurisdicción', () => {
+    expect(formatTaxId(VALID_CUIT, 'AR')).toBe('20-12345678-6')
+    expect(formatTaxId(VALID_RUT, 'UY')).toBe('01-234567-8908')
+    expect(formatTaxId(VALID_CUIT, undefined)).toBe('20-12345678-6')
   })
 })
 

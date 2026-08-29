@@ -17,6 +17,7 @@
  */
 
 import type { PrismaClient } from '@prisma/client'
+import { DEFAULT_FISCAL_JURISDICTION, resolveJurisdiction } from '@bizcode/types'
 import type { ServiceResult } from '../services/serviceResults'
 import { ArcaService, type FiscalConfigInput } from './ar/ArcaService'
 import { decryptFiscalSecret, encryptFiscalSecret } from './ar/fiscalSecrets'
@@ -178,8 +179,17 @@ export class FiscalProviderConfigService {
 
   /**
    * @en Resolves which provider handles new authorizations for a tenant: an explicit
-   *   `FiscalProviderConfig.isDefault` row, or — for tenants not yet migrated — the
-   *   presence of a legacy `TenantFiscalConfig` row (implies `arca_wsfe`).
+   *   `FiscalProviderConfig.isDefault` row, then an enabled row whose `countryCode` matches the
+   *   tenant tax jurisdiction (#207), and finally — for tenants not yet migrated — the presence
+   *   of a legacy `TenantFiscalConfig` row (implies `arca_wsfe`).
+   * @es Resuelve qué proveedor autoriza los comprobantes del tenant: la fila explícita
+   *   `FiscalProviderConfig.isDefault`, luego una fila habilitada cuyo `countryCode` coincida con la
+   *   jurisdicción fiscal del tenant (#207) y, por último, la fila legacy `TenantFiscalConfig`
+   *   (implica `arca_wsfe`) para tenants sin migrar.
+   * @pt-BR Resolve qual provedor autoriza os comprovantes do tenant: a linha explícita
+   *   `FiscalProviderConfig.isDefault`, depois uma linha habilitada cujo `countryCode` corresponda à
+   *   jurisdição fiscal do tenant (#207) e, por fim, a linha legada `TenantFiscalConfig`
+   *   (implica `arca_wsfe`) para tenants não migrados.
    */
   async resolveDefaultProvider(tenantId: number): Promise<ServiceResult<FiscalProviderCode>> {
     const row = await this.prisma.fiscalProviderConfig.findFirst({
@@ -187,8 +197,17 @@ export class FiscalProviderConfigService {
     })
     if (row) return { ok: true, data: row.providerCode as FiscalProviderCode }
 
-    const legacyArca = await this.prisma.tenantFiscalConfig.findUnique({ where: { tenantId } })
-    if (legacyArca) return { ok: true, data: 'arca_wsfe' }
+    const config = await this.prisma.tenantConfig.findUnique({ where: { tenantId } })
+    const jurisdiction = resolveJurisdiction(config?.jurisdiccionFiscal)
+    const byCountry = await this.prisma.fiscalProviderConfig.findFirst({
+      where: { tenantId, enabled: true, countryCode: jurisdiction },
+    })
+    if (byCountry) return { ok: true, data: byCountry.providerCode as FiscalProviderCode }
+
+    if (jurisdiction === DEFAULT_FISCAL_JURISDICTION) {
+      const legacyArca = await this.prisma.tenantFiscalConfig.findUnique({ where: { tenantId } })
+      if (legacyArca) return { ok: true, data: 'arca_wsfe' }
+    }
 
     return { ok: false, status: 422, error: 'FISCAL_PROVIDER_NOT_CONFIGURED' }
   }

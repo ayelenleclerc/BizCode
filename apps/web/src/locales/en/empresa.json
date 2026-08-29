@@ -6,6 +6,18 @@
     "nombre": "Company name",
     "cuit": "Tax ID (CUIT)",
     "cuitHint": "Format XX-XXXXXXXX-X",
+    "taxId": {
+      "cuit": {
+        "label": "Tax ID (CUIT)",
+        "hint": "Format XX-XXXXXXXX-X",
+        "invalid": "Invalid CUIT"
+      },
+      "rut": {
+        "label": "Tax ID (RUT)",
+        "hint": "Format XX-XXXXXX-XXXX (12 digits)",
+        "invalid": "Invalid RUT"
+      }
+    },
     "domicilio": "Address",
     "condicionIva": "VAT condition (issuer)",
     "condicionRi": "Registered VAT payer",

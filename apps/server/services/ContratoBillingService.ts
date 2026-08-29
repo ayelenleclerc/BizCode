@@ -2,6 +2,7 @@ import type { Prisma, PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import type { ContratoInput } from '@bizcode/types'
 import { calculateInvoice, calculateItemSubtotal } from '../../web/src/lib/invoice'
+import { getTenantJurisdiction } from './tenantJurisdiction'
 import { computeNextBillingDate, type BillingFrecuencia } from '../lib/computeNextBillingDate'
 import { resolveSystemUserId } from '../lib/systemUserId'
 import { notifyManagers } from '../notifications'
@@ -184,6 +185,7 @@ export class ContratoBillingService {
         articuloIva: item.condIva,
       })),
       contrato.cliente.condIva,
+      await getTenantJurisdiction(this.prisma, contrato.tenantId),
     )
     const result = await this.facturaService.create(
       contrato.tenantId,

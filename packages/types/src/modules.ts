@@ -10,6 +10,12 @@ export interface ModuleDef {
   label: string
   required: boolean
   requiredInProd: boolean
+  /**
+   * @en Jurisdictions where the module is mandatory in production (#207); country-specific fiscal modules use it instead of a blanket `requiredInProd`.
+   * @es Jurisdicciones donde el módulo es obligatorio en producción (#207); los módulos fiscales por país lo usan en lugar de un `requiredInProd` global.
+   * @pt-BR Jurisdições em que o módulo é obrigatório em produção (#207); os módulos fiscais por país o usam em vez de um `requiredInProd` global.
+   */
+  requiredInProdForCountries?: readonly string[]
   dependencies: readonly string[]
   plan: ModulePlan
   price: number

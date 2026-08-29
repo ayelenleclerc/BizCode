@@ -13,6 +13,10 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }))
 
+vi.mock('@/contexts/FeatureFlagsContext', () => ({
+  useFeatureFlags: () => ({ jurisdiccionFiscal: 'AR' }),
+}))
+
 vi.mock('@/components/IfModule', () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))

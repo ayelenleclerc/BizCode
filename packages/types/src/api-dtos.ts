@@ -6,6 +6,12 @@ import type { TenantPlanSnapshot } from './plans'
 export type TenantFeaturesData = {
   modules: string[]
   integrations: string[]
+  /**
+   * @en Tenant tax jurisdiction (#207); ISO-3166-1 alpha-2, `AR` by default.
+   * @es Jurisdicción fiscal del tenant (#207); ISO-3166-1 alpha-2, `AR` por defecto.
+   * @pt-BR Jurisdição fiscal do tenant (#207); ISO-3166-1 alpha-2, `AR` por padrão.
+   */
+  jurisdiccionFiscal: string
 }
 
 // ============ PLANS (PUBLIC API) ============
@@ -116,6 +122,12 @@ export type TenantConfigDTO = {
   plan: string
   modules: string[]
   integrations: string[]
+  /**
+   * @en Tenant tax jurisdiction (#207); ISO-3166-1 alpha-2, `AR` by default.
+   * @es Jurisdicción fiscal del tenant (#207); ISO-3166-1 alpha-2, `AR` por defecto.
+   * @pt-BR Jurisdição fiscal do tenant (#207); ISO-3166-1 alpha-2, `AR` por padrão.
+   */
+  jurisdiccionFiscal: string
   updatedAt: string
 }
 
@@ -126,6 +138,12 @@ export type TenantConfigUpsertInput = {
   rubros?: string[]
   plan?: string
   integrations?: string[]
+  /**
+   * @en Omitting it preserves the jurisdiction currently stored for the tenant (#207).
+   * @es Omitirlo conserva la jurisdicción actualmente almacenada para el tenant (#207).
+   * @pt-BR Omiti-lo preserva a jurisdição atualmente armazenada para o tenant (#207).
+   */
+  jurisdiccionFiscal?: string
 }
 
 export type TenantConfigApplyTemplateInput = {

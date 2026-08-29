@@ -38,6 +38,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       }),
       upsert: vi.fn().mockResolvedValue({ id: 1 }),
     },
+    tenantConfig: {
+      findUnique: vi.fn().mockResolvedValue({ jurisdiccionFiscal: 'AR' }),
+    },
     fiscalProviderConfig: {
       findUnique: vi.fn().mockResolvedValue(null),
       findFirst: vi.fn().mockResolvedValue(null),

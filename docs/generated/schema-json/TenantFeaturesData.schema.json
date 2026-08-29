@@ -7,6 +7,9 @@
       },
       "type": "array"
     },
+    "jurisdiccionFiscal": {
+      "$ref": "./FiscalJurisdictionCode.schema.json"
+    },
     "modules": {
       "items": {
         "type": "string"
@@ -16,7 +19,8 @@
   },
   "required": [
     "modules",
-    "integrations"
+    "integrations",
+    "jurisdiccionFiscal"
   ],
   "title": "TenantFeaturesData",
   "type": "object"

@@ -3,7 +3,11 @@ import {
   DEFAULT_MODULES,
   MODULE_KEYS,
   MODULE_PRESETS,
+  DEFAULT_FISCAL_JURISDICTION,
   NEW_TENANT_MODULES,
+  isFiscalJurisdictionCode,
+  resolveJurisdiction,
+  type FiscalJurisdictionCode,
   type ModuleKey,
   type ModulePresetKey,
 } from '@bizcode/types'
@@ -22,12 +26,14 @@ export type TenantConfigDto = {
   plan: string
   modules: ModuleKey[]
   integrations: string[]
+  jurisdiccionFiscal: FiscalJurisdictionCode
   updatedAt: string
 }
 
 export type TenantFeaturesDto = {
   modules: ModuleKey[]
   integrations: string[]
+  jurisdiccionFiscal: FiscalJurisdictionCode
 }
 
 export type TenantConfigUpsertInput = {
@@ -36,6 +42,7 @@ export type TenantConfigUpsertInput = {
   plan?: string
   modules: ModuleKey[]
   integrations?: string[]
+  jurisdiccionFiscal?: string
 }
 
 const BUSINESS_TYPES = new Set(['mayorista', 'minorista', 'ambos'])
@@ -62,6 +69,7 @@ function rowToDto(row: {
   plan: string
   modules: string[]
   integrations: string[]
+  jurisdiccionFiscal?: string
   updatedAt: Date
 }): TenantConfigDto {
   return {
@@ -71,6 +79,7 @@ function rowToDto(row: {
     plan: row.plan,
     modules: normalizeModules(row.modules),
     integrations: [...row.integrations],
+    jurisdiccionFiscal: resolveJurisdiction(row.jurisdiccionFiscal),
     updatedAt: row.updatedAt.toISOString(),
   }
 }
@@ -85,6 +94,7 @@ function snapshotConfig(row: TenantConfigDto | null): Prisma.InputJsonValue {
     plan: row.plan,
     modules: row.modules,
     integrations: row.integrations,
+    jurisdiccionFiscal: row.jurisdiccionFiscal,
   }
 }
 
@@ -104,14 +114,29 @@ export class TenantConfigService {
   async getFeaturesForTenant(tenantId: number): Promise<TenantFeaturesDto> {
     const cached = getCachedTenantFeatures(tenantId)
     if (cached) {
-      return { modules: [...cached.modules], integrations: [...cached.integrations] }
+      return {
+        modules: [...cached.modules],
+        integrations: [...cached.integrations],
+        jurisdiccionFiscal: cached.jurisdiction,
+      }
     }
 
     const row = await this.prisma.tenantConfig.findUnique({ where: { tenantId } })
     const modules = row ? normalizeModules(row.modules) : [...NEW_TENANT_MODULES]
     const integrations = row ? [...row.integrations] : []
-    setCachedTenantFeatures(tenantId, modules, integrations)
-    return { modules, integrations }
+    const jurisdiccionFiscal = resolveJurisdiction(row?.jurisdiccionFiscal)
+    setCachedTenantFeatures(tenantId, modules, integrations, jurisdiccionFiscal)
+    return { modules, integrations, jurisdiccionFiscal }
+  }
+
+  /**
+   * @en Tax jurisdiction driving VAT rates, tax-id validation and country-specific modules (#207).
+   * @es Jurisdicción fiscal que gobierna alícuotas, validación de identificador fiscal y módulos por país (#207).
+   * @pt-BR Jurisdição fiscal que rege alíquotas, validação de identificador fiscal e módulos por país (#207).
+   */
+  async getJurisdictionForTenant(tenantId: number): Promise<FiscalJurisdictionCode> {
+    const features = await this.getFeaturesForTenant(tenantId)
+    return features.jurisdiccionFiscal
   }
 
   async getConfig(tenantId: number): Promise<TenantConfigDto | null> {
@@ -122,9 +147,12 @@ export class TenantConfigService {
     return rowToDto(row)
   }
 
-  validateModules(modules: readonly ModuleKey[]): ReturnType<typeof validateModuleSet> {
+  validateModules(
+    modules: readonly ModuleKey[],
+    jurisdiction?: FiscalJurisdictionCode,
+  ): ReturnType<typeof validateModuleSet> {
     const env = resolveDeploymentEnv()
-    return validateModuleSet(modules, env)
+    return validateModuleSet(modules, env, jurisdiction)
   }
 
   async createDefaultForTenant(
@@ -153,7 +181,18 @@ export class TenantConfigService {
     reason: string,
   ): Promise<TenantConfigDto> {
     const modules = normalizeModules(input.modules)
-    const validation = this.validateModules(modules)
+    if (input.jurisdiccionFiscal != null && !isFiscalJurisdictionCode(input.jurisdiccionFiscal)) {
+      throw new Error('invalid_jurisdiction')
+    }
+
+    const beforeRow = await this.getConfig(tenantId)
+    // Omitir la jurisdicción en el input conserva la del tenant; nunca lo devuelve a AR (#207).
+    const jurisdiccionFiscal =
+      input.jurisdiccionFiscal != null
+        ? resolveJurisdiction(input.jurisdiccionFiscal)
+        : (beforeRow?.jurisdiccionFiscal ?? DEFAULT_FISCAL_JURISDICTION)
+
+    const validation = this.validateModules(modules, jurisdiccionFiscal)
     if (!validation.valid) {
       const err = new Error('invalid_module_set') as Error & { validation: typeof validation }
       err.validation = validation
@@ -170,8 +209,6 @@ export class TenantConfigService {
     }
     const rubros = input.rubros ?? []
     const integrations = input.integrations ?? []
-
-    const beforeRow = await this.getConfig(tenantId)
     const row = await this.prisma.tenantConfig.upsert({
       where: { tenantId },
       create: {
@@ -181,6 +218,7 @@ export class TenantConfigService {
         plan,
         modules,
         integrations,
+        jurisdiccionFiscal,
         updatedById: changedById,
       },
       update: {
@@ -189,6 +227,7 @@ export class TenantConfigService {
         plan,
         modules,
         integrations,
+        jurisdiccionFiscal,
         updatedById: changedById,
       },
     })

@@ -15,6 +15,14 @@
       },
       "type": "array"
     },
+    "jurisdiccionFiscal": {
+      "allOf": [
+        {
+          "$ref": "./FiscalJurisdictionCode.schema.json"
+        }
+      ],
+      "description": "Omitting it preserves the jurisdiction currently stored for the tenant."
+    },
     "modules": {
       "items": {
         "type": "string"

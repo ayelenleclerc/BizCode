@@ -37,6 +37,18 @@
     "rsocial": "Razón Social",
     "fantasia": "Nombre Fantasía",
     "cuit": "CUIT",
+    "taxId": {
+      "cuit": {
+        "label": "CUIT",
+        "placeholder": "20-12345678-9",
+        "invalid": "CUIT inválido"
+      },
+      "rut": {
+        "label": "RUT",
+        "placeholder": "01-234567-8908",
+        "invalid": "RUT inválido"
+      }
+    },
     "condIva": "Condición IVA",
     "domicilio": "Domicilio",
     "localidad": "Localidad",

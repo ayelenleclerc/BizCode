@@ -16,14 +16,15 @@ undefined
 
 # TenantConfigUpsertBody Properties
 
-| Property                      | Type     | Required | Nullable       | Defined by                                                                                                       |
-| :---------------------------- | :------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------- |
-| [businessType](#businesstype) | `string` | Optional | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-businesstype.md "undefined#/properties/businessType") |
-| [integrations](#integrations) | `array`  | Optional | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-integrations.md "undefined#/properties/integrations") |
-| [modules](#modules)           | `array`  | Required | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-modules.md "undefined#/properties/modules")           |
-| [plan](#plan)                 | `string` | Optional | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-plan.md "undefined#/properties/plan")                 |
-| [reason](#reason)             | `string` | Required | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-reason.md "undefined#/properties/reason")             |
-| [rubros](#rubros)             | `array`  | Optional | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-rubros.md "undefined#/properties/rubros")             |
+| Property                                  | Type     | Required | Nullable       | Defined by                                                                                                                   |
+| :---------------------------------------- | :------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| [businessType](#businesstype)             | `string` | Optional | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-businesstype.md "undefined#/properties/businessType")             |
+| [integrations](#integrations)             | `array`  | Optional | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-integrations.md "undefined#/properties/integrations")             |
+| [jurisdiccionFiscal](#jurisdiccionfiscal) | Merged   | Optional | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-jurisdiccionfiscal.md "undefined#/properties/jurisdiccionFiscal") |
+| [modules](#modules)                       | `array`  | Required | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-modules.md "undefined#/properties/modules")                       |
+| [plan](#plan)                             | `string` | Optional | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-plan.md "undefined#/properties/plan")                             |
+| [reason](#reason)                         | `string` | Required | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-reason.md "undefined#/properties/reason")                         |
+| [rubros](#rubros)                         | `array`  | Optional | cannot be null | [TenantConfigUpsertBody](tenantconfigupsertbody-properties-rubros.md "undefined#/properties/rubros")                         |
 
 ## businessType
 
@@ -70,6 +71,28 @@ undefined
 ### integrations Type
 
 `string[]`
+
+## jurisdiccionFiscal
+
+Omitting it preserves the jurisdiction currently stored for the tenant.
+
+`jurisdiccionFiscal`
+
+* is optional
+
+* Type: merged type ([Details](tenantconfigupsertbody-properties-jurisdiccionfiscal.md))
+
+* cannot be null
+
+* defined in: [TenantConfigUpsertBody](tenantconfigupsertbody-properties-jurisdiccionfiscal.md "undefined#/properties/jurisdiccionFiscal")
+
+### jurisdiccionFiscal Type
+
+merged type ([Details](tenantconfigupsertbody-properties-jurisdiccionfiscal.md))
+
+all of
+
+* [FiscalJurisdictionCode](fiscaljurisdictioncode.md "check type definition")
 
 ## modules
 

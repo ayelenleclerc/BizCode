@@ -2889,6 +2889,10 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 
     `string`
 
+  - **`jurisdiccionFiscal` (required)**
+
+    `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+
   - **`modules` (required)**
 
     `array`
@@ -2912,7 +2916,8 @@ Returns module and integration keys enabled for the authenticated user's tenant.
     ],
     "integrations": [
       ""
-    ]
+    ],
+    "jurisdiccionFiscal": "AR"
   }
 }
 ```
@@ -5974,6 +5979,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `string`
 
+  - **`jurisdiccionFiscal` (required)**
+
+    `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+
   - **`modules` (required)**
 
     `array`
@@ -6024,6 +6033,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "integrations": [
       ""
     ],
+    "jurisdiccionFiscal": "AR",
     "updatedAt": ""
   }
 }
@@ -6222,6 +6232,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   `string`
 
+- **`jurisdiccionFiscal`**
+
+  `object` — Omitting it preserves the jurisdiction currently stored for the tenant.
+
 - **`plan`**
 
   `string`, possible values: `"starter", "pro", "enterprise"`
@@ -6249,6 +6263,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
   "integrations": [
     ""
   ],
+  "jurisdiccionFiscal": "AR",
   "reason": ""
 }
 ```
@@ -6274,6 +6289,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     **Items:**
 
     `string`
+
+  - **`jurisdiccionFiscal` (required)**
+
+    `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -6325,6 +6344,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "integrations": [
       ""
     ],
+    "jurisdiccionFiscal": "AR",
     "updatedAt": ""
   }
 }
@@ -6733,6 +6753,10 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
     `string`
 
+  - **`jurisdiccionFiscal` (required)**
+
+    `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+
   - **`modules` (required)**
 
     `array`
@@ -6783,6 +6807,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
     "integrations": [
       ""
     ],
+    "jurisdiccionFiscal": "AR",
     "updatedAt": ""
   }
 }
@@ -213134,6 +213159,10 @@ Sales breakdown by operation currency (#206).
 
   `string`
 
+* **`jurisdiccionFiscal` (required)**
+
+  `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+
 * **`modules` (required)**
 
   `array`
@@ -213151,7 +213180,8 @@ Sales breakdown by operation currency (#206).
   ],
   "integrations": [
     ""
-  ]
+  ],
+  "jurisdiccionFiscal": "AR"
 }
 ```
 
@@ -213170,6 +213200,10 @@ Sales breakdown by operation currency (#206).
     **Items:**
 
     `string`
+
+  - **`jurisdiccionFiscal` (required)**
+
+    `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -213194,7 +213228,8 @@ Sales breakdown by operation currency (#206).
     ],
     "integrations": [
       ""
-    ]
+    ],
+    "jurisdiccionFiscal": "AR"
   }
 }
 ```
@@ -213548,6 +213583,14 @@ Sales breakdown by operation currency (#206).
 }
 ```
 
+### FiscalJurisdictionCode
+
+- **Type:**`string`
+
+Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.
+
+**Example:**
+
 ### TenantConfig
 
 - **Type:**`object`
@@ -213563,6 +213606,10 @@ Sales breakdown by operation currency (#206).
   **Items:**
 
   `string`
+
+* **`jurisdiccionFiscal` (required)**
+
+  `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 * **`modules` (required)**
 
@@ -213608,6 +213655,7 @@ Sales breakdown by operation currency (#206).
   "integrations": [
     ""
   ],
+  "jurisdiccionFiscal": "AR",
   "updatedAt": ""
 }
 ```
@@ -213631,6 +213679,10 @@ Sales breakdown by operation currency (#206).
     **Items:**
 
     `string`
+
+  - **`jurisdiccionFiscal` (required)**
+
+    `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -213682,6 +213734,7 @@ Sales breakdown by operation currency (#206).
     "integrations": [
       ""
     ],
+    "jurisdiccionFiscal": "AR",
     "updatedAt": ""
   }
 }
@@ -214332,6 +214385,10 @@ Sales breakdown by operation currency (#206).
 
   `string`
 
+* **`jurisdiccionFiscal`**
+
+  `object` — Omitting it preserves the jurisdiction currently stored for the tenant.
+
 * **`plan`**
 
   `string`, possible values: `"starter", "pro", "enterprise"`
@@ -214359,6 +214416,7 @@ Sales breakdown by operation currency (#206).
   "integrations": [
     ""
   ],
+  "jurisdiccionFiscal": "AR",
   "reason": ""
 }
 ```

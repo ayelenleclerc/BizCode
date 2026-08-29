@@ -61,6 +61,10 @@
     "rsocial": "Razón social",
     "fantasia": "Nombre fantasía",
     "cuit": "CUIT",
+    "taxId": {
+      "cuit": { "label": "CUIT", "invalid": "CUIT inválido" },
+      "rut": { "label": "RUT", "invalid": "RUT inválido" }
+    },
     "condIva": "Condición IVA",
     "telef": "Teléfono",
     "email": "Email",

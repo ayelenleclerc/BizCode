@@ -126,6 +126,50 @@ describe('calculateInvoice', () => {
     expect(result.iva1).toBe(2.1)
   })
 
+  it('mantiene las alícuotas argentinas cuando no se indica jurisdicción', () => {
+    const items = [
+      { cantidad: 1, precio: 100, dscto: 0, articuloIva: '1' as const },
+      { cantidad: 1, precio: 200, dscto: 0, articuloIva: '2' as const },
+    ]
+    expect(calculateInvoice(items, 'RI')).toEqual(calculateInvoice(items, 'RI', 'AR'))
+  })
+
+  it('aplica las alícuotas uruguayas (22% y 10%) con jurisdicción UY', () => {
+    const result = calculateInvoice(
+      [
+        { cantidad: 1, precio: 100, dscto: 0, articuloIva: '1' },
+        { cantidad: 1, precio: 200, dscto: 0, articuloIva: '2' },
+      ],
+      'RI',
+      'UY'
+    )
+    expect(result.neto1).toBe(100)
+    expect(result.neto2).toBe(200)
+    expect(result.iva1).toBe(22)
+    expect(result.iva2).toBe(20)
+    expect(result.total).toBe(342)
+  })
+
+  it('cae a las alícuotas argentinas ante una jurisdicción desconocida', () => {
+    const result = calculateInvoice(
+      [{ cantidad: 1, precio: 100, dscto: 0, articuloIva: '1' }],
+      'RI',
+      'ZZ'
+    )
+    expect(result.iva1).toBe(21)
+    expect(result.total).toBe(121)
+  })
+
+  it('no aplica IVA a un cliente CF uruguayo', () => {
+    const result = calculateInvoice(
+      [{ cantidad: 1, precio: 100, dscto: 0, articuloIva: '1' }],
+      'CF',
+      'UY'
+    )
+    expect(result.iva1).toBe(0)
+    expect(result.total).toBe(100)
+  })
+
   it('no acumula neto para articuloIva fuera de "1","2","3" (rama implícita del else-if)', () => {
     // TypeScript previene esto en producción, pero la cobertura de V8 exige cubrir la rama implícita
     const result = calculateInvoice(

@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { calculateInvoice, calculateItemSubtotal } from '../../web/src/lib/invoice'
+import { getTenantJurisdiction } from './tenantJurisdiction'
 import type { PedidoEstado, PedidoInput, PedidoInvoiceInput } from '@bizcode/types'
 import {
   actionForTargetEstado,
@@ -483,6 +484,7 @@ export class PedidoService {
         articuloIva: it.condIva as '1' | '2' | '3',
       })),
       pedido.cliente.condIva,
+      await getTenantJurisdiction(this.prisma, tenantId),
     )
 
     const facturaResult = await this.facturaService.create(

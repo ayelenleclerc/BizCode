@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useFormPageHotkeys } from '@/hooks/useListPageKeyboard'
@@ -8,8 +8,13 @@ import { useTranslation } from 'react-i18next'
 import { empresaAPI } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { hasPermission } from '@/lib/rbac'
-import { validateCUIT } from '@/lib/validators'
-import type { EmpresaConfig } from '@bizcode/types'
+import { validateTaxId } from '@/lib/validators'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import {
+  FISCAL_JURISDICTIONS,
+  type EmpresaConfig,
+  type FiscalJurisdictionCode,
+} from '@bizcode/types'
 import FiscalProviderSection from './FiscalProviderSection'
 import PrintDevicesSection from './PrintDevicesSection'
 import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
@@ -37,7 +42,8 @@ const EMPRESA_TIMEZONE_OPTIONS = [
 const empresaFormSchema = z
   .object({
     nombre: z.string().trim().min(1).max(40),
-    cuit: z.string().trim().refine((v) => validateCUIT(v), { message: 'cuitInvalid' }),
+    // Validado contra la jurisdicción del tenant al construir el schema (#207).
+    cuit: z.string().trim().min(1),
     domicilio: z.string().max(40).optional(),
     puntoVenta: z.coerce.number().int().min(1).max(9999),
     tipoFactura: z.enum(['A', 'B', 'C']),
@@ -61,6 +67,18 @@ const empresaFormSchema = z
   })
 
 type EmpresaFormData = z.infer<typeof empresaFormSchema>
+
+/**
+ * @en Refines the company tax identifier with the algorithm of the tenant jurisdiction (#207).
+ * @es Refina el identificador fiscal de la empresa con el algoritmo de la jurisdicción del tenant (#207).
+ * @pt-BR Refina o identificador fiscal da empresa com o algoritmo da jurisdição do tenant (#207).
+ */
+function buildEmpresaFormSchema(jurisdiccion: FiscalJurisdictionCode) {
+  return empresaFormSchema.refine((data) => validateTaxId(data.cuit, jurisdiccion), {
+    message: 'cuitInvalid',
+    path: ['cuit'],
+  })
+}
 
 function configToFormValues(data: EmpresaConfig): EmpresaFormData {
   return {
@@ -93,6 +111,10 @@ export default function EmpresaPage() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [prefijoPreview, setPrefijoPreview] = useState('0001')
+  // Jurisdicción fiscal del tenant: elige el algoritmo y las etiquetas del identificador (#207).
+  const { jurisdiccionFiscal } = useFeatureFlags()
+  const taxIdKind = FISCAL_JURISDICTIONS[jurisdiccionFiscal].taxIdKind
+  const schema = useMemo(() => buildEmpresaFormSchema(jurisdiccionFiscal), [jurisdiccionFiscal])
 
   const {
     register,
@@ -101,7 +123,7 @@ export default function EmpresaPage() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<EmpresaFormData>({
-    resolver: zodResolver(empresaFormSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       nombre: '',
       cuit: '',
@@ -272,7 +294,7 @@ export default function EmpresaPage() {
 
           <div>
             <label htmlFor="empresa-cuit" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              {t('form.cuit')}
+              {t(`form.taxId.${taxIdKind}.label`)}
               <span className="text-red-500" aria-hidden="true">
                 {' '}
                 *
@@ -281,6 +303,7 @@ export default function EmpresaPage() {
             <input
               id="empresa-cuit"
               data-testid="input-empresa-cuit"
+              data-tax-id-kind={taxIdKind}
               {...register('cuit')}
               readOnly={!canEdit}
               aria-required="true"
@@ -290,11 +313,11 @@ export default function EmpresaPage() {
               disabled={!canEdit}
             />
             <p id="empresa-cuit-hint" className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              {t('form.cuitHint')}
+              {t(`form.taxId.${taxIdKind}.hint`)}
             </p>
             {errors.cuit && (
               <p id="empresa-cuit-error" className="text-red-500 text-xs mt-1" role="alert">
-                {fieldError('cuit', t('errors.cuitInvalid'))}
+                {fieldError('cuit', t(`form.taxId.${taxIdKind}.invalid`))}
               </p>
             )}
           </div>
