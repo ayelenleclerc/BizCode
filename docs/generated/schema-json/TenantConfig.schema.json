@@ -15,6 +15,9 @@
       },
       "type": "array"
     },
+    "jurisdiccionFiscal": {
+      "$ref": "./FiscalJurisdictionCode.schema.json"
+    },
     "modules": {
       "items": {
         "type": "string"
@@ -50,6 +53,7 @@
     "plan",
     "modules",
     "integrations",
+    "jurisdiccionFiscal",
     "updatedAt"
   ],
   "title": "TenantConfig",

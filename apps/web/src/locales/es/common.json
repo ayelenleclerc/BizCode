@@ -263,6 +263,11 @@
       "title": "Módulos del tenant",
       "deploymentEnv": "Ambiente de despliegue: {{env}}",
       "modulesSection": "Módulos habilitados",
+      "jurisdiction": {
+        "section": "Jurisdicción fiscal",
+        "label": "País de tributación del tenant",
+        "hint": "Determina las alícuotas de IVA ({{standard}}% y {{reduced}}%), el algoritmo del identificador fiscal y qué módulos son obligatorios en producción."
+      },
       "saveSection": "Guardar cambios",
       "reasonLabel": "Motivo del cambio (obligatorio)",
       "save": "Guardar configuración",

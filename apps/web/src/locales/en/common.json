@@ -263,6 +263,11 @@
       "title": "Tenant modules",
       "deploymentEnv": "Deployment environment: {{env}}",
       "modulesSection": "Enabled modules",
+      "jurisdiction": {
+        "section": "Tax jurisdiction",
+        "label": "Tenant country of taxation",
+        "hint": "Drives the VAT rates ({{standard}}% and {{reduced}}%), the tax identifier algorithm and which modules are mandatory in production."
+      },
       "saveSection": "Save changes",
       "reasonLabel": "Change reason (required)",
       "save": "Save configuration",

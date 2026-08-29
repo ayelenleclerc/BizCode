@@ -27,6 +27,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       findUnique: vi.fn().mockResolvedValue(null),
       upsert: vi.fn().mockResolvedValue({ id: 1 }),
     },
+    tenantConfig: {
+      findUnique: vi.fn().mockResolvedValue(null),
+    },
     ...overrides,
   } as unknown as PrismaClient
 }
@@ -172,6 +175,60 @@ describe('FiscalProviderConfigService', () => {
   it('resolveDefaultProvider fails when the tenant has no fiscal configuration at all', async () => {
     const result = await service.resolveDefaultProvider(1)
     expect(result).toEqual({ ok: false, status: 422, error: 'FISCAL_PROVIDER_NOT_CONFIGURED' })
+  })
+
+  describe('resolveDefaultProvider by tax jurisdiction (#207)', () => {
+    it('picks the enabled config matching the tenant country when no row is marked as default', async () => {
+      prisma = buildPrismaMock({
+        fiscalProviderConfig: {
+          findMany: vi.fn(),
+          findUnique: vi.fn(),
+          findFirst: vi
+            .fn()
+            .mockResolvedValueOnce(null)
+            .mockResolvedValueOnce({ providerCode: 'uruguay_dgi' }),
+          upsert: vi.fn(),
+          updateMany: vi.fn(),
+        },
+        tenantConfig: { findUnique: vi.fn().mockResolvedValue({ jurisdiccionFiscal: 'UY' }) },
+      })
+      service = new FiscalProviderConfigService(prisma)
+
+      const result = await service.resolveDefaultProvider(1)
+      expect(result).toEqual({ ok: true, data: 'uruguay_dgi' })
+      expect(prisma.fiscalProviderConfig.findFirst).toHaveBeenLastCalledWith({
+        where: { tenantId: 1, enabled: true, countryCode: 'UY' },
+      })
+    })
+
+    it('does not fall back to the Argentine legacy table for a non-Argentine tenant', async () => {
+      prisma = buildPrismaMock({
+        tenantFiscalConfig: {
+          findUnique: vi.fn().mockResolvedValue({ cuit: '1' }),
+          upsert: vi.fn(),
+        },
+        tenantConfig: { findUnique: vi.fn().mockResolvedValue({ jurisdiccionFiscal: 'UY' }) },
+      })
+      service = new FiscalProviderConfigService(prisma)
+
+      const result = await service.resolveDefaultProvider(1)
+      expect(result).toEqual({ ok: false, status: 422, error: 'FISCAL_PROVIDER_NOT_CONFIGURED' })
+      expect(prisma.tenantFiscalConfig.findUnique).not.toHaveBeenCalled()
+    })
+
+    it('treats an unknown persisted jurisdiction as Argentina', async () => {
+      prisma = buildPrismaMock({
+        tenantFiscalConfig: {
+          findUnique: vi.fn().mockResolvedValue({ cuit: '1' }),
+          upsert: vi.fn(),
+        },
+        tenantConfig: { findUnique: vi.fn().mockResolvedValue({ jurisdiccionFiscal: 'ZZ' }) },
+      })
+      service = new FiscalProviderConfigService(prisma)
+
+      const result = await service.resolveDefaultProvider(1)
+      expect(result).toEqual({ ok: true, data: 'arca_wsfe' })
+    })
   })
 
   it('validateConfiguration records the validation outcome without a registered provider', async () => {

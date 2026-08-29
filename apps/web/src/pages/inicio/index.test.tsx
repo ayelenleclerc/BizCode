@@ -80,6 +80,7 @@ describe('InicioPage', () => {
       hasModule: (key) => key === 'analytics.advanced',
       modules: ['analytics.advanced'],
       integrations: [],
+      jurisdiccionFiscal: 'AR' as const,
       hasIntegration: () => false,
       refreshFeatures: vi.fn(),
     })

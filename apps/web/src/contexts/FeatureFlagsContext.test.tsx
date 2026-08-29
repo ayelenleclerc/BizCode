@@ -49,6 +49,7 @@ describe('FeatureFlagsContext', () => {
     vi.mocked(featuresAPI.get).mockResolvedValue({
       modules: [...DEFAULT_MODULES, 'billing.orders'],
       integrations: ['mercadopago'],
+      jurisdiccionFiscal: 'AR',
     })
 
     render(
@@ -105,7 +106,11 @@ describe('FeatureFlagsContext', () => {
       mfaEnabled: false,
       mfaSetupRequired: true,
     })
-    vi.mocked(featuresAPI.get).mockResolvedValue({ modules: [], integrations: [] })
+    vi.mocked(featuresAPI.get).mockResolvedValue({
+      modules: [],
+      integrations: [],
+      jurisdiccionFiscal: 'AR',
+    })
 
     render(
       <AuthProvider>

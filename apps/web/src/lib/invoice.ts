@@ -1,8 +1,10 @@
 /**
- * @en Argentine VAT invoice line aggregation (net, IVA buckets, total).
- * @es Agregación de líneas de factura con IVA argentino (netos, IVA, total).
- * @pt-BR Agregação de linhas de fatura com IVA argentino (netos, IVA, total).
+ * @en VAT invoice line aggregation (net, IVA buckets, total) driven by the tenant jurisdiction (#207).
+ * @es Agregación de líneas de factura con IVA (netos, IVA, total) según la jurisdicción del tenant (#207).
+ * @pt-BR Agregação de linhas de fatura com IVA (líquidos, IVA, total) conforme a jurisdição do tenant (#207).
  */
+
+import { getVatRates } from '@bizcode/types'
 
 export interface InvoiceItem {
   articuloId: number
@@ -12,18 +14,18 @@ export interface InvoiceItem {
 }
 
 export interface InvoiceTotals {
-  neto1: number // Neto IVA 21%
-  neto2: number // Neto IVA 10.5%
+  neto1: number // Neto alícuota general (AR 21%, UY 22%)
+  neto2: number // Neto alícuota reducida (AR 10.5%, UY 10%)
   neto3: number // Neto exento
-  iva1: number // IVA 21%
-  iva2: number // IVA 10.5%
+  iva1: number // IVA alícuota general
+  iva2: number // IVA alícuota reducida
   total: number
 }
 
 /**
- * @en Computes invoice totals from line items and customer VAT category (`clienteIva`: RI, Mono, CF, Exento). Article VAT codes: `1` 21%, `2` 10.5%, `3` exempt.
- * @es Calcula totales según ítems y condición IVA del cliente; `articuloIva` 1/2/3 según alícuota del artículo.
- * @pt-BR Calcula totais a partir dos itens e da condição de IVA do cliente; `articuloIva` 1/2/3 conforme alíquota.
+ * @en Computes invoice totals from line items and customer VAT category (`clienteIva`: RI, Mono, CF, Exento). Article VAT codes: `1` standard rate, `2` reduced rate, `3` exempt; the rates come from the tenant jurisdiction (#207), defaulting to Argentina.
+ * @es Calcula totales según ítems y condición IVA del cliente; `articuloIva` 1/2/3 según alícuota del artículo, con las tasas de la jurisdicción del tenant (#207) y Argentina por defecto.
+ * @pt-BR Calcula totais a partir dos itens e da condição de IVA do cliente; `articuloIva` 1/2/3 conforme alíquota, com as taxas da jurisdição do tenant (#207) e Argentina por padrão.
  */
 export function calculateInvoice(
   items: Array<{
@@ -32,7 +34,8 @@ export function calculateInvoice(
     dscto: number
     articuloIva: '1' | '2' | '3'
   }>,
-  clienteIva: string
+  clienteIva: string,
+  jurisdiccion?: unknown
 ): InvoiceTotals {
   let neto1 = 0
   let neto2 = 0
@@ -63,8 +66,9 @@ export function calculateInvoice(
 
   if (clienteIva !== 'CF' && clienteIva !== 'Exento') {
     // RI y Monotributista pagan IVA
-    iva1 = Math.round(neto1 * 0.21 * 100) / 100
-    iva2 = Math.round(neto2 * 0.105 * 100) / 100
+    const { standard, reduced } = getVatRates(jurisdiccion)
+    iva1 = Math.round(((neto1 * standard) / 100) * 100) / 100
+    iva2 = Math.round(((neto2 * reduced) / 100) * 100) / 100
   }
 
   const total = neto1 + neto2 + neto3 + iva1 + iva2

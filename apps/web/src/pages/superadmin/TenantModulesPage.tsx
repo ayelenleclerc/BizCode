@@ -13,6 +13,13 @@ import {
   type TenantPricingData,
 } from '@/lib/api'
 import {
+  DEFAULT_FISCAL_JURISDICTION,
+  FISCAL_JURISDICTIONS,
+  FISCAL_JURISDICTION_CODES,
+  resolveJurisdiction,
+  type FiscalJurisdictionCode,
+} from '@bizcode/types'
+import {
   MODULE_KEYS,
   MODULE_PRESET_KEYS,
   estimateTenantMonthlyPrice,
@@ -62,10 +69,16 @@ export default function TenantModulesPage() {
   const [error, setError] = useState<string | null>(null)
   const [validationDetail, setValidationDetail] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
+  // Jurisdicción fiscal del tenant: gobierna alícuotas, identificador fiscal y módulos por país (#207).
+  const [jurisdiccionFiscal, setJurisdiccionFiscal] = useState<FiscalJurisdictionCode>(
+    DEFAULT_FISCAL_JURISDICTION,
+  )
+  const jurisdictionFieldId = useId()
 
   const applyConfigToState = useCallback((config: TenantConfigDTO) => {
     setActiveModules(new Set(config.modules))
     setTenantPlan(config.plan)
+    setJurisdiccionFiscal(resolveJurisdiction(config.jurisdiccionFiscal))
   }, [])
 
   const trialsByModule = useMemo(() => {
@@ -181,6 +194,7 @@ export default function TenantModulesPage() {
       const updated = await superadminAPI.putConfig(tenantId, {
         modules: [...activeModules],
         reason: trimmedReason,
+        jurisdiccionFiscal,
       })
       applyConfigToState(updated)
       setReason('')
@@ -381,6 +395,42 @@ export default function TenantModulesPage() {
           {t('superadmin.modules.saveSuccess')}
         </div>
       ) : null}
+
+      <section className="mb-8" aria-labelledby="superadmin-jurisdiction-heading">
+        <h2 id="superadmin-jurisdiction-heading" className="text-lg font-semibold mb-3">
+          {t('superadmin.modules.jurisdiction.section')}
+        </h2>
+        <label htmlFor={jurisdictionFieldId} className="flex max-w-sm flex-col gap-1 text-sm font-medium">
+          {t('superadmin.modules.jurisdiction.label')}
+          <select
+            id={jurisdictionFieldId}
+            value={jurisdiccionFiscal}
+            onChange={(e) => {
+              setJurisdiccionFiscal(resolveJurisdiction(e.target.value))
+              setSaveSuccess(false)
+              setValidationDetail(null)
+            }}
+            className="rounded border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-900"
+            data-testid="superadmin-jurisdiction-select"
+            aria-describedby="superadmin-jurisdiction-hint"
+          >
+            {FISCAL_JURISDICTION_CODES.map((code) => (
+              <option key={code} value={code}>
+                {FISCAL_JURISDICTIONS[code].label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p
+          id="superadmin-jurisdiction-hint"
+          className="mt-1 text-xs text-slate-500 dark:text-slate-400"
+        >
+          {t('superadmin.modules.jurisdiction.hint', {
+            standard: FISCAL_JURISDICTIONS[jurisdiccionFiscal].vatRates.standard,
+            reduced: FISCAL_JURISDICTIONS[jurisdiccionFiscal].vatRates.reduced,
+          })}
+        </p>
+      </section>
 
       <section className="mb-8" aria-labelledby="superadmin-modules-list-heading">
         <h2 id="superadmin-modules-list-heading" className="text-lg font-semibold mb-3">

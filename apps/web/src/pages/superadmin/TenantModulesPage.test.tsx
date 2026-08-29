@@ -74,6 +74,7 @@ const configRow = {
   plan: 'starter',
   modules: [...DEFAULT_MODULES],
   integrations: [],
+  jurisdiccionFiscal: 'AR',
   updatedAt: new Date().toISOString(),
 }
 
@@ -140,9 +141,45 @@ describe('TenantModulesPage', () => {
       expect(superadminAPI.putConfig).toHaveBeenCalledWith(1, {
         modules: expect.arrayContaining(['billing.orders']),
         reason: 'enable orders for demo',
+        jurisdiccionFiscal: 'AR',
       })
     })
     expect(screen.getByTestId('superadmin-config-save-success')).toBeInTheDocument()
+  })
+
+  describe('tax jurisdiction selector (#207)', () => {
+    it('preselects the jurisdiction stored for the tenant', async () => {
+      vi.mocked(superadminAPI.getConfig).mockResolvedValue({
+        ...configRow,
+        jurisdiccionFiscal: 'UY',
+      })
+
+      renderPage()
+      await waitFor(() => screen.getByTestId('superadmin-modules-page'))
+      expect(screen.getByTestId('superadmin-jurisdiction-select')).toHaveValue('UY')
+    })
+
+    it('sends the selected jurisdiction when saving', async () => {
+      const user = userEvent.setup()
+      vi.mocked(superadminAPI.putConfig).mockResolvedValue({
+        ...configRow,
+        jurisdiccionFiscal: 'UY',
+      })
+
+      renderPage()
+      await waitFor(() => screen.getByTestId('superadmin-modules-page'))
+
+      await user.selectOptions(screen.getByTestId('superadmin-jurisdiction-select'), 'UY')
+      await user.type(screen.getByTestId('superadmin-config-reason'), 'tenant moved to Uruguay')
+      await user.click(screen.getByTestId('superadmin-config-save'))
+
+      await waitFor(() => {
+        expect(superadminAPI.putConfig).toHaveBeenCalledWith(
+          1,
+          expect.objectContaining({ jurisdiccionFiscal: 'UY' }),
+        )
+      })
+    })
   })
 
   it('shows estimated pricing panel', async () => {

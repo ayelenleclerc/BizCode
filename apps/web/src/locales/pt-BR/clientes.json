@@ -37,6 +37,18 @@
     "rsocial": "Razão Social",
     "fantasia": "Nome Fantasia",
     "cuit": "CNPJ/CPF",
+    "taxId": {
+      "cuit": {
+        "label": "Identificação fiscal (CUIT)",
+        "placeholder": "20-12345678-9",
+        "invalid": "CUIT inválido"
+      },
+      "rut": {
+        "label": "Identificação fiscal (RUT)",
+        "placeholder": "01-234567-8908",
+        "invalid": "RUT inválido"
+      }
+    },
     "condIva": "Regime Fiscal",
     "domicilio": "Endereço",
     "localidad": "Cidade",

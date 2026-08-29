@@ -61,6 +61,10 @@
     "rsocial": "Razão social",
     "fantasia": "Nome fantasia",
     "cuit": "CNPJ/CPF",
+    "taxId": {
+      "cuit": { "label": "CUIT", "invalid": "CUIT inválido" },
+      "rut": { "label": "RUT", "invalid": "RUT inválido" }
+    },
     "condIva": "Regime fiscal",
     "telef": "Telefone",
     "email": "E-mail",

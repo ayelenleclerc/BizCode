@@ -47,6 +47,9 @@ function buildPrisma(overrides: Record<string, unknown> = {}): PrismaClient {
     cliente: {
       findFirst: vi.fn().mockResolvedValue({ id: 1, suspended: false, condIva: 'RI' }),
     },
+    tenantConfig: {
+      findUnique: vi.fn().mockResolvedValue({ jurisdiccionFiscal: 'AR' }),
+    },
     appUser: {
       findFirst: vi.fn().mockResolvedValue({ id: 2 }),
     },

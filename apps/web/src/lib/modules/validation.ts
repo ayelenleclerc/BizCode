@@ -1,3 +1,4 @@
+import { resolveJurisdiction } from '@bizcode/types'
 import { MODULE_CATALOG, MODULE_KEYS, type ModuleKey } from './catalog'
 import type { DeploymentEnv, ModuleDef, ModuleValidationResult } from './types'
 
@@ -6,38 +7,48 @@ function isModuleKey(value: string): value is ModuleKey {
 }
 
 /**
- * @en Whether a module may be turned off for the given deployment environment.
- * @es Si un módulo puede desactivarse en el ambiente de despliegue dado.
- * @pt-BR Se um módulo pode ser desativado no ambiente de implantação informado.
+ * @en Whether a module may be turned off for the given environment and tax jurisdiction (#207).
+ * @es Si un módulo puede desactivarse en el ambiente y la jurisdicción fiscal dados (#207).
+ * @pt-BR Se um módulo pode ser desativado no ambiente e na jurisdição fiscal informados (#207).
  */
-export function canDeactivate(key: ModuleKey, env: DeploymentEnv): boolean {
-  const mod = MODULE_CATALOG[key]
-  if (mod.required) {
-    return false
-  }
-  if (mod.requiredInProd && env === 'prod') {
-    return false
-  }
-  return true
+export function canDeactivate(
+  key: ModuleKey,
+  env: DeploymentEnv,
+  jurisdiction?: unknown,
+): boolean {
+  return !moduleIsRequired(MODULE_CATALOG[key], env, jurisdiction)
 }
 
-function moduleIsRequired(def: ModuleDef, env: DeploymentEnv): boolean {
-  return def.required || (def.requiredInProd && env === 'prod')
+function moduleIsRequired(def: ModuleDef, env: DeploymentEnv, jurisdiction?: unknown): boolean {
+  if (def.required) {
+    return true
+  }
+  if (env !== 'prod') {
+    return false
+  }
+  if (def.requiredInProd) {
+    return true
+  }
+  return def.requiredInProdForCountries?.includes(resolveJurisdiction(jurisdiction)) ?? false
 }
 
 /**
- * @en Validates an active module set against required flags and dependency edges.
- * @es Valida un conjunto de módulos activos frente a obligatorios y dependencias.
- * @pt-BR Valida um conjunto de módulos ativos contra obrigatórios e dependências.
+ * @en Validates an active module set against required flags, dependency edges and the tax jurisdiction (#207).
+ * @es Valida un conjunto de módulos activos frente a obligatorios, dependencias y la jurisdicción fiscal (#207).
+ * @pt-BR Valida um conjunto de módulos ativos contra obrigatórios, dependências e a jurisdição fiscal (#207).
  */
-export function validateModuleSet(modules: readonly ModuleKey[], env: DeploymentEnv): ModuleValidationResult {
+export function validateModuleSet(
+  modules: readonly ModuleKey[],
+  env: DeploymentEnv,
+  jurisdiction?: unknown,
+): ModuleValidationResult {
   const active = new Set<ModuleKey>(modules)
   const errors: ModuleValidationResult['errors'] = []
 
   for (const key of MODULE_KEYS) {
     const def = MODULE_CATALOG[key]
     const isActive = active.has(key)
-    const isRequired = moduleIsRequired(def, env)
+    const isRequired = moduleIsRequired(def, env, jurisdiction)
 
     if (isRequired && !isActive) {
       errors.push({ module: key, reason: 'required_module_missing' })

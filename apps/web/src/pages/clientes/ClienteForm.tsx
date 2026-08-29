@@ -1,4 +1,4 @@
-import { useState, useEffect, type FocusEvent } from 'react'
+import { useState, useEffect, useMemo, type FocusEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -6,9 +6,16 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
 import { arcaAPI, clientesAPI, listasPreciosAPI, zonasEntregaAPI } from '@/lib/api'
-import { validateCUIT, formatCUIT, validateCBU } from '@/lib/validators'
+import { validateCUIT, formatTaxId, validateCBU, validateTaxId } from '@/lib/validators'
 import { useAuth } from '@/contexts/AuthContext'
-import { Cliente, DeliveryZone, type ListaPrecioRow } from '@bizcode/types'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import {
+  Cliente,
+  DeliveryZone,
+  FISCAL_JURISDICTIONS,
+  type FiscalJurisdictionCode,
+  type ListaPrecioRow,
+} from '@bizcode/types'
 import ClienteCobrosRecientes from './ClienteCobrosRecientes'
 import ClienteCuentaCorrienteSection from './ClienteCuentaCorrienteSection'
 import ClienteFidelizacionSection from './ClienteFidelizacionSection'
@@ -21,10 +28,8 @@ const clienteSchema = z.object({
   codigo: z.coerce.number().int().positive('Código debe ser positivo'),
   rsocial: z.string().min(3, 'Razón social mínimo 3 caracteres').max(30),
   fantasia: z.string().max(30).optional(),
-  cuit: z.string().optional().refine(
-    (val) => !val || validateCUIT(val),
-    'CUIT inválido'
-  ),
+  // Validado contra la jurisdicción del tenant en `useMemo` más abajo (#207).
+  cuit: z.string().optional(),
   condIva: z.enum(['RI', 'Mono', 'CF', 'Exento']),
   domicilio: z.string().max(40).optional(),
   localidad: z.string().max(25).optional(),
@@ -70,6 +75,18 @@ const clienteSchema = z.object({
 })
 
 type ClienteFormData = z.infer<typeof clienteSchema>
+
+/**
+ * @en Refines the tax identifier with the algorithm of the tenant jurisdiction (#207).
+ * @es Refina el identificador fiscal con el algoritmo de la jurisdicción del tenant (#207).
+ * @pt-BR Refina o identificador fiscal com o algoritmo da jurisdição do tenant (#207).
+ */
+function buildClienteSchema(jurisdiccion: FiscalJurisdictionCode, invalidMessage: string) {
+  return clienteSchema.refine((data) => !data.cuit || validateTaxId(data.cuit, jurisdiccion), {
+    path: ['cuit'],
+    message: invalidMessage,
+  })
+}
 
 interface ClienteFormProps {
   cliente: Cliente | null
@@ -134,6 +151,14 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   // AFIP Padrón A4 lookup (#192) — never blocks submit; degrades gracefully.
   const [padronStatus, setPadronStatus] = useState<PadronStatus>('idle')
   const [padronTruncatedWarning, setPadronTruncatedWarning] = useState(false)
+  // Jurisdicción fiscal del tenant: elige el algoritmo y las etiquetas del identificador (#207).
+  const { jurisdiccionFiscal } = useFeatureFlags()
+  const taxIdKind = FISCAL_JURISDICTIONS[jurisdiccionFiscal].taxIdKind
+  const taxIdLabel = t(`form.taxId.${taxIdKind}.label`)
+  const schema = useMemo(
+    () => buildClienteSchema(jurisdiccionFiscal, t(`form.taxId.${taxIdKind}.invalid`)),
+    [jurisdiccionFiscal, taxIdKind, t],
+  )
 
   const {
     register,
@@ -142,7 +167,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
     setValue,
   } = useForm<ClienteFormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(clienteSchema) as any,
+    resolver: zodResolver(schema) as any,
     defaultValues: (cliente || {
       condIva: 'RI',
       activo: true,
@@ -183,11 +208,16 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   }, [cliente, setValue])
 
   /**
-   * @en Looks up the CUIT in AFIP Padrón A4 on blur and autofills verified fields (#192). Never blocks the form.
-   * @es Consulta el CUIT en Padrón A4 AFIP al perder foco y autocompleta campos verificados (#192). Nunca bloquea el formulario.
-   * @pt-BR Consulta o CUIT no Padrón A4 AFIP ao perder foco e autopreenche campos verificados (#192). Nunca bloqueia o formulário.
+   * @en Looks up the CUIT in AFIP Padrón A4 on blur and autofills verified fields (#192). Never blocks the form; skipped outside Argentina (#207).
+   * @es Consulta el CUIT en Padrón A4 AFIP al perder foco y autocompleta campos verificados (#192). Nunca bloquea el formulario; se omite fuera de Argentina (#207).
+   * @pt-BR Consulta o CUIT no Padrón A4 AFIP ao perder foco e autopreenche campos verificados (#192). Nunca bloqueia o formulário; ignorado fora da Argentina (#207).
    */
   const handleCuitBlur = async (rawValue: string) => {
+    if (taxIdKind !== 'cuit') {
+      setPadronStatus('idle')
+      setPadronTruncatedWarning(false)
+      return
+    }
     const value = rawValue.trim()
     if (!value) {
       setPadronStatus('idle')
@@ -254,7 +284,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
       }
 
       if (data.cuit) {
-        data.cuit = formatCUIT(data.cuit)
+        data.cuit = formatTaxId(data.cuit, jurisdiccionFiscal)
       }
 
       let result: Cliente
@@ -406,18 +436,19 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
 
           <div>
             <label htmlFor="cliente-cuit" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
-              {t('form.cuit')}
+              {taxIdLabel}
             </label>
             <input
               id="cliente-cuit"
               type="text"
               data-testid="cliente-form-cuit"
+              data-tax-id-kind={taxIdKind}
               {...register('cuit', {
                 onBlur: (e: FocusEvent<HTMLInputElement>) => {
                   void handleCuitBlur(e.target.value)
                 },
               })}
-              placeholder="20-12345678-9"
+              placeholder={t(`form.taxId.${taxIdKind}.placeholder`)}
               aria-describedby={errors.cuit ? 'cliente-cuit-error' : 'cliente-padron-status'}
               className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none font-mono"
             />

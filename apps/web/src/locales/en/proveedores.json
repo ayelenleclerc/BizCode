@@ -61,6 +61,10 @@
     "rsocial": "Business name",
     "fantasia": "Trade name",
     "cuit": "Tax ID",
+    "taxId": {
+      "cuit": { "label": "CUIT", "invalid": "Invalid CUIT" },
+      "rut": { "label": "RUT", "invalid": "Invalid RUT" }
+    },
     "condIva": "VAT condition",
     "telef": "Phone",
     "email": "Email",

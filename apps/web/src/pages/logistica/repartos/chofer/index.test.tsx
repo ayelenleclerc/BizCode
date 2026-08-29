@@ -115,6 +115,7 @@ describe('ChoferRepartosPage', () => {
     vi.mocked(useFeatureFlags).mockReturnValue({
       modules: ['logistics.pod'],
       integrations: [],
+      jurisdiccionFiscal: 'AR' as const,
       hasModule: (key) => key === 'logistics.pod',
       hasIntegration: () => false,
       status: 'ready',

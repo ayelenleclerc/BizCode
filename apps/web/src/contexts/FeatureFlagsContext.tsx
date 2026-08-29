@@ -7,6 +7,11 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import {
+  DEFAULT_FISCAL_JURISDICTION,
+  resolveJurisdiction,
+  type FiscalJurisdictionCode,
+} from '@bizcode/types'
 import { featuresAPI } from '@/lib/api'
 import { MODULE_KEYS, type ModuleKey } from '@/lib/modules'
 import { useTranslation } from 'react-i18next'
@@ -18,6 +23,12 @@ type FeatureFlagsContextValue = {
   status: FeatureFlagsStatus
   modules: readonly ModuleKey[]
   integrations: readonly string[]
+  /**
+   * @en Tenant tax jurisdiction; drives tax-id validation and VAT rates in the UI (#207).
+   * @es Jurisdicción fiscal del tenant; gobierna la validación del identificador y las alícuotas en la UI (#207).
+   * @pt-BR Jurisdição fiscal do tenant; rege a validação do identificador e as alíquotas na UI (#207).
+   */
+  jurisdiccionFiscal: FiscalJurisdictionCode
   hasModule: (key: ModuleKey) => boolean
   hasIntegration: (id: string) => boolean
   refreshFeatures: () => Promise<void>
@@ -40,12 +51,16 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<FeatureFlagsStatus>('idle')
   const [modules, setModules] = useState<readonly ModuleKey[]>([])
   const [integrations, setIntegrations] = useState<readonly string[]>([])
+  const [jurisdiccionFiscal, setJurisdiccionFiscal] = useState<FiscalJurisdictionCode>(
+    DEFAULT_FISCAL_JURISDICTION,
+  )
 
   const refreshFeatures = useCallback(async () => {
     if (authStatus !== 'authenticated') {
       setStatus('idle')
       setModules([])
       setIntegrations([])
+      setJurisdiccionFiscal(DEFAULT_FISCAL_JURISDICTION)
       return
     }
     setStatus('loading')
@@ -53,10 +68,12 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
       const data = await featuresAPI.get()
       setModules(parseModuleKeys(data.modules))
       setIntegrations([...data.integrations])
+      setJurisdiccionFiscal(resolveJurisdiction(data.jurisdiccionFiscal))
       setStatus('ready')
     } catch {
       setModules([])
       setIntegrations([])
+      setJurisdiccionFiscal(DEFAULT_FISCAL_JURISDICTION)
       setStatus('ready')
     }
   }, [authStatus])
@@ -67,6 +84,7 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
         setStatus('idle')
         setModules([])
         setIntegrations([])
+        setJurisdiccionFiscal(DEFAULT_FISCAL_JURISDICTION)
         return
       }
       void refreshFeatures()
@@ -97,11 +115,20 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
       status,
       modules,
       integrations,
+      jurisdiccionFiscal,
       hasModule,
       hasIntegration,
       refreshFeatures,
     }),
-    [status, modules, integrations, hasModule, hasIntegration, refreshFeatures],
+    [
+      status,
+      modules,
+      integrations,
+      jurisdiccionFiscal,
+      hasModule,
+      hasIntegration,
+      refreshFeatures,
+    ],
   )
 
   return <FeatureFlagsContext.Provider value={value}>{children}</FeatureFlagsContext.Provider>

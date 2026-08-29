@@ -81,6 +81,7 @@ function mockFlagsWithCreditNotes() {
     status: 'ready',
     modules: ['billing.credit_notes', 'finance.ledger'],
     integrations: [],
+    jurisdiccionFiscal: 'AR' as const,
     hasModule: (k) => k === 'billing.credit_notes' || k === 'finance.ledger',
     hasIntegration: () => false,
     refreshFeatures: vi.fn(),

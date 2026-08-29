@@ -3,7 +3,9 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, proveedoresAPI, type ProveedorInputDTO } from '@/lib/api'
-import { formatCUIT, validateCBU, validateCUIT } from '@/lib/validators'
+import { formatTaxId, validateCBU, validateTaxId } from '@/lib/validators'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import { FISCAL_JURISDICTIONS } from '@bizcode/types'
 import type { Proveedor, ProveedorCategoria, ProveedorCondicionPago, ProveedorTipoCuenta } from '@bizcode/types'
 import ProveedorCatalogoSection from './ProveedorCatalogoSection'
 import ProveedorCuentaCorrienteSection from './ProveedorCuentaCorrienteSection'
@@ -67,6 +69,9 @@ function ProveedorDatosFormShell({
 export default function ProveedorForm({ proveedorId, onClose, onSaved }: ProveedorFormProps) {
   const { t } = useTranslation('proveedores')
   const { t: tc } = useTranslation('common')
+  // Jurisdicción fiscal del tenant: elige el algoritmo del identificador (#207).
+  const { jurisdiccionFiscal } = useFeatureFlags()
+  const taxIdKind = FISCAL_JURISDICTIONS[jurisdiccionFiscal].taxIdKind
   const [loading, setLoading] = useState(proveedorId != null)
   const [formCodigo, setFormCodigo] = useState('')
   const [formRsocial, setFormRsocial] = useState('')
@@ -147,8 +152,8 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
       errs.rsocial = t('form.errors.rsocialInvalid')
     }
     const cuitTrim = formCuit.trim()
-    if (cuitTrim && !validateCUIT(cuitTrim)) {
-      errs.cuit = t('form.errors.cuitInvalid')
+    if (cuitTrim && !validateTaxId(cuitTrim, jurisdiccionFiscal)) {
+      errs.cuit = t(`form.taxId.${taxIdKind}.invalid`)
     }
     const cbuTrim = formCbu.trim()
     if (cbuTrim && !validateCBU(cbuTrim)) {
@@ -166,7 +171,9 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
       condIva: formCondIva,
       activo: formActivo,
       fantasia: formFantasia.trim() || null,
-      cuit: formCuit.trim() ? formatCUIT(formCuit.trim().replace(/[-\s]/g, '')) : null,
+      cuit: formCuit.trim()
+        ? formatTaxId(formCuit.trim().replace(/[-\s]/g, ''), jurisdiccionFiscal)
+        : null,
       telef: formTelef.trim() || null,
       email: formEmail.trim() || null,
       moneda: formMoneda.trim() || 'ARS',
@@ -451,17 +458,20 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                   </div>
                   <div>
                     <label htmlFor="proveedor-form-cuit" className="block text-sm font-medium mb-1">
-                      {t('form.cuit')}
+                      {t(`form.taxId.${taxIdKind}.label`)}
                     </label>
                     <input
                       id="proveedor-form-cuit"
                       data-testid="proveedor-form-cuit"
+                      data-tax-id-kind={taxIdKind}
                       type="text"
                       value={formCuit}
                       onChange={(e) => setFormCuit(e.target.value)}
                       onBlur={() => {
                         const v = formCuit.trim()
-                        if (v && validateCUIT(v)) setFormCuit(formatCUIT(v))
+                        if (v && validateTaxId(v, jurisdiccionFiscal)) {
+                          setFormCuit(formatTaxId(v, jurisdiccionFiscal))
+                        }
                       }}
                       className={inputClass}
                       {...(fieldErrors.cuit ? { 'aria-invalid': 'true' as const } : {})}

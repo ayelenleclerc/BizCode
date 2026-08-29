@@ -1,10 +1,37 @@
 /**
- * @en Pure validation helpers for invoicing (CUIT, codes, prices, VAT).
- * @es Funciones puras de validación para facturación (CUIT, códigos, precios, IVA).
- * @pt-BR Funções puras de validação para faturamento (CUIT, códigos, preços, IVA).
+ * @en Pure validation helpers for invoicing (tax ids, codes, prices, VAT).
+ * @es Funciones puras de validación para facturación (identificadores fiscales, códigos, precios, IVA).
+ * @pt-BR Funções puras de validação para faturamento (identificadores fiscais, códigos, preços, IVA).
  */
 
+import { FISCAL_JURISDICTIONS, resolveJurisdiction } from '@bizcode/types'
+import { formatCUIT, validateCUIT } from './validators/cuit'
+import { formatRUT, validateRUT } from './validators/rut'
+
 export { formatCUIT, validateCUIT } from './validators/cuit'
+export { formatRUT, rutCheckDigit, validateRUT } from './validators/rut'
+
+/**
+ * @en Validates a tax identifier with the algorithm of the given jurisdiction (#207).
+ * @es Valida un identificador fiscal con el algoritmo de la jurisdicción indicada (#207).
+ * @pt-BR Valida um identificador fiscal com o algoritmo da jurisdição informada (#207).
+ */
+export function validateTaxId(taxId: string, jurisdiction: unknown): boolean {
+  return FISCAL_JURISDICTIONS[resolveJurisdiction(jurisdiction)].taxIdKind === 'rut'
+    ? validateRUT(taxId)
+    : validateCUIT(taxId)
+}
+
+/**
+ * @en Formats a tax identifier following the convention of the given jurisdiction (#207).
+ * @es Formatea un identificador fiscal según la convención de la jurisdicción indicada (#207).
+ * @pt-BR Formata um identificador fiscal conforme a convenção da jurisdição informada (#207).
+ */
+export function formatTaxId(taxId: string, jurisdiction: unknown): string {
+  return FISCAL_JURISDICTIONS[resolveJurisdiction(jurisdiction)].taxIdKind === 'rut'
+    ? formatRUT(taxId)
+    : formatCUIT(taxId)
+}
 
 const CBU_BLOCK1_WEIGHTS = [7, 1, 3, 9, 7, 1, 3] as const
 const CBU_BLOCK2_WEIGHTS = [3, 9, 7, 1, 3, 9, 7, 1, 3, 9, 7, 1, 3] as const
@@ -35,9 +62,16 @@ export function validateCBU(cbu: string): boolean {
 }
 
 /**
+ * @en VAT rates accepted by `calculateIVA`: the two rates of each supported jurisdiction plus exempt (#207).
+ * @es Alícuotas admitidas por `calculateIVA`: las dos de cada jurisdicción soportada más exento (#207).
+ * @pt-BR Alíquotas aceitas por `calculateIVA`: as duas de cada jurisdição suportada mais isento (#207).
+ */
+export type VatRateLiteral = '21' | '10.5' | '22' | '10' | '0'
+
+/**
  * Calcula IVA sobre un monto según alícuota
  */
-export function calculateIVA(amount: number, rate: '21' | '10.5' | '0'): number {
+export function calculateIVA(amount: number, rate: VatRateLiteral): number {
   const rateNum = parseFloat(rate)
   return parseFloat(((amount * rateNum) / 100).toFixed(2))
 }

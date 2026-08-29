@@ -30669,7 +30669,7 @@ components:
 
     TenantFeaturesData:
       type: object
-      required: [modules, integrations]
+      required: [modules, integrations, jurisdiccionFiscal]
       properties:
         modules:
           type: array
@@ -30679,6 +30679,8 @@ components:
           type: array
           items:
             type: string
+        jurisdiccionFiscal:
+          $ref: '#/components/schemas/FiscalJurisdictionCode'
 
     TenantFeaturesEnvelope:
       type: object
@@ -30809,9 +30811,17 @@ components:
         currentPlan:
           type: string
 
+    FiscalJurisdictionCode:
+      type: string
+      enum: [AR, UY]
+      description: >-
+        Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which
+        modules are mandatory in production. Defaults to `AR`.
+
     TenantConfig:
       type: object
-      required: [tenantId, businessType, rubros, plan, modules, integrations, updatedAt]
+      required:
+        [tenantId, businessType, rubros, plan, modules, integrations, jurisdiccionFiscal, updatedAt]
       properties:
         tenantId:
           type: integer
@@ -30833,6 +30843,8 @@ components:
           type: array
           items:
             type: string
+        jurisdiccionFiscal:
+          $ref: '#/components/schemas/FiscalJurisdictionCode'
         updatedAt:
           type: string
           format: date-time
@@ -31084,6 +31096,10 @@ components:
           type: array
           items:
             type: string
+        jurisdiccionFiscal:
+          allOf:
+            - $ref: '#/components/schemas/FiscalJurisdictionCode'
+          description: Omitting it preserves the jurisdiction currently stored for the tenant.
         reason:
           type: string
           minLength: 1

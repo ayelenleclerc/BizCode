@@ -65,6 +65,7 @@ describe('ContratoBillingService', () => {
       factura: { findFirst: vi.fn() },
       appUser: { findMany: vi.fn().mockResolvedValue([]) },
       notification: { createMany: vi.fn() },
+      tenantConfig: { findUnique: vi.fn().mockResolvedValue({ jurisdiccionFiscal: 'AR' }) },
       $transaction: vi.fn(),
     } as unknown as PrismaClient
     service = new ContratoBillingService(

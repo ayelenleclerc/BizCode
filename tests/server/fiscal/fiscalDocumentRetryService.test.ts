@@ -29,6 +29,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
         keyEncrypted: encryptFiscalSecret('key'),
       }),
     },
+    tenantConfig: {
+      findUnique: vi.fn().mockResolvedValue({ jurisdiccionFiscal: 'AR' }),
+    },
     fiscalDocument: {
       findUnique: vi.fn().mockResolvedValue(null),
       create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 1, attemptCount: 1, ...data })),

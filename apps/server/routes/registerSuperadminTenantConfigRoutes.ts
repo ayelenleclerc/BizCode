@@ -94,6 +94,8 @@ export function registerSuperadminTenantConfigRoutes(
             integrations: Array.isArray(body.integrations)
               ? body.integrations.filter((r): r is string => typeof r === 'string')
               : undefined,
+            jurisdiccionFiscal:
+              typeof body.jurisdiccionFiscal === 'string' ? body.jurisdiccionFiscal : undefined,
           },
           authReq.auth!.claims.userId,
           reason,
@@ -105,7 +107,12 @@ export function registerSuperadminTenantConfigRoutes(
           res.status(400).json({ success: false, error: 'invalid_module_set', validation })
           return
         }
-        if (e instanceof Error && (e.message === 'invalid_business_type' || e.message === 'invalid_plan')) {
+        if (
+          e instanceof Error &&
+          (e.message === 'invalid_business_type' ||
+            e.message === 'invalid_plan' ||
+            e.message === 'invalid_jurisdiction')
+        ) {
           res.status(400).json({ success: false, error: e.message })
           return
         }

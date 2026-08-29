@@ -77,14 +77,55 @@ describe('module catalog', () => {
     }
   })
 
-  it('exposes billing.arca_cae with requiredInProd in catalog', () => {
-    expect(MODULE_CATALOG['billing.arca_cae'].requiredInProd).toBe(true)
+  it('exposes billing.arca_cae as required in prod only for Argentina (#207)', () => {
+    expect(MODULE_CATALOG['billing.arca_cae'].requiredInProd).toBe(false)
     expect(MODULE_CATALOG['billing.arca_cae'].required).toBe(false)
+    expect(MODULE_CATALOG['billing.arca_cae'].requiredInProdForCountries).toEqual(['AR'])
+  })
+
+  describe('multi-country base (#207)', () => {
+    it('keeps generic modules independent from the Argentine fiscal module', () => {
+      for (const key of ['billing.credit_notes', 'finance.ledger', 'finance.retenciones'] as const) {
+        expect(MODULE_CATALOG[key].dependencies).not.toContain('billing.arca_cae')
+      }
+    })
+
+    it('lets a Uruguayan tenant run credit notes and the ledger without ARCA in prod', () => {
+      const modules = [
+        'core.auth',
+        'core.catalog',
+        'core.clients',
+        'core.invoicing',
+        'billing.credit_notes',
+        'finance.collections',
+        'finance.ledger',
+      ] as const
+      expect(validateModuleSet(modules, 'prod', 'UY').valid).toBe(true)
+      expect(validateModuleSet(modules, 'prod', 'AR').valid).toBe(false)
+    })
+
+    it('only blocks deactivating ARCA in Argentine production', () => {
+      expect(canDeactivate('billing.arca_cae', 'prod', 'AR')).toBe(false)
+      expect(canDeactivate('billing.arca_cae', 'prod', 'UY')).toBe(true)
+      expect(canDeactivate('billing.arca_cae', 'dev', 'AR')).toBe(true)
+    })
+
+    it('defaults to Argentina when the jurisdiction is absent or unknown', () => {
+      expect(canDeactivate('billing.arca_cae', 'prod')).toBe(false)
+      expect(canDeactivate('billing.arca_cae', 'prod', 'ZZ')).toBe(false)
+    })
+
+    it('keeps required core modules mandatory in every jurisdiction', () => {
+      expect(canDeactivate('core.auth', 'prod', 'UY')).toBe(false)
+      expect(canDeactivate('core.auth', 'dev', 'UY')).toBe(false)
+    })
   })
 })
 
 describe('GET /api/modules/catalog', () => {
-  const prisma = {} as Parameters<typeof createApp>[0]
+  const prisma = {
+    tenantConfig: { findUnique: async () => null },
+  } as unknown as Parameters<typeof createApp>[0]
 
   afterEach(() => {
     delete process.env.BIZCODE_TEST_AUTH_BYPASS
@@ -105,7 +146,7 @@ describe('GET /api/modules/catalog', () => {
     const arca = res.body.data.modules.find(
       (m: { key: string }) => m.key === 'billing.arca_cae',
     )
-    expect(arca).toMatchObject({ requiredInProd: true, required: false })
+    expect(arca).toMatchObject({ requiredInProd: false, required: false })
   })
 
   it('returns 401 when auth bypass is disabled', async () => {

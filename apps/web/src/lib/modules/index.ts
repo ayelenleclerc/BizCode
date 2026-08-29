@@ -39,11 +39,11 @@ import type { ModuleCatalogEntry } from '@bizcode/types'
 export type { ModuleCatalogEntry } from '@bizcode/types'
 
 /**
- * @en Serializes catalog metadata for API consumers (no tenant-specific state).
- * @es Serializa metadatos del catálogo para consumidores de la API (sin estado por tenant).
- * @pt-BR Serializa metadados do catálogo para consumidores da API (sem estado por tenant).
+ * @en Serializes catalog metadata for API consumers; `canDeactivate` depends on the tenant jurisdiction (#207).
+ * @es Serializa metadatos del catálogo para la API; `canDeactivate` depende de la jurisdicción del tenant (#207).
+ * @pt-BR Serializa metadados do catálogo para a API; `canDeactivate` depende da jurisdição do tenant (#207).
  */
-export function buildModuleCatalogPayload(): {
+export function buildModuleCatalogPayload(jurisdiction?: unknown): {
   deploymentEnv: ReturnType<typeof resolveDeploymentEnv>
   modules: ModuleCatalogEntry[]
   presets: Record<string, { modules: ModuleKey[] }>
@@ -59,7 +59,7 @@ export function buildModuleCatalogPayload(): {
       dependencies: [...def.dependencies],
       plan: def.plan,
       price: def.price,
-      canDeactivate: canDeactivateModule(key, deploymentEnv),
+      canDeactivate: canDeactivateModule(key, deploymentEnv, jurisdiction),
     }
   })
 

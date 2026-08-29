@@ -2653,6 +2653,11 @@ model TenantConfig {
   /// @pt-BR Tipo de câmbio preferido para preços USD/EUR de catálogo (#243).
   /// oficial | mep | ccl | blue | manual
   tipoCambioPreferido          String   @default("oficial") @db.VarChar(20)
+  /// @en Tax jurisdiction driving VAT rates, tax-id validation and country-specific modules (#207). ISO-3166-1 alpha-2; `AR` keeps the current behaviour.
+  /// @es Jurisdiccion fiscal que gobierna alicuotas de IVA, validacion de identificador fiscal y modulos por pais (#207). ISO-3166-1 alpha-2; `AR` conserva el comportamiento actual.
+  /// @pt-BR Jurisdicao fiscal que rege aliquotas de IVA, validacao de identificador fiscal e modulos por pais (#207). ISO-3166-1 alpha-2; `AR` mantem o comportamento atual.
+  /// AR | UY
+  jurisdiccionFiscal           String   @default("AR") @db.VarChar(2)
   /// @en Seller action when credit limit is exceeded (#256). warn | block
   /// @es Acción Seller al superar límite de crédito (#256). warn | block
   /// @pt-BR Ação Seller ao superar limite de crédito (#256). warn | block
