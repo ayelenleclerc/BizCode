@@ -47,6 +47,10 @@ export function getFiscalProviderAdapter(
       const factory = registry.get('uruguay_dgi')
       return factory ? factory(prisma) : null
     }
+    case 'chile_sii': {
+      const factory = registry.get('chile_sii')
+      return factory ? factory(prisma) : null
+    }
     case 'mexico_sat_pac': {
       const factory = registry.get('mexico_sat_pac')
       return factory ? factory(prisma) : null

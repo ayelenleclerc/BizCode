@@ -13,7 +13,7 @@
  * @es Jurisdicciones con modelo fiscal operativo. Mexico queda fuera: su adaptador es un stub de capacidades.
  * @pt-BR Jurisdicoes com modelo fiscal operacional. Mexico fica de fora: seu adaptador e um stub de capacidades.
  */
-export const FISCAL_JURISDICTION_CODES = ['AR', 'UY'] as const
+export const FISCAL_JURISDICTION_CODES = ['AR', 'UY', 'CL'] as const
 
 export type FiscalJurisdictionCode = (typeof FISCAL_JURISDICTION_CODES)[number]
 
@@ -71,6 +71,22 @@ export const FISCAL_JURISDICTIONS: Record<FiscalJurisdictionCode, FiscalJurisdic
     taxIdKind: 'rut',
     vatRates: { standard: 22, reduced: 10 },
     providerCode: 'uruguay_dgi',
+  },
+  /**
+   * @en Chile has a single 19% VAT rate, so `reduced` repeats it: `Factura` persists the
+   *   `neto1`/`neto2` buckets and a bucket without a rate has no representation (#208).
+   * @es Chile tiene una unica alicuota de IVA del 19%, por eso `reduced` la repite: `Factura`
+   *   persiste los buckets `neto1`/`neto2` y un bucket sin alicuota no tiene representacion (#208).
+   * @pt-BR O Chile tem uma unica aliquota de IVA de 19%, por isso `reduced` a repete: `Factura`
+   *   persiste os buckets `neto1`/`neto2` e um bucket sem aliquota nao tem representacao (#208).
+   */
+  CL: {
+    code: 'CL',
+    label: 'Chile',
+    currency: 'CLP',
+    taxIdKind: 'rut',
+    vatRates: { standard: 19, reduced: 19 },
+    providerCode: 'chile_sii',
   },
 }
 

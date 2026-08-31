@@ -10,6 +10,7 @@
 import { registerFiscalProviderAdapterFactory } from './fiscalProviderRegistry'
 import { ArcaFiscalAdapter } from './arca/ArcaFiscalAdapter'
 import { UruguayDgiFiscalAdapter } from './stubs/UruguayDgiFiscalAdapter'
+import { ChileSiiFiscalAdapter } from './stubs/ChileSiiFiscalAdapter'
 import { MexicoSatFiscalAdapter } from './stubs/MexicoSatFiscalAdapter'
 
 let bootstrapped = false
@@ -19,6 +20,7 @@ export function bootstrapFiscalProviders(): void {
   if (bootstrapped) return
   registerFiscalProviderAdapterFactory('arca_wsfe', (prisma) => new ArcaFiscalAdapter(prisma))
   registerFiscalProviderAdapterFactory('uruguay_dgi', (prisma) => new UruguayDgiFiscalAdapter(prisma))
+  registerFiscalProviderAdapterFactory('chile_sii', (prisma) => new ChileSiiFiscalAdapter(prisma))
   registerFiscalProviderAdapterFactory('mexico_sat_pac', (prisma) => new MexicoSatFiscalAdapter(prisma))
   bootstrapped = true
 }
