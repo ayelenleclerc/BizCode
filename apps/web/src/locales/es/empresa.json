@@ -7,14 +7,19 @@
     "cuit": "CUIT",
     "cuitHint": "Formato XX-XXXXXXXX-X",
     "taxId": {
-      "cuit": {
+      "AR": {
         "label": "CUIT",
         "hint": "Formato XX-XXXXXXXX-X",
         "invalid": "CUIT inválido"
       },
-      "rut": {
+      "UY": {
         "label": "RUT",
         "hint": "Formato XX-XXXXXX-XXXX (12 dígitos)",
+        "invalid": "RUT inválido"
+      },
+      "CL": {
+        "label": "RUT",
+        "hint": "Formato XX.XXX.XXX-D (el verificador puede ser K)",
         "invalid": "RUT inválido"
       }
     },

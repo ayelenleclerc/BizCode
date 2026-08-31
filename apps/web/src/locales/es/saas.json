@@ -1,57 +1,58 @@
 {
   "landing": {
     "brand": "BizCode",
-    "headline": "Gestión comercial lista para tu negocio",
-    "subhead": "Probá BizCode gratis 30 días. Plan starter incluido. Sin inventar precios: activá tu trial y configurá tu empresa.",
-    "cta": "Empezar gratis 30 días",
+    "headline": "GestiÃ³n comercial lista para tu negocio",
+    "subhead": "ProbÃ¡ BizCode gratis 30 dÃ­as. Plan starter incluido. Sin inventar precios: activÃ¡ tu trial y configurÃ¡ tu empresa.",
+    "cta": "Empezar gratis 30 dÃ­as",
     "login": "Ya tengo cuenta",
     "privacy": "Privacidad"
   },
   "register": {
     "title": "Crear cuenta",
-    "businessName": "Razón social / nombre del negocio",
+    "businessName": "RazÃ³n social / nombre del negocio",
     "cuit": "CUIT",
-    "jurisdiction": "País fiscal",
+    "jurisdiction": "PaÃ­s fiscal",
     "taxId": {
-      "cuit": "CUIT",
-      "rut": "RUT"
+      "AR": "CUIT",
+      "UY": "RUT",
+      "CL": "RUT"
     },
     "email": "Email (usuario owner)",
-    "phone": "Teléfono (opcional)",
+    "phone": "TelÃ©fono (opcional)",
     "tenantSlug": "Identificador del tenant (slug)",
-    "password": "Contraseña",
-    "acceptTerms": "Acepto los términos de uso",
-    "acceptPrivacy": "Acepto la política de privacidad",
+    "password": "ContraseÃ±a",
+    "acceptTerms": "Acepto los tÃ©rminos de uso",
+    "acceptPrivacy": "Acepto la polÃ­tica de privacidad",
     "submit": "Crear cuenta y empezar trial",
-    "submitting": "Creando cuenta…",
-    "success": "Cuenta creada. Iniciá sesión con tu email y el slug del tenant.",
+    "submitting": "Creando cuentaâ€¦",
+    "success": "Cuenta creada. IniciÃ¡ sesiÃ³n con tu email y el slug del tenant.",
     "goLogin": "Ir al login",
     "errorGeneric": "No se pudo completar el registro",
-    "privacyLink": "Ver política de privacidad"
+    "privacyLink": "Ver polÃ­tica de privacidad"
   },
   "trial": {
-    "banner": "Te quedan {{days}} días de prueba gratuita.",
-    "bannerExpired": "Tu prueba gratuita venció. La emisión de facturas está en solo lectura hasta activar la suscripción.",
-    "bannerCta": "Activar suscripción"
+    "banner": "Te quedan {{days}} dÃ­as de prueba gratuita.",
+    "bannerExpired": "Tu prueba gratuita venciÃ³. La emisiÃ³n de facturas estÃ¡ en solo lectura hasta activar la suscripciÃ³n.",
+    "bannerCta": "Activar suscripciÃ³n"
   },
   "billing": {
-    "title": "Suscripción SaaS",
-    "subtitle": "Historial de cobros de plataforma. Precios según el catálogo de planes (starter puede ser $0).",
-    "loading": "Cargando facturación…",
-    "errorGeneric": "No se pudo cargar o actualizar la suscripción",
+    "title": "SuscripciÃ³n SaaS",
+    "subtitle": "Historial de cobros de plataforma. Precios segÃºn el catÃ¡logo de planes (starter puede ser $0).",
+    "loading": "Cargando facturaciÃ³nâ€¦",
+    "errorGeneric": "No se pudo cargar o actualizar la suscripciÃ³n",
     "status": "Estado",
-    "subscribeCta": "Activar o renovar suscripción",
-    "submitting": "Procesando…",
-    "successMock": "Suscripción activada (mock: sin credenciales Mercado Pago de plataforma).",
-    "successLive": "Suscripción iniciada. Completá el pago en Mercado Pago si se abrió el checkout.",
-    "empty": "Todavía no hay facturas SaaS.",
+    "subscribeCta": "Activar o renovar suscripciÃ³n",
+    "submitting": "Procesandoâ€¦",
+    "successMock": "SuscripciÃ³n activada (mock: sin credenciales Mercado Pago de plataforma).",
+    "successLive": "SuscripciÃ³n iniciada. CompletÃ¡ el pago en Mercado Pago si se abriÃ³ el checkout.",
+    "empty": "TodavÃ­a no hay facturas SaaS.",
     "tableCaption": "Historial de facturas SaaS",
-    "colPeriod": "Período",
+    "colPeriod": "PerÃ­odo",
     "colPlan": "Plan",
     "colAmount": "Importe",
     "colStatus": "Estado",
-    "renewTitle": "Renová tu suscripción",
-    "renewBody": "El cobro falló. Solo podés operar esta pantalla de renovación hasta regularizar el pago.",
-    "renewCta": "Ir a suscripción"
+    "renewTitle": "RenovÃ¡ tu suscripciÃ³n",
+    "renewBody": "El cobro fallÃ³. Solo podÃ©s operar esta pantalla de renovaciÃ³n hasta regularizar el pago.",
+    "renewCta": "Ir a suscripciÃ³n"
   }
 }

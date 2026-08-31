@@ -34,6 +34,8 @@ The Chilean RUT shares its name with the Uruguayan one but not its algorithm: 7â
 
 `TaxIdKind` therefore stays `'cuit' | 'rut'` â€” it is a user-facing label, not an algorithm selector. `validateTaxId` and `formatTaxId` dispatch on the **jurisdiction code**, so `UY` and `CL` both display "RUT" while running different algorithms, and no i18n key had to be migrated.
 
+The user-facing labels follow the same rule. `form.taxId.*` keys are indexed by jurisdiction code (`AR`, `UY`, `CL`) instead of by identifier kind, because a shared `rut` key showed the Uruguayan example `01-234567-8908` to Chilean tenants, and that value does not validate as a Chilean RUT. The padron lookup is likewise skipped by country rather than by identifier kind.
+
 The SII specification is not part of this repository: the rule implemented is the documented public one and the test vectors in [tests/lib/validators/rutCl.test.ts](../../../tests/lib/validators/rutCl.test.ts) are derived from it, not from official SII sample data.
 
 ## Modules

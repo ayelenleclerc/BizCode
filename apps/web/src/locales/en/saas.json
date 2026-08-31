@@ -13,8 +13,9 @@
     "cuit": "CUIT",
     "jurisdiction": "Tax country",
     "taxId": {
-      "cuit": "CUIT",
-      "rut": "RUT"
+      "AR": "CUIT",
+      "UY": "RUT",
+      "CL": "RUT"
     },
     "email": "Email (owner username)",
     "phone": "Phone (optional)",
@@ -23,7 +24,7 @@
     "acceptTerms": "I accept the terms of use",
     "acceptPrivacy": "I accept the privacy policy",
     "submit": "Create account and start trial",
-    "submitting": "Creating account…",
+    "submitting": "Creating accountâ€¦",
     "success": "Account created. Sign in with your email and tenant slug.",
     "goLogin": "Go to login",
     "errorGeneric": "Registration could not be completed",
@@ -37,11 +38,11 @@
   "billing": {
     "title": "SaaS subscription",
     "subtitle": "Platform charge history. Prices come from the plan catalog (starter may be $0).",
-    "loading": "Loading billing…",
+    "loading": "Loading billingâ€¦",
     "errorGeneric": "Could not load or update the subscription",
     "status": "Status",
     "subscribeCta": "Activate or renew subscription",
-    "submitting": "Processing…",
+    "submitting": "Processingâ€¦",
     "successMock": "Subscription activated (mock: no platform Mercado Pago credentials).",
     "successLive": "Subscription started. Complete payment in Mercado Pago if checkout opened.",
     "empty": "No SaaS invoices yet.",

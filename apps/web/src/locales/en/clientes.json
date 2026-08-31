@@ -38,14 +38,19 @@
     "fantasia": "Trade Name",
     "cuit": "Tax ID",
     "taxId": {
-      "cuit": {
+      "AR": {
         "label": "Tax ID (CUIT)",
         "placeholder": "20-12345678-9",
         "invalid": "Invalid CUIT"
       },
-      "rut": {
+      "UY": {
         "label": "Tax ID (RUT)",
         "placeholder": "01-234567-8908",
+        "invalid": "Invalid RUT"
+      },
+      "CL": {
+        "label": "Tax ID (RUT)",
+        "placeholder": "12.345.678-5",
         "invalid": "Invalid RUT"
       }
     },

@@ -34,6 +34,8 @@ El RUT chileno comparte nombre con el uruguayo pero no su algoritmo: 7-8 dígito
 
 Por eso `TaxIdKind` sigue siendo `'cuit' | 'rut'`: es una etiqueta de interfaz, no un selector de algoritmo. `validateTaxId` y `formatTaxId` resuelven por **código de jurisdicción**, de modo que `UY` y `CL` muestran «RUT» pero ejecutan algoritmos distintos, y no hubo que migrar ninguna clave i18n.
 
+Las etiquetas de interfaz siguen la misma regla. Las claves `form.taxId.*` se indexan por código de jurisdicción (`AR`, `UY`, `CL`) y no por tipo de identificador, porque una clave `rut` compartida mostraba a los tenants chilenos el ejemplo uruguayo `01-234567-8908`, que no valida como RUT chileno. La consulta al padrón también se omite por país y no por tipo de identificador.
+
 La especificación del SII no forma parte de este repositorio: la regla implementada es la pública documentada y los vectores de prueba de [tests/lib/validators/rutCl.test.ts](../../../tests/lib/validators/rutCl.test.ts) se derivan de ella, no de datos oficiales del SII.
 
 ## Módulos

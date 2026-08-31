@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { saasAPI, type SaasJurisdictionOption } from '@/lib/api'
+import { DEFAULT_FISCAL_JURISDICTION } from '@bizcode/types'
 
 /**
  * @en Public SaaS registration form (#180).
@@ -34,6 +35,15 @@ export default function RegistroPage() {
   const [jurisdiccionFiscal, setJurisdiccionFiscal] = useState('')
   const selectedTaxIdKind =
     jurisdictions.find((option) => option.code === jurisdiccionFiscal)?.taxIdKind ?? 'cuit'
+  /**
+   * @en Labels follow the jurisdiction, not the identifier kind: Uruguay and Chile both call it
+   *   RUT but expect different formats, so a shared label would show the wrong example (#208).
+   * @es Las etiquetas siguen a la jurisdicción, no al tipo: Uruguay y Chile llaman RUT a formatos
+   *   distintos, así que una etiqueta compartida mostraría el ejemplo equivocado (#208).
+   * @pt-BR Os rótulos seguem a jurisdição, não o tipo: Uruguai e Chile chamam de RUT formatos
+   *   diferentes, então um rótulo compartilhado mostraria o exemplo errado (#208).
+   */
+  const selectedJurisdiction = jurisdiccionFiscal || DEFAULT_FISCAL_JURISDICTION
 
   useEffect(() => {
     void saasAPI
@@ -159,7 +169,7 @@ export default function RegistroPage() {
         ) : null}
         <div>
           <label htmlFor="saas-cuit" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-            {t(`register.taxId.${selectedTaxIdKind}`)}
+            {t(`register.taxId.${selectedJurisdiction}`)}
           </label>
           <input
             id="saas-cuit"

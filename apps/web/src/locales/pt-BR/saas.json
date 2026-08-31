@@ -1,57 +1,58 @@
 {
   "landing": {
     "brand": "BizCode",
-    "headline": "Gestão comercial pronta para o seu negócio",
-    "subhead": "Experimente o BizCode grátis por 30 dias. Plano starter incluído. Sem preços inventados: inicie o trial e configure sua empresa.",
-    "cta": "Começar grátis por 30 dias",
-    "login": "Já tenho conta",
+    "headline": "GestÃ£o comercial pronta para o seu negÃ³cio",
+    "subhead": "Experimente o BizCode grÃ¡tis por 30 dias. Plano starter incluÃ­do. Sem preÃ§os inventados: inicie o trial e configure sua empresa.",
+    "cta": "ComeÃ§ar grÃ¡tis por 30 dias",
+    "login": "JÃ¡ tenho conta",
     "privacy": "Privacidade"
   },
   "register": {
     "title": "Criar conta",
-    "businessName": "Razão social / nome do negócio",
+    "businessName": "RazÃ£o social / nome do negÃ³cio",
     "cuit": "CUIT",
-    "jurisdiction": "País fiscal",
+    "jurisdiction": "PaÃ­s fiscal",
     "taxId": {
-      "cuit": "CUIT",
-      "rut": "RUT"
+      "AR": "CUIT",
+      "UY": "RUT",
+      "CL": "RUT"
     },
-    "email": "E-mail (usuário owner)",
+    "email": "E-mail (usuÃ¡rio owner)",
     "phone": "Telefone (opcional)",
     "tenantSlug": "Identificador do tenant (slug)",
     "password": "Senha",
     "acceptTerms": "Aceito os termos de uso",
-    "acceptPrivacy": "Aceito a política de privacidade",
+    "acceptPrivacy": "Aceito a polÃ­tica de privacidade",
     "submit": "Criar conta e iniciar trial",
-    "submitting": "Criando conta…",
+    "submitting": "Criando contaâ€¦",
     "success": "Conta criada. Entre com seu e-mail e o slug do tenant.",
     "goLogin": "Ir para o login",
-    "errorGeneric": "Não foi possível concluir o registro",
-    "privacyLink": "Ver política de privacidade"
+    "errorGeneric": "NÃ£o foi possÃ­vel concluir o registro",
+    "privacyLink": "Ver polÃ­tica de privacidade"
   },
   "trial": {
     "banner": "Restam {{days}} dias de teste gratuito.",
-    "bannerExpired": "Seu teste gratuito encerrou. A emissão de faturas está somente leitura até ativar a assinatura.",
+    "bannerExpired": "Seu teste gratuito encerrou. A emissÃ£o de faturas estÃ¡ somente leitura atÃ© ativar a assinatura.",
     "bannerCta": "Ativar assinatura"
   },
   "billing": {
     "title": "Assinatura SaaS",
-    "subtitle": "Histórico de cobranças da plataforma. Preços do catálogo de planos (starter pode ser $0).",
-    "loading": "Carregando faturamento…",
-    "errorGeneric": "Não foi possível carregar ou atualizar a assinatura",
+    "subtitle": "HistÃ³rico de cobranÃ§as da plataforma. PreÃ§os do catÃ¡logo de planos (starter pode ser $0).",
+    "loading": "Carregando faturamentoâ€¦",
+    "errorGeneric": "NÃ£o foi possÃ­vel carregar ou atualizar a assinatura",
     "status": "Status",
     "subscribeCta": "Ativar ou renovar assinatura",
-    "submitting": "Processando…",
+    "submitting": "Processandoâ€¦",
     "successMock": "Assinatura ativada (mock: sem credenciais Mercado Pago da plataforma).",
     "successLive": "Assinatura iniciada. Conclua o pagamento no Mercado Pago se o checkout abriu.",
-    "empty": "Ainda não há faturas SaaS.",
-    "tableCaption": "Histórico de faturas SaaS",
-    "colPeriod": "Período",
+    "empty": "Ainda nÃ£o hÃ¡ faturas SaaS.",
+    "tableCaption": "HistÃ³rico de faturas SaaS",
+    "colPeriod": "PerÃ­odo",
     "colPlan": "Plano",
     "colAmount": "Valor",
     "colStatus": "Status",
     "renewTitle": "Renove sua assinatura",
-    "renewBody": "A cobrança falhou. Você só pode usar esta tela de renovação até regularizar o pagamento.",
+    "renewBody": "A cobranÃ§a falhou. VocÃª sÃ³ pode usar esta tela de renovaÃ§Ã£o atÃ© regularizar o pagamento.",
     "renewCta": "Ir para assinatura"
   }
 }
