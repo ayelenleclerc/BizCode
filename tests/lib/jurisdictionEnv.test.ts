@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vitest'
+﻿import { describe, expect, it } from 'vitest'
 import {
   isJurisdictionEnabled,
   resolveDefaultJurisdiction,
   resolveInstallationJurisdictions,
 } from '../../apps/web/src/lib/modules/jurisdictionEnv'
+import { FISCAL_JURISDICTION_CODES } from '../../packages/types/src/fiscal-jurisdictions'
 
 function env(vars: Record<string, string | undefined>): NodeJS.ProcessEnv {
   return vars as NodeJS.ProcessEnv
@@ -12,7 +13,7 @@ function env(vars: Record<string, string | undefined>): NodeJS.ProcessEnv {
 describe('resolveInstallationJurisdictions (#437)', () => {
   it('keeps the pre-#437 behaviour when nothing is configured', () => {
     const result = resolveInstallationJurisdictions(env({}))
-    expect(result.enabled).toEqual(['AR', 'UY'])
+    expect(result.enabled).toEqual([...FISCAL_JURISDICTION_CODES])
     expect(result.default).toBe('AR')
   })
 
@@ -33,7 +34,7 @@ describe('resolveInstallationJurisdictions (#437)', () => {
     const result = resolveInstallationJurisdictions(
       env({ BIZCODE_FISCAL_JURISDICTIONS: 'ZZ,XX' }),
     )
-    expect(result.enabled).toEqual(['AR', 'UY'])
+    expect(result.enabled).toEqual([...FISCAL_JURISDICTION_CODES])
     expect(result.default).toBe('AR')
   })
 

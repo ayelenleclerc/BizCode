@@ -47,7 +47,7 @@ describe('FiscalProviderConfigService', () => {
 
   it('getCapabilities lists every registered provider without requiring tenant context', () => {
     const capabilities = service.getCapabilities()
-    expect(capabilities.map((c) => c.provider).sort()).toEqual(['arca_wsfe', 'mexico_sat_pac', 'uruguay_dgi'].sort())
+    expect(capabilities.map((c) => c.provider).sort()).toEqual(['arca_wsfe', 'chile_sii', 'mexico_sat_pac', 'uruguay_dgi'].sort())
   })
 
   it('getStatus falls back to legacy TenantFiscalConfig for arca_wsfe when no FiscalProviderConfig row exists', async () => {

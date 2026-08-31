@@ -9,9 +9,9 @@ import {
 } from '../../packages/types/src/fiscal-jurisdictions'
 
 describe('fiscal jurisdictions catalog (#207)', () => {
-  it('exposes Argentina and Uruguay only', () => {
-    expect([...FISCAL_JURISDICTION_CODES]).toEqual(['AR', 'UY'])
-    expect(Object.keys(FISCAL_JURISDICTIONS)).toEqual(['AR', 'UY'])
+  it('exposes Argentina, Uruguay and Chile only', () => {
+    expect([...FISCAL_JURISDICTION_CODES]).toEqual(['AR', 'UY', 'CL'])
+    expect(Object.keys(FISCAL_JURISDICTIONS)).toEqual(['AR', 'UY', 'CL'])
   })
 
   it('defaults to Argentina to preserve the historical behaviour', () => {

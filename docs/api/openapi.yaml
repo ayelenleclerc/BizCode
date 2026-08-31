@@ -4389,7 +4389,7 @@ paths:
       summary: Multi-organism fiscal provider status per tenant (#378)
       description: |
         Requires `settings.fiscal.manage`. Lists every registered provider (`arca_wsfe`,
-        `uruguay_dgi`, `mexico_sat_pac`) with capabilities and configuration status.
+        `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`) with capabilities and configuration status.
         Never returns certificate/private key material.
       responses:
         '200':
@@ -4477,7 +4477,7 @@ paths:
       summary: Static capability declaration for every registered fiscal provider (#378)
       description: |
         Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe` is the only
-        provider with `implemented: true` today — `uruguay_dgi` and `mexico_sat_pac` are
+        provider with `implemented: true` today — `uruguay_dgi`, `chile_sii` and `mexico_sat_pac` are
         capability-only stubs (Not evidenced in current codebase — no live SOAP/REST client).
       responses:
         '200':
@@ -24889,7 +24889,7 @@ components:
 
     FiscalProviderCode:
       type: string
-      enum: [arca_wsfe, uruguay_dgi, mexico_sat_pac]
+      enum: [arca_wsfe, uruguay_dgi, chile_sii, mexico_sat_pac]
 
     FiscalProviderCapabilities:
       type: object
@@ -30865,7 +30865,7 @@ components:
 
     FiscalJurisdictionCode:
       type: string
-      enum: [AR, UY]
+      enum: [AR, UY, CL]
       description: >-
         Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which
         modules are mandatory in production. Defaults to `AR`.

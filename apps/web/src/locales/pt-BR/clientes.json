@@ -38,14 +38,19 @@
     "fantasia": "Nome Fantasia",
     "cuit": "CNPJ/CPF",
     "taxId": {
-      "cuit": {
+      "AR": {
         "label": "Identificação fiscal (CUIT)",
         "placeholder": "20-12345678-9",
         "invalid": "CUIT inválido"
       },
-      "rut": {
+      "UY": {
         "label": "Identificação fiscal (RUT)",
         "placeholder": "01-234567-8908",
+        "invalid": "RUT inválido"
+      },
+      "CL": {
+        "label": "Identificação fiscal (RUT)",
+        "placeholder": "12.345.678-5",
         "invalid": "RUT inválido"
       }
     },

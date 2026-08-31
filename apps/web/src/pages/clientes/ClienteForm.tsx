@@ -154,10 +154,10 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   // Jurisdicción fiscal del tenant: elige el algoritmo y las etiquetas del identificador (#207).
   const { jurisdiccionFiscal } = useFeatureFlags()
   const taxIdKind = FISCAL_JURISDICTIONS[jurisdiccionFiscal].taxIdKind
-  const taxIdLabel = t(`form.taxId.${taxIdKind}.label`)
+  const taxIdLabel = t(`form.taxId.${jurisdiccionFiscal}.label`)
   const schema = useMemo(
-    () => buildClienteSchema(jurisdiccionFiscal, t(`form.taxId.${taxIdKind}.invalid`)),
-    [jurisdiccionFiscal, taxIdKind, t],
+    () => buildClienteSchema(jurisdiccionFiscal, t(`form.taxId.${jurisdiccionFiscal}.invalid`)),
+    [jurisdiccionFiscal, t],
   )
 
   const {
@@ -213,7 +213,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
    * @pt-BR Consulta o CUIT no Padrón A4 AFIP ao perder foco e autopreenche campos verificados (#192). Nunca bloqueia o formulário; ignorado fora da Argentina (#207).
    */
   const handleCuitBlur = async (rawValue: string) => {
-    if (taxIdKind !== 'cuit') {
+    if (jurisdiccionFiscal !== 'AR') {
       setPadronStatus('idle')
       setPadronTruncatedWarning(false)
       return
@@ -448,7 +448,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
                   void handleCuitBlur(e.target.value)
                 },
               })}
-              placeholder={t(`form.taxId.${taxIdKind}.placeholder`)}
+              placeholder={t(`form.taxId.${jurisdiccionFiscal}.placeholder`)}
               aria-describedby={errors.cuit ? 'cliente-cuit-error' : 'cliente-padron-status'}
               className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none font-mono"
             />

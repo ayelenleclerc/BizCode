@@ -62,8 +62,9 @@
     "fantasia": "Trade name",
     "cuit": "Tax ID",
     "taxId": {
-      "cuit": { "label": "CUIT", "invalid": "Invalid CUIT" },
-      "rut": { "label": "RUT", "invalid": "Invalid RUT" }
+      "AR": { "label": "CUIT", "invalid": "Invalid CUIT" },
+      "UY": { "label": "RUT", "invalid": "Invalid RUT" },
+      "CL": { "label": "RUT", "invalid": "Invalid RUT" }
     },
     "condIva": "VAT condition",
     "telef": "Phone",

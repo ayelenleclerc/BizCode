@@ -62,8 +62,9 @@
     "fantasia": "Nombre fantasía",
     "cuit": "CUIT",
     "taxId": {
-      "cuit": { "label": "CUIT", "invalid": "CUIT inválido" },
-      "rut": { "label": "RUT", "invalid": "RUT inválido" }
+      "AR": { "label": "CUIT", "invalid": "CUIT inválido" },
+      "UY": { "label": "RUT", "invalid": "RUT inválido" },
+      "CL": { "label": "RUT", "invalid": "RUT inválido" }
     },
     "condIva": "Condición IVA",
     "telef": "Teléfono",

@@ -99,6 +99,7 @@ Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and 
 | :----- | :---------- |
 | `"AR"` |             |
 | `"UY"` |             |
+| `"CL"` |             |
 
 ## modules
 

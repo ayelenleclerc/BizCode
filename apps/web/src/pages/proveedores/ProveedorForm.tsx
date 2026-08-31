@@ -64,12 +64,12 @@ function ProveedorDatosFormShell({
 /**
  * @en Full supplier profile form with collapsible sections (#269).
  * @es Formulario de ficha de proveedor con secciones colapsables (#269).
- * @pt-BR Formulário de ficha de fornecedor com seções recolhíveis (#269).
+ * @pt-BR FormulÃ¡rio de ficha de fornecedor com seÃ§Ãµes recolhÃ­veis (#269).
  */
 export default function ProveedorForm({ proveedorId, onClose, onSaved }: ProveedorFormProps) {
   const { t } = useTranslation('proveedores')
   const { t: tc } = useTranslation('common')
-  // Jurisdicción fiscal del tenant: elige el algoritmo del identificador (#207).
+  // JurisdicciÃ³n fiscal del tenant: elige el algoritmo del identificador (#207).
   const { jurisdiccionFiscal } = useFeatureFlags()
   const taxIdKind = FISCAL_JURISDICTIONS[jurisdiccionFiscal].taxIdKind
   const [loading, setLoading] = useState(proveedorId != null)
@@ -153,7 +153,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
     }
     const cuitTrim = formCuit.trim()
     if (cuitTrim && !validateTaxId(cuitTrim, jurisdiccionFiscal)) {
-      errs.cuit = t(`form.taxId.${taxIdKind}.invalid`)
+      errs.cuit = t(`form.taxId.${jurisdiccionFiscal}.invalid`)
     }
     const cbuTrim = formCbu.trim()
     if (cbuTrim && !validateCBU(cbuTrim)) {
@@ -249,7 +249,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
         className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-6 shadow-xl text-slate-900 dark:text-slate-100"
       >
         <h2 id="proveedor-form-title" className="text-xl font-semibold mb-2">
-          {proveedorId != null ? t('form.titleEdit', { codigo: formCodigo || '…' }) : t('form.titleNew')}
+          {proveedorId != null ? t('form.titleEdit', { codigo: formCodigo || 'â€¦' }) : t('form.titleNew')}
         </h2>
         <p className="text-xs text-slate-500 mb-4">{t('form.hint')}</p>
         <KeyboardHint shortcuts={formShortcuts} className="mb-4" />
@@ -458,7 +458,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                   </div>
                   <div>
                     <label htmlFor="proveedor-form-cuit" className="block text-sm font-medium mb-1">
-                      {t(`form.taxId.${taxIdKind}.label`)}
+                      {t(`form.taxId.${jurisdiccionFiscal}.label`)}
                     </label>
                     <input
                       id="proveedor-form-cuit"

@@ -62,8 +62,9 @@
     "fantasia": "Nome fantasia",
     "cuit": "CNPJ/CPF",
     "taxId": {
-      "cuit": { "label": "CUIT", "invalid": "CUIT inválido" },
-      "rut": { "label": "RUT", "invalid": "RUT inválido" }
+      "AR": { "label": "CUIT", "invalid": "CUIT inválido" },
+      "UY": { "label": "RUT", "invalid": "RUT inválido" },
+      "CL": { "label": "RUT", "invalid": "RUT inválido" }
     },
     "condIva": "Regime fiscal",
     "telef": "Telefone",

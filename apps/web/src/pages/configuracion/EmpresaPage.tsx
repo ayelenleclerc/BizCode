@@ -42,7 +42,7 @@ const EMPRESA_TIMEZONE_OPTIONS = [
 const empresaFormSchema = z
   .object({
     nombre: z.string().trim().min(1).max(40),
-    // Validado contra la jurisdicción del tenant al construir el schema (#207).
+    // Validado contra la jurisdicciÃ³n del tenant al construir el schema (#207).
     cuit: z.string().trim().min(1),
     domicilio: z.string().max(40).optional(),
     puntoVenta: z.coerce.number().int().min(1).max(9999),
@@ -70,8 +70,8 @@ type EmpresaFormData = z.infer<typeof empresaFormSchema>
 
 /**
  * @en Refines the company tax identifier with the algorithm of the tenant jurisdiction (#207).
- * @es Refina el identificador fiscal de la empresa con el algoritmo de la jurisdicción del tenant (#207).
- * @pt-BR Refina o identificador fiscal da empresa com o algoritmo da jurisdição do tenant (#207).
+ * @es Refina el identificador fiscal de la empresa con el algoritmo de la jurisdicciÃ³n del tenant (#207).
+ * @pt-BR Refina o identificador fiscal da empresa com o algoritmo da jurisdiÃ§Ã£o do tenant (#207).
  */
 function buildEmpresaFormSchema(jurisdiccion: FiscalJurisdictionCode) {
   return empresaFormSchema.refine((data) => validateTaxId(data.cuit, jurisdiccion), {
@@ -111,7 +111,7 @@ export default function EmpresaPage() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [prefijoPreview, setPrefijoPreview] = useState('0001')
-  // Jurisdicción fiscal del tenant: elige el algoritmo y las etiquetas del identificador (#207).
+  // JurisdicciÃ³n fiscal del tenant: elige el algoritmo y las etiquetas del identificador (#207).
   const { jurisdiccionFiscal } = useFeatureFlags()
   const taxIdKind = FISCAL_JURISDICTIONS[jurisdiccionFiscal].taxIdKind
   const schema = useMemo(() => buildEmpresaFormSchema(jurisdiccionFiscal), [jurisdiccionFiscal])
@@ -294,7 +294,7 @@ export default function EmpresaPage() {
 
           <div>
             <label htmlFor="empresa-cuit" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              {t(`form.taxId.${taxIdKind}.label`)}
+              {t(`form.taxId.${jurisdiccionFiscal}.label`)}
               <span className="text-red-500" aria-hidden="true">
                 {' '}
                 *
@@ -313,11 +313,11 @@ export default function EmpresaPage() {
               disabled={!canEdit}
             />
             <p id="empresa-cuit-hint" className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              {t(`form.taxId.${taxIdKind}.hint`)}
+              {t(`form.taxId.${jurisdiccionFiscal}.hint`)}
             </p>
             {errors.cuit && (
               <p id="empresa-cuit-error" className="text-red-500 text-xs mt-1" role="alert">
-                {fieldError('cuit', t(`form.taxId.${taxIdKind}.invalid`))}
+                {fieldError('cuit', t(`form.taxId.${jurisdiccionFiscal}.invalid`))}
               </p>
             )}
           </div>

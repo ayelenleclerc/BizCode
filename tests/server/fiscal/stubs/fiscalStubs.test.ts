@@ -8,6 +8,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { UruguayDgiFiscalAdapter } from '../../../../apps/server/fiscal/stubs/UruguayDgiFiscalAdapter'
+import { ChileSiiFiscalAdapter } from '../../../../apps/server/fiscal/stubs/ChileSiiFiscalAdapter'
 import { MexicoSatFiscalAdapter } from '../../../../apps/server/fiscal/stubs/MexicoSatFiscalAdapter'
 import { FiscalAdapterNotImplementedError } from '../../../../apps/server/fiscal/stubs/FiscalAdapterNotImplementedError'
 import type { FiscalProviderAdapter } from '../../../../apps/server/fiscal/FiscalProviderAdapter'
@@ -16,6 +17,7 @@ const prisma = {} as unknown as PrismaClient
 
 describe.each([
   { name: 'UruguayDgiFiscalAdapter', Adapter: UruguayDgiFiscalAdapter, provider: 'uruguay_dgi', countryCode: 'UY' },
+  { name: 'ChileSiiFiscalAdapter', Adapter: ChileSiiFiscalAdapter, provider: 'chile_sii', countryCode: 'CL' },
   { name: 'MexicoSatFiscalAdapter', Adapter: MexicoSatFiscalAdapter, provider: 'mexico_sat_pac', countryCode: 'MX' },
 ])('$name (#378 capability stub)', ({ Adapter, provider, countryCode }) => {
   let adapter: FiscalProviderAdapter

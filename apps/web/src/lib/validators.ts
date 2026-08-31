@@ -4,12 +4,34 @@
  * @pt-BR Funções puras de validação para faturamento (identificadores fiscais, códigos, preços, IVA).
  */
 
-import { FISCAL_JURISDICTIONS, resolveJurisdiction } from '@bizcode/types'
+import { resolveJurisdiction, type FiscalJurisdictionCode } from '@bizcode/types'
 import { formatCUIT, validateCUIT } from './validators/cuit'
 import { formatRUT, validateRUT } from './validators/rut'
+import { formatRUTCL, validateRUTCL } from './validators/rutCl'
 
 export { formatCUIT, validateCUIT } from './validators/cuit'
 export { formatRUT, rutCheckDigit, validateRUT } from './validators/rut'
+export { formatRUTCL, rutClCheckDigit, validateRUTCL } from './validators/rutCl'
+
+/**
+ * @en Tax-id algorithm per jurisdiction. Uruguay and Chile both call their identifier "RUT" but use
+ *   different algorithms, so the algorithm is selected by country code and not by `taxIdKind`,
+ *   which only drives the UI label (#208).
+ * @es Algoritmo de identificador fiscal por jurisdicción. Uruguay y Chile llaman "RUT" a su
+ *   identificador pero usan algoritmos distintos, así que el algoritmo se elige por código de país
+ *   y no por `taxIdKind`, que solo gobierna la etiqueta de la UI (#208).
+ * @pt-BR Algoritmo de identificador fiscal por jurisdição. Uruguai e Chile chamam seu identificador
+ *   de "RUT" mas usam algoritmos diferentes, então o algoritmo é escolhido pelo código do país e não
+ *   por `taxIdKind`, que apenas rege o rótulo da UI (#208).
+ */
+const TAX_ID_ALGORITHMS: Record<
+  FiscalJurisdictionCode,
+  { validate: (taxId: string) => boolean; format: (taxId: string) => string }
+> = {
+  AR: { validate: validateCUIT, format: formatCUIT },
+  UY: { validate: validateRUT, format: formatRUT },
+  CL: { validate: validateRUTCL, format: formatRUTCL },
+}
 
 /**
  * @en Validates a tax identifier with the algorithm of the given jurisdiction (#207).
@@ -17,9 +39,7 @@ export { formatRUT, rutCheckDigit, validateRUT } from './validators/rut'
  * @pt-BR Valida um identificador fiscal com o algoritmo da jurisdição informada (#207).
  */
 export function validateTaxId(taxId: string, jurisdiction: unknown): boolean {
-  return FISCAL_JURISDICTIONS[resolveJurisdiction(jurisdiction)].taxIdKind === 'rut'
-    ? validateRUT(taxId)
-    : validateCUIT(taxId)
+  return TAX_ID_ALGORITHMS[resolveJurisdiction(jurisdiction)].validate(taxId)
 }
 
 /**
@@ -28,9 +48,7 @@ export function validateTaxId(taxId: string, jurisdiction: unknown): boolean {
  * @pt-BR Formata um identificador fiscal conforme a convenção da jurisdição informada (#207).
  */
 export function formatTaxId(taxId: string, jurisdiction: unknown): string {
-  return FISCAL_JURISDICTIONS[resolveJurisdiction(jurisdiction)].taxIdKind === 'rut'
-    ? formatRUT(taxId)
-    : formatCUIT(taxId)
+  return TAX_ID_ALGORITHMS[resolveJurisdiction(jurisdiction)].format(taxId)
 }
 
 const CBU_BLOCK1_WEIGHTS = [7, 1, 3, 9, 7, 1, 3] as const
@@ -66,7 +84,7 @@ export function validateCBU(cbu: string): boolean {
  * @es Alícuotas admitidas por `calculateIVA`: las dos de cada jurisdicción soportada más exento (#207).
  * @pt-BR Alíquotas aceitas por `calculateIVA`: as duas de cada jurisdição suportada mais isento (#207).
  */
-export type VatRateLiteral = '21' | '10.5' | '22' | '10' | '0'
+export type VatRateLiteral = '21' | '10.5' | '22' | '19' | '10' | '0'
 
 /**
  * Calcula IVA sobre un monto según alícuota

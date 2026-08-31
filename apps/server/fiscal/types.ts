@@ -13,13 +13,18 @@
 
 /**
  * @en Registered fiscal provider codes. Only `arca_wsfe` has a working adapter today;
- *   `uruguay_dgi` and `mexico_sat_pac` are capability-only stubs (#378).
+ *   `uruguay_dgi`, `chile_sii` and `mexico_sat_pac` are capability-only stubs (#378, #208).
  * @es Códigos de proveedor fiscal registrados. Solo `arca_wsfe` tiene adapter funcional hoy;
- *   `uruguay_dgi` y `mexico_sat_pac` son stubs de capacidades (#378).
+ *   `uruguay_dgi`, `chile_sii` y `mexico_sat_pac` son stubs de capacidades (#378, #208).
  * @pt-BR Códigos de provedor fiscal registrados. Apenas `arca_wsfe` tem adapter funcional hoje;
- *   `uruguay_dgi` e `mexico_sat_pac` são stubs de capacidades (#378).
+ *   `uruguay_dgi`, `chile_sii` e `mexico_sat_pac` são stubs de capacidades (#378, #208).
  */
-export const FISCAL_PROVIDER_CODES = ['arca_wsfe', 'uruguay_dgi', 'mexico_sat_pac'] as const
+export const FISCAL_PROVIDER_CODES = [
+  'arca_wsfe',
+  'uruguay_dgi',
+  'chile_sii',
+  'mexico_sat_pac',
+] as const
 
 export type FiscalProviderCode = (typeof FISCAL_PROVIDER_CODES)[number]
 
@@ -28,7 +33,7 @@ export function isFiscalProviderCode(value: unknown): value is FiscalProviderCod
 }
 
 /** @en ISO-3166-1 alpha-2 country code the provider issues documents for. */
-export type FiscalCountryCode = 'AR' | 'UY' | 'MX'
+export type FiscalCountryCode = 'AR' | 'UY' | 'CL' | 'MX'
 
 /**
  * @en Normalized environment. Mirrors ArcaService's `ambiente` vocabulary (the only
