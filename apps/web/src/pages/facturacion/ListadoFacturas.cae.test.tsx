@@ -71,13 +71,14 @@ const baseFactura: Factura = {
   items: [],
 }
 
-describe('ListadoFacturas — CAE UI', () => {
+describe('ListadoFacturas â€” CAE UI', () => {
   it('shows pending badge and retry when module enabled', () => {
     vi.mocked(useFeatureFlags).mockReturnValue({
       status: 'ready',
       modules: ['billing.arca_cae'],
       integrations: [],
       jurisdiccionFiscal: 'AR' as const,
+      jurisdiccionesHabilitadas: ['AR', 'UY'] as const,
       hasModule: (key) => key === 'billing.arca_cae',
       hasIntegration: () => false,
       refreshFeatures: vi.fn(),
@@ -104,6 +105,7 @@ describe('ListadoFacturas — CAE UI', () => {
       modules: ['billing.arca_cae'],
       integrations: [],
       jurisdiccionFiscal: 'AR' as const,
+      jurisdiccionesHabilitadas: ['AR', 'UY'] as const,
       hasModule: (key) => key === 'billing.arca_cae',
       hasIntegration: () => false,
       refreshFeatures: vi.fn(),

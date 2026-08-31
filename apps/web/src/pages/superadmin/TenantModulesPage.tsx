@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import {
   ApiRequestFailedError,
   modulesCatalogAPI,
@@ -74,6 +75,22 @@ export default function TenantModulesPage() {
     DEFAULT_FISCAL_JURISDICTION,
   )
   const jurisdictionFieldId = useId()
+  const { jurisdiccionesHabilitadas } = useFeatureFlags()
+  /**
+   * @en Only the jurisdictions this installation enables are offered; the tenant's current one stays
+   *   listed so an existing configuration is never silently rewritten (#437).
+   * @es Solo se ofrecen las jurisdicciones que habilita esta instalación; la actual del tenant se
+   *   mantiene listada para no reescribir en silencio una configuración existente (#437).
+   * @pt-BR Só são oferecidas as jurisdições habilitadas por esta instalação; a atual do tenant
+   *   permanece listada para não reescrever silenciosamente uma configuração existente (#437).
+   */
+  const jurisdictionOptions = useMemo(
+    () =>
+      FISCAL_JURISDICTION_CODES.filter(
+        (code) => jurisdiccionesHabilitadas.includes(code) || code === jurisdiccionFiscal,
+      ),
+    [jurisdiccionesHabilitadas, jurisdiccionFiscal],
+  )
 
   const applyConfigToState = useCallback((config: TenantConfigDTO) => {
     setActiveModules(new Set(config.modules))
@@ -414,7 +431,7 @@ export default function TenantModulesPage() {
             data-testid="superadmin-jurisdiction-select"
             aria-describedby="superadmin-jurisdiction-hint"
           >
-            {FISCAL_JURISDICTION_CODES.map((code) => (
+            {jurisdictionOptions.map((code) => (
               <option key={code} value={code}>
                 {FISCAL_JURISDICTIONS[code].label}
               </option>

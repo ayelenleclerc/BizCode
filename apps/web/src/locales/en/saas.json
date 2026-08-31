@@ -11,6 +11,11 @@
     "title": "Create account",
     "businessName": "Legal / business name",
     "cuit": "CUIT",
+    "jurisdiction": "Tax country",
+    "taxId": {
+      "cuit": "CUIT",
+      "rut": "RUT"
+    },
     "email": "Email (owner username)",
     "phone": "Phone (optional)",
     "tenantSlug": "Tenant identifier (slug)",

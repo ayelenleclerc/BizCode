@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../apps/server/passwordHash'
-import { NEW_TENANT_MODULES } from '../apps/web/src/lib/modules/tenantDefaults'
+import { buildNewTenantFiscalDefaults } from '../apps/server/services/tenantProvisioningDefaults'
 import { USER_CHANNELS } from '../packages/types/src/rbac'
 
 export const SUPERADMIN_SEED_TENANT_SLUG = 'platform'
@@ -36,6 +36,7 @@ export async function runSuperAdminSeed(args: {
   const passwordHash = hashPassword(rawPassword)
   const channelList = [...USER_CHANNELS]
 
+  const fiscalDefaults = buildNewTenantFiscalDefaults(undefined, args.env)
   await args.prisma.tenantConfig.upsert({
     where: { tenantId: tenant.id },
     create: {
@@ -43,7 +44,8 @@ export async function runSuperAdminSeed(args: {
       businessType: 'ambos',
       rubros: [],
       plan: 'enterprise',
-      modules: [...NEW_TENANT_MODULES, 'billing.orders'],
+      modules: [...fiscalDefaults.modules, 'billing.orders'],
+      jurisdiccionFiscal: fiscalDefaults.jurisdiccionFiscal,
       integrations: [],
     },
     update: {},

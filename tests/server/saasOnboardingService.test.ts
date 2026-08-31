@@ -88,4 +88,71 @@ describe('SaasOnboardingService', () => {
     expect(tenantCreate).toHaveBeenCalled()
     expect(paramEmpresaCreate).toHaveBeenCalled()
   })
+
+  describe('fiscal jurisdiction at registration (#437)', () => {
+    const VALID_RUT_UY = '210001730016'
+
+    function baseInput() {
+      return {
+        businessName: 'Demo SaaS',
+        email: 'owner@example.com',
+        tenantSlug: 'demo-saas',
+        password: 'password1',
+        acceptTerms: true,
+        acceptPrivacy: true,
+      } as const
+    }
+
+    it('persists the installation default when no jurisdiction is chosen', async () => {
+      const svc = new SaasOnboardingService(prisma)
+      const r = await svc.register({ ...baseInput(), cuit: PADRON_MOCK_KNOWN_CUIT })
+      expect(r.ok).toBe(true)
+      expect(tenantConfigCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ jurisdiccionFiscal: 'AR' }),
+        }),
+      )
+    })
+
+    it('rejects a jurisdiction this installation does not enable', async () => {
+      const svc = new SaasOnboardingService(prisma)
+      const r = await svc.register({
+        ...baseInput(),
+        cuit: PADRON_MOCK_KNOWN_CUIT,
+        jurisdiccionFiscal: 'ZZ',
+      })
+      expect(r.ok).toBe(false)
+      if (!r.ok) expect(r.code).toBe('JURISDICTION_NOT_ENABLED')
+      expect(tenantCreate).not.toHaveBeenCalled()
+    })
+
+    it('validates the tax id with the algorithm of the chosen jurisdiction', async () => {
+      const svc = new SaasOnboardingService(prisma)
+      const argentineCuitInUruguay = await svc.register({
+        ...baseInput(),
+        cuit: PADRON_MOCK_KNOWN_CUIT,
+        jurisdiccionFiscal: 'UY',
+      })
+      expect(argentineCuitInUruguay.ok).toBe(false)
+      if (!argentineCuitInUruguay.ok) expect(argentineCuitInUruguay.code).toBe('INVALID_CUIT')
+    })
+
+    it('creates a Uruguayan tenant without the Argentine legal modules', async () => {
+      const svc = new SaasOnboardingService(prisma)
+      const r = await svc.register({
+        ...baseInput(),
+        cuit: VALID_RUT_UY,
+        jurisdiccionFiscal: 'UY',
+      })
+      expect(r.ok).toBe(true)
+      const data = tenantConfigCreate.mock.calls[0]?.[0]?.data as {
+        jurisdiccionFiscal: string
+        modules: string[]
+      }
+      expect(data.jurisdiccionFiscal).toBe('UY')
+      expect(data.modules).not.toContain('billing.arca_cae')
+      expect(data.modules).not.toContain('fiscal.remito')
+      expect(data.modules).toContain('core.invoicing')
+    })
+  })
 })
