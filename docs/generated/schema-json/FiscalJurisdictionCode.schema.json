@@ -3,7 +3,8 @@
   "description": "Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.",
   "enum": [
     "AR",
-    "UY"
+    "UY",
+    "CL"
   ],
   "title": "FiscalJurisdictionCode",
   "type": "string"

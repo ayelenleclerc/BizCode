@@ -22,4 +22,5 @@ undefined#/properties/provider
 | :----------------- | :---------- |
 | `"arca_wsfe"`      |             |
 | `"uruguay_dgi"`    |             |
+| `"chile_sii"`      |             |
 | `"mexico_sat_pac"` |             |

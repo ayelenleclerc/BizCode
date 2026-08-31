@@ -108,6 +108,7 @@ undefined#/properties/data
 | :----------------- | :---------- |
 | `"arca_wsfe"`      |             |
 | `"uruguay_dgi"`    |             |
+| `"chile_sii"`      |             |
 | `"mexico_sat_pac"` |             |
 
 ## status

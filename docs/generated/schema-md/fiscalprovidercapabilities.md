@@ -127,6 +127,7 @@ undefined#/properties/capabilities
 | :----------------- | :---------- |
 | `"arca_wsfe"`      |             |
 | `"uruguay_dgi"`    |             |
+| `"chile_sii"`      |             |
 | `"mexico_sat_pac"` |             |
 
 ## supportsCancel
