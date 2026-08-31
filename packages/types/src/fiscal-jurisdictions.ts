@@ -1,45 +1,29 @@
 /**
- * @en Tax jurisdiction catalog for the multi-country base (#207): VAT rates, tax-id kind and currency.
- * @es Catalogo de jurisdicciones fiscales para la base multi-pais (#207): alicuotas de IVA, tipo de identificador y moneda.
- * @pt-BR Catalogo de jurisdicoes fiscais para a base multipais (#207): aliquotas de IVA, tipo de identificador e moeda.
- *
- * @en Declarative data only: emitting a fiscal document still depends on each provider adapter.
- * @es Solo datos declarativos: emitir un comprobante sigue dependiendo del adaptador de cada proveedor.
- * @pt-BR Apenas dados declarativos: emitir um comprovante ainda depende do adaptador de cada provedor.
+ * @en Jurisdiction catalog kept as the historical public surface (#207), now derived from the
+ *   per-country rule sets in `fiscal/` (#440) so there is a single source of truth.
+ * @es Catalogo de jurisdicciones conservado como superficie publica historica (#207), ahora derivado
+ *   de los conjuntos de reglas por pais de `fiscal/` (#440) para tener una unica fuente de verdad.
+ * @pt-BR Catalogo de jurisdicoes mantido como superficie publica historica (#207), agora derivado
+ *   dos conjuntos de regras por pais de `fiscal/` (#440) para haver uma unica fonte de verdade.
  */
 
-/**
- * @en Jurisdictions with an operational tax model. Mexico is excluded: its adapter is a capability stub.
- * @es Jurisdicciones con modelo fiscal operativo. Mexico queda fuera: su adaptador es un stub de capacidades.
- * @pt-BR Jurisdicoes com modelo fiscal operacional. Mexico fica de fora: seu adaptador e um stub de capacidades.
- */
-export const FISCAL_JURISDICTION_CODES = ['AR', 'UY', 'CL'] as const
+import {
+  FISCAL_RULE_SETS,
+  FISCAL_JURISDICTION_CODES,
+  DEFAULT_FISCAL_JURISDICTION,
+  isFiscalJurisdictionCode,
+  resolveJurisdiction,
+  type FiscalJurisdictionCode,
+} from './fiscal/registry'
+import type { TaxIdKind, VatRates } from './fiscal/types'
 
-export type FiscalJurisdictionCode = (typeof FISCAL_JURISDICTION_CODES)[number]
-
-/**
- * @en Jurisdiction used when a tenant has no explicit configuration; preserves the historical behaviour.
- * @es Jurisdiccion usada cuando el tenant no tiene configuracion explicita; conserva el comportamiento historico.
- * @pt-BR Jurisdicao usada quando o tenant nao tem configuracao explicita; mantem o comportamento historico.
- */
-export const DEFAULT_FISCAL_JURISDICTION: FiscalJurisdictionCode = 'AR'
-
-/**
- * @en Kind of tax identifier a jurisdiction expects, which selects the validation algorithm.
- * @es Tipo de identificador fiscal que espera la jurisdiccion, que selecciona el algoritmo de validacion.
- * @pt-BR Tipo de identificador fiscal esperado pela jurisdicao, que seleciona o algoritmo de validacao.
- */
-export type TaxIdKind = 'cuit' | 'rut'
-
-/**
- * @en Two VAT rates per jurisdiction, matching the `neto1`/`neto2` buckets persisted on `Factura`.
- * @es Dos alicuotas de IVA por jurisdiccion, alineadas con los buckets `neto1`/`neto2` de `Factura`.
- * @pt-BR Duas aliquotas de IVA por jurisdicao, alinhadas aos buckets `neto1`/`neto2` de `Factura`.
- */
-export type VatRates = {
-  standard: number
-  reduced: number
+export {
+  FISCAL_JURISDICTION_CODES,
+  DEFAULT_FISCAL_JURISDICTION,
+  isFiscalJurisdictionCode,
+  resolveJurisdiction,
 }
+export type { FiscalJurisdictionCode, TaxIdKind, VatRates }
 
 export type FiscalJurisdiction = {
   code: FiscalJurisdictionCode
@@ -55,61 +39,28 @@ export type FiscalJurisdiction = {
   providerCode: string
 }
 
-export const FISCAL_JURISDICTIONS: Record<FiscalJurisdictionCode, FiscalJurisdiction> = {
-  AR: {
-    code: 'AR',
-    label: 'Argentina',
-    currency: 'ARS',
-    taxIdKind: 'cuit',
-    vatRates: { standard: 21, reduced: 10.5 },
-    providerCode: 'arca_wsfe',
-  },
-  UY: {
-    code: 'UY',
-    label: 'Uruguay',
-    currency: 'UYU',
-    taxIdKind: 'rut',
-    vatRates: { standard: 22, reduced: 10 },
-    providerCode: 'uruguay_dgi',
-  },
-  /**
-   * @en Chile has a single 19% VAT rate, so `reduced` repeats it: `Factura` persists the
-   *   `neto1`/`neto2` buckets and a bucket without a rate has no representation (#208).
-   * @es Chile tiene una unica alicuota de IVA del 19%, por eso `reduced` la repite: `Factura`
-   *   persiste los buckets `neto1`/`neto2` y un bucket sin alicuota no tiene representacion (#208).
-   * @pt-BR O Chile tem uma unica aliquota de IVA de 19%, por isso `reduced` a repete: `Factura`
-   *   persiste os buckets `neto1`/`neto2` e um bucket sem aliquota nao tem representacao (#208).
-   */
-  CL: {
-    code: 'CL',
-    label: 'Chile',
-    currency: 'CLP',
-    taxIdKind: 'rut',
-    vatRates: { standard: 19, reduced: 19 },
-    providerCode: 'chile_sii',
-  },
-}
-
 /**
- * @en Narrows an arbitrary string to a supported jurisdiction code.
- * @es Estrecha un string arbitrario a un codigo de jurisdiccion soportado.
- * @pt-BR Restringe uma string arbitraria a um codigo de jurisdicao suportado.
+ * @en Flattened view of the rule sets, preserving the shape consumed since #207.
+ * @es Vista aplanada de los conjuntos de reglas, preservando la forma consumida desde #207.
+ * @pt-BR Visao achatada dos conjuntos de regras, preservando o formato consumido desde #207.
  */
-export function isFiscalJurisdictionCode(value: unknown): value is FiscalJurisdictionCode {
-  return (
-    typeof value === 'string' &&
-    (FISCAL_JURISDICTION_CODES as readonly string[]).includes(value)
-  )
-}
-
-/**
- * @en Resolves a persisted value to a jurisdiction, falling back to the default when unknown or absent.
- * @es Resuelve un valor persistido a una jurisdiccion, cayendo al default cuando es desconocido o falta.
- * @pt-BR Resolve um valor persistido para uma jurisdicao, retornando ao padrao quando desconhecido ou ausente.
- */
-export function resolveJurisdiction(value: unknown): FiscalJurisdictionCode {
-  return isFiscalJurisdictionCode(value) ? value : DEFAULT_FISCAL_JURISDICTION
-}
+export const FISCAL_JURISDICTIONS: Record<FiscalJurisdictionCode, FiscalJurisdiction> =
+  Object.fromEntries(
+    FISCAL_JURISDICTION_CODES.map((code) => {
+      const rules = FISCAL_RULE_SETS[code]
+      return [
+        code,
+        {
+          code,
+          label: rules.label,
+          currency: rules.currency,
+          taxIdKind: rules.taxId.kind,
+          vatRates: rules.vatRates,
+          providerCode: rules.providerCode,
+        },
+      ]
+    }),
+  ) as Record<FiscalJurisdictionCode, FiscalJurisdiction>
 
 /**
  * @en VAT rates for a jurisdiction, safe against unknown persisted values.
@@ -117,5 +68,5 @@ export function resolveJurisdiction(value: unknown): FiscalJurisdictionCode {
  * @pt-BR Aliquotas de IVA de uma jurisdicao, seguras contra valores persistidos desconhecidos.
  */
 export function getVatRates(value: unknown): VatRates {
-  return FISCAL_JURISDICTIONS[resolveJurisdiction(value)].vatRates
+  return FISCAL_RULE_SETS[resolveJurisdiction(value)].vatRates
 }

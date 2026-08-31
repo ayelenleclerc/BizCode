@@ -89,7 +89,7 @@ describe('ClienteForm tax identifier per jurisdiction (#208)', () => {
     render(<ClienteForm cliente={null} onClose={vi.fn()} onGuardado={vi.fn()} />)
 
     const field = screen.getByTestId('cliente-form-cuit')
-    expect(field).toHaveAttribute('placeholder', '20-12345678-9')
+    expect(field).toHaveAttribute('placeholder', '20-12345678-6')
 
     await user.type(field, '20-11111111-2')
     await user.tab()

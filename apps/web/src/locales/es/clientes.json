@@ -40,7 +40,7 @@
     "taxId": {
       "AR": {
         "label": "CUIT",
-        "placeholder": "20-12345678-9",
+        "placeholder": "20-12345678-6",
         "invalid": "CUIT inválido"
       },
       "UY": {

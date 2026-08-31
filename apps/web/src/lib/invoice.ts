@@ -4,7 +4,7 @@
  * @pt-BR Agregação de linhas de fatura com IVA (líquidos, IVA, total) conforme a jurisdição do tenant (#207).
  */
 
-import { getVatRates } from '@bizcode/types'
+import { getVatRates, subjectPaysVat } from '@bizcode/types'
 
 export interface InvoiceItem {
   articuloId: number
@@ -64,8 +64,8 @@ export function calculateInvoice(
   let iva1 = 0
   let iva2 = 0
 
-  if (clienteIva !== 'CF' && clienteIva !== 'Exento') {
-    // RI y Monotributista pagan IVA
+  // Quién paga IVA lo declara cada país en su conjunto de reglas, no el motor (#440).
+  if (subjectPaysVat(clienteIva, jurisdiccion)) {
     const { standard, reduced } = getVatRates(jurisdiccion)
     iva1 = Math.round(((neto1 * standard) / 100) * 100) / 100
     iva2 = Math.round(((neto2 * reduced) / 100) * 100) / 100

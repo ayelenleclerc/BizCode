@@ -37,6 +37,8 @@ export default defineConfig({
         'apps/server/**/*.ts',
         'apps/web/src/**/*.{ts,tsx}',
         'packages/api-client/src/**/*.ts',
+        // Tier 1: per-country fiscal rule registry, pure modules moved out of src/lib (#440).
+        'packages/types/src/fiscal/**/*.ts',
       ],
       exclude: [
         '**/*.test.ts',
