@@ -198,6 +198,68 @@ One-time endpoint to create initial tenant and owner user.
 }
 ```
 
+### Fiscal jurisdictions offered by this installation (#437)
+
+- **Method:** `GET`
+- **Path:** `/api/saas/jurisdictions`
+- **Tags:** saas
+
+Public endpoint. Reports the jurisdictions enabled by BIZCODE\_FISCAL\_JURISDICTIONS and the default applied to tenants created without an explicit choice, so the public registration form only proposes supported countries. Exposes installation configuration, never tenant data.
+
+#### Responses
+
+##### Status: 200 Enabled jurisdictions
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`default` (required)**
+
+    `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+
+  - **`enabled` (required)**
+
+    `array`
+
+    **Items:**
+
+    - **`code` (required)**
+
+      `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+
+    - **`label` (required)**
+
+      `string`
+
+    - **`taxIdKind` (required)**
+
+      `string`, possible values: `"cuit", "rut"`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "enabled": [
+      {
+        "code": "AR",
+        "label": "",
+        "taxIdKind": "cuit"
+      }
+    ],
+    "default": "AR"
+  }
+}
+```
+
 ### Suggest tenant slug from business name (#180)
 
 - **Method:** `GET`
@@ -273,6 +335,10 @@ Public endpoint (rate-limited). Creates tenant + owner + ParamEmpresa starter pl
 
   `string`
 
+- **`jurisdiccionFiscal`**
+
+  `object` — Fiscal jurisdiction chosen at registration (#437). Omitted, the installation default applies. A jurisdiction this installation does not enable is rejected with JURISDICTION\_NOT\_ENABLED.
+
 - **`phone`**
 
   `string`
@@ -283,6 +349,7 @@ Public endpoint (rate-limited). Creates tenant + owner + ParamEmpresa starter pl
 {
   "businessName": "",
   "cuit": "",
+  "jurisdiccionFiscal": "AR",
   "email": "",
   "phone": "",
   "tenantSlug": "",
@@ -2901,6 +2968,14 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 
     `string`
 
+  - **`jurisdiccionesHabilitadas`**
+
+    `array` — Fiscal jurisdictions this installation offers (#437).
+
+    **Items:**
+
+    `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+
 - **`success` (required)**
 
   `boolean`
@@ -2917,7 +2992,10 @@ Returns module and integration keys enabled for the authenticated user's tenant.
     "integrations": [
       ""
     ],
-    "jurisdiccionFiscal": "AR"
+    "jurisdiccionFiscal": "AR",
+    "jurisdiccionesHabilitadas": [
+      "AR"
+    ]
   }
 }
 ```
@@ -167433,6 +167511,10 @@ Rate-limited mutation; requires products.manage. USD only.
 
   `string`
 
+* **`jurisdiccionFiscal`**
+
+  `object` — Fiscal jurisdiction chosen at registration (#437). Omitted, the installation default applies. A jurisdiction this installation does not enable is rejected with JURISDICTION\_NOT\_ENABLED.
+
 * **`phone`**
 
   `string`
@@ -167443,6 +167525,7 @@ Rate-limited mutation; requires products.manage. USD only.
 {
   "businessName": "",
   "cuit": "",
+  "jurisdiccionFiscal": "AR",
   "email": "",
   "phone": "",
   "tenantSlug": "",
@@ -213171,6 +213254,14 @@ Sales breakdown by operation currency (#206).
 
   `string`
 
+* **`jurisdiccionesHabilitadas`**
+
+  `array` — Fiscal jurisdictions this installation offers (#437).
+
+  **Items:**
+
+  `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+
 **Example:**
 
 ```json
@@ -213181,7 +213272,10 @@ Sales breakdown by operation currency (#206).
   "integrations": [
     ""
   ],
-  "jurisdiccionFiscal": "AR"
+  "jurisdiccionFiscal": "AR",
+  "jurisdiccionesHabilitadas": [
+    "AR"
+  ]
 }
 ```
 
@@ -213213,6 +213307,14 @@ Sales breakdown by operation currency (#206).
 
     `string`
 
+  - **`jurisdiccionesHabilitadas`**
+
+    `array` — Fiscal jurisdictions this installation offers (#437).
+
+    **Items:**
+
+    `string`, possible values: `"AR", "UY"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+
 * **`success` (required)**
 
   `boolean`
@@ -213229,7 +213331,10 @@ Sales breakdown by operation currency (#206).
     "integrations": [
       ""
     ],
-    "jurisdiccionFiscal": "AR"
+    "jurisdiccionFiscal": "AR",
+    "jurisdiccionesHabilitadas": [
+      "AR"
+    ]
   }
 }
 ```

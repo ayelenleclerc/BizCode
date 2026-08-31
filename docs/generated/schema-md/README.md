@@ -2402,6 +2402,8 @@
 
 * [Untitled array in TenantFeaturesData](./tenantfeaturesdata-properties-integrations.md) – `undefined#/properties/integrations`
 
+* [Untitled array in TenantFeaturesData](./tenantfeaturesdata-properties-jurisdiccioneshabilitadas.md "Fiscal jurisdictions this installation offers (#437)") – `undefined#/properties/jurisdiccionesHabilitadas`
+
 * [Untitled array in TenantFeaturesData](./tenantfeaturesdata-properties-modules.md) – `undefined#/properties/modules`
 
 * [Untitled array in TenantModuleTrialListEnvelope](./tenantmoduletriallistenvelope-properties-data.md) – `undefined#/properties/data`
