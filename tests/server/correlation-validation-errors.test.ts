@@ -8,6 +8,7 @@ import { createApp } from '../../apps/server/createApp'
 
 function buildPrismaMock(): PrismaClient {
   return {
+    tenantConfig: { findUnique: vi.fn().mockResolvedValue(null) },
     deliveryZone: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(null),

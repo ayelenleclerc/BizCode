@@ -195,6 +195,10 @@ function basePrismaForMutations(): {
     $transaction: (fn: (tx: Tx) => Promise<unknown>) => Promise<unknown>
   }
 
+  prisma.tenantConfig = {
+    findUnique: vi.fn().mockResolvedValue(null),
+  } as unknown as Tx['tenantConfig']
+
   prisma.deliveryZone = {
     findMany: vi.fn().mockResolvedValue([]),
     findFirst: vi.fn().mockResolvedValue({ id: 1, nombre: 'Z', tipo: 'barrio', diasEntrega: null, horario: null }),

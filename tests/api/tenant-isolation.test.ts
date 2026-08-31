@@ -8,6 +8,7 @@ import { createApp } from '../../apps/server/createApp'
 
 function buildBasePrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
+    tenantConfig: { findUnique: vi.fn().mockResolvedValue(null) },
     cliente: {
       findFirst: vi.fn().mockResolvedValue(null),
       findMany: vi.fn().mockResolvedValue([]),

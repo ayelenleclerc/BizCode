@@ -71,6 +71,7 @@ const ARTICULO_STOCK_ROW = {
 
 function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): PrismaClient {
   return {
+    tenantConfig: { findUnique: vi.fn().mockResolvedValue(null) },
     deliveryZone: { findFirst: vi.fn().mockResolvedValue({ id: 1, tenantId: 1 }) },
     cliente: extendClientePrismaForCc({
       findMany: vi.fn().mockResolvedValue([CLIENTE_BASE]),

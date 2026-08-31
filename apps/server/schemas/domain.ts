@@ -1,5 +1,11 @@
 import { z } from 'zod'
-import { validateCBU, validateCUIT } from '../../web/src/lib/validators'
+import { validateCUIT } from '../../web/src/lib/validators'
+import {
+  DEFAULT_FISCAL_JURISDICTION,
+  getFiscalRules,
+  type FiscalJurisdictionCode,
+  type FiscalRuleSet,
+} from '@bizcode/types'
 import { isValidIanaTimeZone } from '../lib/tenantLocalTime'
 import { UNIDAD_BASE_VALUES, umedidaFromUnidadBase } from '../lib/uom'
 import type {
@@ -72,13 +78,62 @@ function normalizeOptStr(v: string | null | undefined, max: number, fieldKey: st
   }
 }
 
-export const clienteBodySchema = z
+/**
+ * @en Checks the tax condition, the tax identifier and the bank identifier against the rules the
+ *   jurisdiction declares (#440), instead of against hardcoded Argentine codes and algorithms.
+ * @es Comprueba la condición fiscal, el identificador fiscal y el bancario contra las reglas que
+ *   declara la jurisdicción (#440), en vez de contra códigos y algoritmos argentinos cableados.
+ * @pt-BR Verifica a condição fiscal, o identificador fiscal e o bancário contra as regras que a
+ *   jurisdição declara (#440), em vez de códigos e algoritmos argentinos fixos.
+ */
+function checkFiscalFields(
+  rules: FiscalRuleSet,
+  data: { condIva: string; cuit?: unknown; cbu?: unknown },
+  ctx: z.RefinementCtx,
+): void {
+  const conditions = rules.subjectTaxConditions.map((c) => c.code)
+  if (!conditions.includes(data.condIva)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `condIva must be one of: ${conditions.join(', ')}`,
+      path: ['condIva'],
+    })
+  }
+
+  const taxId = typeof data.cuit === 'string' ? data.cuit.trim() : data.cuit
+  if (typeof taxId === 'string' && taxId !== '' && !rules.taxId.validate(taxId)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `cuit must be a valid ${rules.taxId.kind.toUpperCase()}`,
+      path: ['cuit'],
+    })
+  }
+
+  const bank = typeof data.cbu === 'string' ? data.cbu.trim() : data.cbu
+  if (rules.bankAccount && typeof bank === 'string' && bank !== '' && !rules.bankAccount.validate(bank)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `cbu must be a valid ${rules.bankAccount.code}`,
+      path: ['cbu'],
+    })
+  }
+}
+
+/**
+ * @en Builds the customer body schema for a jurisdiction (#440). Use it through
+ *   `validateBodyForTenant` so each tenant is validated with the rules of its own country.
+ * @es Construye el esquema del cuerpo de cliente para una jurisdicción (#440). Se usa con
+ *   `validateBodyForTenant` para que cada tenant se valide con las reglas de su país.
+ * @pt-BR Constrói o esquema do corpo de cliente para uma jurisdição (#440). Usa-se com
+ *   `validateBodyForTenant` para que cada tenant seja validado com as regras do seu país.
+ */
+export function buildClienteBodySchema(jurisdiction: FiscalJurisdictionCode) {
+  const rules = getFiscalRules(jurisdiction)
+  return z
   .object({
     codigo: z.number({ invalid_type_error: 'codigo must be an integer' }),
     rsocial: z.string(),
-    condIva: z.enum(['RI', 'Mono', 'CF', 'Exento'], {
-      errorMap: () => ({ message: 'condIva must be one of: RI, Mono, CF, Exento' }),
-    }),
+    condIva: z.string({ invalid_type_error: 'condIva must be a string' }),
     activo: z.boolean({ invalid_type_error: 'activo must be a boolean' }),
     fantasia: z.union([z.string(), z.null(), z.undefined()]).optional(),
     domicilio: z.union([z.string(), z.null(), z.undefined()]).optional(),
@@ -116,14 +171,7 @@ export const clienteBodySchema = z
     normalizeOptStr(data.cuit === undefined ? undefined : data.cuit, 14, 'cuit', ctx)
     normalizeOptStr(data.alias === undefined ? undefined : data.alias, 60, 'alias', ctx)
     normalizeOptStr(data.cbu === undefined ? undefined : data.cbu, 22, 'cbu', ctx)
-    const ci = typeof data.cuit === 'string' ? data.cuit.trim() : data.cuit
-    if (ci != null && typeof ci === 'string' && ci !== '' && !validateCUIT(ci)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cuit must be a valid Argentine CUIT', path: ['cuit'] })
-    }
-    const cbuRaw = typeof data.cbu === 'string' ? data.cbu.trim() : data.cbu
-    if (cbuRaw != null && typeof cbuRaw === 'string' && cbuRaw !== '' && !validateCBU(cbuRaw)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cbu must be a valid Argentine CBU', path: ['cbu'] })
-    }
+    checkFiscalFields(rules, data, ctx)
     if (data.creditLimit !== undefined && data.creditLimit !== null && (typeof data.creditLimit !== 'number' || data.creditLimit < 0)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'creditLimit must be a number', path: ['creditLimit'] })
     }
@@ -234,6 +282,14 @@ export const clienteBodySchema = z
     }
     return out
   })
+}
+
+/**
+ * @en Customer schema for the default jurisdiction, kept for callers that have no tenant context.
+ * @es Esquema de cliente para la jurisdicción por defecto, para llamadores sin contexto de tenant.
+ * @pt-BR Esquema de cliente para a jurisdição padrão, para chamadores sem contexto de tenant.
+ */
+export const clienteBodySchema = buildClienteBodySchema(DEFAULT_FISCAL_JURISDICTION)
 
 export const articuloBodySchema = z
   .object({
@@ -457,13 +513,18 @@ const proveedorCategoriaSchema = z.enum(['materia_prima', 'insumos', 'servicios'
   errorMap: () => ({ message: 'categoria must be materia_prima, insumos, servicios, or logistica' }),
 })
 
-export const proveedorBodySchema = z
+/**
+ * @en Builds the supplier body schema for a jurisdiction (#440), mirroring the customer factory.
+ * @es Construye el esquema del cuerpo de proveedor para una jurisdicción (#440), como el de cliente.
+ * @pt-BR Constrói o esquema do corpo de fornecedor para uma jurisdição (#440), como o de cliente.
+ */
+export function buildProveedorBodySchema(jurisdiction: FiscalJurisdictionCode) {
+  const rules = getFiscalRules(jurisdiction)
+  return z
   .object({
     codigo: z.number(),
     rsocial: z.string(),
-    condIva: z.enum(['RI', 'Mono', 'CF', 'Exento'], {
-      errorMap: () => ({ message: 'condIva must be one of: RI, Mono, CF, Exento' }),
-    }),
+    condIva: z.string({ invalid_type_error: 'condIva must be a string' }),
     activo: z.boolean(),
     fantasia: z.union([z.string(), z.null(), z.undefined()]).optional(),
     telef: z.union([z.string(), z.null(), z.undefined()]).optional(),
@@ -499,15 +560,8 @@ export const proveedorBodySchema = z
     normalizeOptStr(data.telef === undefined ? undefined : data.telef, 25, 'telef', ctx)
     normalizeOptStr(data.email === undefined ? undefined : data.email, 50, 'email', ctx)
     normalizeOptStr(data.cuit === undefined ? undefined : data.cuit, 14, 'cuit', ctx)
-    const cui = typeof data.cuit === 'string' ? data.cuit.trim() : data.cuit
-    if (cui != null && typeof cui === 'string' && cui !== '' && !validateCUIT(cui)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cuit must be a valid Argentine CUIT', path: ['cuit'] })
-    }
     normalizeOptStr(data.cbu === undefined ? undefined : data.cbu, 22, 'cbu', ctx)
-    const cbuRaw = typeof data.cbu === 'string' ? data.cbu.trim() : data.cbu
-    if (cbuRaw != null && typeof cbuRaw === 'string' && cbuRaw !== '' && !validateCBU(cbuRaw)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cbu must be a valid Argentine CBU', path: ['cbu'] })
-    }
+    checkFiscalFields(rules, data, ctx)
     normalizeOptStr(data.alias === undefined ? undefined : data.alias, 20, 'alias', ctx)
     normalizeOptStr(data.banco === undefined ? undefined : data.banco, 50, 'banco', ctx)
     if (data.moneda !== undefined && data.moneda.trim().length > 3) {
@@ -594,6 +648,14 @@ export const proveedorBodySchema = z
     assignOpt('notas', trimOrNull(data.notas) as ProveedorInput['notas'])
     return out
   })
+}
+
+/**
+ * @en Supplier schema for the default jurisdiction, kept for callers that have no tenant context.
+ * @es Esquema de proveedor para la jurisdicción por defecto, para llamadores sin contexto de tenant.
+ * @pt-BR Esquema de fornecedor para a jurisdição padrão, para chamadores sem contexto de tenant.
+ */
+export const proveedorBodySchema = buildProveedorBodySchema(DEFAULT_FISCAL_JURISDICTION)
 
 const retencionPercepcionLineSchema = z.object({
   regimenId: z.number().int().min(1),
