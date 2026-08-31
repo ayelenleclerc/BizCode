@@ -3668,12 +3668,29 @@ export const printingAPI = {
 export type SaasRegisterInput = {
   businessName: string
   cuit: string
+  /**
+   * @en Tax jurisdiction chosen at registration (#437); omitted uses the installation default.
+   * @es Jurisdicción fiscal elegida en el registro (#437); omitida usa el default de la instalación.
+   * @pt-BR Jurisdição fiscal escolhida no registro (#437); omitida usa o padrão da instalação.
+   */
+  jurisdiccionFiscal?: string
   email: string
   phone?: string
   tenantSlug: string
   password: string
   acceptTerms: true
   acceptPrivacy: true
+}
+
+export type SaasJurisdictionOption = {
+  code: string
+  label: string
+  taxIdKind: string
+}
+
+export type SaasJurisdictionsData = {
+  enabled: SaasJurisdictionOption[]
+  default: string
 }
 
 export type SaasRegisterResult = {
@@ -3732,6 +3749,21 @@ export type SaasBillingList = {
 
 /** @en Public SaaS onboarding + trial status + tenant billing (#180/#182). */
 export const saasAPI = {
+  /**
+   * @en Jurisdictions this installation offers, for the public registration form (#437).
+   * @es Jurisdicciones que ofrece esta instalación, para el formulario público de registro (#437).
+   * @pt-BR Jurisdições oferecidas por esta instalação, para o formulário público de registro (#437).
+   */
+  jurisdictions: async (): Promise<SaasJurisdictionsData> => {
+    try {
+      const response = await api.get<{ success: boolean; data: SaasJurisdictionsData }>(
+        '/saas/jurisdictions',
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
   suggestSlug: async (name: string): Promise<{ slug: string }> => {
     try {
       const response = await api.get<{ success: boolean; data: { slug: string } }>(

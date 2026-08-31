@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client'
-import { NEW_TENANT_MODULES } from '@bizcode/types'
+import { buildNewTenantFiscalDefaults } from './tenantProvisioningDefaults'
 import { USER_CHANNELS } from '@bizcode/types'
 import { hashPassword } from '../passwordHash'
 import { revokeAllTenantAuthTokens } from '../lib/sessionTokens'
@@ -186,13 +186,15 @@ export class SuperadminTenantService {
           slug: input.slug,
         },
       })
+      const fiscalDefaults = buildNewTenantFiscalDefaults()
       await tx.tenantConfig.create({
         data: {
           tenantId: tenant.id,
           businessType: 'ambos',
           rubros: [],
           plan,
-          modules: [...NEW_TENANT_MODULES],
+          modules: fiscalDefaults.modules,
+          jurisdiccionFiscal: fiscalDefaults.jurisdiccionFiscal,
           integrations: [],
         },
       })

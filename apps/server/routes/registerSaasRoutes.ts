@@ -1,6 +1,8 @@
 import type { Application, Request, Response } from 'express'
 import type { PrismaClient } from '@prisma/client'
+import { FISCAL_JURISDICTIONS } from '@bizcode/types'
 import type { AuthenticatedRequest } from '../auth'
+import { resolveInstallationJurisdictions } from '../../web/src/lib/modules/jurisdictionEnv'
 import { validateBody } from '../middleware/validateBody'
 import { saasRegisterHttpRateLimiter } from '../middleware/routeRateLimit'
 import { saasRegisterBodySchema } from '../schemas/saasRegister'
@@ -16,6 +18,32 @@ import { suggestTenantSlug } from '../saas/tenantSlug'
 export function registerSaasRoutes(app: Application, prisma: PrismaClient): void {
   const onboarding = new SaasOnboardingService(prisma)
   const trial = new SaasTrialService(prisma)
+
+  /**
+   * @en Jurisdictions offered by this installation, so the public registration form can only propose
+   *   countries the installation actually supports (#437). No authentication: it exposes installation
+   *   configuration, never tenant data.
+   * @es Jurisdicciones que ofrece esta instalación, para que el formulario público de registro solo
+   *   proponga países soportados (#437). Sin autenticación: expone configuración de instalación,
+   *   nunca datos de un tenant.
+   * @pt-BR Jurisdições oferecidas por esta instalação, para que o formulário público de registro só
+   *   proponha países suportados (#437). Sem autenticação: expõe configuração da instalação, nunca
+   *   dados de um tenant.
+   */
+  app.get('/api/saas/jurisdictions', (_req: Request, res: Response) => {
+    const installation = resolveInstallationJurisdictions()
+    res.json({
+      success: true,
+      data: {
+        enabled: installation.enabled.map((code) => ({
+          code,
+          label: FISCAL_JURISDICTIONS[code].label,
+          taxIdKind: FISCAL_JURISDICTIONS[code].taxIdKind,
+        })),
+        default: installation.default,
+      },
+    })
+  })
 
   app.get('/api/saas/slug-suggestion', (req: Request, res: Response) => {
     const name = typeof req.query.name === 'string' ? req.query.name : ''

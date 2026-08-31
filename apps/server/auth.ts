@@ -19,7 +19,7 @@ import {
 import { hashPassword, verifyPassword } from './passwordHash'
 import { writeAuditEvent } from './audit'
 import { applyLoginGeoBaseline } from './security/loginGeoBaseline'
-import { NEW_TENANT_MODULES } from '@bizcode/types'
+import { buildNewTenantFiscalDefaults } from './services/tenantProvisioningDefaults'
 import {
   ACCESS_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
@@ -421,13 +421,15 @@ export function registerAuthRoutes(app: import('express').Application, prisma: P
         },
       })
       const starterPlan = await tx.plan.findUnique({ where: { key: 'starter' } })
+      const fiscalDefaults = buildNewTenantFiscalDefaults()
       await tx.tenantConfig.create({
         data: {
           tenantId: tenant.id,
           businessType: 'ambos',
           rubros: [],
           plan: 'starter',
-          modules: [...NEW_TENANT_MODULES],
+          modules: fiscalDefaults.modules,
+          jurisdiccionFiscal: fiscalDefaults.jurisdiccionFiscal,
           integrations: [],
         },
       })

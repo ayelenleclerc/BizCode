@@ -7,6 +7,12 @@ export {
 } from './catalog'
 import { resolveDeploymentEnv } from './env'
 export { resolveDeploymentEnv } from './env'
+export {
+  isJurisdictionEnabled,
+  resolveDefaultJurisdiction,
+  resolveInstallationJurisdictions,
+  type InstallationJurisdictions,
+} from './jurisdictionEnv'
 import { MODULE_PRESETS } from './presets'
 export { MODULE_PRESET_KEYS, MODULE_PRESETS, type ModulePresetKey } from './presets'
 export { BACKFILL_TENANT_MODULES, NEW_TENANT_MODULES } from './tenantDefaults'
@@ -35,13 +41,23 @@ export {
   validateModuleSet,
 } from './validation'
 
+import { isModuleAvailableInJurisdiction } from '@bizcode/types'
 import type { ModuleCatalogEntry } from '@bizcode/types'
+export {
+  filterModulesByJurisdiction,
+  getDefaultModulesForJurisdiction,
+  isModuleAvailableInJurisdiction,
+} from '@bizcode/types'
 export type { ModuleCatalogEntry } from '@bizcode/types'
 
 /**
  * @en Serializes catalog metadata for API consumers; `canDeactivate` depends on the tenant jurisdiction (#207).
  * @es Serializa metadatos del catálogo para la API; `canDeactivate` depende de la jurisdicción del tenant (#207).
  * @pt-BR Serializa metadados do catálogo para a API; `canDeactivate` depende da jurisdição do tenant (#207).
+ *
+ * @en Modules that are not legally applicable in that jurisdiction are omitted so the UI never offers them (#437).
+ * @es Los módulos no aplicables legalmente en esa jurisdicción se omiten para que la UI no los ofrezca (#437).
+ * @pt-BR Os módulos não aplicáveis legalmente nessa jurisdição são omitidos para que a UI não os ofereça (#437).
  */
 export function buildModuleCatalogPayload(jurisdiction?: unknown): {
   deploymentEnv: ReturnType<typeof resolveDeploymentEnv>
@@ -49,7 +65,10 @@ export function buildModuleCatalogPayload(jurisdiction?: unknown): {
   presets: Record<string, { modules: ModuleKey[] }>
 } {
   const deploymentEnv = resolveDeploymentEnv()
-  const modules = MODULE_KEYS.map((key) => {
+  const availableKeys = MODULE_KEYS.filter((key) =>
+    isModuleAvailableInJurisdiction(key, jurisdiction),
+  )
+  const modules = availableKeys.map((key) => {
     const def = MODULE_CATALOG[key]
     return {
       key,
@@ -64,7 +83,10 @@ export function buildModuleCatalogPayload(jurisdiction?: unknown): {
   })
 
   const presets = Object.fromEntries(
-    Object.entries(MODULE_PRESETS).map(([name, modList]) => [name, { modules: [...modList] }]),
+    Object.entries(MODULE_PRESETS).map(([name, modList]) => [
+      name,
+      { modules: modList.filter((key) => isModuleAvailableInJurisdiction(key, jurisdiction)) },
+    ]),
   )
 
   return { deploymentEnv, modules, presets }

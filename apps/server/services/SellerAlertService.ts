@@ -8,7 +8,7 @@ import type {
   SellerStockEstado,
   StockMultipleResult,
 } from '@bizcode/types'
-import { NEW_TENANT_MODULES } from '@bizcode/types'
+import { buildNewTenantFiscalDefaults } from './tenantProvisioningDefaults'
 import { ClienteCuentaCorrienteService } from './ClienteCuentaCorrienteService'
 import { ReciboCobroService } from './ReciboCobroService'
 import { computeDaysPastDue } from './ReportesFinancierosService'
@@ -167,13 +167,15 @@ export class SellerAlertService {
 
     const existing = await this.prisma.tenantConfig.findUnique({ where: { tenantId } })
     if (!existing) {
+      const fiscalDefaults = buildNewTenantFiscalDefaults()
       await this.prisma.tenantConfig.create({
         data: {
           tenantId,
           businessType: 'ambos',
           rubros: [],
           plan: 'starter',
-          modules: [...NEW_TENANT_MODULES],
+          modules: fiscalDefaults.modules,
+          jurisdiccionFiscal: fiscalDefaults.jurisdiccionFiscal,
           integrations: [],
           sellerCreditOverLimitAction:
             patch.sellerCreditOverLimitAction ?? DEFAULT_POLICIES.sellerCreditOverLimitAction,

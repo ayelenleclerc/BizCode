@@ -1,6 +1,6 @@
 import { config } from 'dotenv'
 import { Prisma, PrismaClient } from '@prisma/client'
-import { NEW_TENANT_MODULES } from '../apps/web/src/lib/modules/tenantDefaults'
+import { buildNewTenantFiscalDefaults } from '../apps/server/services/tenantProvisioningDefaults'
 import {
   assertSafeStagingDatabaseUrl,
   resolveStagingSeedTargetUrl,
@@ -46,6 +46,7 @@ async function main(): Promise<void> {
       update: { name: STAGING_SEED_TENANT_NAME, active: true },
     })
 
+    const fiscalDefaults = buildNewTenantFiscalDefaults()
     await prisma.tenantConfig.upsert({
       where: { tenantId: tenant.id },
       create: {
@@ -53,7 +54,8 @@ async function main(): Promise<void> {
         businessType: 'ambos',
         rubros: [],
         plan: 'pro',
-        modules: [...NEW_TENANT_MODULES],
+        modules: fiscalDefaults.modules,
+        jurisdiccionFiscal: fiscalDefaults.jurisdiccionFiscal,
         integrations: [],
       },
       update: {},

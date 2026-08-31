@@ -16,16 +16,17 @@ undefined
 
 # SaasRegisterInput Properties
 
-| Property                        | Type      | Required | Nullable       | Defined by                                                                                               |
-| :------------------------------ | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------- |
-| [acceptPrivacy](#acceptprivacy) | `boolean` | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-acceptprivacy.md "undefined#/properties/acceptPrivacy") |
-| [acceptTerms](#acceptterms)     | `boolean` | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-acceptterms.md "undefined#/properties/acceptTerms")     |
-| [businessName](#businessname)   | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-businessname.md "undefined#/properties/businessName")   |
-| [cuit](#cuit)                   | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-cuit.md "undefined#/properties/cuit")                   |
-| [email](#email)                 | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-email.md "undefined#/properties/email")                 |
-| [password](#password)           | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-password.md "undefined#/properties/password")           |
-| [phone](#phone)                 | `string`  | Optional | cannot be null | [SaasRegisterInput](saasregisterinput-properties-phone.md "undefined#/properties/phone")                 |
-| [tenantSlug](#tenantslug)       | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-tenantslug.md "undefined#/properties/tenantSlug")       |
+| Property                                  | Type      | Required | Nullable       | Defined by                                                                                                         |
+| :---------------------------------------- | :-------- | :------- | :------------- | :----------------------------------------------------------------------------------------------------------------- |
+| [acceptPrivacy](#acceptprivacy)           | `boolean` | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-acceptprivacy.md "undefined#/properties/acceptPrivacy")           |
+| [acceptTerms](#acceptterms)               | `boolean` | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-acceptterms.md "undefined#/properties/acceptTerms")               |
+| [businessName](#businessname)             | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-businessname.md "undefined#/properties/businessName")             |
+| [cuit](#cuit)                             | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-cuit.md "undefined#/properties/cuit")                             |
+| [email](#email)                           | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-email.md "undefined#/properties/email")                           |
+| [jurisdiccionFiscal](#jurisdiccionfiscal) | Merged    | Optional | cannot be null | [SaasRegisterInput](saasregisterinput-properties-jurisdiccionfiscal.md "undefined#/properties/jurisdiccionFiscal") |
+| [password](#password)                     | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-password.md "undefined#/properties/password")                     |
+| [phone](#phone)                           | `string`  | Optional | cannot be null | [SaasRegisterInput](saasregisterinput-properties-phone.md "undefined#/properties/phone")                           |
+| [tenantSlug](#tenantslug)                 | `string`  | Required | cannot be null | [SaasRegisterInput](saasregisterinput-properties-tenantslug.md "undefined#/properties/tenantSlug")                 |
 
 ## acceptPrivacy
 
@@ -150,6 +151,28 @@ true
 **maximum length**: the maximum number of characters for this string is: `120`
 
 **email**: the string must be an email address, according to [RFC 5322, section 3.4.1](https://tools.ietf.org/html/rfc5322 "check the specification")
+
+## jurisdiccionFiscal
+
+Fiscal jurisdiction chosen at registration (#437). Omitted, the installation default applies. A jurisdiction this installation does not enable is rejected with JURISDICTION\_NOT\_ENABLED.
+
+`jurisdiccionFiscal`
+
+* is optional
+
+* Type: merged type ([Details](saasregisterinput-properties-jurisdiccionfiscal.md))
+
+* cannot be null
+
+* defined in: [SaasRegisterInput](saasregisterinput-properties-jurisdiccionfiscal.md "undefined#/properties/jurisdiccionFiscal")
+
+### jurisdiccionFiscal Type
+
+merged type ([Details](saasregisterinput-properties-jurisdiccionfiscal.md))
+
+all of
+
+* [FiscalJurisdictionCode](fiscaljurisdictioncode.md "check type definition")
 
 ## password
 

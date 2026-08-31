@@ -116,6 +116,7 @@ describe('ChoferRepartosPage', () => {
       modules: ['logistics.pod'],
       integrations: [],
       jurisdiccionFiscal: 'AR' as const,
+      jurisdiccionesHabilitadas: ['AR', 'UY'] as const,
       hasModule: (key) => key === 'logistics.pod',
       hasIntegration: () => false,
       status: 'ready',

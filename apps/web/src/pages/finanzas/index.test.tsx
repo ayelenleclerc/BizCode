@@ -82,6 +82,7 @@ function mockFlagsWithCreditNotes() {
     modules: ['billing.credit_notes', 'finance.ledger'],
     integrations: [],
     jurisdiccionFiscal: 'AR' as const,
+    jurisdiccionesHabilitadas: ['AR', 'UY'] as const,
     hasModule: (k) => k === 'billing.credit_notes' || k === 'finance.ledger',
     hasIntegration: () => false,
     refreshFeatures: vi.fn(),
@@ -192,7 +193,7 @@ describe('FinanzasPage', () => {
     expect(screen.getByTestId('finanzas-aging-table')).toBeInTheDocument()
   })
 
-  it('lista notas de crédito cuando el módulo está habilitado', async () => {
+  it('lista notas de crÃ©dito cuando el mÃ³dulo estÃ¡ habilitado', async () => {
     vi.mocked(notasCreditoAPI.list).mockResolvedValue({
       data: [
         {
@@ -284,7 +285,7 @@ describe('FinanzasPage', () => {
     expect(await screen.findByTestId('finanzas-libro-iva-compras-count-cbtu')).toHaveTextContent('1')
   })
 
-  it('abre cuenta corriente con cliente válido', async () => {
+  it('abre cuenta corriente con cliente vÃ¡lido', async () => {
     const user = userEvent.setup()
     render(<FinanzasPage />)
     await screen.findByTestId('finanzas-page')

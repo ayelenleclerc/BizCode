@@ -10,6 +10,13 @@
     "jurisdiccionFiscal": {
       "$ref": "./FiscalJurisdictionCode.schema.json"
     },
+    "jurisdiccionesHabilitadas": {
+      "description": "Fiscal jurisdictions this installation offers (#437).",
+      "items": {
+        "$ref": "./FiscalJurisdictionCode.schema.json"
+      },
+      "type": "array"
+    },
     "modules": {
       "items": {
         "type": "string"

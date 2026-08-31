@@ -5,6 +5,7 @@ import {
   MODULE_PRESETS,
   DEFAULT_FISCAL_JURISDICTION,
   NEW_TENANT_MODULES,
+  filterModulesByJurisdiction,
   isFiscalJurisdictionCode,
   resolveJurisdiction,
   type FiscalJurisdictionCode,
@@ -12,7 +13,9 @@ import {
   type ModulePresetKey,
 } from '@bizcode/types'
 import { resolveDeploymentEnv } from '../../web/src/lib/modules/env'
+import { isJurisdictionEnabled } from '../../web/src/lib/modules/jurisdictionEnv'
 import { validateModuleSet } from '../../web/src/lib/modules/validation'
+import { buildNewTenantFiscalDefaults } from './tenantProvisioningDefaults'
 import {
   getCachedTenantFeatures,
   invalidateTenantFeaturesCache,
@@ -122,9 +125,13 @@ export class TenantConfigService {
     }
 
     const row = await this.prisma.tenantConfig.findUnique({ where: { tenantId } })
-    const modules = row ? normalizeModules(row.modules) : [...NEW_TENANT_MODULES]
+    // Sin fila el tenant se comporta como recién aprovisionado por esta instalación (#437).
+    const provisioning = buildNewTenantFiscalDefaults()
+    const modules = row ? normalizeModules(row.modules) : provisioning.modules
     const integrations = row ? [...row.integrations] : []
-    const jurisdiccionFiscal = resolveJurisdiction(row?.jurisdiccionFiscal)
+    const jurisdiccionFiscal = row
+      ? resolveJurisdiction(row.jurisdiccionFiscal)
+      : provisioning.jurisdiccionFiscal
     setCachedTenantFeatures(tenantId, modules, integrations, jurisdiccionFiscal)
     return { modules, integrations, jurisdiccionFiscal }
   }
@@ -160,13 +167,15 @@ export class TenantConfigService {
     tx?: Prisma.TransactionClient,
   ): Promise<TenantConfigDto> {
     const db = tx ?? this.prisma
+    const fiscalDefaults = buildNewTenantFiscalDefaults()
     const row = await db.tenantConfig.create({
       data: {
         tenantId,
         businessType: 'ambos',
         rubros: [],
         plan: 'starter',
-        modules: [...NEW_TENANT_MODULES],
+        modules: fiscalDefaults.modules,
+        jurisdiccionFiscal: fiscalDefaults.jurisdiccionFiscal,
         integrations: [],
       },
     })
@@ -183,6 +192,10 @@ export class TenantConfigService {
     const modules = normalizeModules(input.modules)
     if (input.jurisdiccionFiscal != null && !isFiscalJurisdictionCode(input.jurisdiccionFiscal)) {
       throw new Error('invalid_jurisdiction')
+    }
+    // Una jurisdicción fuera de las habilitadas por la instalación se rechaza, no se degrada (#437).
+    if (input.jurisdiccionFiscal != null && !isJurisdictionEnabled(input.jurisdiccionFiscal)) {
+      throw new Error('jurisdiction_not_enabled')
     }
 
     const beforeRow = await this.getConfig(tenantId)
@@ -258,13 +271,18 @@ export class TenantConfigService {
       throw new Error('invalid_preset')
     }
     const existing = await this.getConfig(tenantId)
+    // El preset se recorta a lo aplicable en la jurisdicción del tenant (#437).
+    const applicableModules = filterModulesByJurisdiction(
+      presetModules,
+      existing?.jurisdiccionFiscal,
+    )
     return this.upsertConfig(
       tenantId,
       {
         businessType: existing?.businessType ?? 'ambos',
         rubros: existing?.rubros ?? [],
         plan: existing?.plan ?? 'starter',
-        modules: [...presetModules],
+        modules: [...applicableModules],
         integrations: existing?.integrations ?? [],
       },
       changedById,

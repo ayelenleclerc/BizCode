@@ -32,6 +32,20 @@ vi.mock('@/lib/api', () => ({
   },
 }))
 
+// La página limita el selector de jurisdicción a lo habilitado por la instalación (#437).
+vi.mock('@/contexts/FeatureFlagsContext', () => ({
+  useFeatureFlags: () => ({
+    status: 'ready' as const,
+    modules: [],
+    integrations: [],
+    jurisdiccionFiscal: 'AR' as const,
+    jurisdiccionesHabilitadas: ['AR', 'UY'] as const,
+    hasModule: () => true,
+    hasIntegration: () => true,
+    refreshFeatures: vi.fn(),
+  }),
+}))
+
 import {
   ApiRequestFailedError,
   modulesCatalogAPI,
@@ -157,6 +171,16 @@ describe('TenantModulesPage', () => {
       renderPage()
       await waitFor(() => screen.getByTestId('superadmin-modules-page'))
       expect(screen.getByTestId('superadmin-jurisdiction-select')).toHaveValue('UY')
+    })
+
+    it('only offers the jurisdictions enabled by the installation (#437)', async () => {
+      renderPage()
+      await waitFor(() => screen.getByTestId('superadmin-modules-page'))
+
+      const options = Array.from(
+        screen.getByTestId('superadmin-jurisdiction-select').querySelectorAll('option'),
+      ).map((option) => option.value)
+      expect(options).toEqual(['AR', 'UY'])
     })
 
     it('sends the selected jurisdiction when saving', async () => {

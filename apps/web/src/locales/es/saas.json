@@ -11,6 +11,11 @@
     "title": "Crear cuenta",
     "businessName": "Razón social / nombre del negocio",
     "cuit": "CUIT",
+    "jurisdiction": "País fiscal",
+    "taxId": {
+      "cuit": "CUIT",
+      "rut": "RUT"
+    },
     "email": "Email (usuario owner)",
     "phone": "Teléfono (opcional)",
     "tenantSlug": "Identificador del tenant (slug)",

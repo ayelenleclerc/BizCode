@@ -59,6 +59,7 @@ function mockFeatures() {
     modules: ['logistics.dispatches', 'logistics.picking', 'logistics.gps'],
     integrations: [],
     jurisdiccionFiscal: 'AR' as const,
+    jurisdiccionesHabilitadas: ['AR', 'UY'] as const,
     hasIntegration: () => false,
     status: 'ready',
     refreshFeatures: vi.fn(),

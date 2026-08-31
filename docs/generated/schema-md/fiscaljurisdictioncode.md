@@ -1,7 +1,7 @@
 # FiscalJurisdictionCode Schema
 
 ```txt
-undefined#/properties/jurisdiccionFiscal
+undefined#/properties/jurisdiccionesHabilitadas/items
 ```
 
 Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.
@@ -10,11 +10,11 @@ Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and 
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------- |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [TenantFeaturesData.schema.json\*](../schema-json/TenantFeaturesData.schema.json "open original schema") |
 
-## jurisdiccionFiscal Type
+## items Type
 
 `string` ([FiscalJurisdictionCode](fiscaljurisdictioncode.md))
 
-## jurisdiccionFiscal Constraints
+## items Constraints
 
 **enum**: the value of this property must be equal to one of the following values:
 

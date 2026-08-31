@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { saasAPI } from '@/lib/api'
+import { saasAPI, type SaasJurisdictionOption } from '@/lib/api'
 
 /**
  * @en Public SaaS registration form (#180).
@@ -22,6 +22,30 @@ export default function RegistroPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [createdSlug, setCreatedSlug] = useState<string | null>(null)
+  /**
+   * @en Jurisdictions this installation offers (#437). Until they load, or when only one is offered,
+   *   the selector stays hidden and the installation default applies.
+   * @es Jurisdicciones que ofrece esta instalación (#437). Hasta que cargan, o si solo se ofrece una,
+   *   el selector queda oculto y rige el default de la instalación.
+   * @pt-BR Jurisdições oferecidas por esta instalação (#437). Até carregarem, ou se apenas uma for
+   *   oferecida, o seletor fica oculto e vale o padrão da instalação.
+   */
+  const [jurisdictions, setJurisdictions] = useState<SaasJurisdictionOption[]>([])
+  const [jurisdiccionFiscal, setJurisdiccionFiscal] = useState('')
+  const selectedTaxIdKind =
+    jurisdictions.find((option) => option.code === jurisdiccionFiscal)?.taxIdKind ?? 'cuit'
+
+  useEffect(() => {
+    void saasAPI
+      .jurisdictions()
+      .then((data) => {
+        setJurisdictions(data.enabled)
+        setJurisdiccionFiscal(data.default)
+      })
+      .catch(() => {
+        /* the installation default applies when the lookup fails */
+      })
+  }, [])
 
   useEffect(() => {
     if (businessName.trim().length < 2) return
@@ -51,6 +75,7 @@ export default function RegistroPage() {
       const result = await saasAPI.register({
         businessName,
         cuit,
+        jurisdiccionFiscal: jurisdiccionFiscal || undefined,
         email,
         phone: phone.trim() || undefined,
         tenantSlug,
@@ -108,13 +133,38 @@ export default function RegistroPage() {
             autoComplete="organization"
           />
         </div>
+        {jurisdictions.length > 1 ? (
+          <div>
+            <label
+              htmlFor="saas-jurisdiction"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+            >
+              {t('register.jurisdiction')}
+            </label>
+            <select
+              id="saas-jurisdiction"
+              data-testid="saas-register-jurisdiction"
+              className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 dark:border-slate-600 dark:bg-slate-800"
+              value={jurisdiccionFiscal}
+              onChange={(e) => setJurisdiccionFiscal(e.target.value)}
+              required
+            >
+              {jurisdictions.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
         <div>
           <label htmlFor="saas-cuit" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-            {t('register.cuit')}
+            {t(`register.taxId.${selectedTaxIdKind}`)}
           </label>
           <input
             id="saas-cuit"
             data-testid="saas-register-cuit"
+            data-tax-id-kind={selectedTaxIdKind}
             className="mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 dark:border-slate-600 dark:bg-slate-800"
             value={cuit}
             onChange={(e) => setCuit(e.target.value)}

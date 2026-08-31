@@ -81,6 +81,7 @@ describe('InicioPage', () => {
       modules: ['analytics.advanced'],
       integrations: [],
       jurisdiccionFiscal: 'AR' as const,
+      jurisdiccionesHabilitadas: ['AR', 'UY'] as const,
       hasIntegration: () => false,
       refreshFeatures: vi.fn(),
     })
@@ -89,7 +90,7 @@ describe('InicioPage', () => {
     mockAuth(['reports.operational.read'])
   })
 
-  it('muestra KPIs en pestaña Resumen', async () => {
+  it('muestra KPIs en pestaÃ±a Resumen', async () => {
     render(<InicioPage />)
     await waitFor(() => {
       expect(screen.getByTestId('inicio-panel-summary')).toBeInTheDocument()
@@ -97,7 +98,7 @@ describe('InicioPage', () => {
     expect(dashboardAPI.summary).toHaveBeenCalled()
   })
 
-  it('muestra analítica cuando hay permiso y módulo', async () => {
+  it('muestra analÃ­tica cuando hay permiso y mÃ³dulo', async () => {
     const user = userEvent.setup()
     render(<InicioPage />)
     await user.click(screen.getByTestId('inicio-tab-analytics'))

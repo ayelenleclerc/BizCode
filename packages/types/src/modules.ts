@@ -16,6 +16,12 @@ export interface ModuleDef {
    * @pt-BR Jurisdições em que o módulo é obrigatório em produção (#207); os módulos fiscais por país o usam em vez de um `requiredInProd` global.
    */
   requiredInProdForCountries?: readonly string[]
+  /**
+   * @en Jurisdictions where the module is legally applicable (#437). Absent means every jurisdiction; a module listed here cannot be enabled elsewhere.
+   * @es Jurisdicciones donde el módulo es legalmente aplicable (#437). Ausente significa todas; un módulo listado aquí no puede activarse en otra.
+   * @pt-BR Jurisdições em que o módulo é legalmente aplicável (#437). Ausente significa todas; um módulo listado aqui não pode ser ativado em outra.
+   */
+  availableForCountries?: readonly string[]
   dependencies: readonly string[]
   plan: ModulePlan
   price: number
@@ -24,6 +30,7 @@ export interface ModuleDef {
 export type ModuleValidationReason =
   | 'required_module_missing'
   | `missing_dependency:${string}`
+  | `not_available_in_country:${string}`
 
 export interface ModuleValidationError {
   module: string

@@ -16,11 +16,12 @@ undefined#/properties/data
 
 # data Properties
 
-| Property                                  | Type     | Required | Nullable       | Defined by                                                                                               |
-| :---------------------------------------- | :------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------- |
-| [integrations](#integrations)             | `array`  | Required | cannot be null | [TenantFeaturesData](tenantfeaturesdata-properties-integrations.md "undefined#/properties/integrations") |
-| [jurisdiccionFiscal](#jurisdiccionfiscal) | `string` | Required | cannot be null | [TenantFeaturesData](fiscaljurisdictioncode.md "undefined#/properties/jurisdiccionFiscal")               |
-| [modules](#modules)                       | `array`  | Required | cannot be null | [TenantFeaturesData](tenantfeaturesdata-properties-modules.md "undefined#/properties/modules")           |
+| Property                                                | Type     | Required | Nullable       | Defined by                                                                                                                         |
+| :------------------------------------------------------ | :------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
+| [integrations](#integrations)                           | `array`  | Required | cannot be null | [TenantFeaturesData](tenantfeaturesdata-properties-integrations.md "undefined#/properties/integrations")                           |
+| [jurisdiccionFiscal](#jurisdiccionfiscal)               | `string` | Required | cannot be null | [TenantFeaturesData](fiscaljurisdictioncode.md "undefined#/properties/jurisdiccionFiscal")                                         |
+| [jurisdiccionesHabilitadas](#jurisdiccioneshabilitadas) | `array`  | Optional | cannot be null | [TenantFeaturesData](tenantfeaturesdata-properties-jurisdiccioneshabilitadas.md "undefined#/properties/jurisdiccionesHabilitadas") |
+| [modules](#modules)                                     | `array`  | Required | cannot be null | [TenantFeaturesData](tenantfeaturesdata-properties-modules.md "undefined#/properties/modules")                                     |
 
 ## integrations
 
@@ -66,6 +67,24 @@ Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and 
 | :----- | :---------- |
 | `"AR"` |             |
 | `"UY"` |             |
+
+## jurisdiccionesHabilitadas
+
+Fiscal jurisdictions this installation offers (#437).
+
+`jurisdiccionesHabilitadas`
+
+* is optional
+
+* Type: `string[]` ([FiscalJurisdictionCode](fiscaljurisdictioncode.md))
+
+* cannot be null
+
+* defined in: [TenantFeaturesData](tenantfeaturesdata-properties-jurisdiccioneshabilitadas.md "undefined#/properties/jurisdiccionesHabilitadas")
+
+### jurisdiccionesHabilitadas Type
+
+`string[]` ([FiscalJurisdictionCode](fiscaljurisdictioncode.md))
 
 ## modules
 

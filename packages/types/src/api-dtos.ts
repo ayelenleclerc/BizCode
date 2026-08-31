@@ -12,6 +12,12 @@ export type TenantFeaturesData = {
    * @pt-BR Jurisdição fiscal do tenant (#207); ISO-3166-1 alpha-2, `AR` por padrão.
    */
   jurisdiccionFiscal: string
+  /**
+   * @en Jurisdictions this installation offers (#437); a tenant can only be moved to one of these.
+   * @es Jurisdicciones que ofrece esta instalación (#437); un tenant solo puede moverse a una de estas.
+   * @pt-BR Jurisdições que esta instalação oferece (#437); um tenant só pode ser movido para uma destas.
+   */
+  jurisdiccionesHabilitadas?: string[]
 }
 
 // ============ PLANS (PUBLIC API) ============

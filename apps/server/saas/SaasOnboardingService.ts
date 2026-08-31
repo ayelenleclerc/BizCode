@@ -1,8 +1,10 @@
 import type { PrismaClient } from '@prisma/client'
 import nodemailer from 'nodemailer'
-import { NEW_TENANT_MODULES, USER_CHANNELS } from '@bizcode/types'
+import { USER_CHANNELS, type FiscalJurisdictionCode } from '@bizcode/types'
 import { hashPassword } from '../passwordHash'
-import { validateCUIT } from '../../web/src/lib/validators'
+import { validateTaxId } from '../../web/src/lib/validators'
+import { isJurisdictionEnabled, resolveDefaultJurisdiction } from '../../web/src/lib/modules/jurisdictionEnv'
+import { buildNewTenantFiscalDefaults } from '../services/tenantProvisioningDefaults'
 import { mockConsultaPadronA4, normalizeCuitDigits } from '../fiscal/ar/arcaPadronMock'
 import { isSmtpConfigured } from '../channels'
 import { resolveSmtpTransportConfig } from '../config/smtpTransport'
@@ -17,6 +19,12 @@ import { isPlausibleEmail } from './emailCheck'
 export type SaasRegisterInput = {
   businessName: string
   cuit: string
+  /**
+   * @en Tax jurisdiction chosen at registration (#437); omitted falls back to the installation default.
+   * @es Jurisdicción fiscal elegida en el registro (#437); si se omite se usa el default de la instalación.
+   * @pt-BR Jurisdição fiscal escolhida no registro (#437); se omitida usa o padrão da instalação.
+   */
+  jurisdiccionFiscal?: string
   email: string
   phone?: string
   tenantSlug: string
@@ -94,6 +102,22 @@ async function sendWelcomeEmail(args: {
 export class SaasOnboardingService {
   constructor(private readonly prisma: PrismaClient) {}
 
+  /**
+   * @en Narrows the requested jurisdiction to one enabled by the installation (#437); an absent value
+   *   takes the installation default, and a disabled one is rejected instead of silently downgraded.
+   * @es Estrecha la jurisdicción pedida a una habilitada por la instalación (#437); si falta se toma
+   *   el default de la instalación, y una deshabilitada se rechaza en vez de degradarse en silencio.
+   * @pt-BR Restringe a jurisdição solicitada a uma habilitada pela instalação (#437); ausente usa o
+   *   padrão da instalação, e uma desabilitada é rejeitada em vez de rebaixada silenciosamente.
+   */
+  private resolveRequestedJurisdiction(requested?: string): FiscalJurisdictionCode | null {
+    const trimmed = requested?.trim().toUpperCase()
+    if (!trimmed) {
+      return resolveDefaultJurisdiction()
+    }
+    return isJurisdictionEnabled(trimmed) ? trimmed : null
+  }
+
   async register(input: SaasRegisterInput, now = new Date()): Promise<SaasRegisterResult> {
     if (!input.acceptTerms || !input.acceptPrivacy) {
       return {
@@ -109,12 +133,33 @@ export class SaasOnboardingService {
       return { ok: false, status: 400, error: 'Invalid business name', code: 'INVALID_NAME' }
     }
 
-    const cuitDigits = normalizeCuitDigits(input.cuit)
-    if (!validateCUIT(cuitDigits)) {
-      return { ok: false, status: 400, error: 'Invalid CUIT', code: 'INVALID_CUIT' }
+    const jurisdiccionFiscal = this.resolveRequestedJurisdiction(input.jurisdiccionFiscal)
+    if (!jurisdiccionFiscal) {
+      return {
+        ok: false,
+        status: 400,
+        error: 'Jurisdiction not enabled for this installation',
+        code: 'JURISDICTION_NOT_ENABLED',
+      }
     }
 
-    const padron = mockConsultaPadronA4(cuitDigits)
+    const taxIdDigits = normalizeCuitDigits(input.cuit)
+    if (!validateTaxId(taxIdDigits, jurisdiccionFiscal)) {
+      return { ok: false, status: 400, error: 'Invalid tax id', code: 'INVALID_CUIT' }
+    }
+
+    /**
+     * @en The ARCA registry lookup only exists for Argentina; elsewhere the company data is taken
+     *   from the registration form (#437).
+     * @es La consulta al padrón de ARCA solo existe para Argentina; en el resto los datos de la
+     *   empresa se toman del formulario de registro (#437).
+     * @pt-BR A consulta ao cadastro da ARCA só existe para a Argentina; nos demais os dados da
+     *   empresa vêm do formulário de registro (#437).
+     */
+    const padron =
+      jurisdiccionFiscal === 'AR'
+        ? mockConsultaPadronA4(taxIdDigits)
+        : ({ status: 'skipped' } as const)
     if (padron.status === 'timeout') {
       return {
         ok: false,
@@ -174,13 +219,15 @@ export class SaasOnboardingService {
         },
       })
 
+      const fiscalDefaults = buildNewTenantFiscalDefaults(jurisdiccionFiscal)
       await tx.tenantConfig.create({
         data: {
           tenantId: tenant.id,
           businessType: 'ambos',
           rubros: [],
           plan: 'starter',
-          modules: [...NEW_TENANT_MODULES],
+          modules: fiscalDefaults.modules,
+          jurisdiccionFiscal: fiscalDefaults.jurisdiccionFiscal,
           integrations: [],
         },
       })
@@ -211,7 +258,7 @@ export class SaasOnboardingService {
         data: {
           tenantId: tenant.id,
           nombre: nombreEmpresa,
-          cuit: cuitDigits,
+          cuit: taxIdDigits,
           condicionIva,
           domicilio: padron.status === 'ok' ? padron.persona.domicilio?.slice(0, 40) ?? null : null,
         },

@@ -1,4 +1,4 @@
-import { resolveJurisdiction } from '@bizcode/types'
+import { isModuleDefAvailableInJurisdiction, resolveJurisdiction } from '@bizcode/types'
 import { MODULE_CATALOG, MODULE_KEYS, type ModuleKey } from './catalog'
 import type { DeploymentEnv, ModuleDef, ModuleValidationResult } from './types'
 
@@ -20,6 +20,9 @@ export function canDeactivate(
 }
 
 function moduleIsRequired(def: ModuleDef, env: DeploymentEnv, jurisdiction?: unknown): boolean {
+  if (!isModuleDefAvailableInJurisdiction(def, jurisdiction)) {
+    return false
+  }
   if (def.required) {
     return true
   }
@@ -52,6 +55,13 @@ export function validateModuleSet(
 
     if (isRequired && !isActive) {
       errors.push({ module: key, reason: 'required_module_missing' })
+    }
+
+    if (isActive && !isModuleDefAvailableInJurisdiction(def, jurisdiction)) {
+      errors.push({
+        module: key,
+        reason: `not_available_in_country:${resolveJurisdiction(jurisdiction)}`,
+      })
     }
 
     if (isActive) {

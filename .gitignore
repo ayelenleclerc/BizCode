@@ -46,3 +46,6 @@ BizCode.code-workspace
 
 # plan:sync local reports (state under .github/plan-sync/state/ is versioned)
 .github/plan-sync/reports/
+
+# Local CI artifact downloads used to diagnose docs drift (never committed)
+.ci-artifacts/

@@ -9,6 +9,8 @@ import {
 } from 'react'
 import {
   DEFAULT_FISCAL_JURISDICTION,
+  FISCAL_JURISDICTION_CODES,
+  isFiscalJurisdictionCode,
   resolveJurisdiction,
   type FiscalJurisdictionCode,
 } from '@bizcode/types'
@@ -29,6 +31,12 @@ type FeatureFlagsContextValue = {
    * @pt-BR Jurisdição fiscal do tenant; rege a validação do identificador e as alíquotas na UI (#207).
    */
   jurisdiccionFiscal: FiscalJurisdictionCode
+  /**
+   * @en Jurisdictions this installation offers (#437); the super-admin selector must not go beyond them.
+   * @es Jurisdicciones que ofrece esta instalación (#437); el selector de super-admin no debe excederlas.
+   * @pt-BR Jurisdições que esta instalação oferece (#437); o seletor de super-admin não deve excedê-las.
+   */
+  jurisdiccionesHabilitadas: readonly FiscalJurisdictionCode[]
   hasModule: (key: ModuleKey) => boolean
   hasIntegration: (id: string) => boolean
   refreshFeatures: () => Promise<void>
@@ -39,6 +47,16 @@ const FeatureFlagsContext = createContext<FeatureFlagsContextValue | null>(null)
 function parseModuleKeys(raw: string[]): ModuleKey[] {
   const allowed = new Set(MODULE_KEYS as readonly string[])
   return raw.filter((k): k is ModuleKey => allowed.has(k))
+}
+
+/**
+ * @en An API that does not report enabled jurisdictions keeps the full catalog, as before #437.
+ * @es Una API que no informa jurisdicciones habilitadas conserva el catálogo completo, como antes de #437.
+ * @pt-BR Uma API que não informa jurisdições habilitadas mantém o catálogo completo, como antes de #437.
+ */
+function parseEnabledJurisdictions(raw: string[] | undefined): readonly FiscalJurisdictionCode[] {
+  const parsed = (raw ?? []).filter(isFiscalJurisdictionCode)
+  return parsed.length > 0 ? parsed : FISCAL_JURISDICTION_CODES
 }
 
 /**
@@ -54,6 +72,9 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
   const [jurisdiccionFiscal, setJurisdiccionFiscal] = useState<FiscalJurisdictionCode>(
     DEFAULT_FISCAL_JURISDICTION,
   )
+  const [jurisdiccionesHabilitadas, setJurisdiccionesHabilitadas] = useState<
+    readonly FiscalJurisdictionCode[]
+  >(FISCAL_JURISDICTION_CODES)
 
   const refreshFeatures = useCallback(async () => {
     if (authStatus !== 'authenticated') {
@@ -69,6 +90,7 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
       setModules(parseModuleKeys(data.modules))
       setIntegrations([...data.integrations])
       setJurisdiccionFiscal(resolveJurisdiction(data.jurisdiccionFiscal))
+      setJurisdiccionesHabilitadas(parseEnabledJurisdictions(data.jurisdiccionesHabilitadas))
       setStatus('ready')
     } catch {
       setModules([])
@@ -116,6 +138,7 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
       modules,
       integrations,
       jurisdiccionFiscal,
+      jurisdiccionesHabilitadas,
       hasModule,
       hasIntegration,
       refreshFeatures,
@@ -125,6 +148,7 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
       modules,
       integrations,
       jurisdiccionFiscal,
+      jurisdiccionesHabilitadas,
       hasModule,
       hasIntegration,
       refreshFeatures,
