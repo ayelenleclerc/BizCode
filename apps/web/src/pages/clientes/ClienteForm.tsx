@@ -6,9 +6,14 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
 import { arcaAPI, clientesAPI, listasPreciosAPI, zonasEntregaAPI } from '@/lib/api'
-import { validateCUIT, formatTaxId, validateCBU, validateTaxId } from '@/lib/validators'
+import { formatTaxId, validateBankAccount, validateCUIT, validateTaxId } from '@/lib/validators'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import {
+  defaultTaxCondition,
+  isValidTaxCondition,
+  taxConditionOptions,
+} from '@/lib/fiscal/uiOptions'
 import {
   Cliente,
   DeliveryZone,
@@ -24,69 +29,73 @@ import IfModule from '@/components/IfModule'
 /** AFIP Padrón A4 CUIT lookup status shown next to the CUIT field (#192). */
 type PadronStatus = 'idle' | 'loading' | 'verified' | 'not_found' | 'unavailable' | 'timeout' | 'invalid'
 
-const clienteSchema = z.object({
-  codigo: z.coerce.number().int().positive('Código debe ser positivo'),
-  rsocial: z.string().min(3, 'Razón social mínimo 3 caracteres').max(30),
-  fantasia: z.string().max(30).optional(),
-  // Validado contra la jurisdicción del tenant en `useMemo` más abajo (#207).
-  cuit: z.string().optional(),
-  condIva: z.enum(['RI', 'Mono', 'CF', 'Exento']),
-  domicilio: z.string().max(40).optional(),
-  localidad: z.string().max(25).optional(),
-  cpost: z.string().max(8).optional(),
-  telef: z.string().max(25).optional(),
-  email: z.string().email('Email inválido').max(50).optional().or(z.literal('')),
-  activo: z.boolean(),
-  // Bank reconciliation matching (#191) — optional CBU/alias used to auto-match bank transfers.
-  cbu: z.string().max(22).optional().refine(
-    (val) => !val || validateCBU(val),
-    'CBU inválido'
-  ),
-  alias: z.string().max(60).optional(),
-  // Financial fields — only sent when the user has manager/owner role
-  creditLimit: z.coerce.number().positive().optional().nullable(),
-  creditDays: z.coerce.number().int().min(0).optional(),
-  suspended: z.boolean().optional(),
-  // Logistics (Issue #32) — HTML <select value=""> must not coerce to 0 (would fail .positive() and block submit silently).
-  deliveryZoneId: z.preprocess((val) => {
-    if (val === '' || val === null || val === undefined) return undefined
-    const n = typeof val === 'number' ? val : Number(val)
-    if (!Number.isFinite(n) || n <= 0) return undefined
-    return Math.trunc(n)
-  }, z.number().int().positive().optional().nullable()),
-  // Price list (Issue #234) — same empty-string handling as deliveryZoneId.
-  listaPrecioId: z.preprocess((val) => {
-    if (val === '' || val === null || val === undefined) return undefined
-    const n = typeof val === 'number' ? val : Number(val)
-    if (!Number.isFinite(n) || n <= 0) return undefined
-    return Math.trunc(n)
-  }, z.number().int().positive().optional().nullable()),
-  // Map pin (#199) — optional; empty clears coords (no geocoder).
-  latitud: z.preprocess((val) => {
-    if (val === '' || val === null || val === undefined) return null
-    const n = typeof val === 'number' ? val : Number(val)
-    return Number.isFinite(n) ? n : NaN
-  }, z.number().min(-90).max(90).nullable().optional()),
-  longitud: z.preprocess((val) => {
-    if (val === '' || val === null || val === undefined) return null
-    const n = typeof val === 'number' ? val : Number(val)
-    return Number.isFinite(n) ? n : NaN
-  }, z.number().min(-180).max(180).nullable().optional()),
-})
-
-type ClienteFormData = z.infer<typeof clienteSchema>
-
 /**
- * @en Refines the tax identifier with the algorithm of the tenant jurisdiction (#207).
- * @es Refina el identificador fiscal con el algoritmo de la jurisdicción del tenant (#207).
- * @pt-BR Refina o identificador fiscal com o algoritmo da jurisdição do tenant (#207).
+ * @en Builds the customer form schema for a jurisdiction: tax id, tax condition and bank account
+ *   follow the per-country rule registry (#440).
+ * @es Construye el esquema del formulario de cliente para una jurisdicción: identificador fiscal,
+ *   condición fiscal y cuenta bancaria siguen el registro por país (#440).
+ * @pt-BR Constrói o esquema do formulário de cliente para uma jurisdição: identificador fiscal,
+ *   condição fiscal e conta bancária seguem o registro por país (#440).
  */
-function buildClienteSchema(jurisdiccion: FiscalJurisdictionCode, invalidMessage: string) {
-  return clienteSchema.refine((data) => !data.cuit || validateTaxId(data.cuit, jurisdiccion), {
-    path: ['cuit'],
-    message: invalidMessage,
-  })
+function buildClienteSchema(
+  jurisdiccion: FiscalJurisdictionCode,
+  invalidMessage: string,
+  invalidBankMessage: string,
+) {
+  return z
+    .object({
+      codigo: z.coerce.number().int().positive('Código debe ser positivo'),
+      rsocial: z.string().min(3, 'Razón social mínimo 3 caracteres').max(30),
+      fantasia: z.string().max(30).optional(),
+      cuit: z.string().optional(),
+      condIva: z.string().refine((v) => isValidTaxCondition(v, jurisdiccion), {
+        message: 'condIva inválida',
+      }),
+      domicilio: z.string().max(40).optional(),
+      localidad: z.string().max(25).optional(),
+      cpost: z.string().max(8).optional(),
+      telef: z.string().max(25).optional(),
+      email: z.string().email('Email inválido').max(50).optional().or(z.literal('')),
+      activo: z.boolean(),
+      cbu: z
+        .string()
+        .max(22)
+        .optional()
+        .refine((val) => !val || validateBankAccount(val, jurisdiccion), invalidBankMessage),
+      alias: z.string().max(60).optional(),
+      creditLimit: z.coerce.number().positive().optional().nullable(),
+      creditDays: z.coerce.number().int().min(0).optional(),
+      suspended: z.boolean().optional(),
+      deliveryZoneId: z.preprocess((val) => {
+        if (val === '' || val === null || val === undefined) return undefined
+        const n = typeof val === 'number' ? val : Number(val)
+        if (!Number.isFinite(n) || n <= 0) return undefined
+        return Math.trunc(n)
+      }, z.number().int().positive().optional().nullable()),
+      listaPrecioId: z.preprocess((val) => {
+        if (val === '' || val === null || val === undefined) return undefined
+        const n = typeof val === 'number' ? val : Number(val)
+        if (!Number.isFinite(n) || n <= 0) return undefined
+        return Math.trunc(n)
+      }, z.number().int().positive().optional().nullable()),
+      latitud: z.preprocess((val) => {
+        if (val === '' || val === null || val === undefined) return null
+        const n = typeof val === 'number' ? val : Number(val)
+        return Number.isFinite(n) ? n : NaN
+      }, z.number().min(-90).max(90).nullable().optional()),
+      longitud: z.preprocess((val) => {
+        if (val === '' || val === null || val === undefined) return null
+        const n = typeof val === 'number' ? val : Number(val)
+        return Number.isFinite(n) ? n : NaN
+      }, z.number().min(-180).max(180).nullable().optional()),
+    })
+    .refine((data) => !data.cuit || validateTaxId(data.cuit, jurisdiccion), {
+      path: ['cuit'],
+      message: invalidMessage,
+    })
 }
+
+type ClienteFormData = z.infer<ReturnType<typeof buildClienteSchema>>
 
 interface ClienteFormProps {
   cliente: Cliente | null
@@ -155,8 +164,14 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
   const { jurisdiccionFiscal } = useFeatureFlags()
   const taxIdKind = FISCAL_JURISDICTIONS[jurisdiccionFiscal].taxIdKind
   const taxIdLabel = t(`form.taxId.${jurisdiccionFiscal}.label`)
+  const condIvaChoices = useMemo(() => taxConditionOptions(jurisdiccionFiscal), [jurisdiccionFiscal])
   const schema = useMemo(
-    () => buildClienteSchema(jurisdiccionFiscal, t(`form.taxId.${jurisdiccionFiscal}.invalid`)),
+    () =>
+      buildClienteSchema(
+        jurisdiccionFiscal,
+        t(`form.taxId.${jurisdiccionFiscal}.invalid`),
+        t('form.errors.cbu'),
+      ),
     [jurisdiccionFiscal, t],
   )
 
@@ -169,7 +184,7 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(schema) as any,
     defaultValues: (cliente || {
-      condIva: 'RI',
+      condIva: defaultTaxCondition(jurisdiccionFiscal),
       activo: true,
     }) as ClienteFormData,
   })
@@ -496,10 +511,11 @@ export default function ClienteForm({ cliente, onClose, onGuardado }: ClienteFor
               aria-required="true"
               className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
             >
-              <option value="RI">{t('form.condIvaOptions.RI')}</option>
-              <option value="Mono">{t('form.condIvaOptions.Mono')}</option>
-              <option value="CF">{t('form.condIvaOptions.CF')}</option>
-              <option value="Exento">{t('form.condIvaOptions.Exento')}</option>
+              {condIvaChoices.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {t(`form.condIvaOptions.${c.code}` as 'form.condIvaOptions.RI')}
+                </option>
+              ))}
             </select>
           </div>
 

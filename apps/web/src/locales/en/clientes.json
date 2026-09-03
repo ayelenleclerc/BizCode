@@ -70,7 +70,8 @@
       "RI": "RI - VAT Registered",
       "Mono": "Small Taxpayer",
       "CF": "CF - End Consumer",
-      "Exento": "Exempt"
+      "Exento": "Exempt",
+      "IVA": "VAT taxpayer"
     },
     "errors": {
       "cuit": "Invalid Tax ID",

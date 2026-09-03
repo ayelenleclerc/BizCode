@@ -29,6 +29,7 @@
     "condicionMono": "Monotributo",
     "condicionCf": "Consumidor Final",
     "condicionExento": "IVA Exento",
+    "condicionIvaTaxpayer": "Contribuyente IVA",
     "ingresosBrutos": "Ingresos Brutos",
     "fechaInicioActividades": "Inicio de actividades",
     "puntoVenta": "Punto de venta",

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useLayoutEffect, useRef, type FormEvent } from 'react'
+import { useState, useEffect, useCallback, useLayoutEffect, useMemo, useRef, type FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -11,6 +11,7 @@ import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
 import { useAuth } from '@/contexts/AuthContext'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import { vatRateOptions } from '@/lib/fiscal/uiOptions'
 import {
   Articulo,
   MONEDAS_PRECIO,
@@ -153,7 +154,8 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const { t } = useTranslation('articulos')
   const { t: tc } = useTranslation('common')
   const { claims } = useAuth()
-  const { hasModule } = useFeatureFlags()
+  const { hasModule, jurisdiccionFiscal } = useFeatureFlags()
+  const ivaChoices = useMemo(() => vatRateOptions(jurisdiccionFiscal), [jurisdiccionFiscal])
   const multicurrencyEnabled = hasModule('catalog.multicurrency')
   const fefoEnabled = hasModule('inventory.fefo')
   const pharmacyEnabled = hasModule('vertical.pharmacy')
@@ -664,9 +666,11 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               aria-required="true"
               className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none"
             >
-              <option value="1">{t('form.condIvaOptions.1')}</option>
-              <option value="2">{t('form.condIvaOptions.2')}</option>
-              <option value="3">{t('form.condIvaOptions.3')}</option>
+              {ivaChoices.map((opt) => (
+                <option key={opt.code} value={opt.code}>
+                  {opt.exempt ? t('form.condIvaOptions.3') : opt.rateLabel}
+                </option>
+              ))}
             </select>
           </div>
 

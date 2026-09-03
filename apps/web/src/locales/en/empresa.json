@@ -29,6 +29,7 @@
     "condicionMono": "Simplified regime",
     "condicionCf": "Final consumer",
     "condicionExento": "VAT exempt",
+    "condicionIvaTaxpayer": "VAT taxpayer",
     "ingresosBrutos": "Gross income registration",
     "fechaInicioActividades": "Activity start date",
     "puntoVenta": "Point of sale number",

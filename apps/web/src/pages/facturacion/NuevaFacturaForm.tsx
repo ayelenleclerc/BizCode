@@ -7,6 +7,7 @@ import { calculateInvoice, calculateItemSubtotal } from '@/lib/invoice'
 import { Cliente, Articulo, FormaPago, allowsDecimalQuantity, type UnidadBase } from '@bizcode/types'
 import KeyboardHint, { useInvoiceShortcuts } from '@/components/shared/KeyboardHint'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import { defaultTaxCondition, vatRateOptions } from '@/lib/fiscal/uiOptions'
 import FefoPreviewBadge from './FefoPreviewBadge'
 
 interface LineaFactura {
@@ -87,7 +88,12 @@ export default function NuevaFacturaForm({
   const [applyPercepciones, setApplyPercepciones] = useState(false)
   const [percepcionRows, setPercepcionRows] = useState<Array<RetencionPreviewLineDTO & { selected: boolean }>>([])
   const [percepcionesLoading, setPercepcionesLoading] = useState(false)
-  const { hasModule } = useFeatureFlags()
+  const { hasModule, jurisdiccionFiscal } = useFeatureFlags()
+  const ivaChoices = useMemo(() => vatRateOptions(jurisdiccionFiscal), [jurisdiccionFiscal])
+  const defaultClienteIva = useMemo(
+    () => defaultTaxCondition(jurisdiccionFiscal),
+    [jurisdiccionFiscal],
+  )
   const retencionesModule = hasModule('finance.retenciones')
   const pricelistsModule = hasModule('catalog.pricelists')
   const loyaltyModule = hasModule('clients.loyalty')
@@ -243,9 +249,13 @@ export default function NuevaFacturaForm({
       articuloIva: (l.mode === 'adhoc' ? l.condIva : l.articulo?.condIva ?? l.condIva) as '1' | '2' | '3',
     }))
 
-    const newTotales = calculateInvoice(itemsForCalc, cliente?.condIva || 'RI')
+    const newTotales = calculateInvoice(
+      itemsForCalc,
+      cliente?.condIva || defaultClienteIva,
+      jurisdiccionFiscal,
+    )
     setTotales(newTotales)
-  }, [lineas, cliente])
+  }, [lineas, cliente, defaultClienteIva, jurisdiccionFiscal])
 
   useEffect(() => {
     if (!retencionesModule) return
@@ -892,9 +902,11 @@ export default function NuevaFacturaForm({
                             aria-label={`${t('items.condIva')} ${idx + 1}`}
                             className="bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-500 px-2 py-1 text-xs"
                           >
-                            <option value="1">21%</option>
-                            <option value="2">10.5%</option>
-                            <option value="3">{t('items.exento')}</option>
+                            {ivaChoices.map((opt) => (
+                              <option key={opt.code} value={opt.code}>
+                                {opt.exempt ? t('items.exento') : opt.rateLabel}
+                              </option>
+                            ))}
                           </select>
                           <select
                             value={linea.unidadServicio ?? 'hora'}

@@ -108,7 +108,8 @@
       "RI": "RI",
       "Mono": "Monotributo",
       "CF": "End consumer",
-      "Exento": "Exempt"
+      "Exento": "Exempt",
+      "IVA": "VAT taxpayer"
     },
     "errors": {
       "generic": "Could not save supplier",

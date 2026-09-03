@@ -70,7 +70,8 @@
       "RI": "RI - Contribuinte ICMS",
       "Mono": "MEI / Simples",
       "CF": "CF - Consumidor Final",
-      "Exento": "Isento"
+      "Exento": "Isento",
+      "IVA": "Contribuinte de IVA"
     },
     "errors": {
       "cuit": "CNPJ/CPF inválido",

@@ -426,14 +426,14 @@ export interface EmpresaConfig {
   cuit: string
   domicilio: string | null
   puntoVenta: number
-  tipoFactura: 'A' | 'B' | 'C'
+  tipoFactura: string
   logoUrl: string | null
   prefijoFactura: string
   recordatorioDiasGracia: number
   timezone: string
   recordatorioHoraInicio: number
   recordatorioHoraFin: number
-  condicionIva: 'RI' | 'Mono' | 'CF' | 'Exento'
+  condicionIva: string
   ingresosBrutos: string | null
   fechaInicioActividades: string | null
 }

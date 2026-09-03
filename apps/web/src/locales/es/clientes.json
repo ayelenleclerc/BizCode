@@ -70,7 +70,8 @@
       "RI": "RI - Responsable Inscrito",
       "Mono": "Monotributista",
       "CF": "CF - Consumidor Final",
-      "Exento": "Exento"
+      "Exento": "Exento",
+      "IVA": "Contribuyente IVA"
     },
     "errors": {
       "cuit": "CUIT inválido",
