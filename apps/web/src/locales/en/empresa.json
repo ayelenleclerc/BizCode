@@ -21,6 +21,11 @@
         "label": "Tax ID (RUT)",
         "hint": "Format XX.XXX.XXX-D (the check digit may be K)",
         "invalid": "Invalid RUT"
+      },
+      "MX": {
+        "label": "Tax ID (RFC)",
+        "hint": "Legal entity 12 characters or individual 13 (including homoclave)",
+        "invalid": "Invalid RFC"
       }
     },
     "domicilio": "Address",

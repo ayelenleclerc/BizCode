@@ -21,6 +21,11 @@
         "label": "RUT",
         "hint": "Formato XX.XXX.XXX-D (el verificador puede ser K)",
         "invalid": "RUT inválido"
+      },
+      "MX": {
+        "label": "RFC",
+        "hint": "Persona moral 12 caracteres o física 13 (homoclave incluida)",
+        "invalid": "RFC inválido"
       }
     },
     "domicilio": "Domicilio",

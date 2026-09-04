@@ -21,6 +21,11 @@
         "label": "Identificação fiscal (RUT)",
         "hint": "Formato XX.XXX.XXX-D (o verificador pode ser K)",
         "invalid": "RUT inválido"
+      },
+      "MX": {
+        "label": "Identificação fiscal (RFC)",
+        "hint": "Pessoa moral 12 caracteres ou física 13 (homoclave incluída)",
+        "invalid": "RFC inválido"
       }
     },
     "domicilio": "Endereço",

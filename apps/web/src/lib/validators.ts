@@ -20,6 +20,9 @@ export {
   formatRUTCL,
   rutClCheckDigit,
   validateRUTCL,
+  formatRFC,
+  rfcCheckDigit,
+  validateRFC,
   validateCBU,
   formatCBU,
 } from '@bizcode/types'
@@ -60,7 +63,7 @@ export function validateBankAccount(value: string, jurisdiction: unknown): boole
  * @es Alícuotas admitidas por `calculateIVA`: las de cada jurisdicción soportada más exento (#207).
  * @pt-BR Alíquotas aceitas por `calculateIVA`: as de cada jurisdição suportada mais isento (#207).
  */
-export type VatRateLiteral = '21' | '10.5' | '22' | '19' | '10' | '0'
+export type VatRateLiteral = '21' | '10.5' | '22' | '19' | '16' | '10' | '0'
 
 /**
  * Calcula IVA sobre un monto según alícuota

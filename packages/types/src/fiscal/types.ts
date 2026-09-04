@@ -19,7 +19,7 @@
  * @pt-BR Tipo de identificador fiscal esperado pela jurisdicao. E apenas um rotulo de interface:
  *   Uruguai e Chile o chamam de `rut` mas usam algoritmos diferentes, escolhidos por pais.
  */
-export type TaxIdKind = 'cuit' | 'rut'
+export type TaxIdKind = 'cuit' | 'rut' | 'rfc'
 
 /**
  * @en Two VAT rates per jurisdiction, matching the `neto1`/`neto2` buckets persisted on `Factura`.

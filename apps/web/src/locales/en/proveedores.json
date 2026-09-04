@@ -64,7 +64,8 @@
     "taxId": {
       "AR": { "label": "CUIT", "invalid": "Invalid CUIT" },
       "UY": { "label": "RUT", "invalid": "Invalid RUT" },
-      "CL": { "label": "RUT", "invalid": "Invalid RUT" }
+      "CL": { "label": "RUT", "invalid": "Invalid RUT" },
+      "MX": { "label": "RFC", "invalid": "Invalid RFC" }
     },
     "condIva": "VAT condition",
     "telef": "Phone",
