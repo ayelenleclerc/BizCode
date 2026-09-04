@@ -22,6 +22,7 @@ const ARGENTINE_ONLY_MODULES = [
   'finance.retenciones',
   'fiscal.remito',
   'fiscal.cheques',
+  'fiscal.libro_iva',
 ] as const
 
 describe('module availability per jurisdiction (#437)', () => {

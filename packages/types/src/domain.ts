@@ -214,6 +214,14 @@ export interface ProveedorCuentaCorrienteSaldo {
   excedeLimite: boolean
 }
 
+/**
+ * @en Supplier payment method. `echeq` is Argentine electronic cheque and is only offered when
+ *   `fiscal.cheques` is enabled; it remains in the union so historical receipts stay typed (#440).
+ * @es Método de pago a proveedor. `echeq` es el cheque electrónico argentino y solo se ofrece con
+ *   `fiscal.cheques`; permanece en la unión para tipar recibos históricos (#440).
+ * @pt-BR Método de pagamento a fornecedor. `echeq` é o cheque eletrônico argentino e só é oferecido
+ *   com `fiscal.cheques`; permanece na união para tipar recibos históricos (#440).
+ */
 export type ReciboPagoMetodo = 'transferencia' | 'cheque' | 'efectivo' | 'echeq'
 
 export interface ReciboPagoFactura {

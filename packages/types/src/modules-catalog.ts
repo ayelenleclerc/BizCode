@@ -142,6 +142,20 @@ export const MODULE_CATALOG = {
     plan: 'starter',
     price: 0,
   },
+  /**
+   * @en Argentine Libro IVA Ventas/Compras exports (ARCA RG 3685). Not a generic ledger feature (#440).
+   * @es Exportaciones Libro IVA Ventas/Compras argentinas (ARCA RG 3685). No es una función genérica del ledger (#440).
+   * @pt-BR Exportações Livro IVA Vendas/Compras argentinas (ARCA RG 3685). Não é um recurso genérico do ledger (#440).
+   */
+  'fiscal.libro_iva': {
+    label: 'Libro IVA (AR)',
+    required: false,
+    requiredInProd: false,
+    availableForCountries: ['AR'],
+    dependencies: ['finance.ledger'],
+    plan: 'pro',
+    price: 0,
+  },
   'logistics.dispatches': {
     label: 'Repartos',
     required: false,
@@ -472,6 +486,7 @@ export const DEFAULT_MODULES = [
   'finance.ledger',
   'fiscal.remito',
   'fiscal.cheques',
+  'fiscal.libro_iva',
   'finance.retenciones',
   'comms.notifications',
   'analytics.dashboard',

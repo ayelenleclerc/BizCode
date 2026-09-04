@@ -10,18 +10,21 @@ import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
 
 /**
- * @en Accounting exports — Libro IVA Ventas (#147) and Compras (#306).
- * @es Exportaciones contables — Libro IVA Ventas (#147) y Compras (#306).
- * @pt-BR Exportações contábeis — Livro IVA Vendas (#147) e Compras (#306).
+ * @en Accounting exports — Libro IVA Ventas (#147) and Compras (#306). Gated by the AR-only
+ *   `fiscal.libro_iva` module so non-Argentine tenants with `finance.ledger` do not see RG 3685 exports (#440).
+ * @es Exportaciones contables — Libro IVA Ventas (#147) y Compras (#306). Bajo el módulo AR-only
+ *   `fiscal.libro_iva` para que tenants no argentinos con `finance.ledger` no vean exportaciones RG 3685 (#440).
+ * @pt-BR Exportações contábeis — Livro IVA Vendas (#147) e Compras (#306). Sob o módulo AR-only
+ *   `fiscal.libro_iva` para que tenants não argentinos com `finance.ledger` não vejam exportações RG 3685 (#440).
  */
 export function registerContabilidadRoutes(app: Application, ctx: RestRouteContext): void {
   const { services } = ctx
   const { libroIvaVentas, libroIvaCompras } = services
-  const ledgerModule = requireModule('finance.ledger')
+  const libroIvaModule = requireModule('fiscal.libro_iva')
 
   app.get(
     '/api/contabilidad/libro-iva-ventas',
-    ledgerModule,
+    libroIvaModule,
     requirePermission('reports.financial.read'),
     async (req: Request, res: Response) => {
       try {
@@ -83,7 +86,7 @@ export function registerContabilidadRoutes(app: Application, ctx: RestRouteConte
 
   app.get(
     '/api/contabilidad/libro-iva-compras',
-    ledgerModule,
+    libroIvaModule,
     requirePermission('reports.financial.read'),
     async (req: Request, res: Response) => {
       try {

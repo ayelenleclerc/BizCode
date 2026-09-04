@@ -2649,65 +2649,84 @@ export const clienteCuentaCorrienteEnviarBodySchema = z.object({
 
 export { movimientoClienteCCTipoSchema }
 
-const reciboPagoMetodoSchema = z.enum(['transferencia', 'cheque', 'efectivo', 'echeq'])
+/**
+ * @en Generic supplier-receipt payment methods. `echeq` is Argentine-only and is added only when
+ *   `fiscal.cheques` is enabled for the tenant (#440).
+ * @es Métodos de pago genéricos del recibo a proveedor. `echeq` es solo argentino y se agrega solo
+ *   cuando el tenant tiene `fiscal.cheques` (#440).
+ * @pt-BR Métodos de pagamento genéricos do recibo a fornecedor. `echeq` é só argentino e só é
+ *   adicionado quando o tenant tem `fiscal.cheques` (#440).
+ */
+const RECIBO_PAGO_METODOS_BASE = ['transferencia', 'cheque', 'efectivo'] as const
+const RECIBO_PAGO_METODOS_WITH_ECHEQ = [...RECIBO_PAGO_METODOS_BASE, 'echeq'] as const
 
 const reciboPagoRetencionLineSchema = retencionPercepcionLineSchema
 
-/** @en Supplier payment receipt body (#271, #276 retenciones). */
-export const reciboPagoBodySchema = z
-  .object({
-    fecha: z.string(),
-    total: z.number().positive('total must be positive'),
-    metodoPago: reciboPagoMetodoSchema,
-    cbu: z.union([z.string(), z.null(), z.undefined()]).optional(),
-    referencia: z.union([z.string(), z.null(), z.undefined()]).optional(),
-    notas: z.union([z.string(), z.null(), z.undefined()]).optional(),
-    chequeId: z.union([z.number(), z.null(), z.undefined()]).optional(),
-    facturas: z
-      .array(
-        z.object({
-          comprobanteCompraId: z.union([z.number(), z.null(), z.undefined()]).optional(),
-          facturaRef: z.string().trim().min(1).max(40),
-          monto: z.number().positive('monto must be positive'),
-        }),
-      )
-      .min(1, 'At least one factura allocation is required'),
-    retenciones: z.array(reciboPagoRetencionLineSchema).optional(),
-  })
-  .superRefine((data, ctx) => {
-    const f = data.fecha.trim()
-    if (f.length === 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
-    }
-    if (data.cbu != null && data.cbu.length > 22) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cbu max 22 chars', path: ['cbu'] })
-    }
-    if (data.referencia != null && data.referencia.length > 60) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'referencia max 60 chars', path: ['referencia'] })
-    }
-    if (data.notas != null && data.notas.length > 500) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'notas max 500 chars', path: ['notas'] })
-    }
-    for (const line of data.facturas) {
-      if (line.comprobanteCompraId != null && (!Number.isInteger(line.comprobanteCompraId) || line.comprobanteCompraId < 1)) {
+/**
+ * @en Builds the supplier payment receipt body schema; includes `echeq` only when the cheques module is on (#440).
+ * @es Construye el esquema del cuerpo del recibo a proveedor; incluye `echeq` solo con el módulo de cheques (#440).
+ * @pt-BR Constrói o esquema do corpo do recibo a fornecedor; inclui `echeq` só com o módulo de cheques (#440).
+ */
+export function buildReciboPagoBodySchema(allowEcheq: boolean) {
+  const metodoSchema = z.enum(allowEcheq ? RECIBO_PAGO_METODOS_WITH_ECHEQ : RECIBO_PAGO_METODOS_BASE)
+  return z
+    .object({
+      fecha: z.string(),
+      total: z.number().positive('total must be positive'),
+      metodoPago: metodoSchema,
+      cbu: z.union([z.string(), z.null(), z.undefined()]).optional(),
+      referencia: z.union([z.string(), z.null(), z.undefined()]).optional(),
+      notas: z.union([z.string(), z.null(), z.undefined()]).optional(),
+      chequeId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+      facturas: z
+        .array(
+          z.object({
+            comprobanteCompraId: z.union([z.number(), z.null(), z.undefined()]).optional(),
+            facturaRef: z.string().trim().min(1).max(40),
+            monto: z.number().positive('monto must be positive'),
+          }),
+        )
+        .min(1, 'At least one factura allocation is required'),
+      retenciones: z.array(reciboPagoRetencionLineSchema).optional(),
+    })
+    .superRefine((data, ctx) => {
+      const f = data.fecha.trim()
+      if (f.length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'fecha is required', path: ['fecha'] })
+      }
+      if (data.cbu != null && data.cbu.length > 22) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cbu max 22 chars', path: ['cbu'] })
+      }
+      if (data.referencia != null && data.referencia.length > 60) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'referencia max 60 chars', path: ['referencia'] })
+      }
+      if (data.notas != null && data.notas.length > 500) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'notas max 500 chars', path: ['notas'] })
+      }
+      for (const line of data.facturas) {
+        if (line.comprobanteCompraId != null && (!Number.isInteger(line.comprobanteCompraId) || line.comprobanteCompraId < 1)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'comprobanteCompraId must be >= 1',
+            path: ['facturas'],
+          })
+        }
+      }
+      const bruto = data.facturas.reduce((sum, line) => sum + line.monto, 0)
+      const retTotal = (data.retenciones ?? []).reduce((sum, line) => sum + line.importe, 0)
+      const expectedNet = bruto - retTotal
+      if (Math.abs(expectedNet - data.total) > 0.009) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'comprobanteCompraId must be >= 1',
-          path: ['facturas'],
+          message: 'total must equal sum of facturas minus sum of retenciones',
+          path: ['total'],
         })
       }
-    }
-    const bruto = data.facturas.reduce((sum, line) => sum + line.monto, 0)
-    const retTotal = (data.retenciones ?? []).reduce((sum, line) => sum + line.importe, 0)
-    const expectedNet = bruto - retTotal
-    if (Math.abs(expectedNet - data.total) > 0.009) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'total must equal sum of facturas minus sum of retenciones',
-        path: ['total'],
-      })
-    }
-  })
+    })
+}
+
+/** @en Default schema without eCheq — for callers without tenant module context (#271, #440). */
+export const reciboPagoBodySchema = buildReciboPagoBodySchema(false)
 
 const reciboCobroFormaTipoSchema = z.enum([
   'efectivo',

@@ -79,11 +79,12 @@ function mockAuth(permissions: Permission[]) {
 function mockFlagsWithCreditNotes() {
   vi.mocked(useFeatureFlags).mockReturnValue({
     status: 'ready',
-    modules: ['billing.credit_notes', 'finance.ledger'],
+    modules: ['billing.credit_notes', 'finance.ledger', 'fiscal.libro_iva'],
     integrations: [],
     jurisdiccionFiscal: 'AR' as const,
     jurisdiccionesHabilitadas: ['AR', 'UY'] as const,
-    hasModule: (k) => k === 'billing.credit_notes' || k === 'finance.ledger',
+    hasModule: (k) =>
+      k === 'billing.credit_notes' || k === 'finance.ledger' || k === 'fiscal.libro_iva',
     hasIntegration: () => false,
     refreshFeatures: vi.fn(),
   })
@@ -231,7 +232,7 @@ describe('FinanzasPage', () => {
     expect(await screen.findByTestId('finanzas-nc-row-9')).toBeInTheDocument()
   })
 
-  it('muestra preview del Libro IVA Ventas con finance.ledger', async () => {
+  it('muestra preview del Libro IVA Ventas con fiscal.libro_iva', async () => {
     render(<FinanzasPage />)
     await screen.findByTestId('finanzas-page')
     await waitFor(() => {
@@ -240,7 +241,7 @@ describe('FinanzasPage', () => {
     expect(await screen.findByTestId('finanzas-libro-iva-preview')).toBeInTheDocument()
   })
 
-  it('muestra preview del Libro IVA Compras con finance.ledger', async () => {
+  it('muestra preview del Libro IVA Compras con fiscal.libro_iva', async () => {
     render(<FinanzasPage />)
     await screen.findByTestId('finanzas-page')
     await waitFor(() => {
