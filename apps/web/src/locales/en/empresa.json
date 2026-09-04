@@ -147,6 +147,24 @@
       "saveFailed": "Could not save Mexico SAT settings"
     }
   },
+  "uruguayDgi": {
+    "title": "DGI CFE (Uruguay) — mock",
+    "subtitle": "Homologación mock CFE — stores RUT only. Live DGI SOAP/REST is not evidenced in this build (#207).",
+    "loading": "Loading Uruguay DGI settings…",
+    "configuredHint": "Configured for RUT {{rut}} ({{ambiente}}).",
+    "notConfigured": "Uruguay DGI CFE mock is not configured yet.",
+    "rut": "RUT",
+    "ambiente": "Environment",
+    "ambienteHomologacion": "Homologación (mock)",
+    "ambienteProduccion": "Production (not enabled in this build)",
+    "save": "Save Uruguay DGI settings",
+    "saving": "Saving…",
+    "saveSuccess": "Uruguay DGI settings saved",
+    "errors": {
+      "loadFailed": "Could not load Uruguay DGI settings",
+      "saveFailed": "Could not save Uruguay DGI settings"
+    }
+  },
   "mercadopago": {
     "title": "MercadoPago",
     "subtitle": "Optional integration — access token and webhook secret are encrypted and never shown after save.",

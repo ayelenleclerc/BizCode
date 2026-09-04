@@ -17,7 +17,7 @@
  */
 
 import type { PrismaClient } from '@prisma/client'
-import { DEFAULT_FISCAL_JURISDICTION, resolveJurisdiction } from '@bizcode/types'
+import { DEFAULT_FISCAL_JURISDICTION, resolveJurisdiction, validateRUT } from '@bizcode/types'
 import type { ServiceResult } from '../services/serviceResults'
 import { ArcaService, type FiscalConfigInput } from './ar/ArcaService'
 import { decryptFiscalSecret, encryptFiscalSecret } from './ar/fiscalSecrets'
@@ -279,6 +279,63 @@ export class FiscalProviderConfigService {
         enabled: true,
         isDefault,
         taxIdentifier: rfc,
+        legalName: input.legalName?.trim() || null,
+        encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
+        configVersion: (existing?.configVersion ?? 0) + 1,
+      },
+    })
+    return { ok: true, data: { id: row.id } }
+  }
+
+  /**
+   * @en Upserts Uruguay DGI CFE mock config: RUT + homologación environment (#207).
+   *   No live DGI secrets — SOAP/REST DGI is Not evidenced.
+   */
+  async upsertUruguayDgiConfig(
+    tenantId: number,
+    input: { rut: string; ambiente?: FiscalEnvironment; legalName?: string },
+  ): Promise<ServiceResult<{ id: number }>> {
+    const rutRaw = input.rut.trim()
+    if (!validateRUT(rutRaw)) {
+      return { ok: false, status: 400, error: 'INVALID_RUT' }
+    }
+    const rut = rutRaw.replace(/[-.\s]/g, '')
+    const ambiente: FiscalEnvironment = input.ambiente ?? 'homologacion'
+    const bundle = { rut, ambiente, mock: true as const }
+    const existing = await this.prisma.fiscalProviderConfig.findUnique({
+      where: { tenantId_providerCode: { tenantId, providerCode: 'uruguay_dgi' } },
+    })
+    const anyDefault = await this.prisma.fiscalProviderConfig.findFirst({
+      where: { tenantId, isDefault: true },
+    })
+    const isDefault = existing?.isDefault ?? anyDefault == null
+
+    if (isDefault && !existing?.isDefault) {
+      await this.prisma.fiscalProviderConfig.updateMany({
+        where: { tenantId, isDefault: true },
+        data: { isDefault: false },
+      })
+    }
+
+    const row = await this.prisma.fiscalProviderConfig.upsert({
+      where: { tenantId_providerCode: { tenantId, providerCode: 'uruguay_dgi' } },
+      create: {
+        tenantId,
+        providerCode: 'uruguay_dgi',
+        countryCode: 'UY',
+        environment: ambiente,
+        enabled: true,
+        isDefault,
+        taxIdentifier: rut,
+        legalName: input.legalName?.trim() || null,
+        encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
+        configVersion: 1,
+      },
+      update: {
+        environment: ambiente,
+        enabled: true,
+        isDefault,
+        taxIdentifier: rut,
         legalName: input.legalName?.trim() || null,
         encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
         configVersion: (existing?.configVersion ?? 0) + 1,

@@ -50,6 +50,14 @@ describe('module catalog', () => {
     expect(result.errors).toEqual([])
   })
 
+  it('validates Uruguayan defaults including billing.dgi_cfe in prod', () => {
+    const uyDefaults = getDefaultModulesForJurisdiction('UY')
+    expect(uyDefaults).toContain('billing.dgi_cfe')
+    const result = validateModuleSet([...uyDefaults], 'prod', 'UY')
+    expect(result.valid).toBe(true)
+    expect(result.errors).toEqual([])
+  })
+
   it('flags missing required modules in prod', () => {
     const withoutCore = DEFAULT_MODULES.filter((k) => k !== 'core.auth')
     const result = validateModuleSet(withoutCore, 'prod')
@@ -107,6 +115,7 @@ describe('module catalog', () => {
         'core.catalog',
         'core.clients',
         'core.invoicing',
+        'billing.dgi_cfe',
         'billing.credit_notes',
         'finance.collections',
         'finance.ledger',

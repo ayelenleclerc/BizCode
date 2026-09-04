@@ -147,6 +147,24 @@
       "saveFailed": "No se pudo guardar la configuración SAT México"
     }
   },
+  "uruguayDgi": {
+    "title": "DGI CFE (Uruguay) — mock",
+    "subtitle": "Mock de homologación CFE — solo guarda RUT. SOAP/REST DGI live no está evidenciado en este build (#207).",
+    "loading": "Cargando configuración DGI Uruguay…",
+    "configuredHint": "Configurado para RUT {{rut}} ({{ambiente}}).",
+    "notConfigured": "El mock CFE DGI Uruguay aún no está configurado.",
+    "rut": "RUT",
+    "ambiente": "Ambiente",
+    "ambienteHomologacion": "Homologación (mock)",
+    "ambienteProduccion": "Producción (no habilitada en este build)",
+    "save": "Guardar configuración DGI Uruguay",
+    "saving": "Guardando…",
+    "saveSuccess": "Configuración DGI Uruguay guardada",
+    "errors": {
+      "loadFailed": "No se pudo cargar la configuración DGI Uruguay",
+      "saveFailed": "No se pudo guardar la configuración DGI Uruguay"
+    }
+  },
   "mercadopago": {
     "title": "MercadoPago",
     "subtitle": "Integración opcional — el access token y el webhook secret se cifran y no se muestran tras guardar.",

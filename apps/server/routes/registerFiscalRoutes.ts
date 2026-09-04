@@ -28,6 +28,7 @@ const providerConfigBodySchema = z.object({
   privateKey: z.string().min(1).optional(),
   ambiente: z.enum(['homologacion', 'produccion']).optional(),
   rfc: z.string().min(12).max(13).optional(),
+  rut: z.string().min(12).max(20).optional(),
   legalName: z.string().max(160).optional(),
 })
 
@@ -101,6 +102,31 @@ export function registerFiscalRoutes(app: Application, ctx: RestRouteContext): v
           }
           const result = await providerConfigService.upsertMexicoSatConfig(getTenantId(req), {
             rfc: body.rfc,
+            ambiente: body.ambiente,
+            legalName: body.legalName,
+          })
+          if (!result.ok) {
+            res.status(result.status).json({ success: false, error: result.error })
+            return
+          }
+          await writeAudit(
+            req as AuthenticatedRequest,
+            'fiscal_provider_config_upsert',
+            'fiscal_provider_config',
+            String(result.data.id),
+            { provider: body.provider },
+          )
+          res.json({ success: true, data: { configured: true } })
+          return
+        }
+
+        if (body.provider === 'uruguay_dgi') {
+          if (!body.rut) {
+            res.status(400).json({ success: false, error: 'RUT_REQUIRED' })
+            return
+          }
+          const result = await providerConfigService.upsertUruguayDgiConfig(getTenantId(req), {
+            rut: body.rut,
             ambiente: body.ambiente,
             legalName: body.legalName,
           })

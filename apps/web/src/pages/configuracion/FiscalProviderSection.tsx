@@ -5,19 +5,21 @@ import IfModule from '@/components/IfModule'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import ArcaFiscalSection from './ArcaFiscalSection'
 import MexicoSatFiscalSection from './MexicoSatFiscalSection'
+import UruguayDgiFiscalSection from './UruguayDgiFiscalSection'
 
 /**
- * @en Multi-organism fiscal e-invoicing section (#378, #210). Lists providers and mounts
- *   ARCA / Mexico SAT credential forms when the matching module is enabled.
- * @es Sección de facturación electrónica multi-organismo (#378, #210). Lista proveedores y
- *   monta formularios ARCA / SAT México cuando el módulo correspondiente está habilitado.
- * @pt-BR Seção de nota fiscal eletrônica multi-organismo (#378, #210). Lista provedores e
- *   monta formulários ARCA / SAT México quando o módulo correspondente está habilitado.
+ * @en Multi-organism fiscal e-invoicing section (#378, #210, #207). Lists providers and mounts
+ *   ARCA / Mexico SAT / Uruguay DGI credential forms when the matching module is enabled.
+ * @es Sección de facturación electrónica multi-organismo (#378, #210, #207). Lista proveedores y
+ *   monta formularios ARCA / SAT México / DGI Uruguay cuando el módulo correspondiente está habilitado.
+ * @pt-BR Seção de nota fiscal eletrônica multi-organismo (#378, #210, #207). Lista provedores e
+ *   monta formulários ARCA / SAT México / DGI Uruguai quando o módulo correspondente está habilitado.
  */
 export default function FiscalProviderSection() {
   const { t } = useTranslation('empresa')
   const { hasModule } = useFeatureFlags()
-  const showSection = hasModule('billing.arca_cae') || hasModule('billing.cfdi_sat')
+  const showSection =
+    hasModule('billing.arca_cae') || hasModule('billing.cfdi_sat') || hasModule('billing.dgi_cfe')
   const [loading, setLoading] = useState(true)
   const [providers, setProviders] = useState<FiscalProviderStatusEntry[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -115,6 +117,7 @@ export default function FiscalProviderSection() {
         <ArcaFiscalSection />
       </IfModule>
       <MexicoSatFiscalSection />
+      <UruguayDgiFiscalSection />
     </>
   )
 }

@@ -21,7 +21,7 @@ Usar `apps/server/fiscal/arca/ArcaFiscalAdapter.ts` (envuelve `ArcaService`) com
 
 ## 3. Reemplazar el stub de capacidades
 
-Hasta que el paso 2 sea real, el proveedor debe seguir usando su stub bajo `apps/server/fiscal/stubs/` (p. ej. `UruguayDgiFiscalAdapter.ts`, `ChileSiiFiscalAdapter.ts`), que lanza [`FiscalAdapterNotImplementedError`](../../../apps/server/fiscal/stubs/FiscalAdapterNotImplementedError.ts) en todo método operacional. Una vez que exista el adapter real, actualizar el registro de la factory (paso siguiente) para usarlo en vez del stub — no dejar ambos registrados para el mismo código de proveedor.
+Hasta que el paso 2 sea real, el proveedor debe seguir usando su stub bajo `apps/server/fiscal/stubs/` (p. ej. `ChileSiiFiscalAdapter.ts`), que lanza [`FiscalAdapterNotImplementedError`](../../../apps/server/fiscal/stubs/FiscalAdapterNotImplementedError.ts) en todo método operacional. Una vez que exista el adapter real, actualizar el registro de la factory (paso siguiente) para usarlo en vez del stub — no dejar ambos registrados para el mismo código de proveedor.
 
 ## 4. Registrar la factory del adapter
 
@@ -48,6 +48,6 @@ Actualizar la lista de proveedores de esta guía más abajo y agregar una nota e
 | Proveedor | `providerCode` | `implemented` | Fuente |
 |---|---|---|---|
 | ARCA / AFIP (Argentina) | `arca_wsfe` | `true` (mock de homologación) | `apps/server/fiscal/arca/ArcaFiscalAdapter.ts` → `apps/server/fiscal/ar/ArcaService.ts` |
-| DGI (Uruguay) | `uruguay_dgi` | `false` (stub de capacidades) | `apps/server/fiscal/stubs/UruguayDgiFiscalAdapter.ts` |
+| DGI (Uruguay) | `uruguay_dgi` | `true` (mock CFE de homologación; live no evidenciado) | `apps/server/fiscal/uy/UruguayDgiFiscalAdapter.ts` → `UruguayDgiService` + `uyDgiCfeMock` ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)) |
 | SII (Chile) | `chile_sii` | `false` (stub de capacidades) | `apps/server/fiscal/stubs/ChileSiiFiscalAdapter.ts` |
 | SAT/PAC (México) | `mexico_sat_pac` | `true` (mock PAC de homologación; live no evidenciado) | `apps/server/fiscal/mx/MexicoSatFiscalAdapter.ts` → `MexicoSatService` + `mxSatPacMock` ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)) |

@@ -122,6 +122,8 @@ export default function ListadoFacturas({
   const [cfdiCancelError, setCfdiCancelError] = useState<string | null>(null)
   const { hasModule } = useFeatureFlags()
   const useMexicoCfdi = hasModule('billing.cfdi_sat')
+  const useUruguayCfe = hasModule('billing.dgi_cfe')
+  const useFiscalAuthorize = useMexicoCfdi || useUruguayCfe
   const [pdfLoadingId, setPdfLoadingId] = useState<number | null>(null)
   const [pdfError, setPdfError] = useState<string | null>(null)
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
@@ -208,7 +210,7 @@ export default function ListadoFacturas({
     setCaeLoadingId(facturaId)
     setCaeError(null)
     try {
-      if (useMexicoCfdi) {
+      if (useFiscalAuthorize) {
         await fiscalAPI.authorizeDocument(facturaId)
       } else {
         await arcaAPI.requestCae(facturaId)
@@ -565,7 +567,7 @@ export default function ListadoFacturas({
                       </div>
                     </div>
 
-                    {(hasModule('billing.arca_cae') || useMexicoCfdi) && (
+                    {(hasModule('billing.arca_cae') || useFiscalAuthorize) && (
                       <div className="flex flex-wrap gap-2" role="group" aria-label={t('cae.column')}>
                         <CanAccess permission="reports.operational.read">
                           <button
@@ -621,10 +623,14 @@ export default function ListadoFacturas({
                               {caeLoadingId === factura.id
                                 ? useMexicoCfdi
                                   ? t('cfdi.stampLoading')
-                                  : t('cae.retryLoading')
+                                  : useUruguayCfe
+                                    ? t('cfe.stampLoading')
+                                    : t('cae.retryLoading')
                                 : useMexicoCfdi
                                   ? t('cfdi.stamp')
-                                  : t('cae.retry')}
+                                  : useUruguayCfe
+                                    ? t('cfe.stamp')
+                                    : t('cae.retry')}
                             </button>
                           </CanAccess>
                         )}
@@ -696,7 +702,7 @@ export default function ListadoFacturas({
                           </div>
                         </div>
                       )}
-                      {(caeError || pdfError) && (hasModule('billing.arca_cae') || useMexicoCfdi) && (
+                      {(caeError || pdfError) && (hasModule('billing.arca_cae') || useFiscalAuthorize) && (
                         <p className="text-sm text-red-600 dark:text-red-400" role="alert" aria-live="polite">
                           {caeError ?? pdfError}
                         </p>

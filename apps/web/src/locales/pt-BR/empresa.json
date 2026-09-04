@@ -147,6 +147,24 @@
       "saveFailed": "Não foi possível salvar a configuração SAT México"
     }
   },
+  "uruguayDgi": {
+    "title": "DGI CFE (Uruguai) — mock",
+    "subtitle": "Mock de homologação CFE — armazena apenas RUT. SOAP/REST DGI live não está evidenciado neste build (#207).",
+    "loading": "Carregando configuração DGI Uruguai…",
+    "configuredHint": "Configurado para RUT {{rut}} ({{ambiente}}).",
+    "notConfigured": "O mock CFE DGI Uruguai ainda não está configurado.",
+    "rut": "RUT",
+    "ambiente": "Ambiente",
+    "ambienteHomologacion": "Homologação (mock)",
+    "ambienteProduccion": "Produção (não habilitada neste build)",
+    "save": "Salvar configuração DGI Uruguai",
+    "saving": "Salvando…",
+    "saveSuccess": "Configuração DGI Uruguai salva",
+    "errors": {
+      "loadFailed": "Não foi possível carregar a configuração DGI Uruguai",
+      "saveFailed": "Não foi possível salvar a configuração DGI Uruguai"
+    }
+  },
   "mercadopago": {
     "title": "MercadoPago",
     "subtitle": "Integração opcional — access token e webhook secret são criptografados e não são exibidos após salvar.",
