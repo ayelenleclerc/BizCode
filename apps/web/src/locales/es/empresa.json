@@ -72,7 +72,7 @@
   },
   "fiscalProviders": {
     "title": "Facturación electrónica fiscal (multi-organismo)",
-    "subtitle": "ARCA (Argentina) es el único proveedor con integración funcional hoy; DGI (Uruguay) y SAT (México) son stubs de capacidades, sin emisión real.",
+    "subtitle": "ARCA (Argentina) emite CAE con mock de homologación; SAT México CFDI usa mock PAC de homologación (#210). DGI Uruguay y SII Chile siguen como stubs.",
     "loading": "Cargando proveedores fiscales…",
     "defaultBadge": "Predeterminado",
     "configuredBadge": "Configurado",
@@ -127,6 +127,24 @@
       "loadFailed": "No se pudo cargar la configuración ARCA",
       "saveFailed": "No se pudieron guardar las credenciales ARCA",
       "authFailed": "No se pudo obtener el ticket ARCA"
+    }
+  },
+  "mexicoSat": {
+    "title": "SAT CFDI (México) — mock PAC",
+    "subtitle": "Mock de homologación PAC — solo guarda RFC. Facturama/Finkok live no está evidenciado en este build (#210).",
+    "loading": "Cargando configuración SAT México…",
+    "configuredHint": "Configurado para RFC {{rfc}} ({{ambiente}}).",
+    "notConfigured": "El mock PAC SAT México aún no está configurado.",
+    "rfc": "RFC",
+    "ambiente": "Ambiente",
+    "ambienteHomologacion": "Homologación (mock)",
+    "ambienteProduccion": "Producción (no habilitada en este build)",
+    "save": "Guardar configuración SAT México",
+    "saving": "Guardando…",
+    "saveSuccess": "Configuración SAT México guardada",
+    "errors": {
+      "loadFailed": "No se pudo cargar la configuración SAT México",
+      "saveFailed": "No se pudo guardar la configuración SAT México"
     }
   },
   "mercadopago": {

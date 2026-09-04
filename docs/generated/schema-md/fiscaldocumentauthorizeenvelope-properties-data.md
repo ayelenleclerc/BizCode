@@ -139,3 +139,4 @@ undefined#/properties/data
 | `"authorized"` |             |
 | `"rejected"`   |             |
 | `"failed"`     |             |
+| `"cancelled"`  |             |

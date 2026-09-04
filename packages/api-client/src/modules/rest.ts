@@ -2039,7 +2039,7 @@ export const arcaAPI = {
  * @pt-BR Tipos de nota fiscal eletrônica multi-organismo (#378, ADR-0018). `arca_wsfe` é o
  *   único provedor com adapter funcional; `uruguay_dgi`/`mexico_sat_pac` são stubs de capacidades.
  */
-export type FiscalProviderCode = 'arca_wsfe' | 'uruguay_dgi' | 'mexico_sat_pac'
+export type FiscalProviderCode = 'arca_wsfe' | 'uruguay_dgi' | 'chile_sii' | 'mexico_sat_pac'
 
 export type FiscalProviderCapabilities = {
   provider: FiscalProviderCode
@@ -2075,14 +2075,28 @@ export type FiscalProviderConfigInput = {
   certificate?: string
   privateKey?: string
   ambiente?: 'homologacion' | 'produccion'
+  rfc?: string
+  legalName?: string
 }
 
 export type FiscalDocumentAuthorizeResult = {
   fiscalDocumentId: number
-  status: 'pending' | 'authorized' | 'rejected' | 'failed'
+  status: 'pending' | 'authorized' | 'rejected' | 'failed' | 'cancelled'
   authorizationCode?: string
   authorizationExpiresAt?: string
   provider: FiscalProviderCode
+}
+
+export type SatCatalogHit = {
+  catalog: string
+  code: string
+  description: string
+  sourceLabel: string
+}
+
+export type FiscalCancelInput = {
+  documentType?: 'invoice' | 'credit_note'
+  reasonCode: '01' | '02' | '03' | '04'
 }
 
 export const fiscalAPI = {
@@ -2137,6 +2151,36 @@ export const fiscalAPI = {
       const response = await api.post<{ success: boolean; data: FiscalDocumentAuthorizeResult }>(
         `/fiscal/documents/${facturaId}/authorize`,
       )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  cancelDocument: async (
+    documentId: number,
+    body: FiscalCancelInput,
+  ): Promise<FiscalDocumentAuthorizeResult> => {
+    try {
+      const response = await api.post<{ success: boolean; data: FiscalDocumentAuthorizeResult }>(
+        `/fiscal/documents/${documentId}/cancel`,
+        body,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  searchSatCatalog: async (params: {
+    catalog?: string
+    q?: string
+    limit?: number
+  }): Promise<SatCatalogHit[]> => {
+    try {
+      const response = await api.get<{ success: boolean; data: SatCatalogHit[] }>('/fiscal/sat/catalog', {
+        params,
+      })
       return response.data.data
     } catch (error) {
       return handleError(error as AxiosError<ApiErrorPayload>)

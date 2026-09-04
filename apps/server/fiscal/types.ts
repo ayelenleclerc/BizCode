@@ -49,7 +49,12 @@ export type FiscalEnvironment = 'homologacion' | 'produccion'
 export type FiscalDocumentType = 'invoice' | 'credit_note'
 
 /** @en Lifecycle status stored on `FiscalDocument.status` (Prisma). */
-export type FiscalDocumentStatus = 'pending' | 'authorized' | 'rejected' | 'failed'
+export type FiscalDocumentStatus = 'pending' | 'authorized' | 'rejected' | 'failed' | 'cancelled'
+
+/** @en Optional cancel payload; Mexico SAT requires reasonCode 01-04 (#210). */
+export type FiscalCancelOptions = {
+  reasonCode?: string
+}
 
 export type FiscalAuthSession = {
   token: string

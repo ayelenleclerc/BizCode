@@ -1,11 +1,13 @@
 /**
- * @en Multi-organism fiscal e-invoicing API tests (#378, ADR-0018): provider config,
- *   capabilities, validation, and document authorization. Only `arca_wsfe` is evidenced
- *   as implemented (homologación mock); `uruguay_dgi`/`mexico_sat_pac` are capability-only.
- * @es Tests API de facturación electrónica multi-organismo (#378, ADR-0018): config,
- *   capacidades, validación y autorización de documentos. Solo `arca_wsfe` está
- *   evidenciado como implementado (mock homologación); `uruguay_dgi`/`mexico_sat_pac`
- *   son solo de capacidades.
+ * @en Multi-organism fiscal e-invoicing API tests (#378/#210): provider config,
+ *   capabilities, validation, and document authorization. `arca_wsfe` and `mexico_sat_pac`
+ *   are evidenced as homologación mocks; `uruguay_dgi`/`chile_sii` remain capability-only.
+ * @es Tests API de facturación electrónica multi-organismo (#378/#210): config,
+ *   capacidades, validación y autorización. `arca_wsfe` y `mexico_sat_pac` están
+ *   evidenciados como mocks de homologación; `uruguay_dgi`/`chile_sii` solo capacidades.
+ * @pt-BR Testes da API fiscal multi-organismo (#378/#210): config, capacidades,
+ *   validação e autorização. `arca_wsfe` e `mexico_sat_pac` são mocks de homologação;
+ *   `uruguay_dgi`/`chile_sii` apenas capacidades.
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -72,7 +74,7 @@ describe('Fiscal multi-organism API (#378)', () => {
     process.env.BIZCODE_TEST_ROLE = 'owner'
   })
 
-  it('GET /api/fiscal/providers/capabilities lists arca_wsfe as implemented and stubs as not implemented', async () => {
+  it('GET /api/fiscal/providers/capabilities lists arca_wsfe and mexico_sat_pac as implemented mocks', async () => {
     const app = createApp(buildPrismaMock())
     const res = await request(app).get('/api/fiscal/providers/capabilities').expect(200)
 
@@ -82,7 +84,7 @@ describe('Fiscal multi-organism API (#378)', () => {
     )
     expect(byProvider.get('arca_wsfe')?.implemented).toBe(true)
     expect(byProvider.get('uruguay_dgi')?.implemented).toBe(false)
-    expect(byProvider.get('mexico_sat_pac')?.implemented).toBe(false)
+    expect(byProvider.get('mexico_sat_pac')?.implemented).toBe(true)
     await assertMatchesOpenApi('/api/fiscal/providers/capabilities', 'get', '200', res.body)
   })
 

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "documentType": {
+      "default": "invoice",
+      "enum": [
+        "invoice",
+        "credit_note"
+      ],
+      "type": "string"
+    },
+    "reasonCode": {
+      "description": "SAT CFDI cancel reason codes (#210)",
+      "enum": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "reasonCode"
+  ],
+  "title": "FiscalDocumentCancelInput",
+  "type": "object"
+}

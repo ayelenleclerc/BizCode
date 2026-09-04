@@ -9,7 +9,9 @@ import {
   MODULE_PRESET_KEYS,
   canDeactivate,
   detectCatalogDependencyCycles,
+  filterModulesByJurisdiction,
   findUnknownCatalogDependencies,
+  getDefaultModulesForJurisdiction,
   validateModuleSet,
 } from '../../apps/web/src/lib/modules'
 
@@ -33,8 +35,17 @@ describe('module catalog', () => {
     expect(canDeactivate('core.auth', 'dev')).toBe(false)
   })
 
-  it('validates DEFAULT_MODULES in prod', () => {
-    const result = validateModuleSet([...DEFAULT_MODULES], 'prod')
+  it('validates Argentine DEFAULT_MODULES slice in prod', () => {
+    const argentineDefaults = getDefaultModulesForJurisdiction('AR')
+    const result = validateModuleSet([...argentineDefaults], 'prod', 'AR')
+    expect(result.valid).toBe(true)
+    expect(result.errors).toEqual([])
+  })
+
+  it('validates Mexican defaults including billing.cfdi_sat in prod', () => {
+    const mexicanDefaults = getDefaultModulesForJurisdiction('MX')
+    expect(mexicanDefaults).toContain('billing.cfdi_sat')
+    const result = validateModuleSet([...mexicanDefaults], 'prod', 'MX')
     expect(result.valid).toBe(true)
     expect(result.errors).toEqual([])
   })
@@ -69,10 +80,10 @@ describe('module catalog', () => {
     expect(result.valid).toBe(true)
   })
 
-  it('validates all six presets in prod', () => {
+  it('validates all six presets in prod for Argentina (filters foreign legal modules)', () => {
     for (const key of MODULE_PRESET_KEYS) {
-      const preset = MODULE_PRESETS[key]
-      const result = validateModuleSet(preset, 'prod')
+      const preset = filterModulesByJurisdiction(MODULE_PRESETS[key], 'AR')
+      const result = validateModuleSet(preset, 'prod', 'AR')
       expect(result.valid, `preset ${key} invalid: ${JSON.stringify(result.errors)}`).toBe(true)
     }
   })

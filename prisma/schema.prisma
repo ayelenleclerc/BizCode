@@ -293,6 +293,10 @@ model Articulo {
   precioOverride       Decimal?           @db.Decimal(14, 2)
   costoOverride        Decimal?           @db.Decimal(13, 2)
   condIva              String             @db.VarChar(1) // IVA %: 1=21%, 2=10.5%, 3=Exento
+  /// @en SAT c_ClaveProdServ (8 digits) for CFDI line mapping; MX tenants (#210).
+  /// @es c_ClaveProdServ del SAT (8 dígitos) para mapear líneas CFDI; tenants MX (#210).
+  /// @pt-BR c_ClaveProdServ do SAT (8 dígitos) para mapear linhas CFDI; tenants MX (#210).
+  claveProdServ        String?            @db.VarChar(8)
   umedida              String             @db.VarChar(6)
   /// @en Catalog item kind: physical article vs service without stock (#244).
   /// @es Tipo de ítem de catálogo: artículo físico vs servicio sin stock (#244).
@@ -1781,8 +1785,13 @@ model FiscalDocument {
   documentType           String                @db.VarChar(20)
   documentNumber         String?               @db.VarChar(30)
   pointOfSale            String?               @db.VarChar(10)
-  /// pending | authorized | rejected | failed (FiscalDocumentStatus)
+  /// pending | authorized | rejected | failed | cancelled (FiscalDocumentStatus)
   status                 String                @default("pending") @db.VarChar(20)
+  /// @en SAT CFDI cancel reason (01-04) when status is cancelled (#210).
+  /// @es Motivo de cancelación CFDI SAT (01-04) cuando status es cancelled (#210).
+  /// @pt-BR Motivo de cancelamento CFDI SAT (01-04) quando status é cancelled (#210).
+  cancelReasonCode       String?               @db.VarChar(2)
+  cancelledAt            DateTime?
   externalReference      String?               @db.VarChar(80)
   authorizationCode      String?               @db.VarChar(30)
   authorizationExpiresAt DateTime?
@@ -1806,6 +1815,26 @@ model FiscalDocument {
   @@unique([tenantId, idempotencyKey])
   @@index([tenantId, invoiceId])
   @@index([status, nextRetryAt])
+}
+
+/// @en SAT catalog row for CFDI mapping (national, not tenant-scoped) (#210).
+/// @es Fila de catálogo SAT para mapeo CFDI (nacional, sin tenant) (#210).
+/// @pt-BR Linha de catálogo SAT para mapeamento CFDI (nacional, sem tenant) (#210).
+model SatCatalogEntry {
+  id          Int      @id @default(autoincrement())
+  /// ClaveProdServ | ClaveUnidad | FormaPago | MetodoPago | UsoCFDI | RegimenFiscal
+  catalog     String   @db.VarChar(32)
+  code        String   @db.VarChar(16)
+  description String   @db.VarChar(512)
+  /// @en Catalog publication label (e.g. SAT CFDI 4.0 curated subset YYYY-MM).
+  /// @es Etiqueta de publicación del catálogo (ej. subconjunto curado SAT CFDI 4.0 YYYY-MM).
+  /// @pt-BR Rótulo de publicação do catálogo (ex. subconjunto curado SAT CFDI 4.0 YYYY-MM).
+  sourceLabel String   @default("sat-cfdi-4.0-curated") @db.VarChar(64)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([catalog, code])
+  @@index([catalog, description])
 }
 
 /// Cached AFIP Padrón A4 lookup per tenant CUIT (#192). TTL typically 24h.

@@ -54,6 +54,8 @@ export interface Articulo {
   precioOverride?: number | string | null
   costoOverride?: number | string | null
   condIva: string // 1=21%, 2=10.5%, 3=Exento
+  /** @en SAT c_ClaveProdServ for MX CFDI (#210). @es c_ClaveProdServ SAT para CFDI MX (#210). @pt-BR c_ClaveProdServ SAT para CFDI MX (#210). */
+  claveProdServ?: string | null
   umedida: string
   /** @en articulo | servicio (#244). @es articulo | servicio (#244). @pt-BR articulo | serviço (#244). */
   tipo?: 'articulo' | 'servicio'

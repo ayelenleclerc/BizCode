@@ -232,6 +232,62 @@ export class FiscalProviderConfigService {
   }
 
   /**
+   * @en Upserts Mexico SAT PAC mock config: RFC + homologación environment (#210).
+   *   No commercial PAC secrets — live Facturama/Finkok is Not evidenced.
+   */
+  async upsertMexicoSatConfig(
+    tenantId: number,
+    input: { rfc: string; ambiente?: FiscalEnvironment; legalName?: string },
+  ): Promise<ServiceResult<{ id: number }>> {
+    const rfc = input.rfc.trim().toUpperCase()
+    if (rfc.length < 12 || rfc.length > 13) {
+      return { ok: false, status: 400, error: 'INVALID_RFC' }
+    }
+    const ambiente: FiscalEnvironment = input.ambiente ?? 'homologacion'
+    const bundle = { rfc, ambiente, mock: true as const }
+    const existing = await this.prisma.fiscalProviderConfig.findUnique({
+      where: { tenantId_providerCode: { tenantId, providerCode: 'mexico_sat_pac' } },
+    })
+    const anyDefault = await this.prisma.fiscalProviderConfig.findFirst({
+      where: { tenantId, isDefault: true },
+    })
+    const isDefault = existing?.isDefault ?? anyDefault == null
+
+    if (isDefault && !existing?.isDefault) {
+      await this.prisma.fiscalProviderConfig.updateMany({
+        where: { tenantId, isDefault: true },
+        data: { isDefault: false },
+      })
+    }
+
+    const row = await this.prisma.fiscalProviderConfig.upsert({
+      where: { tenantId_providerCode: { tenantId, providerCode: 'mexico_sat_pac' } },
+      create: {
+        tenantId,
+        providerCode: 'mexico_sat_pac',
+        countryCode: 'MX',
+        environment: ambiente,
+        enabled: true,
+        isDefault,
+        taxIdentifier: rfc,
+        legalName: input.legalName?.trim() || null,
+        encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
+        configVersion: 1,
+      },
+      update: {
+        environment: ambiente,
+        enabled: true,
+        isDefault,
+        taxIdentifier: rfc,
+        legalName: input.legalName?.trim() || null,
+        encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
+        configVersion: (existing?.configVersion ?? 0) + 1,
+      },
+    })
+    return { ok: true, data: { id: row.id } }
+  }
+
+  /**
    * @en Decrypts a stored `FiscalProviderConfig.encryptedConfig` bundle (internal use only,
    *   e.g. adapters that need raw secrets); never expose the return value over HTTP.
    */

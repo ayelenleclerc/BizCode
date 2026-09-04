@@ -12,6 +12,7 @@ import type {
   FiscalAuthorizeRequest,
   FiscalAuthorizeResult,
   FiscalAuthSession,
+  FiscalCancelOptions,
   FiscalCountryCode,
   FiscalDocumentStatusResult,
   FiscalDocumentType,
@@ -39,8 +40,20 @@ export interface FiscalProviderAdapter {
     documentId: number,
   ): Promise<ServiceResult<FiscalDocumentStatusResult>>
 
-  /** @en Voids/cancels a previously authorized document, when the provider supports it. */
-  cancel?(tenantId: number, documentType: FiscalDocumentType, documentId: number): Promise<ServiceResult<void>>
+  /**
+   * @en Voids/cancels a previously authorized document, when the provider supports it.
+   *   Mexico SAT CFDI requires `options.reasonCode` (01-04) (#210).
+   * @es Anula/cancela un documento previamente autorizado, cuando el proveedor lo soporta.
+   *   CFDI SAT México exige `options.reasonCode` (01-04) (#210).
+   * @pt-BR Anula/cancela um documento previamente autorizado, quando o provedor suporta.
+   *   CFDI SAT México exige `options.reasonCode` (01-04) (#210).
+   */
+  cancel?(
+    tenantId: number,
+    documentType: FiscalDocumentType,
+    documentId: number,
+    options?: FiscalCancelOptions,
+  ): Promise<ServiceResult<void>>
 
   /** @en Last authorized document number for a point of sale, when the provider supports it. */
   getLastAuthorizedNumber?(

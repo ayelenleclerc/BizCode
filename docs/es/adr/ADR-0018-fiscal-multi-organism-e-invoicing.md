@@ -32,7 +32,7 @@ Opciones consideradas:
 - **Positivo:** ARCA se comporta como un adapter intercambiable en vez de una implementación paralela y hardcodeada; agregar un cliente real de DGI/SAT en el futuro implica implementar `FiscalProviderAdapter` y registrar una factory, sin tocar `FacturaService`, rutas ni el wiring de UI; los stubs de capacidades permiten que UI y rutas degraden con claridad (`implemented: false`, HTTP 501) en vez de fallar en silencio o inventar datos; los consumidores y tests existentes de `/api/arca/*` (`tests/api/arca.test.ts`) siguen funcionando sin cambios.
 - **Negativo:** una capa extra de indirección (`FiscalDocumentService` → adapter → `ArcaService`) por cada solicitud de CAE; dos fuentes de configuración (`TenantFiscalConfig` y `FiscalProviderConfig`) deben mantenerse consistentes hasta que todos los tenants estén migrados y la tabla legada se deprecie en un ADR futuro.
 - **No evidenciado en el código actual:** cliente SOAP real de AFIP, cliente real de DGI (Uruguay), cliente real de SAT/PAC (México). Solo está evidenciado el mock de homologación de ARCA (`arcaWsfeMock.ts`); los stubs no deben tratarse como integraciones funcionales.
-- **Seguimiento:** se requiere un ADR futuro antes de eliminar `TenantFiscalConfig` (lectura dual) o antes de implementar un adapter real de `uruguay_dgi` / `mexico_sat_pac`.
+- **Seguimiento:** se requiere un ADR futuro antes de eliminar `TenantFiscalConfig` (lectura dual) o antes de implementar un adapter live de `uruguay_dgi`. El mock PAC de México está en [ADR-0024](ADR-0024-mexico-sat-cfdi-mock-pac.md); PAC comercial live sigue sin evidenciarse.
 
 ## Referencias
 

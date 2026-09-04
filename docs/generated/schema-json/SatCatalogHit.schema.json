@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "catalog": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "sourceLabel": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "catalog",
+    "code",
+    "description",
+    "sourceLabel"
+  ],
+  "title": "SatCatalogHit",
+  "type": "object"
+}

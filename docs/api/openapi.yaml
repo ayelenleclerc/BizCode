@@ -4476,9 +4476,9 @@ paths:
       tags: [fiscal]
       summary: Static capability declaration for every registered fiscal provider (#378)
       description: |
-        Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe` is the only
-        provider with `implemented: true` today — `uruguay_dgi`, `chile_sii` and `mexico_sat_pac` are
-        capability-only stubs (Not evidenced in current codebase — no live SOAP/REST client).
+        Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe` and `mexico_sat_pac`
+        report `implemented: true` as homologación mocks today — `uruguay_dgi` and `chile_sii` are
+        capability-only stubs. Live SAT/PAC commercial clients remain Not evidenced.
       responses:
         '200':
           description: Capability list
@@ -4539,6 +4539,97 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/documents/{documentId}/cancel:
+    post:
+      tags: [fiscal]
+      summary: Cancel an authorized fiscal document (#210)
+      description: |
+        Requires `sales.create`. Mexico SAT CFDI requires `reasonCode` 01-04.
+        Providers without cancel support return 501.
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FiscalDocumentCancelInput'
+      responses:
+        '200':
+          description: Cancellation outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalDocumentAuthorizeEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Authorized fiscal document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '501':
+          description: Provider does not support cancel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fiscal/sat/catalog:
+    get:
+      tags: [fiscal]
+      summary: Search curated SAT CFDI catalog entries (#210)
+      description: |
+        Requires `products.read`. Searches the seeded `SatCatalogEntry` table
+        (curated subset; full SAT CSV import via `scripts/sat-catalog-seed.ts`).
+      parameters:
+        - name: catalog
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ClaveProdServ, ClaveUnidad, FormaPago, MetodoPago, UsoCFDI, RegimenFiscal]
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+      responses:
+        '200':
+          description: Catalog hits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SatCatalogSearchEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -24967,6 +25058,40 @@ components:
         ambiente:
           type: string
           enum: [homologacion, produccion]
+        rfc: { type: string, minLength: 12, maxLength: 13 }
+        legalName: { type: string, maxLength: 160 }
+
+    FiscalDocumentCancelInput:
+      type: object
+      required: [reasonCode]
+      properties:
+        documentType:
+          type: string
+          enum: [invoice, credit_note]
+          default: invoice
+        reasonCode:
+          type: string
+          enum: ['01', '02', '03', '04']
+          description: SAT CFDI cancel reason codes (#210)
+
+    SatCatalogHit:
+      type: object
+      required: [catalog, code, description, sourceLabel]
+      properties:
+        catalog: { type: string }
+        code: { type: string }
+        description: { type: string }
+        sourceLabel: { type: string }
+
+    SatCatalogSearchEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SatCatalogHit'
 
     FiscalProviderValidateInput:
       type: object
@@ -25176,7 +25301,7 @@ components:
           required: [fiscalDocumentId, status, provider]
           properties:
             fiscalDocumentId: { type: integer }
-            status: { type: string, enum: [pending, authorized, rejected, failed] }
+            status: { type: string, enum: [pending, authorized, rejected, failed, cancelled] }
             authorizationCode: { type: string }
             authorizationExpiresAt: { type: string, format: date-time }
             provider:

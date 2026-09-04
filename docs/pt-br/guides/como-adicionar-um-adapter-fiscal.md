@@ -21,7 +21,7 @@ Usar `apps/server/fiscal/arca/ArcaFiscalAdapter.ts` (envolve `ArcaService`) como
 
 ## 3. Substituir o stub de capacidades
 
-Até que o passo 2 seja real, o provedor deve continuar usando seu stub em `apps/server/fiscal/stubs/` (`UruguayDgiFiscalAdapter.ts`, `MexicoSatFiscalAdapter.ts`), que lança [`FiscalAdapterNotImplementedError`](../../../apps/server/fiscal/stubs/FiscalAdapterNotImplementedError.ts) em todo método operacional. Depois que o adapter real existir, atualizar o registro da factory (passo seguinte) para usá-lo em vez do stub — não deixar os dois registrados para o mesmo código de provedor.
+Até que o passo 2 seja real, o provedor deve continuar usando seu stub em `apps/server/fiscal/stubs/` (p. ex. `UruguayDgiFiscalAdapter.ts`, `ChileSiiFiscalAdapter.ts`), que lança [`FiscalAdapterNotImplementedError`](../../../apps/server/fiscal/stubs/FiscalAdapterNotImplementedError.ts) em todo método operacional. Depois que o adapter real existir, atualizar o registro da factory (passo seguinte) para usá-lo em vez do stub — não deixar os dois registrados para o mesmo código de provedor.
 
 ## 4. Registrar a factory do adapter
 
@@ -49,4 +49,5 @@ Atualizar a lista de provedores deste guia abaixo e adicionar uma nota na seçã
 |---|---|---|---|
 | ARCA / AFIP (Argentina) | `arca_wsfe` | `true` (mock de homologação) | `apps/server/fiscal/arca/ArcaFiscalAdapter.ts` → `apps/server/fiscal/ar/ArcaService.ts` |
 | DGI (Uruguai) | `uruguay_dgi` | `false` (stub de capacidades) | `apps/server/fiscal/stubs/UruguayDgiFiscalAdapter.ts` |
-| SAT/PAC (México) | `mexico_sat_pac` | `false` (stub de capacidades) | `apps/server/fiscal/stubs/MexicoSatFiscalAdapter.ts` |
+| SII (Chile) | `chile_sii` | `false` (stub de capacidades) | `apps/server/fiscal/stubs/ChileSiiFiscalAdapter.ts` |
+| SAT/PAC (México) | `mexico_sat_pac` | `true` (mock PAC de homologação; live não evidenciado) | `apps/server/fiscal/mx/MexicoSatFiscalAdapter.ts` → `MexicoSatService` + `mxSatPacMock` ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)) |

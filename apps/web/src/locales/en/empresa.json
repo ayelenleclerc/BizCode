@@ -72,7 +72,7 @@
   },
   "fiscalProviders": {
     "title": "Fiscal e-invoicing (multi-organism)",
-    "subtitle": "ARCA (Argentina) is the only provider with a working integration today; DGI (Uruguay) and SAT (Mexico) are capability-only stubs, with no live issuance.",
+    "subtitle": "ARCA (Argentina) issues CAE via homologación mock; Mexico SAT CFDI uses a PAC homologación mock (#210). Uruguay DGI and Chile SII remain capability stubs.",
     "loading": "Loading fiscal providers…",
     "defaultBadge": "Default",
     "configuredBadge": "Configured",
@@ -127,6 +127,24 @@
       "loadFailed": "Could not load ARCA settings",
       "saveFailed": "Could not save ARCA credentials",
       "authFailed": "Could not obtain ARCA ticket"
+    }
+  },
+  "mexicoSat": {
+    "title": "SAT CFDI (Mexico) — PAC mock",
+    "subtitle": "Homologación mock PAC — stores RFC only. Live Facturama/Finkok is not evidenced in this build (#210).",
+    "loading": "Loading Mexico SAT settings…",
+    "configuredHint": "Configured for RFC {{rfc}} ({{ambiente}}).",
+    "notConfigured": "Mexico SAT PAC mock is not configured yet.",
+    "rfc": "RFC",
+    "ambiente": "Environment",
+    "ambienteHomologacion": "Homologación (mock)",
+    "ambienteProduccion": "Production (not enabled in this build)",
+    "save": "Save Mexico SAT settings",
+    "saving": "Saving…",
+    "saveSuccess": "Mexico SAT settings saved",
+    "errors": {
+      "loadFailed": "Could not load Mexico SAT settings",
+      "saveFailed": "Could not save Mexico SAT settings"
     }
   },
   "mercadopago": {

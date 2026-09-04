@@ -14,11 +14,20 @@
     "cuit": {
       "type": "string"
     },
+    "legalName": {
+      "maxLength": 160,
+      "type": "string"
+    },
     "privateKey": {
       "type": "string"
     },
     "provider": {
       "$ref": "./FiscalProviderCode.schema.json"
+    },
+    "rfc": {
+      "maxLength": 13,
+      "minLength": 12,
+      "type": "string"
     }
   },
   "required": [

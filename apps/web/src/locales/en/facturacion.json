@@ -144,6 +144,22 @@
     "caeNumber": "CAE: {{cae}}",
     "caeVto": "Expires: {{date}}"
   },
+  "cfdi": {
+    "stamp": "Stamp CFDI (mock)",
+    "stampLoading": "Stamping CFDI…",
+    "cancel": "Cancel CFDI",
+    "cancelReason": "SAT cancel reason",
+    "cancelConfirm": "Confirm cancel",
+    "cancelDismiss": "Dismiss",
+    "cancelLoading": "Cancelling…",
+    "cancelError": "Could not cancel CFDI",
+    "reasons": {
+      "01": "01 — Errors with related document",
+      "02": "02 — Errors without related document",
+      "03": "03 — Operation did not take place",
+      "04": "04 — Nominative operation related in global invoice"
+    }
+  },
   "pdfModal": {
     "title": "PDF — {{filename}}",
     "close": "Close",

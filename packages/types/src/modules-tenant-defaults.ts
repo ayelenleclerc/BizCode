@@ -34,6 +34,6 @@ export const NEW_TENANT_MODULES: readonly ModuleKey[] = getDefaultModulesForJuri
  * @pt-BR Módulos atribuídos no backfill para tenants existentes (inclui billing.orders por compat #132).
  */
 export const BACKFILL_TENANT_MODULES: readonly ModuleKey[] = [
-  ...DEFAULT_MODULES,
+  ...getDefaultModulesForJurisdiction(DEFAULT_FISCAL_JURISDICTION),
   'billing.orders',
 ]

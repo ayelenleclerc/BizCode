@@ -49,6 +49,7 @@ describe('Mexico fiscal jurisdiction (#210)', () => {
     expect(modules).not.toContain('fiscal.cheques')
     expect(modules).not.toContain('fiscal.libro_iva')
     expect(modules).toContain('core.invoicing')
+    expect(modules).toContain('billing.cfdi_sat')
   })
 
   it('charges 16% VAT on the standard bucket for a taxpayer', () => {

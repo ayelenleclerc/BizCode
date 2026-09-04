@@ -44013,7 +44013,15 @@ Requires `settings.fiscal.manage`. Only `provider: arca_wsfe` is implemented tod
 
   `string`
 
+- **`legalName`**
+
+  `string`
+
 - **`privateKey`**
+
+  `string`
+
+- **`rfc`**
 
   `string`
 
@@ -44025,7 +44033,9 @@ Requires `settings.fiscal.manage`. Only `provider: arca_wsfe` is implemented tod
   "cuit": "",
   "certificate": "",
   "privateKey": "",
-  "ambiente": "homologacion"
+  "ambiente": "homologacion",
+  "rfc": "",
+  "legalName": ""
 }
 ```
 
@@ -44647,7 +44657,7 @@ Requires `settings.fiscal.manage`. Records `lastValidationAt`/`validationStatus`
 - **Path:** `/api/fiscal/providers/capabilities`
 - **Tags:** fiscal
 
-Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe` is the only provider with `implemented: true` today — `uruguay_dgi`, `chile_sii` and `mexico_sat_pac` are capability-only stubs (Not evidenced in current codebase — no live SOAP/REST client).
+Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe` and `mexico_sat_pac` report `implemented: true` as homologación mocks today — `uruguay_dgi` and `chile_sii` are capability-only stubs. Live SAT/PAC commercial clients remain Not evidenced.
 
 #### Responses
 
@@ -44914,7 +44924,7 @@ Requires `sales.create`. Resolves the tenant's default fiscal provider (`arca_ws
 
   - **`status` (required)**
 
-    `string`, possible values: `"pending", "authorized", "rejected", "failed"`
+    `string`, possible values: `"pending", "authorized", "rejected", "failed", "cancelled"`
 
   - **`authorizationCode`**
 
@@ -45262,6 +45272,670 @@ Requires `sales.create`. Resolves the tenant's default fiscal provider (`arca_ws
 ```
 
 ##### Status: 502 Provider authorization request failed
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Cancel an authorized fiscal document (#210)
+
+- **Method:** `POST`
+- **Path:** `/api/fiscal/documents/{documentId}/cancel`
+- **Tags:** fiscal
+
+Requires `sales.create`. Mexico SAT CFDI requires `reasonCode` 01-04. Providers without cancel support return 501.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`reasonCode` (required)**
+
+  `string`, possible values: `"01", "02", "03", "04"` — SAT CFDI cancel reason codes (#210)
+
+- **`documentType`**
+
+  `string`, possible values: `"invoice", "credit_note"`, default: `"invoice"`
+
+**Example:**
+
+```json
+{
+  "documentType": "invoice",
+  "reasonCode": "01"
+}
+```
+
+#### Responses
+
+##### Status: 200 Cancellation outcome
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`fiscalDocumentId` (required)**
+
+    `integer`
+
+  - **`provider` (required)**
+
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+
+  - **`status` (required)**
+
+    `string`, possible values: `"pending", "authorized", "rejected", "failed", "cancelled"`
+
+  - **`authorizationCode`**
+
+    `string`
+
+  - **`authorizationExpiresAt`**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "fiscalDocumentId": 1,
+    "status": "pending",
+    "authorizationCode": "",
+    "authorizationExpiresAt": "",
+    "provider": "arca_wsfe"
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Authorized fiscal document not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 501 Provider does not support cancel
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Search curated SAT CFDI catalog entries (#210)
+
+- **Method:** `GET`
+- **Path:** `/api/fiscal/sat/catalog`
+- **Tags:** fiscal
+
+Requires `products.read`. Searches the seeded `SatCatalogEntry` table (curated subset; full SAT CSV import via `scripts/sat-catalog-seed.ts`).
+
+#### Responses
+
+##### Status: 200 Catalog hits
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`catalog` (required)**
+
+    `string`
+
+  - **`code` (required)**
+
+    `string`
+
+  - **`description` (required)**
+
+    `string`
+
+  - **`sourceLabel` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "catalog": "",
+      "code": "",
+      "description": "",
+      "sourceLabel": ""
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
 
 ###### Content-Type: application/json
 
@@ -196457,7 +197131,15 @@ Originating invoice header (selected columns)
 
   `string`
 
+* **`legalName`**
+
+  `string`
+
 * **`privateKey`**
+
+  `string`
+
+* **`rfc`**
 
   `string`
 
@@ -196469,7 +197151,107 @@ Originating invoice header (selected columns)
   "cuit": "",
   "certificate": "",
   "privateKey": "",
-  "ambiente": "homologacion"
+  "ambiente": "homologacion",
+  "rfc": "",
+  "legalName": ""
+}
+```
+
+### FiscalDocumentCancelInput
+
+- **Type:**`object`
+
+* **`reasonCode` (required)**
+
+  `string`, possible values: `"01", "02", "03", "04"` — SAT CFDI cancel reason codes (#210)
+
+* **`documentType`**
+
+  `string`, possible values: `"invoice", "credit_note"`, default: `"invoice"`
+
+**Example:**
+
+```json
+{
+  "documentType": "invoice",
+  "reasonCode": "01"
+}
+```
+
+### SatCatalogHit
+
+- **Type:**`object`
+
+* **`catalog` (required)**
+
+  `string`
+
+* **`code` (required)**
+
+  `string`
+
+* **`description` (required)**
+
+  `string`
+
+* **`sourceLabel` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "catalog": "",
+  "code": "",
+  "description": "",
+  "sourceLabel": ""
+}
+```
+
+### SatCatalogSearchEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`catalog` (required)**
+
+    `string`
+
+  - **`code` (required)**
+
+    `string`
+
+  - **`description` (required)**
+
+    `string`
+
+  - **`sourceLabel` (required)**
+
+    `string`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "catalog": "",
+      "code": "",
+      "description": "",
+      "sourceLabel": ""
+    }
+  ]
 }
 ```
 
@@ -197320,7 +198102,7 @@ Originating invoice header (selected columns)
 
   - **`status` (required)**
 
-    `string`, possible values: `"pending", "authorized", "rejected", "failed"`
+    `string`, possible values: `"pending", "authorized", "rejected", "failed", "cancelled"`
 
   - **`authorizationCode`**
 

@@ -43,6 +43,21 @@ export const MODULE_CATALOG = {
     plan: 'starter',
     price: 0,
   },
+  /**
+   * @en Mexico SAT CFDI stamping via PAC (homologación mock in #210; live PAC later).
+   * @es Timbrado CFDI SAT México vía PAC (mock de homologación en #210; PAC live después).
+   * @pt-BR Timbramento CFDI SAT México via PAC (mock de homologação em #210; PAC live depois).
+   */
+  'billing.cfdi_sat': {
+    label: 'SAT CFDI (México)',
+    required: false,
+    requiredInProd: false,
+    requiredInProdForCountries: ['MX'],
+    availableForCountries: ['MX'],
+    dependencies: ['core.invoicing'],
+    plan: 'starter',
+    price: 0,
+  },
   'billing.credit_notes': {
     label: 'Notas de credito',
     required: false,
@@ -480,6 +495,7 @@ export const DEFAULT_MODULES = [
   'core.clients',
   'core.invoicing',
   'billing.arca_cae',
+  'billing.cfdi_sat',
   'billing.credit_notes',
   'finance.collections',
   'finance.receipts',

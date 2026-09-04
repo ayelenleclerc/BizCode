@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
-import { DEFAULT_MODULES } from '../../apps/web/src/lib/modules'
+import { getDefaultModulesForJurisdiction } from '../../apps/web/src/lib/modules'
 
 const tenantRow = { id: 1, name: 'Demo', slug: 'demo', active: true }
 
@@ -13,7 +13,7 @@ function buildPrismaMock(): PrismaClient {
     businessType: 'ambos',
     rubros: [] as string[],
     plan: 'starter',
-    modules: [...DEFAULT_MODULES],
+    modules: [...getDefaultModulesForJurisdiction('AR')],
     integrations: [] as string[],
     updatedById: 1,
     updatedAt: new Date(),
@@ -79,7 +79,7 @@ describe('Superadmin tenant config API', () => {
 
   it('PUT accepts valid modules with reason', async () => {
     const app = createApp(buildPrismaMock())
-    const modules = [...DEFAULT_MODULES, 'billing.orders']
+    const modules = [...getDefaultModulesForJurisdiction('AR'), 'billing.orders']
     const res = await request(app)
       .put('/api/superadmin/tenants/1/config')
       .send({

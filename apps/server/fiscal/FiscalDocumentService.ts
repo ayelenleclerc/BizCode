@@ -49,6 +49,62 @@ export class FiscalDocumentService {
     return this.authorize(tenantId, 'credit_note', notaCreditoId)
   }
 
+  /**
+   * @en Cancels a previously authorized fiscal document (Mexico SAT requires reasonCode) (#210).
+   * @es Cancela un documento fiscal previamente autorizado (SAT México exige reasonCode) (#210).
+   * @pt-BR Cancela um documento fiscal previamente autorizado (SAT México exige reasonCode) (#210).
+   */
+  async cancelDocument(
+    tenantId: number,
+    documentType: FiscalDocumentType,
+    documentId: number,
+    reasonCode?: string,
+  ): Promise<ServiceResult<FiscalAuthorizationOutcome>> {
+    const providerResult = await this.providerConfig.resolveDefaultProvider(tenantId)
+    if (!providerResult.ok) return providerResult
+    const provider = providerResult.data
+
+    const adapter = getFiscalProviderAdapter(provider, this.prisma)
+    if (!adapter) return { ok: false, status: 501, error: 'FISCAL_PROVIDER_ADAPTER_NOT_REGISTERED' }
+    if (!adapter.cancel || !adapter.getCapabilities().supportsCancel) {
+      return { ok: false, status: 501, error: 'FISCAL_CANCEL_NOT_SUPPORTED' }
+    }
+
+    const fiscalDocument = await this.prisma.fiscalDocument.findFirst({
+      where: {
+        tenantId,
+        documentType,
+        status: 'authorized',
+        ...(documentType === 'invoice' ? { invoiceId: documentId } : { notaCreditoId: documentId }),
+      },
+      orderBy: { id: 'desc' },
+    })
+    if (!fiscalDocument) {
+      return { ok: false, status: 404, error: 'FISCAL_DOCUMENT_NOT_AUTHORIZED' }
+    }
+
+    try {
+      const result = await adapter.cancel(tenantId, documentType, documentId, { reasonCode })
+      if (!result.ok) return result
+
+      const updated = await this.prisma.fiscalDocument.update({
+        where: { id: fiscalDocument.id },
+        data: {
+          status: 'cancelled',
+          cancelReasonCode: reasonCode ?? null,
+          cancelledAt: new Date(),
+          errorCode: null,
+          errorMessage: null,
+          nextRetryAt: null,
+        },
+      })
+      return { ok: true, data: toOutcome(updated, provider) }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      return { ok: false, status: 502, error: message }
+    }
+  }
+
   private async authorize(
     tenantId: number,
     documentType: FiscalDocumentType,

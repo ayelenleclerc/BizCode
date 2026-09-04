@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { arcaAPI, facturasAPI, printingAPI, remitosAPI, type MercadoPagoFacturaPaymentDto } from '@/lib/api'
+import { arcaAPI, facturasAPI, fiscalAPI, printingAPI, remitosAPI, type MercadoPagoFacturaPaymentDto } from '@/lib/api'
 import KeyboardHint from '@/components/shared/KeyboardHint'
 import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
 import IfIntegration from '@/components/IfIntegration'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import { Factura, Cliente } from '@bizcode/types'
 import FacturaPdfPreviewDialog from './FacturaPdfPreviewDialog'
 import MercadoPagoPaymentLinkModal from './MercadoPagoPaymentLinkModal'
@@ -115,6 +116,12 @@ export default function ListadoFacturas({
   const [voidError, setVoidError] = useState<string | null>(null)
   const [caeLoadingId, setCaeLoadingId] = useState<number | null>(null)
   const [caeError, setCaeError] = useState<string | null>(null)
+  const [cfdiCancelId, setCfdiCancelId] = useState<number | null>(null)
+  const [cfdiCancelReason, setCfdiCancelReason] = useState<'01' | '02' | '03' | '04'>('02')
+  const [cfdiCancelLoading, setCfdiCancelLoading] = useState(false)
+  const [cfdiCancelError, setCfdiCancelError] = useState<string | null>(null)
+  const { hasModule } = useFeatureFlags()
+  const useMexicoCfdi = hasModule('billing.cfdi_sat')
   const [pdfLoadingId, setPdfLoadingId] = useState<number | null>(null)
   const [pdfError, setPdfError] = useState<string | null>(null)
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
@@ -201,12 +208,33 @@ export default function ListadoFacturas({
     setCaeLoadingId(facturaId)
     setCaeError(null)
     try {
-      await arcaAPI.requestCae(facturaId)
+      if (useMexicoCfdi) {
+        await fiscalAPI.authorizeDocument(facturaId)
+      } else {
+        await arcaAPI.requestCae(facturaId)
+      }
       onFacturaUpdated?.()
     } catch (err: unknown) {
       setCaeError((err as Error).message || t('cae.retryError'))
     } finally {
       setCaeLoadingId(null)
+    }
+  }
+
+  const handleCfdiCancel = async (facturaId: number) => {
+    setCfdiCancelLoading(true)
+    setCfdiCancelError(null)
+    try {
+      await fiscalAPI.cancelDocument(facturaId, {
+        documentType: 'invoice',
+        reasonCode: cfdiCancelReason,
+      })
+      setCfdiCancelId(null)
+      onFacturaUpdated?.()
+    } catch (err: unknown) {
+      setCfdiCancelError((err as Error).message || t('cfdi.cancelError'))
+    } finally {
+      setCfdiCancelLoading(false)
     }
   }
 
@@ -222,12 +250,16 @@ export default function ListadoFacturas({
     setPdfPreviewUrl(null)
   }
 
-  const isOverlayOpen = expandedId !== null || pdfPreviewUrl !== null || voidingId !== null
+  const isOverlayOpen =
+    expandedId !== null || pdfPreviewUrl !== null || voidingId !== null || cfdiCancelId !== null
 
   useListPageHotkeys({
     onClose: () => {
       if (pdfPreviewUrl) closePdfPreview()
-      else if (voidingId !== null) {
+      else if (cfdiCancelId !== null) {
+        setCfdiCancelId(null)
+        setCfdiCancelError(null)
+      } else if (voidingId !== null) {
         setVoidingId(null)
         setMotivo('')
         setVoidError(null)
@@ -533,7 +565,7 @@ export default function ListadoFacturas({
                       </div>
                     </div>
 
-                    <IfModule flag="billing.arca_cae">
+                    {(hasModule('billing.arca_cae') || useMexicoCfdi) && (
                       <div className="flex flex-wrap gap-2" role="group" aria-label={t('cae.column')}>
                         <CanAccess permission="reports.operational.read">
                           <button
@@ -586,17 +618,89 @@ export default function ListadoFacturas({
                               onClick={() => void handleRetryCae(factura.id)}
                               className="px-3 py-2 text-sm bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 rounded transition disabled:opacity-50"
                             >
-                              {caeLoadingId === factura.id ? t('cae.retryLoading') : t('cae.retry')}
+                              {caeLoadingId === factura.id
+                                ? useMexicoCfdi
+                                  ? t('cfdi.stampLoading')
+                                  : t('cae.retryLoading')
+                                : useMexicoCfdi
+                                  ? t('cfdi.stamp')
+                                  : t('cae.retry')}
+                            </button>
+                          </CanAccess>
+                        )}
+                        {useMexicoCfdi && factura.estadoCae === 'issued' && (
+                          <CanAccess permission="sales.create">
+                            <button
+                              type="button"
+                              data-testid="btn-factura-cfdi-cancel"
+                              onClick={() => {
+                                setCfdiCancelId(factura.id)
+                                setCfdiCancelError(null)
+                              }}
+                              className="px-3 py-2 text-sm bg-red-100 hover:bg-red-200 dark:bg-red-900/40 text-red-900 dark:text-red-200 rounded transition"
+                            >
+                              {t('cfdi.cancel')}
                             </button>
                           </CanAccess>
                         )}
                       </div>
-                      {(caeError || pdfError) && (
+                    )}
+                      {cfdiCancelId === factura.id && (
+                        <div
+                          className="mt-3 space-y-2 rounded border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 p-3"
+                          data-testid="cfdi-cancel-panel"
+                        >
+                          <label htmlFor="cfdi-cancel-reason" className="block text-sm font-medium text-slate-800 dark:text-slate-200">
+                            {t('cfdi.cancelReason')}
+                          </label>
+                          <select
+                            id="cfdi-cancel-reason"
+                            data-testid="select-cfdi-cancel-reason"
+                            className="w-full rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1.5 text-sm"
+                            value={cfdiCancelReason}
+                            onChange={(e) =>
+                              setCfdiCancelReason(e.target.value as '01' | '02' | '03' | '04')
+                            }
+                          >
+                            <option value="01">{t('cfdi.reasons.01')}</option>
+                            <option value="02">{t('cfdi.reasons.02')}</option>
+                            <option value="03">{t('cfdi.reasons.03')}</option>
+                            <option value="04">{t('cfdi.reasons.04')}</option>
+                          </select>
+                          {cfdiCancelError && (
+                            <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+                              {cfdiCancelError}
+                            </p>
+                          )}
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              data-testid="btn-cfdi-cancel-confirm"
+                              disabled={cfdiCancelLoading}
+                              className="px-3 py-1.5 text-sm bg-red-600 text-white rounded disabled:opacity-50"
+                              onClick={() => void handleCfdiCancel(factura.id)}
+                            >
+                              {cfdiCancelLoading ? t('cfdi.cancelLoading') : t('cfdi.cancelConfirm')}
+                            </button>
+                            <button
+                              type="button"
+                              data-testid="btn-cfdi-cancel-dismiss"
+                              className="px-3 py-1.5 text-sm bg-slate-200 dark:bg-slate-700 rounded"
+                              onClick={() => {
+                                setCfdiCancelId(null)
+                                setCfdiCancelError(null)
+                              }}
+                            >
+                              {t('cfdi.cancelDismiss')}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      {(caeError || pdfError) && (hasModule('billing.arca_cae') || useMexicoCfdi) && (
                         <p className="text-sm text-red-600 dark:text-red-400" role="alert" aria-live="polite">
                           {caeError ?? pdfError}
                         </p>
                       )}
-                    </IfModule>
 
                     <IfModule flag="fiscal.remito">
                       <CanAccess permission="sales.create">

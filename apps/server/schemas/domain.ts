@@ -304,6 +304,8 @@ export const articuloBodySchema = z
     precioOverride: z.union([z.number().min(0), z.null()]).optional(),
     costoOverride: z.union([z.number().min(0), z.null()]).optional(),
     condIva: z.enum(['1', '2', '3'], { errorMap: () => ({ message: 'condIva must be one of: 1, 2, 3' }) }),
+    /** @en SAT c_ClaveProdServ (8 digits); used for MX CFDI (#210). @es c_ClaveProdServ SAT; MX CFDI (#210). @pt-BR c_ClaveProdServ SAT; MX CFDI (#210). */
+    claveProdServ: z.union([z.string().regex(/^\d{8}$/), z.null()]).optional(),
     umedida: z.string(),
     tipo: z.enum(['articulo', 'servicio']).optional(),
     unidadServicio: z

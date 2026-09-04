@@ -15,7 +15,7 @@ import {
 import { bootstrapFiscalProviders, resetFiscalProvidersBootstrap } from '../../../apps/server/fiscal/bootstrapFiscalProviders'
 import { ArcaFiscalAdapter } from '../../../apps/server/fiscal/arca/ArcaFiscalAdapter'
 import { UruguayDgiFiscalAdapter } from '../../../apps/server/fiscal/stubs/UruguayDgiFiscalAdapter'
-import { MexicoSatFiscalAdapter } from '../../../apps/server/fiscal/stubs/MexicoSatFiscalAdapter'
+import { MexicoSatFiscalAdapter } from '../../../apps/server/fiscal/mx/MexicoSatFiscalAdapter'
 import { ChileSiiFiscalAdapter } from '../../../apps/server/fiscal/stubs/ChileSiiFiscalAdapter'
 
 const prisma = {} as unknown as PrismaClient

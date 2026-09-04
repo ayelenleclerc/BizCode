@@ -144,6 +144,22 @@
     "caeNumber": "CAE: {{cae}}",
     "caeVto": "Vto: {{date}}"
   },
+  "cfdi": {
+    "stamp": "Timbrar CFDI (mock)",
+    "stampLoading": "Timbrando CFDI…",
+    "cancel": "Cancelar CFDI",
+    "cancelReason": "Motivo de cancelación SAT",
+    "cancelConfirm": "Confirmar cancelación",
+    "cancelDismiss": "Cerrar",
+    "cancelLoading": "Cancelando…",
+    "cancelError": "No se pudo cancelar el CFDI",
+    "reasons": {
+      "01": "01 — Errores con relación",
+      "02": "02 — Errores sin relación",
+      "03": "03 — No se llevó a cabo la operación",
+      "04": "04 — Operación nominativa relacionada en factura global"
+    }
+  },
   "pdfModal": {
     "title": "PDF — {{filename}}",
     "close": "Cerrar",
