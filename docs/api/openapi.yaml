@@ -30865,9 +30865,9 @@ components:
 
     FiscalJurisdictionCode:
       type: string
-      enum: [AR, UY, CL]
+      enum: [AR, UY, CL, MX]
       description: >-
-        Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which
+        Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which
         modules are mandatory in production. Defaults to `AR`.
 
     TenantConfig:

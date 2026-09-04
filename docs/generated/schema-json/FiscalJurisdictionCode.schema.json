@@ -1,10 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.",
+  "description": "Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.",
   "enum": [
     "AR",
     "UY",
-    "CL"
+    "CL",
+    "MX"
   ],
   "title": "FiscalJurisdictionCode",
   "type": "string"

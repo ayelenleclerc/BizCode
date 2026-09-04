@@ -9,9 +9,9 @@ import {
 } from '../../packages/types/src/fiscal-jurisdictions'
 
 describe('fiscal jurisdictions catalog (#207)', () => {
-  it('exposes Argentina, Uruguay and Chile only', () => {
-    expect([...FISCAL_JURISDICTION_CODES]).toEqual(['AR', 'UY', 'CL'])
-    expect(Object.keys(FISCAL_JURISDICTIONS)).toEqual(['AR', 'UY', 'CL'])
+  it('exposes Argentina, Uruguay, Chile and Mexico', () => {
+    expect([...FISCAL_JURISDICTION_CODES]).toEqual(['AR', 'UY', 'CL', 'MX'])
+    expect(Object.keys(FISCAL_JURISDICTIONS)).toEqual(['AR', 'UY', 'CL', 'MX'])
   })
 
   it('defaults to Argentina to preserve the historical behaviour', () => {
@@ -27,6 +27,7 @@ describe('fiscal jurisdictions catalog (#207)', () => {
   it('carries the VAT rates of each country', () => {
     expect(FISCAL_JURISDICTIONS.AR.vatRates).toEqual({ standard: 21, reduced: 10.5 })
     expect(FISCAL_JURISDICTIONS.UY.vatRates).toEqual({ standard: 22, reduced: 10 })
+    expect(FISCAL_JURISDICTIONS.MX.vatRates).toEqual({ standard: 16, reduced: 0 })
   })
 
   it('maps each jurisdiction to its tax identifier kind, currency and provider', () => {
@@ -40,16 +41,22 @@ describe('fiscal jurisdictions catalog (#207)', () => {
       currency: 'UYU',
       providerCode: 'uruguay_dgi',
     })
+    expect(FISCAL_JURISDICTIONS.MX).toMatchObject({
+      taxIdKind: 'rfc',
+      currency: 'MXN',
+      providerCode: 'mexico_sat_pac',
+    })
   })
 
   describe('isFiscalJurisdictionCode', () => {
     it('accepts supported codes', () => {
       expect(isFiscalJurisdictionCode('AR')).toBe(true)
       expect(isFiscalJurisdictionCode('UY')).toBe(true)
+      expect(isFiscalJurisdictionCode('MX')).toBe(true)
     })
 
     it('rejects unsupported or non-string values', () => {
-      expect(isFiscalJurisdictionCode('MX')).toBe(false)
+      expect(isFiscalJurisdictionCode('BR')).toBe(false)
       expect(isFiscalJurisdictionCode('ar')).toBe(false)
       expect(isFiscalJurisdictionCode('')).toBe(false)
       expect(isFiscalJurisdictionCode(null)).toBe(false)
@@ -61,10 +68,11 @@ describe('fiscal jurisdictions catalog (#207)', () => {
   describe('resolveJurisdiction', () => {
     it('returns the code when supported', () => {
       expect(resolveJurisdiction('UY')).toBe('UY')
+      expect(resolveJurisdiction('MX')).toBe('MX')
     })
 
     it('falls back to the default for unknown or absent values', () => {
-      expect(resolveJurisdiction('MX')).toBe('AR')
+      expect(resolveJurisdiction('BR')).toBe('AR')
       expect(resolveJurisdiction(null)).toBe('AR')
       expect(resolveJurisdiction(undefined)).toBe('AR')
     })

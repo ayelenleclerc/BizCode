@@ -15,7 +15,8 @@
     "taxId": {
       "AR": "CUIT",
       "UY": "RUT",
-      "CL": "RUT"
+      "CL": "RUT",
+      "MX": "RFC"
     },
     "email": "Email (usuario owner)",
     "phone": "TelÃ©fono (opcional)",

@@ -450,7 +450,7 @@
 
 * [FiscalDocumentAuthorizeEnvelope](./fiscaldocumentauthorizeenvelope.md) – `-`
 
-* [FiscalJurisdictionCode](./fiscaljurisdictioncode.md "Tenant tax jurisdiction (#207)") – `-`
+* [FiscalJurisdictionCode](./fiscaljurisdictioncode.md "Tenant tax jurisdiction (#207, #210)") – `-`
 
 * [FiscalProviderCapabilities](./fiscalprovidercapabilities.md) – `-`
 
