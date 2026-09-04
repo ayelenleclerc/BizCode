@@ -91,3 +91,7 @@ Nenhuma transmissão real a órgão fiscal é implementada. DGI (Uruguai), SII (
 | Aplicabilidade do catálogo, padrões derivados, rejeição e filtragem do payload | `tests/lib/modules-availability.test.ts` |
 | Resolução do ambiente e seus fallbacks | `tests/lib/jurisdictionEnv.test.ts` |
 | Registro por jurisdição | `tests/server/saasOnboardingService.test.ts` |
+
+## Evolução posterior
+
+O núcleo ainda assumia condições fiscais, CUIT/CBU e letras argentinas até [#440](https://github.com/ayelenleclerc/BizCode/issues/440) — ver [conjuntos-regras-fiscais-por-pais.md](conjuntos-regras-fiscais-por-pais.md) e [ADR-0023](../../en/adr/ADR-0023-fiscal-rule-sets-by-country.md).

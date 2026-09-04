@@ -78,3 +78,7 @@ All strings are translated in EN/ES/PT-BR.
 - [tests/lib/modules-catalog.test.ts](../../../tests/lib/modules-catalog.test.ts) — decoupling and per-country requirements.
 - [tests/server/fiscal/fiscalProviderConfigService.test.ts](../../../tests/server/fiscal/fiscalProviderConfigService.test.ts) — adapter selection by country.
 - [tests/server/services/tenantJurisdiction.test.ts](../../../tests/server/services/tenantJurisdiction.test.ts) — cache, database read and fallback.
+
+## Later evolution
+
+Hardcoded Argentine codes that remained in the core after #207 were moved into the per-country rule registry in [#440](https://github.com/ayelenleclerc/BizCode/issues/440) — see [fiscal-rule-sets-by-country.md](fiscal-rule-sets-by-country.md) and [ADR-0023](../adr/ADR-0023-fiscal-rule-sets-by-country.md).
