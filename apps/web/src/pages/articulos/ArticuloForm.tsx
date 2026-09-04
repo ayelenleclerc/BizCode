@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { useHotkeys } from 'react-hotkeys-hook'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
-import { ApiRequestFailedError, articulosAPI, catalogVariantsAPI, type StockAjusteHistorialRow } from '@/lib/api'
+import { ApiRequestFailedError, articulosAPI, catalogVariantsAPI, fiscalAPI, type StockAjusteHistorialRow } from '@/lib/api'
 import { hasPermission } from '@/lib/rbac'
 import { CanAccess } from '@/components/CanAccess'
 import IfModule from '@/components/IfModule'
@@ -54,6 +54,10 @@ const articuloSchema = z
       return Math.trunc(n)
     }, z.number().int().positive().nullable()),
     condIva: z.enum(['1', '2', '3']), // 1=21%, 2=10.5%, 3=Exento
+    claveProdServ: z.preprocess((val) => {
+      if (val === '' || val === null || val === undefined) return null
+      return typeof val === 'string' ? val.trim() : val
+    }, z.union([z.string().regex(/^\d{8}$/), z.null()]).optional()),
     umedida: z.string().min(2).max(6),
     tipo: z.enum(['articulo', 'servicio']).default('articulo'),
     unidadServicio: z
@@ -196,6 +200,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
     resolver: zodResolver(articuloSchema) as any,
     defaultValues: (articulo || {
       condIva: '1',
+      claveProdServ: null,
       // Must be length ≥2 (zod + server/createApp.ts); single "U" blocked submit without surfacing umedida in E2E.
       umedida: 'UN',
       tipo: 'articulo',
@@ -223,6 +228,10 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
   const tipoWatch = watch('tipo')
   const categoriaWatch = watch('categoriaId')
   const monedaPrecioWatch = watch('monedaPrecio')
+  const claveProdServWatch = watch('claveProdServ')
+  const [satQuery, setSatQuery] = useState('')
+  const [satHits, setSatHits] = useState<Array<{ code: string; description: string }>>([])
+  const [satSearching, setSatSearching] = useState(false)
   const unidadBaseWatch = watch('unidadBase')
   const multiploVentaWatch = watch('multiploVenta')
   const unidadBaseField = register('unidadBase')
@@ -243,6 +252,7 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
       setValue('categoriaId', articulo.categoriaId ?? null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setValue('condIva', articulo.condIva as any)
+      setValue('claveProdServ', (articulo as Articulo & { claveProdServ?: string | null }).claveProdServ ?? null)
       setValue('umedida', articulo.umedida)
       setValue('tipo', (articulo.tipo as 'articulo' | 'servicio') || 'articulo')
       setValue(
@@ -673,6 +683,100 @@ export default function ArticuloForm({ articulo, rubros, onClose, onGuardado }: 
               ))}
             </select>
           </div>
+
+          {jurisdiccionFiscal === 'MX' && (
+            <div data-testid="articulo-clave-prod-serv">
+              <label htmlFor="articulo-claveProdServ" className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                {t('form.claveProdServ')}
+              </label>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('form.claveProdServHint')}</p>
+              <div className="flex gap-2">
+                <input
+                  id="articulo-claveProdServ"
+                  data-testid="input-articulo-claveProdServ"
+                  {...register('claveProdServ')}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none font-mono"
+                  maxLength={8}
+                  inputMode="numeric"
+                />
+                <button
+                  type="button"
+                  data-testid="btn-articulo-claveProdServ-clear"
+                  className="px-3 py-2 text-sm rounded bg-slate-200 dark:bg-slate-600"
+                  onClick={() => setValue('claveProdServ', null)}
+                >
+                  {t('form.claveProdServClear')}
+                </button>
+              </div>
+              {claveProdServWatch && (
+                <p className="text-xs text-slate-500 mt-1 font-mono" data-testid="articulo-claveProdServ-value">
+                  {claveProdServWatch}
+                </p>
+              )}
+              <div className="mt-2 flex gap-2">
+                <input
+                  id="articulo-sat-search"
+                  data-testid="input-articulo-sat-search"
+                  aria-label={t('form.claveProdServSearch')}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 rounded border border-slate-300 dark:border-slate-600 text-sm"
+                  value={satQuery}
+                  onChange={(e) => setSatQuery(e.target.value)}
+                />
+                <button
+                  type="button"
+                  data-testid="btn-articulo-sat-search"
+                  className="px-3 py-2 text-sm rounded bg-blue-600 text-white disabled:opacity-50"
+                  disabled={satSearching || satQuery.trim().length < 2}
+                  onClick={() => {
+                    void (async () => {
+                      setSatSearching(true)
+                      try {
+                        const hits = await fiscalAPI.searchSatCatalog({
+                          catalog: 'ClaveProdServ',
+                          q: satQuery.trim(),
+                          limit: 15,
+                        })
+                        setSatHits(hits.map((h) => ({ code: h.code, description: h.description })))
+                      } catch {
+                        setSatHits([])
+                      } finally {
+                        setSatSearching(false)
+                      }
+                    })()
+                  }}
+                >
+                  {t('form.claveProdServSearch')}
+                </button>
+              </div>
+              {satHits.length === 0 && satQuery.trim().length >= 2 && !satSearching && (
+                <p className="text-xs text-slate-500 mt-1">{t('form.claveProdServEmpty')}</p>
+              )}
+              {satHits.length > 0 && (
+                <ul
+                  className="mt-2 max-h-40 overflow-y-auto rounded border border-slate-200 dark:border-slate-600 divide-y divide-slate-200 dark:divide-slate-700"
+                  data-testid="list-articulo-sat-hits"
+                >
+                  {satHits.map((hit) => (
+                    <li key={hit.code}>
+                      <button
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
+                        data-testid={`sat-hit-${hit.code}`}
+                        onClick={() => {
+                          setValue('claveProdServ', hit.code)
+                          setSatHits([])
+                          setSatQuery('')
+                        }}
+                      >
+                        <span className="font-mono me-2">{hit.code}</span>
+                        {hit.description}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-4">
             <div>

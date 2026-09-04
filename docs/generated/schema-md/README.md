@@ -450,6 +450,8 @@
 
 * [FiscalDocumentAuthorizeEnvelope](./fiscaldocumentauthorizeenvelope.md) – `-`
 
+* [FiscalDocumentCancelInput](./fiscaldocumentcancelinput.md) – `-`
+
 * [FiscalJurisdictionCode](./fiscaljurisdictioncode.md "Tenant tax jurisdiction (#207, #210)") – `-`
 
 * [FiscalProviderCapabilities](./fiscalprovidercapabilities.md) – `-`
@@ -1295,6 +1297,10 @@
 * [SaasTrialStatus](./saastrialstatus.md) – `-`
 
 * [SaldoPorMoneda](./saldopormoneda.md "Customer running balance for a single currency (#206)") – `-`
+
+* [SatCatalogHit](./satcataloghit.md) – `-`
+
+* [SatCatalogSearchEnvelope](./satcatalogsearchenvelope.md) – `-`
 
 * [SellerAlertAction](./selleralertaction.md) – `-`
 
@@ -2371,6 +2377,8 @@
 * [Untitled array in RutaParadasReplaceInput](./rutaparadasreplaceinput-properties-paradas.md) – `undefined#/properties/paradas`
 
 * [Untitled array in SaasBillingList](./saasbillinglist-properties-invoices.md) – `undefined#/properties/invoices`
+
+* [Untitled array in SatCatalogSearchEnvelope](./satcatalogsearchenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in StockAjusteListEnvelope](./stockajustelistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

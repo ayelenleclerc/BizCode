@@ -82,7 +82,7 @@ Todos os caminhos que criam um tenant escrevem `jurisdiccionFiscal` explicitamen
 
 ## Fora de escopo
 
-Nenhuma transmissão real a órgão fiscal é implementada. DGI (Uruguai), SII (Chile), SAT (México) e NF-e (Brasil) exigem certificado digital e homologação, e continuam sendo stubs que falham de forma explícita. O licenciamento por jurisdição, mencionado como eixo de ativação no ADR-0007, não está implementado: a ativação é apenas por configuração.
+Nenhuma transmissão real a órgão fiscal é implementada. DGI (Uruguai), SII (Chile) e NF-e (Brasil) continuam sendo stubs que falham de forma explícita. CFDI México usa um mock PAC de homologação ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)); clientes PAC comerciais live não estão evidenciados. O licenciamento por jurisdição, mencionado como eixo de ativação no ADR-0007, não está implementado: a ativação é apenas por configuração.
 
 ## Evidência
 

@@ -21,7 +21,8 @@
             "pending",
             "authorized",
             "rejected",
-            "failed"
+            "failed",
+            "cancelled"
           ],
           "type": "string"
         }

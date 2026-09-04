@@ -24,3 +24,4 @@ undefined#/properties/data/properties/status
 | `"authorized"` |             |
 | `"rejected"`   |             |
 | `"failed"`     |             |
+| `"cancelled"`  |             |

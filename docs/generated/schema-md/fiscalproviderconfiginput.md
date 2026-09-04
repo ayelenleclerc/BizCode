@@ -21,8 +21,10 @@ undefined
 | [ambiente](#ambiente)       | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-ambiente.md "undefined#/properties/ambiente")       |
 | [certificate](#certificate) | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-certificate.md "undefined#/properties/certificate") |
 | [cuit](#cuit)               | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-cuit.md "undefined#/properties/cuit")               |
+| [legalName](#legalname)     | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-legalname.md "undefined#/properties/legalName")     |
 | [privateKey](#privatekey)   | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-privatekey.md "undefined#/properties/privateKey")   |
 | [provider](#provider)       | `string` | Required | cannot be null | [FiscalProviderConfigInput](fiscalprovidercode.md "undefined#/properties/provider")                                  |
+| [rfc](#rfc)                 | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-rfc.md "undefined#/properties/rfc")                 |
 
 ## ambiente
 
@@ -87,6 +89,28 @@ undefined
 
 `string`
 
+## legalName
+
+
+
+`legalName`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-legalname.md "undefined#/properties/legalName")
+
+### legalName Type
+
+`string`
+
+### legalName Constraints
+
+**maximum length**: the maximum number of characters for this string is: `160`
+
 ## privateKey
 
 
@@ -133,3 +157,27 @@ undefined
 | `"uruguay_dgi"`    |             |
 | `"chile_sii"`      |             |
 | `"mexico_sat_pac"` |             |
+
+## rfc
+
+
+
+`rfc`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-rfc.md "undefined#/properties/rfc")
+
+### rfc Type
+
+`string`
+
+### rfc Constraints
+
+**maximum length**: the maximum number of characters for this string is: `13`
+
+**minimum length**: the minimum number of characters for this string is: `12`

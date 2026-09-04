@@ -2,24 +2,22 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fiscalAPI, type FiscalProviderStatusEntry } from '@/lib/api'
 import IfModule from '@/components/IfModule'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import ArcaFiscalSection from './ArcaFiscalSection'
+import MexicoSatFiscalSection from './MexicoSatFiscalSection'
 
 /**
- * @en Multi-organism fiscal e-invoicing section (#378, ADR-0018). Shows every registered
- *   provider's capabilities (implemented vs capability-only stub) and tenant status, then
- *   mounts `ArcaFiscalSection` unchanged for the `arca_wsfe` credentials form — only
- *   `arca_wsfe` has a working adapter today.
- * @es Sección de facturación electrónica multi-organismo (#378, ADR-0018). Muestra las
- *   capacidades de cada proveedor registrado (implementado vs. stub de capacidades) y el
- *   estado del tenant, y luego monta `ArcaFiscalSection` sin cambios para el formulario de
- *   credenciales `arca_wsfe` — solo `arca_wsfe` tiene adapter funcional hoy.
- * @pt-BR Seção de nota fiscal eletrônica multi-organismo (#378, ADR-0018). Mostra as
- *   capacidades de cada provedor registrado (implementado vs. stub de capacidades) e o
- *   status do tenant, e então monta `ArcaFiscalSection` sem mudanças para o formulário de
- *   credenciais `arca_wsfe` — apenas `arca_wsfe` tem adapter funcional hoje.
+ * @en Multi-organism fiscal e-invoicing section (#378, #210). Lists providers and mounts
+ *   ARCA / Mexico SAT credential forms when the matching module is enabled.
+ * @es Sección de facturación electrónica multi-organismo (#378, #210). Lista proveedores y
+ *   monta formularios ARCA / SAT México cuando el módulo correspondiente está habilitado.
+ * @pt-BR Seção de nota fiscal eletrônica multi-organismo (#378, #210). Lista provedores e
+ *   monta formulários ARCA / SAT México quando o módulo correspondente está habilitado.
  */
 export default function FiscalProviderSection() {
   const { t } = useTranslation('empresa')
+  const { hasModule } = useFeatureFlags()
+  const showSection = hasModule('billing.arca_cae') || hasModule('billing.cfdi_sat')
   const [loading, setLoading] = useState(true)
   const [providers, setProviders] = useState<FiscalProviderStatusEntry[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -38,11 +36,13 @@ export default function FiscalProviderSection() {
   }, [t])
 
   useEffect(() => {
-    void loadProviders()
-  }, [loadProviders])
+    if (showSection) void loadProviders()
+  }, [loadProviders, showSection])
+
+  if (!showSection) return null
 
   return (
-    <IfModule flag="billing.arca_cae">
+    <>
       <section
         data-testid="section-fiscal-providers"
         className="mt-8 space-y-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6 shadow-sm"
@@ -111,7 +111,10 @@ export default function FiscalProviderSection() {
         )}
       </section>
 
-      <ArcaFiscalSection />
-    </IfModule>
+      <IfModule flag="billing.arca_cae">
+        <ArcaFiscalSection />
+      </IfModule>
+      <MexicoSatFiscalSection />
+    </>
   )
 }
