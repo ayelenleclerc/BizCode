@@ -75,7 +75,7 @@ undefined#/properties/data
 
 ## jurisdiccionFiscal
 
-Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.
+Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.
 
 `jurisdiccionFiscal`
 
@@ -100,6 +100,7 @@ Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and 
 | `"AR"` |             |
 | `"UY"` |             |
 | `"CL"` |             |
+| `"MX"` |             |
 
 ## modules
 

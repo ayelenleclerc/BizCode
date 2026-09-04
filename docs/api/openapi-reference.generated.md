@@ -218,7 +218,7 @@ Public endpoint. Reports the jurisdictions enabled by BIZCODE\_FISCAL\_JURISDICT
 
   - **`default` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`enabled` (required)**
 
@@ -228,7 +228,7 @@ Public endpoint. Reports the jurisdictions enabled by BIZCODE\_FISCAL\_JURISDICT
 
     - **`code` (required)**
 
-      `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+      `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
     - **`label` (required)**
 
@@ -2958,7 +2958,7 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -2974,7 +2974,7 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 
     **Items:**
 
-    `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 - **`success` (required)**
 
@@ -6059,7 +6059,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -6370,7 +6370,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -6833,7 +6833,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -213244,7 +213244,7 @@ Sales breakdown by operation currency (#206).
 
 * **`jurisdiccionFiscal` (required)**
 
-  `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+  `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 * **`modules` (required)**
 
@@ -213260,7 +213260,7 @@ Sales breakdown by operation currency (#206).
 
   **Items:**
 
-  `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+  `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 **Example:**
 
@@ -213297,7 +213297,7 @@ Sales breakdown by operation currency (#206).
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -213313,7 +213313,7 @@ Sales breakdown by operation currency (#206).
 
     **Items:**
 
-    `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 * **`success` (required)**
 
@@ -213692,7 +213692,7 @@ Sales breakdown by operation currency (#206).
 
 - **Type:**`string`
 
-Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.
+Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to `AR`.
 
 **Example:**
 
@@ -213714,7 +213714,7 @@ Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and 
 
 * **`jurisdiccionFiscal` (required)**
 
-  `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+  `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 * **`modules` (required)**
 
@@ -213787,7 +213787,7 @@ Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and 
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL"` — Tenant tax jurisdiction (#207). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
