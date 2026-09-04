@@ -25,10 +25,14 @@ const ARGENTINE_ONLY_MODULES = [
   'fiscal.libro_iva',
 ] as const
 
+const MEXICO_ONLY_MODULES = ['billing.cfdi_sat'] as const
+
+const COUNTRY_RESTRICTED_MODULES = [...ARGENTINE_ONLY_MODULES, ...MEXICO_ONLY_MODULES] as const
+
 describe('module availability per jurisdiction (#437)', () => {
-  it('marks exactly the Argentine legal modules as country restricted', () => {
+  it('marks exactly the country-restricted legal modules', () => {
     const restricted = MODULE_KEYS.filter((key) => moduleDef(key).availableForCountries)
-    expect(restricted.sort()).toEqual([...ARGENTINE_ONLY_MODULES].sort())
+    expect(restricted.sort()).toEqual([...COUNTRY_RESTRICTED_MODULES].sort())
   })
 
   it('keeps every unrestricted module available in any jurisdiction', () => {
@@ -55,9 +59,20 @@ describe('module availability per jurisdiction (#437)', () => {
 })
 
 describe('default modules per jurisdiction (#437)', () => {
-  it('preserves the current Argentine default set', () => {
-    expect(getDefaultModulesForJurisdiction('AR')).toEqual([...DEFAULT_MODULES])
-    expect(NEW_TENANT_MODULES).toEqual([...DEFAULT_MODULES])
+  it('preserves the Argentine default set (filters out foreign legal modules)', () => {
+    const argentine = getDefaultModulesForJurisdiction('AR')
+    expect(argentine).toEqual(filterModulesByJurisdiction(DEFAULT_MODULES, 'AR'))
+    expect(argentine).not.toContain('billing.cfdi_sat')
+    expect(NEW_TENANT_MODULES).toEqual([...argentine])
+  })
+
+  it('includes Mexico CFDI in Mexican defaults and drops Argentine legal modules', () => {
+    const mexican = getDefaultModulesForJurisdiction('MX')
+    expect(mexican).toContain('billing.cfdi_sat')
+    expect(mexican).toContain('core.invoicing')
+    for (const key of ARGENTINE_ONLY_MODULES) {
+      expect(mexican).not.toContain(key)
+    }
   })
 
   it('drops the Argentine legal modules for a Uruguayan tenant', () => {
@@ -65,6 +80,7 @@ describe('default modules per jurisdiction (#437)', () => {
     for (const key of ARGENTINE_ONLY_MODULES) {
       expect(uruguayan).not.toContain(key)
     }
+    expect(uruguayan).not.toContain('billing.cfdi_sat')
     expect(uruguayan).toContain('core.invoicing')
   })
 
@@ -126,9 +142,11 @@ describe('catalog payload hides non applicable modules (#437)', () => {
     }
   })
 
-  it('keeps the full catalog for an Argentine tenant', () => {
+  it('keeps every module applicable in Argentina (omits Mexico-only)', () => {
     const payload = buildModuleCatalogPayload('AR')
-    expect(payload.modules).toHaveLength(MODULE_KEYS.length)
+    const expected = MODULE_KEYS.filter((key) => isModuleAvailableInJurisdiction(key, 'AR'))
+    expect(payload.modules.map((entry) => entry.key).sort()).toEqual([...expected].sort())
+    expect(payload.modules.map((entry) => entry.key)).not.toContain('billing.cfdi_sat')
   })
 
   it('filters presets by applicability', () => {
@@ -137,6 +155,7 @@ describe('catalog payload hides non applicable modules (#437)', () => {
       for (const key of ARGENTINE_ONLY_MODULES) {
         expect(preset.modules).not.toContain(key)
       }
+      expect(preset.modules).not.toContain('billing.cfdi_sat')
     }
   })
 })

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
-import { DEFAULT_MODULES } from '../../apps/web/src/lib/modules'
+import { getDefaultModulesForJurisdiction } from '../../apps/web/src/lib/modules'
 import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const tenantRow = { id: 1, name: 'Demo', slug: 'demo', active: true }
@@ -14,7 +14,7 @@ function buildPrismaMock(): PrismaClient {
     businessType: 'ambos',
     rubros: [] as string[],
     plan: 'pro',
-    modules: [...DEFAULT_MODULES],
+    modules: [...getDefaultModulesForJurisdiction('AR')],
     integrations: [] as string[],
     updatedById: 1,
     updatedAt: new Date(),

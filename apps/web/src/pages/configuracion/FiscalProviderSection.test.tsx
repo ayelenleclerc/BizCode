@@ -29,6 +29,14 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ claims: { role: 'owner', tenantId: 1, userId: 1 } }),
 }))
 
+vi.mock('@/contexts/FeatureFlagsContext', () => ({
+  useFeatureFlags: () => ({
+    hasModule: (key: string) => key === 'billing.arca_cae' || key === 'billing.cfdi_sat',
+    modules: ['billing.arca_cae'],
+    loading: false,
+  }),
+}))
+
 vi.mock('@/components/IfModule', () => ({
   default: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
@@ -116,7 +124,7 @@ describe('FiscalProviderSection (#378)', () => {
   })
 
   it('shows a load error message when the request fails', async () => {
-    vi.mocked(fiscalAPI.getProvidersConfig).mockRejectedValueOnce(new Error('network down'))
+    vi.mocked(fiscalAPI.getProvidersConfig).mockRejectedValue(new Error('network down'))
     render(<FiscalProviderSection />)
     await waitFor(() => {
       expect(screen.getByText('fiscalProviders.errors.loadFailed')).toBeInTheDocument()
