@@ -160,6 +160,10 @@
       "04": "04 — Operação nominativa relacionada na fatura global"
     }
   },
+  "cfe": {
+    "stamp": "Autorizar CFE (mock)",
+    "stampLoading": "Autorizando CFE…"
+  },
   "pdfModal": {
     "title": "PDF — {{filename}}",
     "close": "Fechar",

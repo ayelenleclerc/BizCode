@@ -2076,6 +2076,7 @@ export type FiscalProviderConfigInput = {
   privateKey?: string
   ambiente?: 'homologacion' | 'produccion'
   rfc?: string
+  rut?: string
   legalName?: string
 }
 

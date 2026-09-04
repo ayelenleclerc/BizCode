@@ -25,6 +25,7 @@ undefined
 | [privateKey](#privatekey)   | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-privatekey.md "undefined#/properties/privateKey")   |
 | [provider](#provider)       | `string` | Required | cannot be null | [FiscalProviderConfigInput](fiscalprovidercode.md "undefined#/properties/provider")                                  |
 | [rfc](#rfc)                 | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-rfc.md "undefined#/properties/rfc")                 |
+| [rut](#rut)                 | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-rut.md "undefined#/properties/rut")                 |
 
 ## ambiente
 
@@ -179,5 +180,29 @@ undefined
 ### rfc Constraints
 
 **maximum length**: the maximum number of characters for this string is: `13`
+
+**minimum length**: the minimum number of characters for this string is: `12`
+
+## rut
+
+Uruguayan RUT for uruguay\_dgi mock config (#207)
+
+`rut`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-rut.md "undefined#/properties/rut")
+
+### rut Type
+
+`string`
+
+### rut Constraints
+
+**maximum length**: the maximum number of characters for this string is: `20`
 
 **minimum length**: the minimum number of characters for this string is: `12`

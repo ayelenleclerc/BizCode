@@ -44025,6 +44025,10 @@ Requires `settings.fiscal.manage`. Only `provider: arca_wsfe` is implemented tod
 
   `string`
 
+- **`rut`**
+
+  `string` — Uruguayan RUT for uruguay\_dgi mock config (#207)
+
 **Example:**
 
 ```json
@@ -44035,6 +44039,7 @@ Requires `settings.fiscal.manage`. Only `provider: arca_wsfe` is implemented tod
   "privateKey": "",
   "ambiente": "homologacion",
   "rfc": "",
+  "rut": "",
   "legalName": ""
 }
 ```
@@ -44657,7 +44662,7 @@ Requires `settings.fiscal.manage`. Records `lastValidationAt`/`validationStatus`
 - **Path:** `/api/fiscal/providers/capabilities`
 - **Tags:** fiscal
 
-Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe` and `mexico_sat_pac` report `implemented: true` as homologación mocks today — `uruguay_dgi` and `chile_sii` are capability-only stubs. Live SAT/PAC commercial clients remain Not evidenced.
+Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe`, `mexico_sat_pac` and `uruguay_dgi` report `implemented: true` as homologación mocks today — `chile_sii` is a capability-only stub. Live DGI SOAP/REST and commercial PAC clients remain Not evidenced.
 
 #### Responses
 
@@ -197143,6 +197148,10 @@ Originating invoice header (selected columns)
 
   `string`
 
+* **`rut`**
+
+  `string` — Uruguayan RUT for uruguay\_dgi mock config (#207)
+
 **Example:**
 
 ```json
@@ -197153,6 +197162,7 @@ Originating invoice header (selected columns)
   "privateKey": "",
   "ambiente": "homologacion",
   "rfc": "",
+  "rut": "",
   "legalName": ""
 }
 ```

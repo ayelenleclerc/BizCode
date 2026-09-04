@@ -31,7 +31,8 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 vi.mock('@/contexts/FeatureFlagsContext', () => ({
   useFeatureFlags: () => ({
-    hasModule: (key: string) => key === 'billing.arca_cae' || key === 'billing.cfdi_sat',
+    hasModule: (key: string) =>
+      key === 'billing.arca_cae' || key === 'billing.cfdi_sat' || key === 'billing.dgi_cfe',
     modules: ['billing.arca_cae'],
     loading: false,
   }),

@@ -19,7 +19,7 @@ MVP que elimina as premissas argentinas fixadas no faturamento para que um tenan
 
 ### Fora de escopo (residual)
 
-- Emissão de nota fiscal eletrônica (CFE) junto à DGI uruguaia. Exige certificado digital e homologação perante o órgão; `UruguayDgiFiscalAdapter` continua sendo um stub que lança `FiscalAdapterNotImplementedError` (`implemented: false`).
+- DGI (Uruguai) SOAP/REST live e certificados digitais — **não evidenciado**. O mock CFE de homologação está em `apps/server/fiscal/uy/` ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)); módulo `billing.dgi_cfe`.
 - O circuito CAE argentino não é alterado e continua sendo um mock local: `arcaWsfeMock.ts` calcula o CAE aritmeticamente e o cliente WSFE real segue pendente em #133.
 - PAC live de CFDI México (Facturama/Finkok) permanece não evidenciado; `mexico_sat_pac` é mock de homologação ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)). Ver [jurisdicao-fiscal-mexico.md](jurisdicao-fiscal-mexico.md).
 

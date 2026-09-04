@@ -28,6 +28,12 @@
       "maxLength": 13,
       "minLength": 12,
       "type": "string"
+    },
+    "rut": {
+      "description": "Uruguayan RUT for uruguay_dgi mock config (#207)",
+      "maxLength": 20,
+      "minLength": 12,
+      "type": "string"
     }
   },
   "required": [

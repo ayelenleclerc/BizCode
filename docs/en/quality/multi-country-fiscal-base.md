@@ -19,7 +19,7 @@ MVP that removes the Argentine assumptions hard-coded across invoicing so a tena
 
 ### Out of scope (residual)
 
-- Issuing an e-invoice (CFE) against the Uruguayan DGI. It requires a digital certificate and homologation with the tax authority; `UruguayDgiFiscalAdapter` stays a stub that throws `FiscalAdapterNotImplementedError` (`implemented: false`).
+- Live DGI (Uruguay) SOAP/REST and digital certificates — **Not evidenced**. Homologación CFE mock is evidenced under `apps/server/fiscal/uy/` ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)); module `billing.dgi_cfe`.
 - The Argentine CAE circuit is untouched and is still a local mock: `arcaWsfeMock.ts` computes the CAE arithmetically and the real WSFE client remains pending in #133.
 - Mexico CFDI live PAC (Facturama/Finkok) remains Not evidenced; `mexico_sat_pac` is a homologación mock ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)). See [mexico-fiscal-jurisdiction.md](mexico-fiscal-jurisdiction.md).
 

@@ -23,12 +23,13 @@ describe('fiscal UI options (#440)', () => {
     expect(hasBankAccountRules('AR')).toBe(true)
   })
 
-  it('offers the product-model conditions for UY and CL without invoice letters', () => {
+  it('offers the product-model conditions for UY and CL; UY exposes CFE document kinds', () => {
     expect(taxConditionOptions('UY').map((c) => c.code)).toEqual(['IVA', 'CF', 'Exento'])
     expect(defaultTaxCondition('CL')).toBe('IVA')
     expect(isValidTaxCondition('RI', 'UY')).toBe(false)
     expect(isValidTaxCondition('IVA', 'UY')).toBe(true)
-    expect(documentKindOptions('UY')).toBeNull()
+    expect(documentKindOptions('UY')).toEqual(['e-Factura', 'e-NotaCredito'])
+    expect(documentKindOptions('CL')).toBeNull()
     expect(hasBankAccountRules('CL')).toBe(false)
   })
 

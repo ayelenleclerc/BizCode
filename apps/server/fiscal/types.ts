@@ -1,23 +1,22 @@
 /**
  * @en Shared types for the multi-organism fiscal e-invoicing module (#378, ADR-0018).
- *   `ArcaService` (apps/server/fiscal/ar/ArcaService.ts) remains the only live client
- *   (homologación mocks); other providers are capability-only stubs until a live
- *   integration is evidenced in code.
+ *   Homologación mocks: ARCA, Mexico SAT PAC (#210), Uruguay DGI CFE (#207). Live AFIP/DGI/PAC
+ *   and Chile SII remain Not evidenced until a future ADR.
  * @es Tipos compartidos del módulo fiscal multi-organismo (#378, ADR-0018).
- *   `ArcaService` sigue siendo el único cliente real (mocks de homologación); los
- *   demás proveedores son stubs de capacidades hasta que exista integración real en el código.
+ *   Mocks de homologación: ARCA, PAC SAT México (#210), CFE DGI Uruguay (#207). AFIP/DGI/PAC live
+ *   y SII Chile siguen sin evidenciarse hasta un ADR futuro.
  * @pt-BR Tipos compartilhados do módulo fiscal multi-organismo (#378, ADR-0018).
- *   `ArcaService` continua sendo o único cliente real (mocks de homologação); os
- *   demais provedores são stubs de capacidades até existir integração real no código.
+ *   Mocks de homologação: ARCA, PAC SAT México (#210), CFE DGI Uruguai (#207). AFIP/DGI/PAC live
+ *   e SII Chile permanecem não evidenciados até um ADR futuro.
  */
 
 /**
- * @en Registered fiscal provider codes. Only `arca_wsfe` has a working adapter today;
- *   `uruguay_dgi`, `chile_sii` and `mexico_sat_pac` are capability-only stubs (#378, #208).
- * @es Códigos de proveedor fiscal registrados. Solo `arca_wsfe` tiene adapter funcional hoy;
- *   `uruguay_dgi`, `chile_sii` y `mexico_sat_pac` son stubs de capacidades (#378, #208).
- * @pt-BR Códigos de provedor fiscal registrados. Apenas `arca_wsfe` tem adapter funcional hoje;
- *   `uruguay_dgi`, `chile_sii` e `mexico_sat_pac` são stubs de capacidades (#378, #208).
+ * @en Registered fiscal provider codes. Homologación mocks: `arca_wsfe`, `mexico_sat_pac`,
+ *   `uruguay_dgi`. `chile_sii` remains a capability-only stub (#378, #208).
+ * @es Códigos de proveedor fiscal registrados. Mocks de homologación: `arca_wsfe`, `mexico_sat_pac`,
+ *   `uruguay_dgi`. `chile_sii` sigue siendo stub de capacidades (#378, #208).
+ * @pt-BR Códigos de provedor fiscal registrados. Mocks de homologação: `arca_wsfe`, `mexico_sat_pac`,
+ *   `uruguay_dgi`. `chile_sii` continua stub apenas de capacidades (#378, #208).
  */
 export const FISCAL_PROVIDER_CODES = [
   'arca_wsfe',

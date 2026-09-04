@@ -160,6 +160,10 @@
       "04": "04 — Nominative operation related in global invoice"
     }
   },
+  "cfe": {
+    "stamp": "Authorize CFE (mock)",
+    "stampLoading": "Authorizing CFE…"
+  },
   "pdfModal": {
     "title": "PDF — {{filename}}",
     "close": "Close",

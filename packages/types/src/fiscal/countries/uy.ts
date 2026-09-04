@@ -41,7 +41,12 @@ export const UY_FISCAL_RULES: FiscalRuleSet = {
     { code: '2', rate: 10, exempt: false },
     { code: '3', rate: 0, exempt: true },
   ],
-  documentKinds: null,
+  /**
+   * @en Product-model CFE kinds for invoice / credit note UI — not the full official DGI CFE catalog.
+   * @es Tipos CFE del modelo de producto para factura / NC — no el catálogo oficial DGI completo.
+   * @pt-BR Tipos CFE do modelo de produto para fatura / NC — não o catálogo oficial DGI completo.
+   */
+  documentKinds: ['e-Factura', 'e-NotaCredito'],
   vatRates: { standard: 22, reduced: 10 },
   providerCode: 'uruguay_dgi',
 }

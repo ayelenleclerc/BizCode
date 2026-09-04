@@ -1,15 +1,15 @@
 /**
- * @en Registers built-in fiscal provider adapter factories (ARCA mock, MX mock PAC, capability stubs) (#378/#210).
+ * @en Registers built-in fiscal provider adapter factories (ARCA mock, MX mock PAC, UY mock CFE, stubs) (#378/#210/#207).
  *   Mirrors `bootstrapEcommerceConnectors.ts`.
- * @es Registra factories built-in de adapters fiscales (ARCA mock, PAC MX mock, stubs) (#378/#210).
+ * @es Registra factories built-in de adapters fiscales (ARCA mock, PAC MX mock, CFE UY mock, stubs) (#378/#210/#207).
  *   Refleja `bootstrapEcommerceConnectors.ts`.
- * @pt-BR Registra factories built-in de adapters fiscais (ARCA mock, PAC MX mock, stubs) (#378/#210).
+ * @pt-BR Registra factories built-in de adapters fiscais (ARCA mock, PAC MX mock, CFE UY mock, stubs) (#378/#210/#207).
  *   Reflete `bootstrapEcommerceConnectors.ts`.
  */
 
 import { registerFiscalProviderAdapterFactory } from './fiscalProviderRegistry'
 import { ArcaFiscalAdapter } from './arca/ArcaFiscalAdapter'
-import { UruguayDgiFiscalAdapter } from './stubs/UruguayDgiFiscalAdapter'
+import { UruguayDgiFiscalAdapter } from './uy/UruguayDgiFiscalAdapter'
 import { ChileSiiFiscalAdapter } from './stubs/ChileSiiFiscalAdapter'
 import { MexicoSatFiscalAdapter } from './mx/MexicoSatFiscalAdapter'
 

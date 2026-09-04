@@ -26,8 +26,13 @@ const ARGENTINE_ONLY_MODULES = [
 ] as const
 
 const MEXICO_ONLY_MODULES = ['billing.cfdi_sat'] as const
+const URUGUAY_ONLY_MODULES = ['billing.dgi_cfe'] as const
 
-const COUNTRY_RESTRICTED_MODULES = [...ARGENTINE_ONLY_MODULES, ...MEXICO_ONLY_MODULES] as const
+const COUNTRY_RESTRICTED_MODULES = [
+  ...ARGENTINE_ONLY_MODULES,
+  ...MEXICO_ONLY_MODULES,
+  ...URUGUAY_ONLY_MODULES,
+] as const
 
 describe('module availability per jurisdiction (#437)', () => {
   it('marks exactly the country-restricted legal modules', () => {
@@ -81,6 +86,7 @@ describe('default modules per jurisdiction (#437)', () => {
       expect(uruguayan).not.toContain(key)
     }
     expect(uruguayan).not.toContain('billing.cfdi_sat')
+    expect(uruguayan).toContain('billing.dgi_cfe')
     expect(uruguayan).toContain('core.invoicing')
   })
 

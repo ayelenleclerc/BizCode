@@ -21,7 +21,7 @@ Use `apps/server/fiscal/arca/ArcaFiscalAdapter.ts` (wraps `ArcaService`) as the 
 
 ## 3. Replace the capability stub
 
-Until step 2 is real, the provider must keep using its stub under `apps/server/fiscal/stubs/` (e.g. `UruguayDgiFiscalAdapter.ts`, `ChileSiiFiscalAdapter.ts`), which throws [`FiscalAdapterNotImplementedError`](../../../apps/server/fiscal/stubs/FiscalAdapterNotImplementedError.ts) from every operational method. Once the real adapter exists, update the factory registration (next step) to use it instead of the stub — do not leave both registered for the same provider code.
+Until step 2 is real, the provider must keep using its stub under `apps/server/fiscal/stubs/` (e.g. `ChileSiiFiscalAdapter.ts`), which throws [`FiscalAdapterNotImplementedError`](../../../apps/server/fiscal/stubs/FiscalAdapterNotImplementedError.ts) from every operational method. Once the real adapter exists, update the factory registration (next step) to use it instead of the stub — do not leave both registered for the same provider code.
 
 ## 4. Register the adapter factory
 
@@ -48,6 +48,6 @@ Update this guide's provider list below and add a note to [ADR-0018](../adr/ADR-
 | Provider | `providerCode` | `implemented` | Source |
 |---|---|---|---|
 | ARCA / AFIP (Argentina) | `arca_wsfe` | `true` (homologación mock) | `apps/server/fiscal/arca/ArcaFiscalAdapter.ts` → `apps/server/fiscal/ar/ArcaService.ts` |
-| DGI (Uruguay) | `uruguay_dgi` | `false` (capability stub) | `apps/server/fiscal/stubs/UruguayDgiFiscalAdapter.ts` |
+| DGI (Uruguay) | `uruguay_dgi` | `true` (homologación mock CFE; live Not evidenced) | `apps/server/fiscal/uy/UruguayDgiFiscalAdapter.ts` → `UruguayDgiService` + `uyDgiCfeMock` ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)) |
 | SII (Chile) | `chile_sii` | `false` (capability stub) | `apps/server/fiscal/stubs/ChileSiiFiscalAdapter.ts` |
 | SAT/PAC (Mexico) | `mexico_sat_pac` | `true` (homologación mock PAC; live Not evidenced) | `apps/server/fiscal/mx/MexicoSatFiscalAdapter.ts` → `MexicoSatService` + `mxSatPacMock` ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)) |

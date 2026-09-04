@@ -58,6 +58,21 @@ export const MODULE_CATALOG = {
     plan: 'starter',
     price: 0,
   },
+  /**
+   * @en Uruguay DGI CFE stamping (homologación mock in #207; live DGI later).
+   * @es Emisión CFE DGI Uruguay (mock de homologación en #207; DGI live después).
+   * @pt-BR Emissão CFE DGI Uruguai (mock de homologação em #207; DGI live depois).
+   */
+  'billing.dgi_cfe': {
+    label: 'DGI CFE (Uruguay)',
+    required: false,
+    requiredInProd: false,
+    requiredInProdForCountries: ['UY'],
+    availableForCountries: ['UY'],
+    dependencies: ['core.invoicing'],
+    plan: 'starter',
+    price: 0,
+  },
   'billing.credit_notes': {
     label: 'Notas de credito',
     required: false,
@@ -496,6 +511,7 @@ export const DEFAULT_MODULES = [
   'core.invoicing',
   'billing.arca_cae',
   'billing.cfdi_sat',
+  'billing.dgi_cfe',
   'billing.credit_notes',
   'finance.collections',
   'finance.receipts',
