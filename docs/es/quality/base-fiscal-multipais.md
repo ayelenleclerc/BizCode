@@ -78,3 +78,7 @@ Todos los textos están traducidos en EN/ES/PT-BR.
 - [tests/lib/modules-catalog.test.ts](../../../tests/lib/modules-catalog.test.ts) — desacople y obligatoriedad por país.
 - [tests/server/fiscal/fiscalProviderConfigService.test.ts](../../../tests/server/fiscal/fiscalProviderConfigService.test.ts) — selección de adaptador por país.
 - [tests/server/services/tenantJurisdiction.test.ts](../../../tests/server/services/tenantJurisdiction.test.ts) — caché, lectura de base y fallback.
+
+## Evolución posterior
+
+Los códigos argentinos que quedaban cableados en el núcleo tras #207 se movieron al registro de reglas por país en [#440](https://github.com/ayelenleclerc/BizCode/issues/440) — véase [conjuntos-reglas-fiscales-por-pais.md](conjuntos-reglas-fiscales-por-pais.md) y [ADR-0023](../../en/adr/ADR-0023-fiscal-rule-sets-by-country.md).

@@ -40,7 +40,7 @@
     "taxId": {
       "AR": {
         "label": "Tax ID (CUIT)",
-        "placeholder": "20-12345678-9",
+        "placeholder": "20-12345678-6",
         "invalid": "Invalid CUIT"
       },
       "UY": {
@@ -70,7 +70,8 @@
       "RI": "RI - VAT Registered",
       "Mono": "Small Taxpayer",
       "CF": "CF - End Consumer",
-      "Exento": "Exempt"
+      "Exento": "Exempt",
+      "IVA": "VAT taxpayer"
     },
     "errors": {
       "cuit": "Invalid Tax ID",

@@ -6,7 +6,9 @@ import { ApiRequestFailedError, chequesAPI, fiscalRetencionesAPI, proveedoresAPI
 import type { RetencionPreviewLineDTO } from '@/lib/api'
 import type { ComprobantePendiente, ReciboPago, ReciboPagoMetodo } from '@bizcode/types'
 
-const METODOS: ReciboPagoMetodo[] = ['transferencia', 'cheque', 'efectivo', 'echeq']
+/** @en Generic receipt methods; `echeq` (and portfolio cheque) require `fiscal.cheques` (#440). */
+const METODOS_BASE: ReciboPagoMetodo[] = ['transferencia', 'efectivo']
+const METODOS_CHEQUES: ReciboPagoMetodo[] = ['cheque', 'echeq']
 
 type AllocationRow = {
   comprobanteCompraId: number
@@ -46,6 +48,10 @@ export default function ProveedorReciboPagoSection({ proveedorId, onPaymentRegis
   const { hasModule } = useFeatureFlags()
   const retencionesModule = hasModule('finance.retenciones')
   const chequesModule = hasModule('fiscal.cheques')
+  const metodosPago = useMemo(
+    () => (chequesModule ? [...METODOS_BASE, ...METODOS_CHEQUES] : METODOS_BASE),
+    [chequesModule],
+  )
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -504,7 +510,7 @@ export default function ProveedorReciboPagoSection({ proveedorId, onPaymentRegis
                 data-testid="proveedor-pago-metodo"
                 onChange={(e) => setMetodoPago(e.target.value as ReciboPagoMetodo)}
               >
-                {METODOS.map((m) => (
+                {metodosPago.map((m) => (
                   <option key={m} value={m}>
                     {t(`pagos.metodoOptions.${m}`)}
                   </option>

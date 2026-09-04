@@ -91,3 +91,7 @@ No real filing against any tax authority is implemented. DGI (Uruguay), SII (Chi
 | Catalog applicability, derived defaults, rejection and payload filtering | `tests/lib/modules-availability.test.ts` |
 | Environment resolution and its fallbacks | `tests/lib/jurisdictionEnv.test.ts` |
 | Registration by jurisdiction | `tests/server/saasOnboardingService.test.ts` |
+
+## Later evolution
+
+The core still assumed Argentine tax conditions, CUIT/CBU validation and invoice letters until [#440](https://github.com/ayelenleclerc/BizCode/issues/440) introduced the per-country rule registry — see [fiscal-rule-sets-by-country.md](fiscal-rule-sets-by-country.md) and [ADR-0023](../adr/ADR-0023-fiscal-rule-sets-by-country.md).

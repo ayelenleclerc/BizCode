@@ -91,3 +91,7 @@ No se implementa ninguna presentación real ante un organismo fiscal. DGI (Urugu
 | Aplicabilidad del catálogo, defaults derivados, rechazo y filtrado del payload | `tests/lib/modules-availability.test.ts` |
 | Resolución del entorno y sus fallbacks | `tests/lib/jurisdictionEnv.test.ts` |
 | Registro por jurisdicción | `tests/server/saasOnboardingService.test.ts` |
+
+## Evolución posterior
+
+El núcleo seguía asumiendo condiciones fiscales, CUIT/CBU y letras argentinas hasta [#440](https://github.com/ayelenleclerc/BizCode/issues/440) — véase [conjuntos-reglas-fiscales-por-pais.md](conjuntos-reglas-fiscales-por-pais.md) y [ADR-0023](../../en/adr/ADR-0023-fiscal-rule-sets-by-country.md).

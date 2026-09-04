@@ -108,7 +108,8 @@
       "RI": "RI",
       "Mono": "Monotributo",
       "CF": "Consumidor final",
-      "Exento": "Exento"
+      "Exento": "Exento",
+      "IVA": "Contribuyente IVA"
     },
     "errors": {
       "generic": "Error al guardar proveedor",

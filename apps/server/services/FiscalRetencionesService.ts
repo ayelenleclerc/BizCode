@@ -8,7 +8,7 @@ import type { RetencionPreviewInput, RetencionPreviewLine } from '../fiscal/ar/r
 import { loadPresentacionRetencionRows } from '../fiscal/ar/presentacionRetencionesLoader'
 import { buildSicoreRetencionesExport } from '../fiscal/ar/sicoreRetencionesExport'
 import { buildSifereRetencionesExport } from '../fiscal/ar/sifereRetencionesExport'
-import { validateCUIT } from '../../web/src/lib/validators/cuit'
+import { validateCUIT } from '@bizcode/types'
 
 export type FiscalRetencionesConfigDto = {
   esAgenteRetencionGanancias: boolean

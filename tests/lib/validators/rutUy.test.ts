@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatRUT, rutCheckDigit, validateRUT } from './rut'
+import { formatRUT, rutCheckDigit, validateRUT } from '../../../packages/types/src/fiscal/identifiers/rutUy'
 
 // RUT válido derivado del algoritmo (pesos 4,3,6,7,8,9,2,3,4,5,6):
 // cuerpo "01234567890" → suma 223, resto 3, verificador 8 → "012345678908"

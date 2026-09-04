@@ -11,6 +11,12 @@ import { hasPermission } from '@/lib/rbac'
 import { validateTaxId } from '@/lib/validators'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import {
+  defaultTaxCondition,
+  documentKindOptions,
+  isValidTaxCondition,
+  taxConditionOptions,
+} from '@/lib/fiscal/uiOptions'
+import {
   FISCAL_JURISDICTIONS,
   type EmpresaConfig,
   type FiscalJurisdictionCode,
@@ -39,20 +45,20 @@ const EMPRESA_TIMEZONE_OPTIONS = [
   'UTC',
 ] as const
 
-const empresaFormSchema = z
+const empresaFormBaseSchema = z
   .object({
     nombre: z.string().trim().min(1).max(40),
-    // Validado contra la jurisdicciÃ³n del tenant al construir el schema (#207).
+    // Validado contra la jurisdicción del tenant al construir el schema (#207).
     cuit: z.string().trim().min(1),
     domicilio: z.string().max(40).optional(),
     puntoVenta: z.coerce.number().int().min(1).max(9999),
-    tipoFactura: z.enum(['A', 'B', 'C']),
+    tipoFactura: z.string().min(1).max(1),
     logoUrl: z.string().max(255).optional(),
     recordatorioDiasGracia: z.coerce.number().int().min(0).max(365),
     timezone: z.string().min(1).max(64),
     recordatorioHoraInicio: z.coerce.number().int().min(0).max(23),
     recordatorioHoraFin: z.coerce.number().int().min(1).max(24),
-    condicionIva: z.enum(['RI', 'Mono', 'CF', 'Exento']),
+    condicionIva: z.string().min(1),
     ingresosBrutos: z.string().max(30).optional(),
     fechaInicioActividades: z
       .string()
@@ -66,18 +72,28 @@ const empresaFormSchema = z
     path: ['recordatorioHoraFin'],
   })
 
-type EmpresaFormData = z.infer<typeof empresaFormSchema>
+type EmpresaFormData = z.infer<typeof empresaFormBaseSchema>
 
 /**
- * @en Refines the company tax identifier with the algorithm of the tenant jurisdiction (#207).
- * @es Refina el identificador fiscal de la empresa con el algoritmo de la jurisdicciÃ³n del tenant (#207).
- * @pt-BR Refina o identificador fiscal da empresa com o algoritmo da jurisdiÃ§Ã£o do tenant (#207).
+ * @en Builds the company form schema for a jurisdiction: tax id and tax condition follow the registry (#440).
+ * @es Construye el esquema del formulario de empresa para una jurisdicción: identificador y condición siguen el registro (#440).
+ * @pt-BR Constrói o esquema do formulário da empresa para uma jurisdição: identificador e condição seguem o registro (#440).
  */
 function buildEmpresaFormSchema(jurisdiccion: FiscalJurisdictionCode) {
-  return empresaFormSchema.refine((data) => validateTaxId(data.cuit, jurisdiccion), {
-    message: 'cuitInvalid',
-    path: ['cuit'],
-  })
+  const kinds = documentKindOptions(jurisdiccion)
+  return empresaFormBaseSchema
+    .refine((data) => validateTaxId(data.cuit, jurisdiccion), {
+      message: 'cuitInvalid',
+      path: ['cuit'],
+    })
+    .refine((data) => isValidTaxCondition(data.condicionIva, jurisdiccion), {
+      message: 'condicionIvaInvalid',
+      path: ['condicionIva'],
+    })
+    .refine((data) => kinds == null || kinds.includes(data.tipoFactura), {
+      message: 'tipoFacturaInvalid',
+      path: ['tipoFactura'],
+    })
 }
 
 function configToFormValues(data: EmpresaConfig): EmpresaFormData {
@@ -111,10 +127,12 @@ export default function EmpresaPage() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [prefijoPreview, setPrefijoPreview] = useState('0001')
-  // JurisdicciÃ³n fiscal del tenant: elige el algoritmo y las etiquetas del identificador (#207).
+  // Jurisdicción fiscal del tenant: elige el algoritmo y las etiquetas del identificador (#207).
   const { jurisdiccionFiscal } = useFeatureFlags()
   const taxIdKind = FISCAL_JURISDICTIONS[jurisdiccionFiscal].taxIdKind
   const schema = useMemo(() => buildEmpresaFormSchema(jurisdiccionFiscal), [jurisdiccionFiscal])
+  const condIvaChoices = useMemo(() => taxConditionOptions(jurisdiccionFiscal), [jurisdiccionFiscal])
+  const documentKinds = useMemo(() => documentKindOptions(jurisdiccionFiscal), [jurisdiccionFiscal])
 
   const {
     register,
@@ -135,7 +153,7 @@ export default function EmpresaPage() {
       timezone: 'America/Argentina/Buenos_Aires',
       recordatorioHoraInicio: 8,
       recordatorioHoraFin: 18,
-      condicionIva: 'RI',
+      condicionIva: defaultTaxCondition(jurisdiccionFiscal),
       ingresosBrutos: '',
       fechaInicioActividades: '',
     },
@@ -347,10 +365,11 @@ export default function EmpresaPage() {
               disabled={!canEdit}
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
             >
-              <option value="RI">{t('form.condicionRi')}</option>
-              <option value="Mono">{t('form.condicionMono')}</option>
-              <option value="CF">{t('form.condicionCf')}</option>
-              <option value="Exento">{t('form.condicionExento')}</option>
+              {condIvaChoices.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {t(`form.${c.labelKey}` as 'form.condicionRi')}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -424,22 +443,28 @@ export default function EmpresaPage() {
             )}
           </div>
 
-          <div>
-            <label htmlFor="empresa-tipo-factura" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              {t('form.tipoFactura')}
-            </label>
-            <select
-              id="empresa-tipo-factura"
-              data-testid="select-empresa-tipo-factura"
-              {...register('tipoFactura')}
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
-              disabled={!canEdit}
-            >
-              <option value="A">{t('form.tipoA')}</option>
-              <option value="B">{t('form.tipoB')}</option>
-              <option value="C">{t('form.tipoC')}</option>
-            </select>
-          </div>
+          {documentKinds != null ? (
+            <div>
+              <label htmlFor="empresa-tipo-factura" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                {t('form.tipoFactura')}
+              </label>
+              <select
+                id="empresa-tipo-factura"
+                data-testid="select-empresa-tipo-factura"
+                {...register('tipoFactura')}
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
+                disabled={!canEdit}
+              >
+                {documentKinds.map((kind) => (
+                  <option key={kind} value={kind}>
+                    {t(`form.tipo${kind}` as 'form.tipoA')}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <input type="hidden" {...register('tipoFactura')} data-testid="select-empresa-tipo-factura-hidden" />
+          )}
 
           <div className="md:col-span-2">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('form.prefijoPreview')}</p>

@@ -108,7 +108,8 @@
       "RI": "RI",
       "Mono": "Simples/MEI",
       "CF": "Consumidor final",
-      "Exento": "Isento"
+      "Exento": "Isento",
+      "IVA": "Contribuinte de IVA"
     },
     "errors": {
       "generic": "Erro ao salvar fornecedor",

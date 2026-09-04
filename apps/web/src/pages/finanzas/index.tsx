@@ -361,7 +361,7 @@ function FinanzasPageContent() {
           <PresentacionesRetencionesSection />
         </IfModule>
 
-        <IfModule flag="finance.ledger">
+        <IfModule flag="fiscal.libro_iva">
           <FinanzasLibroIvaVentasSection />
           <FinanzasLibroIvaComprasSection />
         </IfModule>

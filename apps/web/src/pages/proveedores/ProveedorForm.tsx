@@ -1,17 +1,21 @@
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import KeyboardHint, { useFormShortcuts } from '@/components/shared/KeyboardHint'
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, proveedoresAPI, type ProveedorInputDTO } from '@/lib/api'
-import { formatTaxId, validateCBU, validateTaxId } from '@/lib/validators'
+import { formatTaxId, validateBankAccount, validateTaxId } from '@/lib/validators'
 import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import {
+  defaultTaxCondition,
+  isValidTaxCondition,
+  taxConditionOptions,
+} from '@/lib/fiscal/uiOptions'
 import { FISCAL_JURISDICTIONS } from '@bizcode/types'
 import type { Proveedor, ProveedorCategoria, ProveedorCondicionPago, ProveedorTipoCuenta } from '@bizcode/types'
 import ProveedorCatalogoSection from './ProveedorCatalogoSection'
 import ProveedorCuentaCorrienteSection from './ProveedorCuentaCorrienteSection'
 import ProveedorHistorialSection from './ProveedorHistorialSection'
 
-const COND_IVA = ['RI', 'Mono', 'CF', 'Exento'] as const
 const TIPOS_CUENTA: ProveedorTipoCuenta[] = ['cc', 'ca']
 const CONDICIONES_PAGO: ProveedorCondicionPago[] = ['contado', '15dias', '30dias', '60dias', 'otro']
 const CATEGORIAS: ProveedorCategoria[] = ['materia_prima', 'insumos', 'servicios', 'logistica']
@@ -69,15 +73,16 @@ function ProveedorDatosFormShell({
 export default function ProveedorForm({ proveedorId, onClose, onSaved }: ProveedorFormProps) {
   const { t } = useTranslation('proveedores')
   const { t: tc } = useTranslation('common')
-  // JurisdicciÃ³n fiscal del tenant: elige el algoritmo del identificador (#207).
+  // Jurisdicción fiscal del tenant: elige el algoritmo del identificador (#207).
   const { jurisdiccionFiscal } = useFeatureFlags()
   const taxIdKind = FISCAL_JURISDICTIONS[jurisdiccionFiscal].taxIdKind
+  const condIvaChoices = useMemo(() => taxConditionOptions(jurisdiccionFiscal), [jurisdiccionFiscal])
   const [loading, setLoading] = useState(proveedorId != null)
   const [formCodigo, setFormCodigo] = useState('')
   const [formRsocial, setFormRsocial] = useState('')
   const [formFantasia, setFormFantasia] = useState('')
   const [formCuit, setFormCuit] = useState('')
-  const [formCondIva, setFormCondIva] = useState<(typeof COND_IVA)[number]>('RI')
+  const [formCondIva, setFormCondIva] = useState(defaultTaxCondition(jurisdiccionFiscal))
   const [formTelef, setFormTelef] = useState('')
   const [formEmail, setFormEmail] = useState('')
   const [formActivo, setFormActivo] = useState(true)
@@ -105,7 +110,11 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
     setFormRsocial(p.rsocial)
     setFormFantasia(p.fantasia ?? '')
     setFormCuit(p.cuit ?? '')
-    setFormCondIva((COND_IVA.includes(p.condIva as (typeof COND_IVA)[number]) ? p.condIva : 'RI') as (typeof COND_IVA)[number])
+    setFormCondIva(
+      isValidTaxCondition(p.condIva, jurisdiccionFiscal)
+        ? p.condIva
+        : defaultTaxCondition(jurisdiccionFiscal),
+    )
     setFormTelef(p.telef ?? '')
     setFormEmail(p.email ?? '')
     setFormActivo(p.activo)
@@ -123,7 +132,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
     setFormContactoEmail(p.contactoEmail ?? '')
     setFormContactoTel(p.contactoTel ?? '')
     setFormNotas(p.notas ?? '')
-  }, [])
+  }, [jurisdiccionFiscal])
 
   useEffect(() => {
     if (proveedorId == null) {
@@ -156,7 +165,7 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
       errs.cuit = t(`form.taxId.${jurisdiccionFiscal}.invalid`)
     }
     const cbuTrim = formCbu.trim()
-    if (cbuTrim && !validateCBU(cbuTrim)) {
+    if (cbuTrim && !validateBankAccount(cbuTrim, jurisdiccionFiscal)) {
       errs.cbu = t('form.errors.cbuInvalid')
     }
     setFieldErrors(errs)
@@ -490,12 +499,12 @@ export default function ProveedorForm({ proveedorId, onClose, onSaved }: Proveed
                       id="proveedor-form-cond"
                       data-testid="proveedor-form-cond-iva"
                       value={formCondIva}
-                      onChange={(e) => setFormCondIva(e.target.value as (typeof COND_IVA)[number])}
+                      onChange={(e) => setFormCondIva(e.target.value)}
                       className={inputClass}
                     >
-                      {COND_IVA.map((c) => (
-                        <option key={c} value={c}>
-                          {t(`form.condIvaOptions.${c}` as 'form.condIvaOptions.RI')}
+                      {condIvaChoices.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {t(`form.condIvaOptions.${c.code}` as 'form.condIvaOptions.RI')}
                         </option>
                       ))}
                     </select>

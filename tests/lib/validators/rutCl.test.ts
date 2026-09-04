@@ -3,7 +3,7 @@ import {
   formatRUTCL,
   rutClCheckDigit,
   validateRUTCL,
-} from '../../../apps/web/src/lib/validators/rutCl'
+} from '../../../packages/types/src/fiscal/identifiers/rutCl'
 
 /**
  * @en Vectors are derived from the documented modulo 11 rule, not from SII sample data (#208).

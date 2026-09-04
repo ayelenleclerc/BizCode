@@ -40,7 +40,7 @@
     "taxId": {
       "AR": {
         "label": "Identificação fiscal (CUIT)",
-        "placeholder": "20-12345678-9",
+        "placeholder": "20-12345678-6",
         "invalid": "CUIT inválido"
       },
       "UY": {
@@ -70,7 +70,8 @@
       "RI": "RI - Contribuinte ICMS",
       "Mono": "MEI / Simples",
       "CF": "CF - Consumidor Final",
-      "Exento": "Isento"
+      "Exento": "Isento",
+      "IVA": "Contribuinte de IVA"
     },
     "errors": {
       "cuit": "CNPJ/CPF inválido",

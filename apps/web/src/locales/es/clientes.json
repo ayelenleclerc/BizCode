@@ -40,7 +40,7 @@
     "taxId": {
       "AR": {
         "label": "CUIT",
-        "placeholder": "20-12345678-9",
+        "placeholder": "20-12345678-6",
         "invalid": "CUIT inválido"
       },
       "UY": {
@@ -70,7 +70,8 @@
       "RI": "RI - Responsable Inscrito",
       "Mono": "Monotributista",
       "CF": "CF - Consumidor Final",
-      "Exento": "Exento"
+      "Exento": "Exento",
+      "IVA": "Contribuyente IVA"
     },
     "errors": {
       "cuit": "CUIT inválido",

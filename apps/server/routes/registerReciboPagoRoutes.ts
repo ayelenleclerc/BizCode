@@ -1,13 +1,14 @@
-import type { Application, Request, Response } from 'express'
+import type { Application, Request, Response, NextFunction } from 'express'
 import type { AuthenticatedRequest } from '../auth'
 import { requirePermission } from '../auth'
 import { requireModule } from '../middleware/requireModule'
 import { validateBody } from '../middleware/validateBody'
-import { reciboPagoBodySchema } from '../schemas/domain'
+import { buildReciboPagoBodySchema } from '../schemas/domain'
 import type { ReciboPagoInput } from '@bizcode/types'
 import { buildReciboPagoPdfBuffer } from '../finance/reciboPagoPdf'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
 import { reciboPagoPdfFilename } from '../services/ReciboPagoService'
+import { modulesInclude } from '../services/TenantConfigService'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
 
@@ -15,6 +16,17 @@ function parsePositiveIntParam(value: string): number | null {
   const n = Number.parseInt(value, 10)
   if (!Number.isInteger(n) || n < 1) return null
   return n
+}
+
+/**
+ * @en Validates the receipt body with `echeq` only when `fiscal.cheques` is enabled (#440).
+ * @es Valida el cuerpo del recibo incluyendo `echeq` solo si `fiscal.cheques` está habilitado (#440).
+ * @pt-BR Valida o corpo do recibo incluindo `echeq` só se `fiscal.cheques` estiver habilitado (#440).
+ */
+function validateReciboPagoBody(req: Request, res: Response, next: NextFunction): void {
+  const authReq = req as AuthenticatedRequest
+  const allowEcheq = modulesInclude(authReq.tenantModules, 'fiscal.cheques')
+  validateBody(buildReciboPagoBodySchema(allowEcheq))(req, res, next)
 }
 
 /**
@@ -82,7 +94,7 @@ export function registerReciboPagoRoutes(app: Application, ctx: RestRouteContext
     '/api/proveedores/:id/pagos',
     receiptsModule,
     requirePermission('suppliers.manage'),
-    validateBody(reciboPagoBodySchema),
+    validateReciboPagoBody,
     async (req: Request, res: Response) => {
       const authReq = req as AuthenticatedRequest
       if (!authReq.auth) {

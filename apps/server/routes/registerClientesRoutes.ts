@@ -1,8 +1,8 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
-import { validateBody } from '../middleware/validateBody'
+import { validateBodyForTenant } from '../middleware/validateBodyForTenant'
 import { verifyOwnership } from '../middleware/verifyOwnership'
-import { clienteBodySchema } from '../schemas/domain'
+import { buildClienteBodySchema } from '../schemas/domain'
 import type { ClienteInput } from '@bizcode/types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
@@ -91,7 +91,7 @@ export function registerClientesRoutes(app: Application, ctx: RestRouteContext):
   app.post(
     '/api/clientes',
     requirePermission('customers.manage'),
-    validateBody(clienteBodySchema),
+    validateBodyForTenant(ctx.prisma, buildClienteBodySchema),
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)
@@ -112,7 +112,7 @@ export function registerClientesRoutes(app: Application, ctx: RestRouteContext):
   app.put(
     '/api/clientes/:id',
     requirePermission('customers.manage'),
-    validateBody(clienteBodySchema),
+    validateBodyForTenant(ctx.prisma, buildClienteBodySchema),
     ownership,
     async (req: Request, res: Response) => {
       try {

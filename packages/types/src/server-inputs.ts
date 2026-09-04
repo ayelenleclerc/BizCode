@@ -37,7 +37,12 @@ export type {
 export type ClienteInput = {
   codigo: number
   rsocial: string
-  condIva: 'RI' | 'Mono' | 'CF' | 'Exento'
+  /**
+   * @en Tax condition code; the valid set is declared by the tenant jurisdiction, not by the core (#440).
+   * @es Código de condición fiscal; el conjunto válido lo declara la jurisdicción del tenant, no el núcleo (#440).
+   * @pt-BR Código de condição fiscal; o conjunto válido é declarado pela jurisdição do tenant, não pelo núcleo (#440).
+   */
+  condIva: string
   activo: boolean
   fantasia?: string | null
   cuit?: string | null
@@ -506,13 +511,13 @@ export type EmpresaInput = {
   cuit: string
   domicilio?: string | null
   puntoVenta: number
-  tipoFactura: 'A' | 'B' | 'C'
+  tipoFactura: string
   logoUrl?: string | null
   recordatorioDiasGracia?: number
   timezone?: string
   recordatorioHoraInicio?: number
   recordatorioHoraFin?: number
-  condicionIva?: 'RI' | 'Mono' | 'CF' | 'Exento'
+  condicionIva?: string
   ingresosBrutos?: string | null
   fechaInicioActividades?: string | null
 }

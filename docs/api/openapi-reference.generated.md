@@ -106275,7 +106275,7 @@ Returns a credit note with originating invoice header for the current tenant. Re
 - **Path:** `/api/contabilidad/libro-iva-ventas`
 - **Tags:** contabilidad
 
-Generates **Libro IVA Ventas** from persisted `Factura` fiscal fields (types A/B/C, netos, IVA, total, estado). Includes credit notes and voided vouchers (`tipo 999`) per ADR-0013 when `NotaCredito` falls in the period. Requires module `finance.ledger` and permission `reports.financial.read`. Purchases book: see `GET /api/contabilidad/libro-iva-compras` (#306).
+Generates **Libro IVA Ventas** from persisted `Factura` fiscal fields (types A/B/C, netos, IVA, total, estado). Includes credit notes and voided vouchers (`tipo 999`) per ADR-0013 when `NotaCredito` falls in the period. Requires module `fiscal.libro_iva` (Argentina-only Libro IVA exports, #440) and permission `reports.financial.read`. Purchases book: see `GET /api/contabilidad/libro-iva-compras` (#306).
 
 - `format=preview` (default): JSON totals and record counts.
 - `format=txt`: ZIP download with `CBTV.txt` + `ALICUOTAS.txt` (comma-separated, RG 3685 layout).
@@ -106613,7 +106613,7 @@ Generates **Libro IVA Ventas** from persisted `Factura` fiscal fields (types A/B
 - **Path:** `/api/contabilidad/libro-iva-compras`
 - **Tags:** contabilidad
 
-Generates **Libro IVA Compras** from persisted `ComprobanteCompra` fiscal fields (types A/B/C, netos, IVA, total, estado). Requires module `finance.ledger` and permission `reports.financial.read`. Data entry: `POST /api/comprobantes-compra` (supplier fiscal voucher).
+Generates **Libro IVA Compras** from persisted `ComprobanteCompra` fiscal fields (types A/B/C, netos, IVA, total, estado). Requires module `fiscal.libro_iva` (Argentina-only Libro IVA exports, #440) and permission `reports.financial.read`. Data entry: `POST /api/comprobantes-compra` (supplier fiscal voucher).
 
 - `format=preview` (default): JSON totals and record counts.
 - `format=txt`: ZIP download with `CBTU.txt` + `ALICUOTAS.txt` (comma-separated, RG 3685 layout).

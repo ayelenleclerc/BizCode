@@ -44,6 +44,7 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
     return Promise.resolve([proveedorRow])
   })
   return {
+    tenantConfig: { findUnique: vi.fn().mockResolvedValue(null) },
     cliente: { findMany: vi.fn().mockResolvedValue([]), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
     auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
     articulo: { findMany: vi.fn().mockResolvedValue([]) },

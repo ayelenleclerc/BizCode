@@ -1,9 +1,9 @@
 import { Prisma } from '@prisma/client'
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
-import { validateBody } from '../middleware/validateBody'
+import { validateBodyForTenant } from '../middleware/validateBodyForTenant'
 import { verifyOwnership } from '../middleware/verifyOwnership'
-import { proveedorBodySchema, safeParseBodySchema } from '../schemas/domain'
+import { buildProveedorBodySchema, proveedorBodySchema, safeParseBodySchema } from '../schemas/domain'
 import type { ProveedorInput } from '@bizcode/types'
 import { parseCsvWithFixedHeaders, CSV_IMPORT_MAX_ROWS } from '../csvImport'
 import { paginatedListJson, parseListPagination } from '../services/listPagination'
@@ -172,7 +172,7 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
   app.post(
     '/api/proveedores',
     requirePermission('suppliers.manage'),
-    validateBody(proveedorBodySchema),
+    validateBodyForTenant(ctx.prisma, buildProveedorBodySchema),
     async (req: Request, res: Response) => {
     try {
       const tenantId = getTenantId(req)
@@ -193,7 +193,7 @@ export function registerProveedoresRoutes(app: Application, ctx: RestRouteContex
   app.put(
     '/api/proveedores/:id',
     requirePermission('suppliers.manage'),
-    validateBody(proveedorBodySchema),
+    validateBodyForTenant(ctx.prisma, buildProveedorBodySchema),
     ownership,
     async (req: Request, res: Response) => {
     try {

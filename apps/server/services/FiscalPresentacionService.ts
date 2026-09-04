@@ -8,7 +8,7 @@ import {
 } from '../fiscal/ar/presentacionRetencionesLoader'
 import { buildSicoreRetencionesExport } from '../fiscal/ar/sicoreRetencionesExport'
 import { buildSifereRetencionesExport } from '../fiscal/ar/sifereRetencionesExport'
-import { validateCUIT } from '../../web/src/lib/validators/cuit'
+import { validateCUIT } from '@bizcode/types'
 
 export type PresentacionWarningCode = 'missing_cuit' | 'invalid_cuit' | 'zero_importe_excluded'
 

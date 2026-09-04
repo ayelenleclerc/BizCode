@@ -28,6 +28,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'finance.retenciones',
   'fiscal.remito',
   'fiscal.cheques',
+  'fiscal.libro_iva',
   'logistics.purchases',
   'clients.portal',
   'service.contracts',
