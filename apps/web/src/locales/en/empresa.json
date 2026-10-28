@@ -165,6 +165,24 @@
       "saveFailed": "Could not save Uruguay DGI settings"
     }
   },
+  "chileSii": {
+    "title": "SII DTE (Chile) — mock",
+    "subtitle": "Homologación mock DTE — stores Chilean RUT only. Live SII SOAP/XML XAdES is not evidenced in this build (#208).",
+    "loading": "Loading Chile SII settings…",
+    "configuredHint": "Configured for RUT {{rut}} ({{ambiente}}).",
+    "notConfigured": "Chile SII DTE mock is not configured yet.",
+    "rut": "RUT",
+    "ambiente": "Environment",
+    "ambienteHomologacion": "Homologación (mock)",
+    "ambienteProduccion": "Production (not enabled in this build)",
+    "save": "Save Chile SII settings",
+    "saving": "Saving…",
+    "saveSuccess": "Chile SII settings saved",
+    "errors": {
+      "loadFailed": "Could not load Chile SII settings",
+      "saveFailed": "Could not save Chile SII settings"
+    }
+  },
   "mercadopago": {
     "title": "MercadoPago",
     "subtitle": "Optional integration — access token and webhook secret are encrypted and never shown after save.",

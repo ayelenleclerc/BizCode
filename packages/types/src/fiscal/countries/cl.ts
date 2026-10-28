@@ -41,7 +41,15 @@ export const CL_FISCAL_RULES: FiscalRuleSet = {
     { code: '2', rate: 19, exempt: false },
     { code: '3', rate: 0, exempt: true },
   ],
-  documentKinds: null,
+  /**
+   * @en Product-model DTE kinds for invoice / credit note UI — not the full official SII catalog.
+   *   Codes 33 / 61 are cited by issue #208 AC (factura afecta / nota de crédito).
+   * @es Tipos DTE del modelo de producto para factura / NC — no el catálogo oficial SII completo.
+   *   Los códigos 33 / 61 los cita el AC del issue #208 (factura afecta / nota de crédito).
+   * @pt-BR Tipos DTE do modelo de produto para fatura / NC — não o catálogo oficial SII completo.
+   *   Os códigos 33 / 61 são citados pelo AC do issue #208 (factura afecta / nota de crédito).
+   */
+  documentKinds: ['33-FacturaAfecta', '61-NotaCredito'],
   vatRates: { standard: 19, reduced: 19 },
   providerCode: 'chile_sii',
 }

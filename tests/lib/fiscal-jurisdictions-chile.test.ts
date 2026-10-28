@@ -76,5 +76,6 @@ describe('Chilean invoicing and modules (#208)', () => {
     expect(modules).not.toContain('fiscal.remito')
     expect(modules).not.toContain('fiscal.cheques')
     expect(modules).toContain('core.invoicing')
+    expect(modules).toContain('billing.dte_sii')
   })
 })

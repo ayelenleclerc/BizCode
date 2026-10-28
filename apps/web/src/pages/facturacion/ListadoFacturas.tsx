@@ -123,7 +123,8 @@ export default function ListadoFacturas({
   const { hasModule } = useFeatureFlags()
   const useMexicoCfdi = hasModule('billing.cfdi_sat')
   const useUruguayCfe = hasModule('billing.dgi_cfe')
-  const useFiscalAuthorize = useMexicoCfdi || useUruguayCfe
+  const useChileDte = hasModule('billing.dte_sii')
+  const useFiscalAuthorize = useMexicoCfdi || useUruguayCfe || useChileDte
   const [pdfLoadingId, setPdfLoadingId] = useState<number | null>(null)
   const [pdfError, setPdfError] = useState<string | null>(null)
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
@@ -625,12 +626,16 @@ export default function ListadoFacturas({
                                   ? t('cfdi.stampLoading')
                                   : useUruguayCfe
                                     ? t('cfe.stampLoading')
-                                    : t('cae.retryLoading')
+                                    : useChileDte
+                                      ? t('dte.stampLoading')
+                                      : t('cae.retryLoading')
                                 : useMexicoCfdi
                                   ? t('cfdi.stamp')
                                   : useUruguayCfe
                                     ? t('cfe.stamp')
-                                    : t('cae.retry')}
+                                    : useChileDte
+                                      ? t('dte.stamp')
+                                      : t('cae.retry')}
                             </button>
                           </CanAccess>
                         )}

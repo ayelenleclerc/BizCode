@@ -23,13 +23,13 @@ describe('fiscal UI options (#440)', () => {
     expect(hasBankAccountRules('AR')).toBe(true)
   })
 
-  it('offers the product-model conditions for UY and CL; UY exposes CFE document kinds', () => {
+  it('offers the product-model conditions for UY and CL with CFE/DTE document kinds', () => {
     expect(taxConditionOptions('UY').map((c) => c.code)).toEqual(['IVA', 'CF', 'Exento'])
     expect(defaultTaxCondition('CL')).toBe('IVA')
     expect(isValidTaxCondition('RI', 'UY')).toBe(false)
     expect(isValidTaxCondition('IVA', 'UY')).toBe(true)
     expect(documentKindOptions('UY')).toEqual(['e-Factura', 'e-NotaCredito'])
-    expect(documentKindOptions('CL')).toBeNull()
+    expect(documentKindOptions('CL')).toEqual(['33-FacturaAfecta', '61-NotaCredito'])
     expect(hasBankAccountRules('CL')).toBe(false)
   })
 

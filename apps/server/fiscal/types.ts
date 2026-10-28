@@ -1,22 +1,22 @@
 /**
  * @en Shared types for the multi-organism fiscal e-invoicing module (#378, ADR-0018).
- *   Homologación mocks: ARCA, Mexico SAT PAC (#210), Uruguay DGI CFE (#207). Live AFIP/DGI/PAC
- *   and Chile SII remain Not evidenced until a future ADR.
+ *   Homologación mocks: ARCA, Mexico SAT PAC (#210), Uruguay DGI CFE (#207), Chile SII DTE (#208).
+ *   Live AFIP/DGI/PAC/SII remain Not evidenced until a future ADR.
  * @es Tipos compartidos del módulo fiscal multi-organismo (#378, ADR-0018).
- *   Mocks de homologación: ARCA, PAC SAT México (#210), CFE DGI Uruguay (#207). AFIP/DGI/PAC live
- *   y SII Chile siguen sin evidenciarse hasta un ADR futuro.
+ *   Mocks de homologación: ARCA, PAC SAT México (#210), CFE DGI Uruguay (#207), DTE SII Chile (#208).
+ *   AFIP/DGI/PAC/SII live siguen sin evidenciarse hasta un ADR futuro.
  * @pt-BR Tipos compartilhados do módulo fiscal multi-organismo (#378, ADR-0018).
- *   Mocks de homologação: ARCA, PAC SAT México (#210), CFE DGI Uruguai (#207). AFIP/DGI/PAC live
- *   e SII Chile permanecem não evidenciados até um ADR futuro.
+ *   Mocks de homologação: ARCA, PAC SAT México (#210), CFE DGI Uruguai (#207), DTE SII Chile (#208).
+ *   AFIP/DGI/PAC/SII live permanecem não evidenciados até um ADR futuro.
  */
 
 /**
  * @en Registered fiscal provider codes. Homologación mocks: `arca_wsfe`, `mexico_sat_pac`,
- *   `uruguay_dgi`. `chile_sii` remains a capability-only stub (#378, #208).
+ *   `uruguay_dgi`, `chile_sii` (#378/#210/#207/#208).
  * @es Códigos de proveedor fiscal registrados. Mocks de homologación: `arca_wsfe`, `mexico_sat_pac`,
- *   `uruguay_dgi`. `chile_sii` sigue siendo stub de capacidades (#378, #208).
+ *   `uruguay_dgi`, `chile_sii` (#378/#210/#207/#208).
  * @pt-BR Códigos de provedor fiscal registrados. Mocks de homologação: `arca_wsfe`, `mexico_sat_pac`,
- *   `uruguay_dgi`. `chile_sii` continua stub apenas de capacidades (#378, #208).
+ *   `uruguay_dgi`, `chile_sii` (#378/#210/#207/#208).
  */
 export const FISCAL_PROVIDER_CODES = [
   'arca_wsfe',

@@ -49,5 +49,5 @@ Actualizar la lista de proveedores de esta guía más abajo y agregar una nota e
 |---|---|---|---|
 | ARCA / AFIP (Argentina) | `arca_wsfe` | `true` (mock de homologación) | `apps/server/fiscal/arca/ArcaFiscalAdapter.ts` → `apps/server/fiscal/ar/ArcaService.ts` |
 | DGI (Uruguay) | `uruguay_dgi` | `true` (mock CFE de homologación; live no evidenciado) | `apps/server/fiscal/uy/UruguayDgiFiscalAdapter.ts` → `UruguayDgiService` + `uyDgiCfeMock` ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)) |
-| SII (Chile) | `chile_sii` | `false` (stub de capacidades) | `apps/server/fiscal/stubs/ChileSiiFiscalAdapter.ts` |
+| SII (Chile) | `chile_sii` | `true` (mock DTE de homologación; live no evidenciado) | `apps/server/fiscal/cl/ChileSiiFiscalAdapter.ts` → `ChileSiiService` + `clSiiDteMock` ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)) |
 | SAT/PAC (México) | `mexico_sat_pac` | `true` (mock PAC de homologación; live no evidenciado) | `apps/server/fiscal/mx/MexicoSatFiscalAdapter.ts` → `MexicoSatService` + `mxSatPacMock` ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)) |

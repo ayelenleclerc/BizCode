@@ -10,7 +10,7 @@
 | UI `ArcaFiscalSection` | generalizar | sección fiscal según capacidades del proveedor |
 | Job `arca:retry-pending` | generalizar | `FiscalDocumentRetryService` (alias CLI) |
 | PDF/QR/código de barras AR | envolver | `ArcaFiscalDocumentRenderer` |
-| DGI / SII | DGI mock / SII stub | `apps/server/fiscal/uy/` ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)); stub `ChileSiiFiscalAdapter` (sin emisión real) |
+| DGI / SII | DGI + SII mocks | `apps/server/fiscal/uy/` ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)); `apps/server/fiscal/cl/` ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)) |
 | SAT/PAC MX | mock homologación | `apps/server/fiscal/mx/` ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)); PAC live no evidenciado |
 
 Consumidores confirmados: `FacturaService`, rutas ARCA, `PadronA4Service` (sigue siendo específico de AR), módulo `billing.arca_cae`, facturación de Pedido (#391), y facturación desde MeLi/TN/Woo.
@@ -19,8 +19,8 @@ Consumidores confirmados: `FacturaService`, rutas ARCA, `PadronA4Service` (sigue
 
 - **Contrato + registro:** interfaz `FiscalProviderAdapter`, `types.ts` (códigos de proveedor `arca_wsfe` / `uruguay_dgi` / `mexico_sat_pac`), `fiscalProviderRegistry.ts`, `bootstrapFiscalProviders.ts` — refleja `EcommerceConnector` / `connectorRegistry.ts`.
 - **Adapter ARCA:** `ArcaFiscalAdapter` envuelve el `ArcaService` existente — no se crea un segundo cliente WSAA/WSFE. `getCapabilities()` reporta `implemented: true`.
-- **Stubs de capacidades:** `ChileSiiFiscalAdapter` — `getCapabilities()` reporta `implemented: false`; todo método operacional lanza `FiscalAdapterNotImplementedError` (ver [ADR-0018](../adr/ADR-0018-fiscal-multi-organism-e-invoicing.md)).
 - **Mock CFE Uruguay:** `UruguayDgiFiscalAdapter` en `apps/server/fiscal/uy/` — mock de homologación (`implemented: true`); DGI live no evidenciado ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)).
+- **Mock DTE Chile:** `ChileSiiFiscalAdapter` en `apps/server/fiscal/cl/` — mock de homologación (`implemented: true`); SII live no evidenciado ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)).
 - **Mock PAC México:** `MexicoSatFiscalAdapter` en `apps/server/fiscal/mx/` — mock de homologación (`implemented: true`); PAC live no evidenciado ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)).
 - **Prisma:** se agregan los modelos `FiscalProviderConfig` y `FiscalDocument`; se conserva `TenantFiscalConfig` para lectura dual; script de backfill `scripts/migrate-fiscal-provider-config-378.ts` + script de verificación `scripts/verify-fiscal-provider-migration.ts` (`npm run fiscal:migrate-provider-config`, `npm run fiscal:verify-provider-migration`).
 - **Servicios:** `FiscalProviderConfigService` (lectura/escritura dual para `arca_wsfe`), `FiscalDocumentService` (autorización idempotente, una fila `FiscalDocument` por intento), `FiscalDocumentRetryService` (generaliza `ArcaService.retryPending`).
@@ -30,4 +30,4 @@ Consumidores confirmados: `FacturaService`, rutas ARCA, `PadronA4Service` (sigue
 
 ## No evidenciado en el código actual
 
-- Cliente SOAP real de AFIP, cliente real de DGI (Uruguay), cliente comercial SAT/PAC (México), cliente SII (Chile) — mocks de homologación evidenciados: ARCA (`arcaWsfeMock.ts`), CFDI México (`mxSatPacMock.ts`, [ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)), CFE Uruguay (`uyDgiCfeMock.ts`, [ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)).
+- Cliente SOAP real de AFIP, cliente real de DGI (Uruguay), cliente comercial SAT/PAC (México), cliente SII (Chile) — mocks de homologación evidenciados: ARCA (`arcaWsfeMock.ts`), CFDI México (`mxSatPacMock.ts`, [ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)), CFE Uruguay (`uyDgiCfeMock.ts`, [ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)), DTE Chile (`clSiiDteMock.ts`, [ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)).

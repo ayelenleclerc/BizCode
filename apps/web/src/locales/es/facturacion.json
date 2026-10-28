@@ -164,6 +164,10 @@
     "stamp": "Autorizar CFE (mock)",
     "stampLoading": "Autorizando CFE…"
   },
+  "dte": {
+    "stamp": "Autorizar DTE (mock)",
+    "stampLoading": "Autorizando DTE…"
+  },
   "pdfModal": {
     "title": "PDF — {{filename}}",
     "close": "Cerrar",

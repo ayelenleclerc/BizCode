@@ -4476,9 +4476,9 @@ paths:
       tags: [fiscal]
       summary: Static capability declaration for every registered fiscal provider (#378)
       description: |
-        Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe`, `mexico_sat_pac` and
-        `uruguay_dgi` report `implemented: true` as homologación mocks today — `chile_sii` is a
-        capability-only stub. Live DGI SOAP/REST and commercial PAC clients remain Not evidenced.
+        Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe`, `mexico_sat_pac`,
+        `uruguay_dgi` and `chile_sii` report `implemented: true` as homologación mocks today.
+        Live AFIP SOAP, DGI, SII XML/XAdES and commercial PAC clients remain Not evidenced.
       responses:
         '200':
           description: Capability list
@@ -25059,7 +25059,7 @@ components:
           type: string
           enum: [homologacion, produccion]
         rfc: { type: string, minLength: 12, maxLength: 13 }
-        rut: { type: string, minLength: 12, maxLength: 20, description: Uruguayan RUT for uruguay_dgi mock config (#207) }
+        rut: { type: string, minLength: 8, maxLength: 20, description: Tax ID RUT for uruguay_dgi (#207) or chile_sii (#208) mock config; algorithm depends on provider }
         legalName: { type: string, maxLength: 160 }
 
     FiscalDocumentCancelInput:

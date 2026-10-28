@@ -17,7 +17,12 @@
  */
 
 import type { PrismaClient } from '@prisma/client'
-import { DEFAULT_FISCAL_JURISDICTION, resolveJurisdiction, validateRUT } from '@bizcode/types'
+import {
+  DEFAULT_FISCAL_JURISDICTION,
+  resolveJurisdiction,
+  validateRUT,
+  validateRUTCL,
+} from '@bizcode/types'
 import type { ServiceResult } from '../services/serviceResults'
 import { ArcaService, type FiscalConfigInput } from './ar/ArcaService'
 import { decryptFiscalSecret, encryptFiscalSecret } from './ar/fiscalSecrets'
@@ -323,6 +328,59 @@ export class FiscalProviderConfigService {
         tenantId,
         providerCode: 'uruguay_dgi',
         countryCode: 'UY',
+        environment: ambiente,
+        enabled: true,
+        isDefault,
+        taxIdentifier: rut,
+        legalName: input.legalName?.trim() || null,
+        encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
+        configVersion: 1,
+      },
+      update: {
+        environment: ambiente,
+        enabled: true,
+        isDefault,
+        taxIdentifier: rut,
+        legalName: input.legalName?.trim() || null,
+        encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
+        configVersion: (existing?.configVersion ?? 0) + 1,
+      },
+    })
+    return { ok: true, data: { id: row.id } }
+  }
+
+  async upsertChileSiiConfig(
+    tenantId: number,
+    input: { rut: string; ambiente?: FiscalEnvironment; legalName?: string },
+  ): Promise<ServiceResult<{ id: number }>> {
+    const rutRaw = input.rut.trim()
+    if (!validateRUTCL(rutRaw)) {
+      return { ok: false, status: 400, error: 'INVALID_RUT' }
+    }
+    const rut = rutRaw.replace(/[-.\s]/g, '').toUpperCase()
+    const ambiente: FiscalEnvironment = input.ambiente ?? 'homologacion'
+    const bundle = { rut, ambiente, mock: true as const }
+    const existing = await this.prisma.fiscalProviderConfig.findUnique({
+      where: { tenantId_providerCode: { tenantId, providerCode: 'chile_sii' } },
+    })
+    const anyDefault = await this.prisma.fiscalProviderConfig.findFirst({
+      where: { tenantId, isDefault: true },
+    })
+    const isDefault = existing?.isDefault ?? anyDefault == null
+
+    if (isDefault && !existing?.isDefault) {
+      await this.prisma.fiscalProviderConfig.updateMany({
+        where: { tenantId, isDefault: true },
+        data: { isDefault: false },
+      })
+    }
+
+    const row = await this.prisma.fiscalProviderConfig.upsert({
+      where: { tenantId_providerCode: { tenantId, providerCode: 'chile_sii' } },
+      create: {
+        tenantId,
+        providerCode: 'chile_sii',
+        countryCode: 'CL',
         environment: ambiente,
         enabled: true,
         isDefault,
