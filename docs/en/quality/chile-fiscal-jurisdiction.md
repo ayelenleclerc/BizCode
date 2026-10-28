@@ -51,4 +51,4 @@ Module `billing.dte_sii` is `availableForCountries: ['CL']` and `requiredInProdF
 - [tests/lib/fiscal-jurisdictions-chile.test.ts](../../../tests/lib/fiscal-jurisdictions-chile.test.ts) — catalog entry, VAT rates through `calculateInvoice`, tax identifier dispatch and module defaults.
 - [tests/lib/validators/rutCl.test.ts](../../../tests/lib/validators/rutCl.test.ts) — check digit including the `K` and `0` cases, validation and formatting.
 - [tests/server/fiscal/cl/chileSiiFiscalAdapter.test.ts](../../../tests/server/fiscal/cl/chileSiiFiscalAdapter.test.ts) — DTE mock and capabilities.
-- [tests/server/fiscal/fiscalProviderRegistry.test.ts](../../../tests/server/fiscal/fiscalProviderRegistry.test.ts) 
+- [tests/server/fiscal/fiscalProviderRegistry.test.ts](../../../tests/server/fiscal/fiscalProviderRegistry.test.ts) — `chile_sii` is registered by the bootstrap.
