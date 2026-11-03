@@ -24,7 +24,10 @@ BizCode already runs informational `pnpm audit`, CodeQL, Gitleaks, CycloneDX SBO
 - **Positive:** Automated dependency PRs; multi-layer vuln detection (audit + Snyk + image Trivy); ISO evidence for technical vulnerability management.
 - **Negative:** Snyk gate is inactive until `SNYK_TOKEN` is configured; first Snyk runs may fail until HIGH/CRITICAL with fixes are remediated or base images bumped; Dependabot PRs need review bandwidth.
 - **Remediation:** Prefer patch/minor bumps in the same change that introduced the gate; temporary exceptions must be recorded in this ADR with expiry (none at acceptance).
-- **Accepted audit ignore (2026-07-28):** `pnpm.auditConfig.ignoreCves` includes `CVE-2026-14257` (`brace-expansion` / GHSA-mh99-v99m-4gvg). The published vulnerable range `<=5.0.7` also matches already-pinned `1.1.16` / `2.1.3` lines; the tree forces `brace-expansion@5` to `5.0.8`. Revisit when the advisory publishes per-major ranges or when minimatch drops legacy brace-expansion majors. Expiry review: **2026-10-28**.
+- **Accepted audit ignore (2026-07-28):** `pnpm.auditConfig.ignoreCves` includes `CVE-2026-14257` (`brace-expansion` / GHSA-mh99-v99m-4gvg). The published vulnerable range `<=5.0.7` also matches already-pinned `1.1.16` / `2.1.3` lines; the tree forces `brace-expansion@5` to a patched 5.x line. Revisit when the advisory publishes per-major ranges or when minimatch drops legacy brace-expansion majors. Expiry review: **2026-10-28** (extended **2027-02-02** while majors remain pinned via overrides).
+- **Accepted audit ignores (2026-11-02, PR #445 CI remediation):**
+  - `CVE-2026-85393` (`node-forge` via Expo CLI in `apps/driver` / `apps/seller`): advisory reports no fixed release (`patched <0.0.0` for this ID) while sibling Forge advisories are mitigated by override `node-forge@^1.4.1`. Revisit when Expo ships a patched transitive or the advisory gains a fix. Expiry review: **2027-02-02**.
+  - `CVE-2023-54404` / GHSA-mrhx-c7xc-m3w5 (`zod`): fix requires **zod ≥ 4.6.6**; the app remains on **zod 3.x** (breaking major). Transitive `zod@4` (Scalar OpenAPI tooling) is forced to `4.6.6` via override. Zod 4 app migration is out of scope for this remediation. Expiry review: **2027-02-02**.
 
 ## References
 

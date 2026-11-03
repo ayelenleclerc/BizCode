@@ -7,7 +7,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { ChileSiiFiscalAdapter } from '../../../../apps/server/fiscal/cl/ChileSiiFiscalAdapter'
-import { mockClSiiAuthorize } from '../../../../apps/server/fiscal/cl/clSiiDteMock'
+import { ChileSiiService } from '../../../../apps/server/fiscal/cl/ChileSiiService'
+import { mockClSiiAuthenticate, mockClSiiAuthorize } from '../../../../apps/server/fiscal/cl/clSiiDteMock'
 
 const VALID_RUT_CL = '123456785'
 
@@ -20,11 +21,11 @@ function buildPrismaMock() {
       }),
     },
     factura: {
-      findFirst: vi.fn().mockResolvedValue({ id: 9, total: 100 }),
+      findFirst: vi.fn().mockResolvedValue({ id: 9, total: 100, cae: 'DTE3300000009', caeVto: new Date('2027-01-01'), estadoCae: 'issued' }),
       update: vi.fn().mockResolvedValue({}),
     },
     notaCredito: {
-      findFirst: vi.fn().mockResolvedValue({ id: 3 }),
+      findFirst: vi.fn().mockResolvedValue({ id: 3, cae: null, caeVto: null, estadoCae: 'pending' }),
       update: vi.fn().mockResolvedValue({}),
     },
   }
@@ -41,6 +42,55 @@ describe('clSiiDteMock (#208)', () => {
 
   it('rejects invalid document ids', () => {
     expect(() => mockClSiiAuthorize('invoice', 0)).toThrow('MOCK_SII_INVALID_DOCUMENT')
+  })
+
+  it('builds a deterministic mock TA from a formatted RUT', () => {
+    const session = mockClSiiAuthenticate('12.345.678-5')
+    expect(session.token).toBe('MOCK-SII-TOKEN-123456785')
+    expect(session.sign).toBe('MOCK-SII-SIGN')
+    expect(session.expiration.getTime()).toBeGreaterThan(Date.now())
+  })
+})
+
+describe('ChileSiiService (#208)', () => {
+  let prisma: ReturnType<typeof buildPrismaMock>
+  let service: ChileSiiService
+
+  beforeEach(() => {
+    prisma = buildPrismaMock()
+    service = new ChileSiiService(prisma as unknown as PrismaClient)
+  })
+
+  it('getTa returns CHILE_SII_NOT_CONFIGURED when the provider is disabled', async () => {
+    prisma.fiscalProviderConfig.findUnique.mockResolvedValueOnce({ enabled: false, taxIdentifier: VALID_RUT_CL })
+    const result = await service.getTa(1)
+    expect(result).toEqual({ ok: false, status: 422, error: 'CHILE_SII_NOT_CONFIGURED' })
+  })
+
+  it('authorizeInvoice returns 404 when the factura is missing', async () => {
+    prisma.factura.findFirst.mockResolvedValueOnce(null)
+    const result = await service.authorizeInvoice(1, 9)
+    expect(result).toEqual({ ok: false, status: 404, error: 'Factura not found' })
+  })
+
+  it('authorizeCreditNote stamps a nota via the mock', async () => {
+    const result = await service.authorizeCreditNote(1, 3)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.data.dteId).toContain('DTE-61')
+    expect(prisma.notaCredito.update).toHaveBeenCalled()
+  })
+
+  it('authorizeCreditNote returns 404 when the nota is missing', async () => {
+    prisma.notaCredito.findFirst.mockResolvedValueOnce(null)
+    const result = await service.authorizeCreditNote(1, 3)
+    expect(result).toEqual({ ok: false, status: 404, error: 'NotaCredito not found' })
+  })
+
+  it('authorizeInvoice maps mock authorize errors to 422', async () => {
+    prisma.factura.findFirst.mockResolvedValueOnce({ id: 0 })
+    const result = await service.authorizeInvoice(1, 0)
+    expect(result).toEqual({ ok: false, status: 422, error: 'MOCK_SII_INVALID_DOCUMENT' })
   })
 })
 
@@ -68,6 +118,14 @@ describe('ChileSiiFiscalAdapter (#208)', () => {
     expect(result).toEqual({ ok: true, data: { configured: false } })
   })
 
+  it('authenticate returns a mock TA when configured', async () => {
+    const result = await adapter.authenticate(1)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.data.token).toContain('MOCK-SII-TOKEN')
+    expect(result.data.sign).toBe('MOCK-SII-SIGN')
+  })
+
   it('authorizeDocument stamps an invoice via the mock', async () => {
     const result = await adapter.authorizeDocument({
       tenantId: 1,
@@ -80,5 +138,42 @@ describe('ChileSiiFiscalAdapter (#208)', () => {
     expect(result.data.status).toBe('authorized')
     expect(result.data.authorizationCode).toMatch(/^DTE33/)
     expect(prisma.factura.update).toHaveBeenCalled()
+  })
+
+  it('authorizeDocument requires invoiceId for invoices', async () => {
+    const result = await adapter.authorizeDocument({
+      tenantId: 1,
+      documentType: 'invoice',
+      idempotencyKey: 'cl:factura:missing',
+    })
+    expect(result).toEqual({ ok: false, status: 400, error: 'INVOICE_ID_REQUIRED' })
+  })
+
+  it('authorizeDocument stamps a credit note via the mock', async () => {
+    const result = await adapter.authorizeDocument({
+      tenantId: 1,
+      documentType: 'credit_note',
+      notaCreditoId: 3,
+      idempotencyKey: 'cl:nc:3',
+    })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.data.documentNumber).toContain('DTE-61')
+    expect(prisma.notaCredito.update).toHaveBeenCalled()
+  })
+
+  it('getDocumentStatus maps factura and nota estadoCae values', async () => {
+    const invoice = await adapter.getDocumentStatus(1, 'invoice', 9)
+    expect(invoice.ok).toBe(true)
+    if (invoice.ok) expect(invoice.data.status).toBe('authorized')
+
+    const note = await adapter.getDocumentStatus(1, 'credit_note', 3)
+    expect(note.ok).toBe(true)
+    if (note.ok) expect(note.data.status).toBe('pending')
+  })
+
+  it('healthCheck is healthy when authenticate succeeds', async () => {
+    const result = await adapter.healthCheck(1)
+    expect(result).toEqual({ ok: true, data: { healthy: true } })
   })
 })

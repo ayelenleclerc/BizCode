@@ -8,7 +8,12 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Corregido
+
+- **Gates de seguridad CI Quality Gate / Deploy (PR #445):** overrides y bumps de dependencias eliminan CRITICAL de Trivy (`handlebars`, `proxy-addr`, `shell-quote`) y bloqueos de `pnpm audit --audit-level=high`; `ignoreCves` temporales documentados para `node-forge` de Expo sin fix (`CVE-2026-85393`) y `zod@3` de la app (`CVE-2023-54404`) en [ADR-0017](adr/ADR-0017-escaneo-dependencias.md). Cobertura unitaria Chile SII (servicio/UI) ampliada para el suelo de 66% de líneas.
+
 ### Agregado
+
 
 - **DTE SII Chile mock de homologación (#208 residual):** `ChileSiiFiscalAdapter` en `apps/server/fiscal/cl/` (`implemented: true`) con autorización determinista vía `clSiiDteMock`; módulo `billing.dte_sii`; `documentKinds` de producto 33-FacturaAfecta / 61-NotaCredito; UI de config (RUT chileno); [ADR-0026](adr/ADR-0026-chile-sii-dte-mock.md). SII live SOAP/XML XAdES no evidenciado; cancelación no soportada en este mock.
 - **CFE DGI Uruguay mock de homologación (#207 residual):** `UruguayDgiFiscalAdapter` en `apps/server/fiscal/uy/` (`implemented: true`) con autorización determinista vía `uyDgiCfeMock`; módulo `billing.dgi_cfe`; `documentKinds` de producto e-Factura / e-NotaCredito; UI de config (RUT); [ADR-0025](adr/ADR-0025-uruguay-dgi-cfe-mock.md). DGI live SOAP/REST no evidenciado; cancelación no soportada en este mock.

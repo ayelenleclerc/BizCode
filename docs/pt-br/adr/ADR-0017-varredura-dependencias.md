@@ -24,7 +24,10 @@ O BizCode já executa `pnpm audit` informativo, CodeQL, Gitleaks, SBOM CycloneDX
 - **Positivo:** PRs de deps automatizados; detecção multicamada; evidência ISO de vulnerabilidades técnicas.
 - **Negativo:** O gate Snyk fica inativo até configurar `SNYK_TOKEN`; as primeiras execuções do Snyk podem falhar até remediar HIGH/CRITICAL com fix ou atualizar imagens base.
 - **Remediação:** Preferir bumps patch/minor na mesma mudança; exceções temporárias devem constar neste ADR com validade (nenhuma na aceitação).
-- **Ignore de audit aceito (2026-07-28):** `pnpm.auditConfig.ignoreCves` inclui `CVE-2026-14257` (`brace-expansion` / GHSA-mh99-v99m-4gvg). O intervalo publicado `<=5.0.7` também casa com linhas já fixadas `1.1.16` / `2.1.3`; a árvore força `brace-expansion@5` para `5.0.8`. Revisar quando o advisory publicar intervalos por major ou quando o minimatch abandonar majors legacy. Revisão: **2026-10-28**.
+- **Ignore de audit aceito (2026-07-28):** `pnpm.auditConfig.ignoreCves` inclui `CVE-2026-14257` (`brace-expansion` / GHSA-mh99-v99m-4gvg). O intervalo publicado `<=5.0.7` também casa com linhas já fixadas `1.1.16` / `2.1.3`; a árvore força `brace-expansion@5` para uma linha 5.x corrigida. Revisar quando o advisory publicar intervalos por major ou quando o minimatch abandonar majors legacy. Revisão: **2026-10-28** (estendida **2027-02-02** enquanto os majors permanecerem fixados por overrides).
+- **Ignores de audit aceitos (2026-11-02, remediação CI PR #445):**
+  - `CVE-2026-85393` (`node-forge` via Expo CLI em `apps/driver` / `apps/seller`): o advisory não publica correção para este ID (`patched <0.0.0`); advisories irmãos do Forge são mitigados com override `node-forge@^1.4.1`. Revisar quando o Expo publicar o transitivo corrigido ou o advisory ganhar fix. Revisão: **2027-02-02**.
+  - `CVE-2023-54404` / GHSA-mrhx-c7xc-m3w5 (`zod`): a correção exige **zod ≥ 4.6.6**; o app permanece em **zod 3.x** (major breaking). O `zod@4` transitivo (tooling Scalar OpenAPI) é forçado a `4.6.6` via override. A migração do app para Zod 4 fica fora do escopo desta remediação. Revisão: **2027-02-02**.
 
 ## Referências
 

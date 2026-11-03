@@ -8,6 +8,10 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **CI Quality Gate / Deploy security gates (PR #445):** dependency overrides and bumps clear Trivy CRITICAL (`handlebars`, `proxy-addr`, `shell-quote`) and `pnpm audit --audit-level=high` blockers; documented temporary `ignoreCves` for unfixed Expo `node-forge` (`CVE-2026-85393`) and app `zod@3` (`CVE-2023-54404`) in [ADR-0017](adr/ADR-0017-dependency-scanning.md). Chile SII service/UI unit coverage extended for the 66% lines floor.
+
 ### Added
 
 - **Chile SII DTE homologación mock (#208 residual):** `ChileSiiFiscalAdapter` under `apps/server/fiscal/cl/` (`implemented: true`) with deterministic authorize via `clSiiDteMock`; module `billing.dte_sii`; product-model `documentKinds` 33-FacturaAfecta / 61-NotaCredito; config UI (Chilean RUT); [ADR-0026](adr/ADR-0026-chile-sii-dte-mock.md). Live SII SOAP/XML XAdES remains Not evidenced; cancel not supported in this mock.
