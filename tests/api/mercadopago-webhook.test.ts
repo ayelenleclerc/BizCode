@@ -77,6 +77,7 @@ function buildHeaders(dataId: string, secret: string): Record<string, string> {
 
 function buildPrismaMock(): PrismaClient {
   return {
+    $executeRaw: vi.fn().mockResolvedValue(undefined),
     deliveryZone: { findMany: vi.fn().mockResolvedValue([]) },
     tenant: { findUnique: vi.fn().mockResolvedValue({ id: 1, slug: 'demo', active: true }) },
     auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
@@ -99,7 +100,12 @@ function buildPrismaMock(): PrismaClient {
     },
     mercadoPagoProcessedPayment: {
       findUnique: vi.fn().mockResolvedValue(null),
-      create: vi.fn().mockResolvedValue({ id: 1 }),
+      create: vi.fn().mockResolvedValue({ id: 1, estado: 'processing' }),
+      update: vi.fn().mockResolvedValue({ id: 1, estado: 'approved' }),
+      delete: vi.fn().mockResolvedValue({}),
+    },
+    reciboCobroForma: {
+      findFirst: vi.fn().mockResolvedValue(null),
     },
     paymentTransaction: {
       findUnique: vi.fn().mockResolvedValue(null),

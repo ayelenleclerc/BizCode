@@ -2020,7 +2020,7 @@ model MercadoPagoProcessedPayment {
   mpPaymentId   String       @db.VarChar(60)
   facturaId     Int?
   factura       Factura?     @relation(fields: [facturaId], references: [id])
-  /// approved | rejected | cancelled | pending
+  /// processing (in-flight claim #446) | approved | rejected | cancelled | pending
   estado        String       @db.VarChar(20)
   reciboCobroId Int?
   reciboCobro   ReciboCobro? @relation(fields: [reciboCobroId], references: [id])

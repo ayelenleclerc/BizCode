@@ -7,7 +7,6 @@ import {
   MercadoPagoApiError,
   type MercadoPagoPaymentResult,
 } from '../integrations/mercadopago/mercadoPagoApiClient'
-import { computeFacturaPendiente } from '../lib/mercadopagoFacturaPendiente'
 import { parseMercadoPagoExternalReference } from '../lib/mercadopagoExternalReference'
 import { verifyMercadoPagoWebhookSignature } from '../lib/mercadopagoSignature'
 import { sanitizeLogField } from '../lib/sanitizeLogField'
@@ -15,6 +14,11 @@ import { resolveSystemUserId } from '../lib/systemUserId'
 import { notifyManagers } from '../notifications'
 import { ReciboCobroService } from './ReciboCobroService'
 import { MercadoPagoChargebackService } from './MercadoPagoChargebackService'
+import {
+  applyApprovedMercadoPagoPaymentOnce,
+  isProcessedPaymentComplete,
+  upsertNonApprovedProcessedPayment,
+} from './mercadoPagoPaymentIdempotency'
 
 export type MercadoPagoWebhookPayload = {
   action?: string
@@ -122,7 +126,8 @@ export class MercadoPagoWebhookService {
     const existing = await this.prisma.mercadoPagoProcessedPayment.findUnique({
       where: { tenantId_mpPaymentId: { tenantId, mpPaymentId: paymentId } },
     })
-    if (existing) {
+    // Incomplete `processing` claims must resume (#446); only skip finished rows.
+    if (existing && isProcessedPaymentComplete(existing)) {
       return
     }
 
@@ -248,76 +253,21 @@ export class MercadoPagoWebhookService {
     let reciboCobroId: number | null = null
 
     if (mapped === 'approved') {
-      const pendiente = await computeFacturaPendiente(this.prisma, {
+      const applied = await applyApprovedMercadoPagoPaymentOnce(this.prisma, this.reciboCobro, {
         tenantId,
-        clienteId: factura.clienteId,
-        facturaId: factura.id,
-        total: factura.total,
+        mpPaymentId: paymentId,
+        factura,
+        transactionAmount,
+        usuarioId,
+        notifyOnApply: true,
       })
-      if (pendiente.lessThanOrEqualTo(0)) {
-        await this.prisma.mercadoPagoProcessedPayment.create({
-          data: {
-            tenantId,
-            mpPaymentId: paymentId,
-            facturaId: factura.id,
-            estado: mapped,
-            reciboCobroId: null,
-          },
-        })
-        await this.prisma.factura.update({
-          where: { id: factura.id },
-          data: { mpEstado: 'approved', mpPagadoAt: new Date() },
-        })
+      if (!applied.ok) {
         return
       }
-
-      const importe = Math.min(transactionAmount, pendiente.toNumber())
-      if (importe <= 0) {
+      reciboCobroId = applied.reciboCobroId
+      if (applied.skipped) {
         return
       }
-
-      const today = new Date().toISOString().slice(0, 10)
-      const reciboResult = await this.reciboCobro.create(tenantId, factura.clienteId, usuarioId, {
-        fecha: today,
-        totalCobrado: importe,
-        concepto: `Pago Mercado Pago #${paymentId}`,
-        formas: [{ tipo: 'mercadopago', importe, referencia: paymentId }],
-        imputaciones: [{ facturaId: factura.id, importe }],
-        fifo: false,
-      })
-
-      if (!reciboResult.ok) {
-        console.warn(
-          '[mercadopago-webhook] recibo_error',
-          'tenant',
-          tenantId,
-          'payment',
-          sanitizeLogField(paymentId),
-          'error',
-          reciboResult.error,
-        )
-        return
-      }
-
-      reciboCobroId = reciboResult.data.id
-
-      await this.prisma.factura.update({
-        where: { id: factura.id },
-        data: { mpEstado: 'approved', mpPagadoAt: new Date() },
-      })
-
-      const cliente = await this.prisma.cliente.findFirst({
-        where: { id: factura.clienteId, tenantId },
-        select: { rsocial: true },
-      })
-
-      await notifyManagers(this.prisma, tenantId, 'mercadopago_payment_received', {
-        clienteId: factura.clienteId,
-        facturaId: factura.id,
-        facturaRef,
-        rsocial: cliente?.rsocial,
-        amount: importe.toFixed(2),
-      })
     } else if (mapped === 'rejected' || mapped === 'cancelled') {
       await this.prisma.factura.update({
         where: { id: factura.id },
@@ -336,26 +286,24 @@ export class MercadoPagoWebhookService {
         rsocial: cliente?.rsocial,
         amount: transactionAmount > 0 ? transactionAmount.toFixed(2) : undefined,
       })
+
+      await upsertNonApprovedProcessedPayment(this.prisma, {
+        tenantId,
+        mpPaymentId: paymentId,
+        facturaId: factura.id,
+        estado: mapped,
+      })
     } else {
       await this.prisma.factura.update({
         where: { id: factura.id },
         data: { mpEstado: 'pending' },
       })
-    }
-
-    try {
-      await this.prisma.mercadoPagoProcessedPayment.create({
-        data: {
-          tenantId,
-          mpPaymentId: paymentId,
-          facturaId: factura.id,
-          estado: mapped,
-          reciboCobroId,
-        },
+      await upsertNonApprovedProcessedPayment(this.prisma, {
+        tenantId,
+        mpPaymentId: paymentId,
+        facturaId: factura.id,
+        estado: 'pending',
       })
-    } catch {
-      // Unique constraint race — idempotent no-op.
-      return
     }
 
     await writeAuditEvent({
