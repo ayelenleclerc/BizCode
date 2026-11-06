@@ -126,10 +126,13 @@ describe('FiscalProviderConfigService', () => {
   })
 
   it('upsertArcaConfig dual-writes TenantFiscalConfig and FiscalProviderConfig with an encrypted bundle', async () => {
+    // Longer secrets: short literals like "CERT"/"KEY" appear often in random base64 and flake CI.
+    const certificate = 'CERT-MATERIAL-FOR-TEST-ONLY'
+    const privateKey = 'KEY-MATERIAL-FOR-TEST-ONLY'
     const result = await service.upsertArcaConfig(1, {
       cuit: '20123456789',
-      certificate: 'CERT',
-      privateKey: 'KEY',
+      certificate,
+      privateKey,
       ambiente: 'homologacion',
     })
 
@@ -143,9 +146,15 @@ describe('FiscalProviderConfigService', () => {
     const call = vi.mocked(prisma.fiscalProviderConfig.upsert).mock.calls[0]?.[0] as {
       create: { encryptedConfig: string }
     }
-    expect(call.create.encryptedConfig).not.toMatch(/CERT|KEY/)
+    expect(call.create.encryptedConfig).not.toContain(certificate)
+    expect(call.create.encryptedConfig).not.toContain(privateKey)
     const decrypted = FiscalProviderConfigService.decryptArcaBundle(call.create.encryptedConfig)
-    expect(decrypted).toEqual({ cuit: '20123456789', certificate: 'CERT', privateKey: 'KEY', ambiente: 'homologacion' })
+    expect(decrypted).toEqual({
+      cuit: '20123456789',
+      certificate,
+      privateKey,
+      ambiente: 'homologacion',
+    })
   })
 
   it('resolveDefaultProvider prefers an explicit isDefault FiscalProviderConfig row', async () => {

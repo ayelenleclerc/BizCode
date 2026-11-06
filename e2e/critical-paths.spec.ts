@@ -191,8 +191,10 @@ test.describe('Critical Paths — Core Business Workflows', () => {
   test('Keyboard shortcuts (F3=New, F5=Save, Esc=Cancel)', async ({ page }) => {
     await page.goto('/clientes', { waitUntil: 'load' })
     // Wait for SPA hydration before sending hotkeys (CI preview can lag past 300ms).
-    await expect(page.getByTestId('btn-nuevo-cliente')).toBeVisible({ timeout: 15_000 })
-    await page.getByTestId('search-clientes').click()
+    const newBtn = page.getByTestId('btn-nuevo-cliente')
+    await expect(newBtn).toBeVisible({ timeout: 15_000 })
+    // react-hotkeys-hook ignores F3 while focus is on INPUT/TEXTAREA/SELECT — focus a button instead.
+    await newBtn.focus()
 
     await page.keyboard.press('F3')
     await expect(page.getByTestId('cliente-form-dialog')).toBeVisible({ timeout: 10_000 })
