@@ -9832,12 +9832,13 @@ paths:
   /api/webhooks/mercadopago:
     post:
       tags: [mercadopago]
-      summary: Mercado Pago payment webhook (#176)
+      summary: Mercado Pago payment webhook (#176/#447)
       description: |
         Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSecret` from Mercado Pago configuration (#174).
-        Responds `200` immediately and processes the payment asynchronously: on `approved`, creates a customer receipt (`ReciboCobro`) with `mercadopago` payment method and invoice allocation; updates `Factura.mpEstado`.
+        Persists a durable inbox row (`MercadoPagoWebhookInbox`) **before** responding `200` (#447). On persistence failure returns `503` so Mercado Pago can retry.
+        Processing is asynchronous (best-effort in-process + `pnpm run mercadopago:webhook-inbox` worker): on `approved`, creates a customer receipt (`ReciboCobro`) with `mercadopago` payment method and invoice allocation; updates `Factura.mpEstado`.
         Chargeback notifications (`type: chargebacks`) enqueue `MercadoPagoChargeback` and notify managers; no automatic credit note (#179).
-        Idempotent per `mpPaymentId` (`MercadoPagoProcessedPayment`) for payment events. Rate-limited per IP.
+        Accounting effects are idempotent per `tenantId + mpPaymentId` (`MercadoPagoProcessedPayment`, #446). Rate-limited per IP.
       security: []
       parameters:
         - name: data.id
@@ -9870,13 +9871,19 @@ paths:
               $ref: '#/components/schemas/MercadoPagoWebhookBody'
       responses:
         '200':
-          description: Notification accepted (processing may continue asynchronously)
+          description: Notification durably accepted in inbox (processing may continue asynchronously)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MercadoPagoWebhookAckEnvelope'
         '400':
           description: Invalid signature or payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '503':
+          description: Inbox persistence failed — client should retry
           content:
             application/json:
               schema:
