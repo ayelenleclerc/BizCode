@@ -10,7 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- **CI Quality Gate / Deploy security gates (PR #445):** dependency overrides and bumps clear Trivy CRITICAL (`handlebars`, `proxy-addr`, `shell-quote`) and `pnpm audit --audit-level=high` blockers; documented temporary `ignoreCves` for unfixed Expo `node-forge` (`CVE-2026-85393`) and app `zod@3` (`CVE-2023-54404`) in [ADR-0017](adr/ADR-0017-dependency-scanning.md). Chile SII service/UI unit coverage extended for the 66% lines floor.
+- **CI Quality Gate / Deploy security gates (PR #445):** dependency overrides and bumps clear Trivy CRITICAL (`handlebars`, `proxy-addr`, `shell-quote`) and `pnpm audit --audit-level=high` blockers; documented temporary `ignoreCves` for unfixed Expo `node-forge` (`CVE-2026-85393`) and app `zod@3` (`CVE-2023-54404`) in [ADR-0017](adr/ADR-0017-dependency-scanning.md). Chile SII service/UI unit coverage extended for the 66% lines floor. Restored `docs:openapi-md` by dropping mismatched `@vue/*` overrides (Vue is only a Scalar docs transitive) and aligning the lockfile Vue tree.
 
 ### Added
 

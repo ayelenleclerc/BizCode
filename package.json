@@ -251,7 +251,6 @@
       "compression": "^1.8.2",
       "markdown-it": "^14.3.2",
       "follow-redirects": "^1.16.1",
-      "@vue/server-renderer": "^3.5.42",
       "vite": "^6.4.4",
       "node-forge": "^1.4.1",
       "decode-uri-component": "^0.5.1",
@@ -266,6 +265,9 @@
         "CVE-2025-71330",
         "CVE-2026-85393",
         "CVE-2023-54404"
+      ],
+      "ignoreGhsas": [
+        "GHSA-g2v6-rqmx-r4w6"
       ]
     }
   }

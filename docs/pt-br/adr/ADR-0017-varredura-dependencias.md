@@ -28,6 +28,7 @@ O BizCode já executa `pnpm audit` informativo, CodeQL, Gitleaks, SBOM CycloneDX
 - **Ignores de audit aceitos (2026-11-02, remediação CI PR #445):**
   - `CVE-2026-85393` (`node-forge` via Expo CLI em `apps/driver` / `apps/seller`): o advisory não publica correção para este ID (`patched <0.0.0`); advisories irmãos do Forge são mitigados com override `node-forge@^1.4.1`. Revisar quando o Expo publicar o transitivo corrigido ou o advisory ganhar fix. Revisão: **2027-02-02**.
   - `CVE-2023-54404` / GHSA-mrhx-c7xc-m3w5 (`zod`): a correção exige **zod ≥ 4.6.6**; o app permanece em **zod 3.x** (major breaking). O `zod@4` transitivo (tooling Scalar OpenAPI) é forçado a `4.6.6` via override. A migração do app para Zod 4 fica fora do escopo desta remediação. Revisão: **2027-02-02**.
+  - `GHSA-g2v6-rqmx-r4w6` (`@vue/server-renderer` apenas via `@scalar/openapi-to-markdown`): Vue **não** é dependência de UI do produto (BizCode web é React). Forçar overrides `@vue/*` quebrou `docs:openapi-md` (várias cópias de `@vue/runtime-core` → `Cannot define property div`). Aceito como risco de tooling de docs em build sobre OpenAPI confiável até o Scalar publicar uma árvore Vue alinhada. Revisão: **2027-02-02**.
 
 ## Referências
 
