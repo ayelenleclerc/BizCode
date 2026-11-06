@@ -1,13 +1,13 @@
 /**
- * @en Multi-organism fiscal e-invoicing API tests (#378/#210/#207): provider config,
- *   capabilities, validation, and document authorization. `arca_wsfe`, `mexico_sat_pac` and
- *   `uruguay_dgi` are evidenced as homologación mocks; `chile_sii` remains capability-only.
- * @es Tests API de facturación electrónica multi-organismo (#378/#210/#207): config,
- *   capacidades, validación y autorización. `arca_wsfe`, `mexico_sat_pac` y `uruguay_dgi` están
- *   evidenciados como mocks de homologación; `chile_sii` solo capacidades.
- * @pt-BR Testes da API fiscal multi-organismo (#378/#210/#207): config, capacidades,
- *   validação e autorização. `arca_wsfe`, `mexico_sat_pac` e `uruguay_dgi` são mocks de homologação;
- *   `chile_sii` apenas capacidades.
+ * @en Multi-organism fiscal e-invoicing API tests (#378/#210/#207/#208): provider config,
+ *   capabilities, validation, and document authorization. Homologación mocks: `arca_wsfe`,
+ *   `mexico_sat_pac`, `uruguay_dgi`, `chile_sii`. Live AFIP/DGI/SII/PAC remain Not evidenced.
+ * @es Tests API de facturación electrónica multi-organismo (#378/#210/#207/#208): config,
+ *   capacidades, validación y autorización. Mocks de homologación: `arca_wsfe`, `mexico_sat_pac`,
+ *   `uruguay_dgi`, `chile_sii`. AFIP/DGI/SII/PAC live siguen sin evidenciarse.
+ * @pt-BR Testes da API fiscal multi-organismo (#378/#210/#207/#208): config, capacidades,
+ *   validação e autorização. Mocks de homologação: `arca_wsfe`, `mexico_sat_pac`, `uruguay_dgi`,
+ *   `chile_sii`. AFIP/DGI/SII/PAC live permanecem não evidenciados.
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -74,7 +74,7 @@ describe('Fiscal multi-organism API (#378)', () => {
     process.env.BIZCODE_TEST_ROLE = 'owner'
   })
 
-  it('GET /api/fiscal/providers/capabilities lists arca_wsfe, mexico_sat_pac and uruguay_dgi as implemented mocks', async () => {
+  it('GET /api/fiscal/providers/capabilities lists all four providers as implemented mocks', async () => {
     const app = createApp(buildPrismaMock())
     const res = await request(app).get('/api/fiscal/providers/capabilities').expect(200)
 
@@ -85,7 +85,7 @@ describe('Fiscal multi-organism API (#378)', () => {
     expect(byProvider.get('arca_wsfe')?.implemented).toBe(true)
     expect(byProvider.get('uruguay_dgi')?.implemented).toBe(true)
     expect(byProvider.get('mexico_sat_pac')?.implemented).toBe(true)
-    expect(byProvider.get('chile_sii')?.implemented).toBe(false)
+    expect(byProvider.get('chile_sii')?.implemented).toBe(true)
     await assertMatchesOpenApi('/api/fiscal/providers/capabilities', 'get', '200', res.body)
   })
 
@@ -119,15 +119,25 @@ describe('Fiscal multi-organism API (#378)', () => {
     expect(JSON.stringify(res.body)).not.toMatch(/BEGIN CERTIFICATE/)
   })
 
-  it('PUT /api/fiscal/providers/config rejects unimplemented providers with 501', async () => {
+  it('PUT /api/fiscal/providers/config requires RUT for chile_sii', async () => {
     const app = createApp(buildPrismaMock())
     const res = await request(app)
       .put('/api/fiscal/providers/config')
       .send({ provider: 'chile_sii' })
-      .expect(501)
+      .expect(400)
 
     expect(res.body.success).toBe(false)
-    expect(res.body.error).toBe('FISCAL_PROVIDER_NOT_IMPLEMENTED')
+    expect(res.body.error).toBe('RUT_REQUIRED')
+  })
+
+  it('PUT /api/fiscal/providers/config upserts chile_sii mock RUT', async () => {
+    const app = createApp(buildPrismaMock())
+    const res = await request(app)
+      .put('/api/fiscal/providers/config')
+      .send({ provider: 'chile_sii', rut: '12.345.678-5', ambiente: 'homologacion' })
+      .expect(200)
+
+    expect(res.body.data.configured).toBe(true)
   })
 
   it('POST /api/fiscal/providers/validate reports arca_wsfe as configured', async () => {

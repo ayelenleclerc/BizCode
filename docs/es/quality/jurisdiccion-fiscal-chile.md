@@ -14,11 +14,11 @@ Chile se agrega de forma declarativa: no se introdujo ningún condicional en el 
 | Validador de RUT chileno | [apps/web/src/lib/validators/rutCl.ts](../../../apps/web/src/lib/validators/rutCl.ts) |
 | Selección de identificador fiscal por país | `TAX_ID_ALGORITHMS` en [apps/web/src/lib/validators.ts](../../../apps/web/src/lib/validators.ts) |
 | Proveedor `chile_sii` | [apps/server/fiscal/types.ts](../../../apps/server/fiscal/types.ts), [bootstrapFiscalProviders.ts](../../../apps/server/fiscal/bootstrapFiscalProviders.ts), [fiscalProviderRegistry.ts](../../../apps/server/fiscal/fiscalProviderRegistry.ts) |
-| Adaptador solo de capacidades | [apps/server/fiscal/stubs/ChileSiiFiscalAdapter.ts](../../../apps/server/fiscal/stubs/ChileSiiFiscalAdapter.ts) |
+| Adapter mock de homologación | [apps/server/fiscal/cl/ChileSiiFiscalAdapter.ts](../../../apps/server/fiscal/cl/ChileSiiFiscalAdapter.ts) ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)) |
 
 ### Fuera de alcance (residual)
 
-- Emitir un DTE ante el SII chileno. Requiere certificado digital y homologación con el organismo, igual que la e-factura DGI en #207. `ChileSiiFiscalAdapter` declara `implemented: false` y toda llamada operativa lanza `FiscalAdapterNotImplementedError`.
+- SII SOAP/XML XAdES live y certificados digitales — **no evidenciado**. El mock DTE de homologación está en `apps/server/fiscal/cl/` ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)); módulo `billing.dte_sii`.
 
 ## Entrada del catálogo
 
@@ -40,15 +40,15 @@ La especificación del SII no forma parte de este repositorio: la regla implemen
 
 ## Módulos
 
-Ningún módulo se marcó con `availableForCountries: ['CL']`. Los cuatro módulos legales argentinos (`billing.arca_cae`, `fiscal.remito`, `fiscal.cheques`, `finance.retenciones`) ya están restringidos a `AR` por #437, así que un tenant chileno se aprovisiona sin ellos y el catálogo de módulos no los ofrece. No hizo falta cambiar nada más.
+El módulo `billing.dte_sii` está disponible y es requerido en prod para `CL` (#208 residual). Los módulos legales argentinos siguen restringidos a `AR` por #437.
 
 ## Adaptador fiscal
 
-`resolveDefaultProvider` ya selecciona por jurisdicción del tenant, así que un tenant chileno resuelve a `chile_sii` cuando existe una fila de configuración. Como el adaptador es un stub, autorizar un documento falla de forma explícita en vez de fabricar un folio.
+`resolveDefaultProvider` selecciona `chile_sii` para tenants chilenos. El mock de homologación en `apps/server/fiscal/cl/` reporta `implemented: true` y escribe códigos sintéticos en los campos CAE existentes ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)). SII live sigue sin evidenciarse.
 
 ## Pruebas
 
 - [tests/lib/fiscal-jurisdictions-chile.test.ts](../../../tests/lib/fiscal-jurisdictions-chile.test.ts) — entrada del catálogo, alícuotas vía `calculateInvoice`, identificador fiscal y módulos por defecto.
 - [tests/lib/validators/rutCl.test.ts](../../../tests/lib/validators/rutCl.test.ts) — verificador incluyendo los casos `K` y `0`, validación y formato.
-- [tests/server/fiscal/stubs/fiscalStubs.test.ts](../../../tests/server/fiscal/stubs/fiscalStubs.test.ts) — el adaptador rechaza toda llamada operativa.
+- [tests/server/fiscal/cl/chileSiiFiscalAdapter.test.ts](../../../tests/server/fiscal/cl/chileSiiFiscalAdapter.test.ts) — mock DTE y capacidades.
 - [tests/server/fiscal/fiscalProviderRegistry.test.ts](../../../tests/server/fiscal/fiscalProviderRegistry.test.ts) — `chile_sii` queda registrado en el bootstrap.

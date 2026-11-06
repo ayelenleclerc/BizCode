@@ -24,7 +24,11 @@ BizCode ya ejecuta `pnpm audit` informativo, CodeQL, Gitleaks, SBOM CycloneDX y 
 - **Positivo:** PRs de deps automatizados; detección multicapa; evidencia ISO de vulnerabilidades técnicas.
 - **Negativo:** El gate Snyk permanece inactivo hasta configurar `SNYK_TOKEN`; las primeras corridas de Snyk pueden fallar hasta remediar HIGH/CRITICAL con fix o subir imágenes base.
 - **Remediación:** Preferir bumps patch/minor en el mismo cambio; excepciones temporales deben registrarse en este ADR con vencimiento (ninguna al aceptar).
-- **Ignore de audit aceptado (2026-07-28):** `pnpm.auditConfig.ignoreCves` incluye `CVE-2026-14257` (`brace-expansion` / GHSA-mh99-v99m-4gvg). El rango publicado `<=5.0.7` también coincide con líneas ya fijadas `1.1.16` / `2.1.3`; el árbol fuerza `brace-expansion@5` a `5.0.8`. Revisar cuando el advisory publique rangos por major o cuando minimatch deje majors legacy. Revisión: **2026-10-28**.
+- **Ignore de audit aceptado (2026-07-28):** `pnpm.auditConfig.ignoreCves` incluye `CVE-2026-14257` (`brace-expansion` / GHSA-mh99-v99m-4gvg). El rango publicado `<=5.0.7` también coincide con líneas ya fijadas `1.1.16` / `2.1.3`; el árbol fuerza `brace-expansion@5` a una línea 5.x parcheada. Revisar cuando el advisory publique rangos por major o cuando minimatch deje majors legacy. Revisión: **2026-10-28** (extendida **2027-02-02** mientras los majors sigan fijados por overrides).
+- **Ignores de audit aceptados (2026-11-02, remediación CI PR #445):**
+  - `CVE-2026-85393` (`node-forge` vía Expo CLI en `apps/driver` / `apps/seller`): el advisory no publica fix para este ID (`patched <0.0.0`); advisories hermanos de Forge se mitigan con override `node-forge@^1.4.1`. Revisar cuando Expo publique el transitivo parcheado o el advisory gane fix. Revisión: **2027-02-02**.
+  - `CVE-2023-54404` / GHSA-mrhx-c7xc-m3w5 (`zod`): el fix exige **zod ≥ 4.6.6**; la app sigue en **zod 3.x** (major breaking). El `zod@4` transitivo (tooling Scalar OpenAPI) se fuerza a `4.6.6` vía override. La migración de la app a Zod 4 queda fuera de alcance de esta remediación. Revisión: **2027-02-02**.
+  - `GHSA-g2v6-rqmx-r4w6` (`@vue/server-renderer` solo vía `@scalar/openapi-to-markdown`): Vue **no** es dependencia de UI del producto (BizCode web es React). Forzar overrides `@vue/*` rompió `docs:openapi-md` (varias copias de `@vue/runtime-core` → `Cannot define property div`). Aceptado como riesgo de tooling de docs en build sobre OpenAPI confiable hasta que Scalar publique un árbol Vue alineado. Revisión: **2027-02-02**.
 
 ## Referencias
 

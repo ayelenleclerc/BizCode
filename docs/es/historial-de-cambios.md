@@ -8,8 +8,14 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Corregido
+
+- **Gates de seguridad CI Quality Gate / Deploy (PR #445):** overrides y bumps de dependencias eliminan CRITICAL de Trivy (`handlebars`, `proxy-addr`, `shell-quote`) y bloqueos de `pnpm audit --audit-level=high`; `ignoreCves` temporales documentados para `node-forge` de Expo sin fix (`CVE-2026-85393`) y `zod@3` de la app (`CVE-2023-54404`) en [ADR-0017](adr/ADR-0017-escaneo-dependencias.md). Cobertura unitaria Chile SII (servicio/UI) ampliada para el suelo de 66% de líneas. Se restauró `docs:openapi-md` quitando overrides `@vue/*` incompatibles (Vue solo es transitivo de Scalar/docs) y realineando el árbol Vue del lockfile.
+
 ### Agregado
 
+
+- **DTE SII Chile mock de homologación (#208 residual):** `ChileSiiFiscalAdapter` en `apps/server/fiscal/cl/` (`implemented: true`) con autorización determinista vía `clSiiDteMock`; módulo `billing.dte_sii`; `documentKinds` de producto 33-FacturaAfecta / 61-NotaCredito; UI de config (RUT chileno); [ADR-0026](adr/ADR-0026-chile-sii-dte-mock.md). SII live SOAP/XML XAdES no evidenciado; cancelación no soportada en este mock.
 - **CFE DGI Uruguay mock de homologación (#207 residual):** `UruguayDgiFiscalAdapter` en `apps/server/fiscal/uy/` (`implemented: true`) con autorización determinista vía `uyDgiCfeMock`; módulo `billing.dgi_cfe`; `documentKinds` de producto e-Factura / e-NotaCredito; UI de config (RUT); [ADR-0025](adr/ADR-0025-uruguay-dgi-cfe-mock.md). DGI live SOAP/REST no evidenciado; cancelación no soportada en este mock.
 - **CFDI 4.0 México mock PAC de homologación (#210 residual):** `MexicoSatFiscalAdapter` en `apps/server/fiscal/mx/` (`implemented: true`) con timbrado/cancelación deterministas vía `mxSatPacMock`; motivos SAT 01–04; Prisma `SatCatalogEntry` + seed curado (`pnpm run sat:catalog-seed`) y `GET /api/fiscal/sat/catalog`; `Articulo.claveProdServ`; módulo `billing.cfdi_sat`; UI de motivos y búsqueda ClaveProdServ; [ADR-0024](adr/ADR-0024-mexico-sat-cfdi-mock-pac.md). Facturama/Finkok live sigue sin evidenciarse.
 - **Vertical exportación MVP multi-moneda (#206):** módulo `vertical.export` (depende de `catalog.multicurrency`); Prisma `Factura.monedaOperacion` / `totalMonedaOperacion` / `incoterm` / `paisDestino`, `Pedido.incoterm` / `paisDestino` / `despachanteNombre` / `despachanteEmail`, `MovimientoClienteCC.moneda`; REST `GET /api/exportacion/incoterms` y `POST /api/pedidos/{id}/notificar-despachante`; saldo y antigüedad de cuenta corriente por moneda más `porMoneda[]` en `GET /api/reportes/ventas`; moneda, cotización, Incoterm y destino en el formulario de factura; guía [exportacion-multimoneda-incoterms.md](quality/exportacion-multimoneda-incoterms.md). Solo registro local: sin comprobante AFIP tipo E (`MonId` / `MonCotiz`), sin WSFE real, sin liquidación MULC y sin afirmar conformidad cambiaria.

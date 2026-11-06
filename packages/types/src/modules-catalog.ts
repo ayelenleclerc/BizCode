@@ -73,6 +73,21 @@ export const MODULE_CATALOG = {
     plan: 'starter',
     price: 0,
   },
+  /**
+   * @en Chile SII DTE stamping (homologación mock in #208; live SII later).
+   * @es Emisión DTE SII Chile (mock de homologación en #208; SII live después).
+   * @pt-BR Emissão DTE SII Chile (mock de homologação em #208; SII live depois).
+   */
+  'billing.dte_sii': {
+    label: 'SII DTE (Chile)',
+    required: false,
+    requiredInProd: false,
+    requiredInProdForCountries: ['CL'],
+    availableForCountries: ['CL'],
+    dependencies: ['core.invoicing'],
+    plan: 'starter',
+    price: 0,
+  },
   'billing.credit_notes': {
     label: 'Notas de credito',
     required: false,
@@ -512,6 +527,7 @@ export const DEFAULT_MODULES = [
   'billing.arca_cae',
   'billing.cfdi_sat',
   'billing.dgi_cfe',
+  'billing.dte_sii',
   'billing.credit_notes',
   'finance.collections',
   'finance.receipts',

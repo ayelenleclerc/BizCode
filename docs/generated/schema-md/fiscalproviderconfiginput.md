@@ -185,7 +185,7 @@ undefined
 
 ## rut
 
-Uruguayan RUT for uruguay\_dgi mock config (#207)
+Tax ID RUT for uruguay\_dgi (#207) or chile\_sii (#208) mock config; algorithm depends on provider
 
 `rut`
 
@@ -205,4 +205,4 @@ Uruguayan RUT for uruguay\_dgi mock config (#207)
 
 **maximum length**: the maximum number of characters for this string is: `20`
 
-**minimum length**: the minimum number of characters for this string is: `12`
+**minimum length**: the minimum number of characters for this string is: `8`

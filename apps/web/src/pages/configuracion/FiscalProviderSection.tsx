@@ -6,20 +6,24 @@ import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
 import ArcaFiscalSection from './ArcaFiscalSection'
 import MexicoSatFiscalSection from './MexicoSatFiscalSection'
 import UruguayDgiFiscalSection from './UruguayDgiFiscalSection'
+import ChileSiiFiscalSection from './ChileSiiFiscalSection'
 
 /**
- * @en Multi-organism fiscal e-invoicing section (#378, #210, #207). Lists providers and mounts
- *   ARCA / Mexico SAT / Uruguay DGI credential forms when the matching module is enabled.
- * @es Sección de facturación electrónica multi-organismo (#378, #210, #207). Lista proveedores y
- *   monta formularios ARCA / SAT México / DGI Uruguay cuando el módulo correspondiente está habilitado.
- * @pt-BR Seção de nota fiscal eletrônica multi-organismo (#378, #210, #207). Lista provedores e
- *   monta formulários ARCA / SAT México / DGI Uruguai quando o módulo correspondente está habilitado.
+ * @en Multi-organism fiscal e-invoicing section (#378, #210, #207, #208). Lists providers and mounts
+ *   ARCA / Mexico SAT / Uruguay DGI / Chile SII credential forms when the matching module is enabled.
+ * @es Sección de facturación electrónica multi-organismo (#378, #210, #207, #208). Lista proveedores y
+ *   monta formularios ARCA / SAT México / DGI Uruguay / SII Chile cuando el módulo correspondiente está habilitado.
+ * @pt-BR Seção de nota fiscal eletrônica multi-organismo (#378, #210, #207, #208). Lista provedores e
+ *   monta formulários ARCA / SAT México / DGI Uruguai / SII Chile quando o módulo correspondente está habilitado.
  */
 export default function FiscalProviderSection() {
   const { t } = useTranslation('empresa')
   const { hasModule } = useFeatureFlags()
   const showSection =
-    hasModule('billing.arca_cae') || hasModule('billing.cfdi_sat') || hasModule('billing.dgi_cfe')
+    hasModule('billing.arca_cae') ||
+    hasModule('billing.cfdi_sat') ||
+    hasModule('billing.dgi_cfe') ||
+    hasModule('billing.dte_sii')
   const [loading, setLoading] = useState(true)
   const [providers, setProviders] = useState<FiscalProviderStatusEntry[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -118,6 +122,7 @@ export default function FiscalProviderSection() {
       </IfModule>
       <MexicoSatFiscalSection />
       <UruguayDgiFiscalSection />
+      <ChileSiiFiscalSection />
     </>
   )
 }

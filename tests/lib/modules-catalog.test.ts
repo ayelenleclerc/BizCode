@@ -58,6 +58,14 @@ describe('module catalog', () => {
     expect(result.errors).toEqual([])
   })
 
+  it('validates Chilean defaults including billing.dte_sii in prod', () => {
+    const clDefaults = getDefaultModulesForJurisdiction('CL')
+    expect(clDefaults).toContain('billing.dte_sii')
+    const result = validateModuleSet([...clDefaults], 'prod', 'CL')
+    expect(result.valid).toBe(true)
+    expect(result.errors).toEqual([])
+  })
+
   it('flags missing required modules in prod', () => {
     const withoutCore = DEFAULT_MODULES.filter((k) => k !== 'core.auth')
     const result = validateModuleSet(withoutCore, 'prod')

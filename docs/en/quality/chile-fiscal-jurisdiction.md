@@ -14,11 +14,11 @@ Chile is added declaratively: no conditional was introduced in the invoicing, mo
 | Chilean RUT validator | [apps/web/src/lib/validators/rutCl.ts](../../../apps/web/src/lib/validators/rutCl.ts) |
 | Tax identifier dispatch by country | `TAX_ID_ALGORITHMS` in [apps/web/src/lib/validators.ts](../../../apps/web/src/lib/validators.ts) |
 | `chile_sii` provider | [apps/server/fiscal/types.ts](../../../apps/server/fiscal/types.ts), [bootstrapFiscalProviders.ts](../../../apps/server/fiscal/bootstrapFiscalProviders.ts), [fiscalProviderRegistry.ts](../../../apps/server/fiscal/fiscalProviderRegistry.ts) |
-| Capability-only adapter | [apps/server/fiscal/stubs/ChileSiiFiscalAdapter.ts](../../../apps/server/fiscal/stubs/ChileSiiFiscalAdapter.ts) |
+| Homologación mock adapter | [apps/server/fiscal/cl/ChileSiiFiscalAdapter.ts](../../../apps/server/fiscal/cl/ChileSiiFiscalAdapter.ts) ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)) |
 
 ### Out of scope (residual)
 
-- Issuing a DTE against the Chilean SII. It requires a digital certificate and homologation with the tax authority, exactly like the DGI e-invoice in #207. `ChileSiiFiscalAdapter` declares `implemented: false` and every operational call throws `FiscalAdapterNotImplementedError`.
+- Live SII SOAP/XML XAdES and digital certificates — **Not evidenced**. Homologación DTE mock is evidenced under `apps/server/fiscal/cl/` ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)); module `billing.dte_sii`.
 
 ## Catalog entry
 
@@ -40,15 +40,15 @@ The SII specification is not part of this repository: the rule implemented is th
 
 ## Modules
 
-No module was marked `availableForCountries: ['CL']`. The four Argentine legal modules (`billing.arca_cae`, `fiscal.remito`, `fiscal.cheques`, `finance.retenciones`) are already restricted to `AR` by #437, so a Chilean tenant is provisioned without them and the module catalog does not offer them. Nothing else had to change.
+Module `billing.dte_sii` is `availableForCountries: ['CL']` and `requiredInProdForCountries: ['CL']` (#208 residual). The Argentine legal modules remain restricted to `AR` by #437.
 
 ## Fiscal adapter
 
-`resolveDefaultProvider` already selects by tenant jurisdiction, so a Chilean tenant resolves to `chile_sii` once a configuration row exists. Because the adapter is a stub, authorising a document fails explicitly rather than fabricating a folio.
+`resolveDefaultProvider` selects `chile_sii` for Chilean tenants. The homologación mock under `apps/server/fiscal/cl/` reports `implemented: true` and writes synthetic authorization codes to existing CAE fields ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)). Live SII remains Not evidenced.
 
 ## Tests
 
 - [tests/lib/fiscal-jurisdictions-chile.test.ts](../../../tests/lib/fiscal-jurisdictions-chile.test.ts) — catalog entry, VAT rates through `calculateInvoice`, tax identifier dispatch and module defaults.
 - [tests/lib/validators/rutCl.test.ts](../../../tests/lib/validators/rutCl.test.ts) — check digit including the `K` and `0` cases, validation and formatting.
-- [tests/server/fiscal/stubs/fiscalStubs.test.ts](../../../tests/server/fiscal/stubs/fiscalStubs.test.ts) — the adapter rejects every operational call.
+- [tests/server/fiscal/cl/chileSiiFiscalAdapter.test.ts](../../../tests/server/fiscal/cl/chileSiiFiscalAdapter.test.ts) — DTE mock and capabilities.
 - [tests/server/fiscal/fiscalProviderRegistry.test.ts](../../../tests/server/fiscal/fiscalProviderRegistry.test.ts) — `chile_sii` is registered by the bootstrap.

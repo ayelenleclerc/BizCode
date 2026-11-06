@@ -54,10 +54,10 @@ describe('per-country fiscal rule registry (#440)', () => {
     expect(FISCAL_RULE_SETS.CL.bankAccount).toBeNull()
   })
 
-  it('declares invoice letters / CFE kinds only where the product model defines them', () => {
+  it('declares invoice letters / CFE / DTE kinds only where the product model defines them', () => {
     expect(getDocumentKinds('AR')).toEqual(['A', 'B', 'C'])
     expect(getDocumentKinds('UY')).toEqual(['e-Factura', 'e-NotaCredito'])
-    expect(getDocumentKinds('CL')).toBeNull()
+    expect(getDocumentKinds('CL')).toEqual(['33-FacturaAfecta', '61-NotaCredito'])
   })
 
   describe('subject tax conditions', () => {
