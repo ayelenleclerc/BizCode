@@ -20,8 +20,11 @@ import {
 import { sanitizeLogField } from '../lib/sanitizeLogField'
 import { getLocalHour, getLocalMinute } from '../lib/tenantLocalTime'
 import { resolveSystemUserId } from '../lib/systemUserId'
-import { notifyManagers } from '../notifications'
 import { ReciboCobroService } from './ReciboCobroService'
+import {
+  applyApprovedMercadoPagoPaymentOnce,
+  isProcessedPaymentComplete,
+} from './mercadoPagoPaymentIdempotency'
 import type { ServiceResult } from './serviceResults'
 
 export type MercadoPagoReconciliationEntryDto = {
@@ -47,10 +50,6 @@ export type MercadoPagoReconciliationJobSummary = {
 function decimalToMoneyString(value: Decimal | number): string {
   const n = typeof value === 'number' ? value : value.toNumber()
   return n.toFixed(2)
-}
-
-function formatFacturaRef(factura: { tipo: string; prefijo: string; numero: number }): string {
-  return `${factura.tipo}-${factura.prefijo}-${factura.numero}`
 }
 
 function payerDisplayName(payment: MercadoPagoPaymentResult): string | null {
@@ -130,9 +129,10 @@ export class MercadoPagoReconciliationService {
   private async isPaymentAlreadyReconciled(tenantId: number, mpPaymentId: string): Promise<boolean> {
     const processed = await this.prisma.mercadoPagoProcessedPayment.findUnique({
       where: { tenantId_mpPaymentId: { tenantId, mpPaymentId } },
-      select: { reciboCobroId: true },
+      select: { reciboCobroId: true, estado: true },
     })
-    if (processed?.reciboCobroId != null) return true
+    // Finished processed rows (including approved with null recibo when balance was 0) (#446).
+    if (processed && isProcessedPaymentComplete(processed)) return true
 
     const entry = await this.prisma.mercadoPagoReconciliationEntry.findUnique({
       where: { tenantId_mpPaymentId: { tenantId, mpPaymentId } },
@@ -189,73 +189,36 @@ export class MercadoPagoReconciliationService {
     return exactMatches.length === 1 ? exactMatches[0] : null
   }
 
-  private async createReciboForPayment(input: {
+  private async applyApprovedPaymentOnce(input: {
     tenantId: number
     userId: number
     mpPaymentId: string
     factura: { id: number; clienteId: number; tipo: string; prefijo: string; numero: number; total: Decimal }
     transactionAmount: number
-  }): Promise<ServiceResult<{ reciboCobroId: number }>> {
-    const pendiente = await computeFacturaPendiente(this.prisma, {
+  }): Promise<ServiceResult<{ reciboCobroId: number | null; skipped: boolean }>> {
+    const applied = await applyApprovedMercadoPagoPaymentOnce(this.prisma, this.reciboCobro, {
       tenantId: input.tenantId,
-      clienteId: input.factura.clienteId,
-      facturaId: input.factura.id,
-      total: input.factura.total,
+      mpPaymentId: input.mpPaymentId,
+      factura: input.factura,
+      transactionAmount: input.transactionAmount,
+      usuarioId: input.userId,
+      notifyOnApply: true,
     })
-    if (pendiente.lessThanOrEqualTo(0)) {
-      return { ok: false, status: 409, error: 'Invoice has no open balance' }
+    if (!applied.ok) {
+      const status = applied.error === 'Invoice has no open balance' ? 409 : 422
+      return { ok: false, status, error: applied.error }
     }
-
-    const importe = Math.min(input.transactionAmount, pendiente.toNumber())
-    if (importe <= 0) {
-      return { ok: false, status: 422, error: 'Invalid payment amount' }
+    return {
+      ok: true,
+      data: { reciboCobroId: applied.reciboCobroId, skipped: applied.skipped },
     }
-
-    const today = new Date().toISOString().slice(0, 10)
-    const reciboResult = await this.reciboCobro.create(
-      input.tenantId,
-      input.factura.clienteId,
-      input.userId,
-      {
-        fecha: today,
-        totalCobrado: importe,
-        concepto: `Pago Mercado Pago #${input.mpPaymentId}`,
-        formas: [{ tipo: 'mercadopago', importe, referencia: input.mpPaymentId }],
-        imputaciones: [{ facturaId: input.factura.id, importe }],
-        fifo: false,
-      },
-    )
-
-    if (!reciboResult.ok) {
-      return reciboResult
-    }
-
-    await this.prisma.factura.update({
-      where: { id: input.factura.id },
-      data: { mpEstado: 'approved', mpPagadoAt: new Date() },
-    })
-
-    const cliente = await this.prisma.cliente.findFirst({
-      where: { id: input.factura.clienteId, tenantId: input.tenantId },
-      select: { rsocial: true },
-    })
-
-    await notifyManagers(this.prisma, input.tenantId, 'mercadopago_payment_received', {
-      clienteId: input.factura.clienteId,
-      facturaId: input.factura.id,
-      facturaRef: formatFacturaRef(input.factura),
-      rsocial: cliente?.rsocial,
-      amount: importe.toFixed(2),
-    })
-
-    return { ok: true, data: { reciboCobroId: reciboResult.data.id } }
   }
 
   private async markPaymentReconciled(input: {
     tenantId: number
     payment: MercadoPagoPaymentResult
     facturaId: number
-    reciboCobroId: number
+    reciboCobroId: number | null
     autoMatched: boolean
     userId: number | null
   }): Promise<void> {
@@ -292,27 +255,6 @@ export class MercadoPagoReconciliationService {
         reconciledAt: new Date(),
       },
     })
-
-    try {
-      await this.prisma.mercadoPagoProcessedPayment.create({
-        data: {
-          tenantId: input.tenantId,
-          mpPaymentId,
-          facturaId: input.facturaId,
-          estado: 'approved',
-          reciboCobroId: input.reciboCobroId,
-        },
-      })
-    } catch {
-      await this.prisma.mercadoPagoProcessedPayment.updateMany({
-        where: { tenantId: input.tenantId, mpPaymentId },
-        data: {
-          facturaId: input.facturaId,
-          estado: 'approved',
-          reciboCobroId: input.reciboCobroId,
-        },
-      })
-    }
   }
 
   private async queuePendingPayment(tenantId: number, payment: MercadoPagoPaymentResult): Promise<void> {
@@ -366,19 +308,19 @@ export class MercadoPagoReconciliationService {
     )
 
     if (autoFactura) {
-      const recibo = await this.createReciboForPayment({
+      const applied = await this.applyApprovedPaymentOnce({
         tenantId,
         userId: systemUserId,
         mpPaymentId,
         factura: autoFactura,
         transactionAmount,
       })
-      if (recibo.ok) {
+      if (applied.ok) {
         await this.markPaymentReconciled({
           tenantId,
           payment,
           facturaId: autoFactura.id,
-          reciboCobroId: recibo.data.reciboCobroId,
+          reciboCobroId: applied.data.reciboCobroId,
           autoMatched: true,
           userId: null,
         })
@@ -499,15 +441,15 @@ export class MercadoPagoReconciliationService {
       return { ok: false, status: 422, error: 'Payment amount does not match invoice balance' }
     }
 
-    const recibo = await this.createReciboForPayment({
+    const applied = await this.applyApprovedPaymentOnce({
       tenantId,
       userId,
       mpPaymentId,
       factura,
       transactionAmount: entry.transactionAmount.toNumber(),
     })
-    if (!recibo.ok) {
-      return { ok: false, status: recibo.status, error: recibo.error }
+    if (!applied.ok) {
+      return { ok: false, status: applied.status, error: applied.error }
     }
 
     const paymentStub: MercadoPagoPaymentResult = {
@@ -531,7 +473,7 @@ export class MercadoPagoReconciliationService {
       tenantId,
       payment: paymentStub,
       facturaId: factura.id,
-      reciboCobroId: recibo.data.reciboCobroId,
+      reciboCobroId: applied.data.reciboCobroId,
       autoMatched: false,
       userId,
     })

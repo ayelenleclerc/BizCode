@@ -49,10 +49,13 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
   const reconciliationFindMany = vi.fn().mockResolvedValue([])
   const reconciliationUpdate = vi.fn().mockResolvedValue({})
   const processedFindUnique = vi.fn().mockResolvedValue(null)
-  const processedCreate = vi.fn().mockResolvedValue({})
+  const processedCreate = vi.fn().mockResolvedValue({ id: 1, estado: 'processing' })
+  const processedUpdate = vi.fn().mockResolvedValue({})
+  const processedDelete = vi.fn().mockResolvedValue({})
   const processedUpdateMany = vi.fn().mockResolvedValue({ count: 0 })
 
   return {
+    $executeRaw: vi.fn().mockResolvedValue(undefined),
     paramEmpresa: {
       findUnique: vi.fn().mockResolvedValue({ timezone: 'America/Argentina/Buenos_Aires' }),
     },
@@ -65,7 +68,12 @@ function buildPrisma(overrides: Partial<Record<string, unknown>> = {}): PrismaCl
     mercadoPagoProcessedPayment: {
       findUnique: processedFindUnique,
       create: processedCreate,
+      update: processedUpdate,
+      delete: processedDelete,
       updateMany: processedUpdateMany,
+    },
+    reciboCobroForma: {
+      findFirst: vi.fn().mockResolvedValue(null),
     },
     mercadoPagoReconciliationEntry: {
       findUnique: reconciliationFindUnique,
@@ -144,7 +152,16 @@ describe('MercadoPagoReconciliationService (#178)', () => {
     expect(summary.autoReconciled).toBe(1)
     expect(summary.queued).toBe(0)
     expect(prisma.mercadoPagoReconciliationEntry.upsert).toHaveBeenCalled()
-    expect(prisma.mercadoPagoProcessedPayment.create).toHaveBeenCalled()
+    expect(prisma.mercadoPagoProcessedPayment.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ estado: 'processing', mpPaymentId: '9001' }),
+      }),
+    )
+    expect(prisma.mercadoPagoProcessedPayment.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ estado: 'approved', reciboCobroId: 501 }),
+      }),
+    )
   })
 
   it('queues ambiguous matches instead of auto-reconciling', async () => {
@@ -194,8 +211,13 @@ describe('MercadoPagoReconciliationService (#178)', () => {
   it('skips already reconciled payments on second job run', async () => {
     const prisma = buildPrisma({
       mercadoPagoProcessedPayment: {
-        findUnique: vi.fn().mockResolvedValue({ reciboCobroId: 501 }),
+        findUnique: vi.fn().mockResolvedValue({
+          reciboCobroId: 501,
+          estado: 'approved',
+        }),
         create: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
         updateMany: vi.fn(),
       },
     })
