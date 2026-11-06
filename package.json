@@ -76,6 +76,7 @@
     "feriados:seed-ar": "tsx scripts/feriados-seed-ar.ts",
     "tipos-cambio:bcra": "tsx scripts/tipos-cambio-bcra-job.ts",
     "mercadopago:reconciliacion": "tsx scripts/mercadopago-reconciliacion-job.ts",
+    "mercadopago:webhook-inbox": "tsx scripts/mercadopago-webhook-inbox-job.ts",
     "meli:token-refresh": "tsx scripts/meli-token-refresh-job.ts",
     "meli:catalog-sync": "tsx scripts/meli-catalog-sync-job.ts",
     "meli:stock-reconcile": "tsx scripts/meli-stock-reconcile-job.ts",

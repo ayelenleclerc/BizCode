@@ -75,7 +75,28 @@ function buildHeaders(dataId: string, secret: string): Record<string, string> {
   }
 }
 
+function inboxRow(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 1,
+    tenantId: 1,
+    eventKey: `payment:${PAYMENT_ID}`,
+    resourceType: 'payment',
+    resourceId: PAYMENT_ID,
+    payloadJson: {},
+    estado: 'pending',
+    attemptCount: 0,
+    maxAttempts: 5,
+    nextAttemptAt: new Date(),
+    lastError: null,
+    receivedAt: new Date(),
+    processedAt: null,
+    updatedAt: new Date(),
+    ...overrides,
+  }
+}
+
 function buildPrismaMock(): PrismaClient {
+  const inbox = inboxRow()
   return {
     $executeRaw: vi.fn().mockResolvedValue(undefined),
     deliveryZone: { findMany: vi.fn().mockResolvedValue([]) },
@@ -97,6 +118,13 @@ function buildPrismaMock(): PrismaClient {
         accessTokenEncrypted: encryptFiscalSecret('TEST-access-token'),
         webhookSecretEncrypted: encryptFiscalSecret(WEBHOOK_SECRET),
       }),
+    },
+    mercadoPagoWebhookInbox: {
+      create: vi.fn().mockResolvedValue(inbox),
+      findUnique: vi.fn().mockResolvedValue(inbox),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      update: vi.fn().mockResolvedValue({ ...inbox, estado: 'processed' }),
+      findMany: vi.fn().mockResolvedValue([]),
     },
     mercadoPagoProcessedPayment: {
       findUnique: vi.fn().mockResolvedValue(null),
@@ -140,7 +168,7 @@ function buildPrismaMock(): PrismaClient {
   } as unknown as PrismaClient
 }
 
-describe('Mercado Pago webhook API (#176)', () => {
+describe('Mercado Pago webhook API (#176/#447)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(fetchMercadoPagoPayment).mockResolvedValue({
@@ -152,8 +180,9 @@ describe('Mercado Pago webhook API (#176)', () => {
     })
   })
 
-  it('returns 400 for invalid signature', async () => {
-    const app = createApp(buildPrismaMock())
+  it('returns 400 for invalid signature without enqueue', async () => {
+    const prisma = buildPrismaMock()
+    const app = createApp(prisma)
     const res = await request(app)
       .post('/api/webhooks/mercadopago')
       .set('x-signature', 'ts=1,v1=invalid')
@@ -163,9 +192,10 @@ describe('Mercado Pago webhook API (#176)', () => {
 
     expect(res.status).toBe(400)
     expect(res.body.success).toBe(false)
+    expect(prisma.mercadoPagoWebhookInbox.create).not.toHaveBeenCalled()
   })
 
-  it('returns 200 and processes approved payment', async () => {
+  it('persists inbox before 200 and processes approved payment', async () => {
     const prisma = buildPrismaMock()
     const app = createApp(prisma)
     const headers = buildHeaders(PAYMENT_ID, WEBHOOK_SECRET)
@@ -178,11 +208,30 @@ describe('Mercado Pago webhook API (#176)', () => {
 
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
+    expect(prisma.mercadoPagoWebhookInbox.create).toHaveBeenCalled()
 
+    await new Promise((resolve) => setImmediate(resolve))
     await new Promise((resolve) => setImmediate(resolve))
 
     expect(fetchMercadoPagoPayment).toHaveBeenCalledWith(expect.any(String), PAYMENT_ID)
     expect(prisma.mercadoPagoProcessedPayment.create).toHaveBeenCalled()
+  })
+
+  it('returns 503 when inbox persistence fails', async () => {
+    const prisma = buildPrismaMock()
+    vi.mocked(prisma.mercadoPagoWebhookInbox.create).mockRejectedValue(new Error('db down'))
+    const app = createApp(prisma)
+    const headers = buildHeaders(PAYMENT_ID, WEBHOOK_SECRET)
+
+    const res = await request(app)
+      .post('/api/webhooks/mercadopago')
+      .set(headers)
+      .query({ 'data.id': PAYMENT_ID })
+      .send(webhookFixture)
+
+    expect(res.status).toBe(503)
+    expect(res.body.error).toBe('Webhook persistence failed')
+    expect(fetchMercadoPagoPayment).not.toHaveBeenCalled()
   })
 
   it('is idempotent on duplicate webhook delivery', async () => {
@@ -207,6 +256,7 @@ describe('Mercado Pago webhook API (#176)', () => {
       .send(webhookFixture)
 
     expect(res.status).toBe(200)
+    await new Promise((resolve) => setImmediate(resolve))
     await new Promise((resolve) => setImmediate(resolve))
     expect(fetchMercadoPagoPayment).not.toHaveBeenCalled()
   })

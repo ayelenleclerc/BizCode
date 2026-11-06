@@ -1957,6 +1957,7 @@ model Tenant {
   paymentProviderConfigs           PaymentProviderConfig[]
   paymentTransactions              PaymentTransaction[]
   mercadoPagoProcessedPayments     MercadoPagoProcessedPayment[]
+  mercadoPagoWebhookInbox          MercadoPagoWebhookInbox[]
   mercadoPagoReconciliationEntries MercadoPagoReconciliationEntry[]
   mercadoPagoRefunds               MercadoPagoRefund[]
   mercadoPagoChargebacks           MercadoPagoChargeback[]
@@ -2028,6 +2029,34 @@ model MercadoPagoProcessedPayment {
 
   @@unique([tenantId, mpPaymentId])
   @@index([tenantId, facturaId])
+}
+
+/// @en Durable Mercado Pago webhook inbox — persist before HTTP 2xx (#447).
+/// @es Inbox durable de webhooks Mercado Pago — persistir antes del HTTP 2xx (#447).
+/// @pt-BR Inbox durável de webhooks Mercado Pago — persistir antes do HTTP 2xx (#447).
+model MercadoPagoWebhookInbox {
+  id            Int       @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  /// Dedup key e.g. payment:{id} or chargeback:{id}:{action}
+  eventKey      String    @db.VarChar(120)
+  /// payment | chargeback
+  resourceType  String    @db.VarChar(20)
+  resourceId    String    @db.VarChar(60)
+  payloadJson   Json
+  /// pending | processing | processed | failed
+  estado        String    @default("pending") @db.VarChar(20)
+  attemptCount  Int       @default(0)
+  maxAttempts   Int       @default(5)
+  nextAttemptAt DateTime  @default(now())
+  lastError     String?   @db.Text
+  receivedAt    DateTime  @default(now())
+  processedAt   DateTime?
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([tenantId, eventKey])
+  @@index([estado, nextAttemptAt])
+  @@index([tenantId, estado])
 }
 
 /// Mercado Pago payments awaiting or completed reconciliation (#178).

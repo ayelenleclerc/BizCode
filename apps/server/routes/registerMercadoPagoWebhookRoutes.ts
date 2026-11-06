@@ -9,6 +9,7 @@ import {
   isChargebackWebhook,
   type MercadoPagoWebhookPayload,
 } from '../services/MercadoPagoWebhookService'
+import { MercadoPagoWebhookInboxService } from '../services/MercadoPagoWebhookInboxService'
 import { PaymentWebhookService } from '../payments/PaymentWebhookService'
 import { sanitizeLogField } from '../lib/sanitizeLogField'
 import type { RestRouteContext } from './restRouteTypes'
@@ -22,16 +23,14 @@ function headerString(value: string | string[] | undefined): string | null {
 }
 
 /**
- * @en Public Mercado Pago webhook route (#176). Compat facade via `PaymentWebhookService` (#377);
- *   business effects (ReciboCobro) remain in `MercadoPagoWebhookService`.
- * @es Ruta pública de webhook Mercado Pago (#176). Fachada vía `PaymentWebhookService` (#377);
- *   los efectos de negocio siguen en `MercadoPagoWebhookService`.
- * @pt-BR Rota pública de webhook Mercado Pago (#176). Fachada via `PaymentWebhookService` (#377);
- *   efeitos de negócio permanecem em `MercadoPagoWebhookService`.
+ * @en Public Mercado Pago webhook route (#176/#447). Persists inbox before 2xx; effects via worker/best-effort.
+ * @es Ruta pública webhook Mercado Pago (#176/#447). Persiste inbox antes del 2xx; efectos vía worker/best-effort.
+ * @pt-BR Rota pública webhook Mercado Pago (#176/#447). Persiste inbox antes do 2xx; efeitos via worker/best-effort.
  */
 export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRouteContext): void {
   const { prisma } = ctx
   const webhookService = new PaymentWebhookService(prisma)
+  const inboxService = new MercadoPagoWebhookInboxService(prisma)
 
   app.post(
     '/api/webhooks/mercadopago',
@@ -59,7 +58,7 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
           xRequestId,
           dataId,
         })
-        .then((tenantId) => {
+        .then(async (tenantId) => {
           if (tenantId == null) {
             console.warn(
               '[mercadopago-webhook] invalid_signature',
@@ -81,25 +80,39 @@ export function registerMercadoPagoWebhookRoutes(app: Application, ctx: RestRout
             return
           }
 
+          let inboxId: number
+          try {
+            const row = await inboxService.enqueue({
+              tenantId,
+              resourceType: isChargeback ? 'chargeback' : 'payment',
+              resourceId,
+              payload: body,
+              action: body.action ?? null,
+            })
+            inboxId = row.id
+          } catch (err: unknown) {
+            console.warn(
+              '[mercadopago-webhook] inbox_persist_error',
+              'tenant',
+              tenantId,
+              'payment',
+              sanitizeLogField(resourceId),
+              'detail',
+              err instanceof Error ? err.message : err,
+            )
+            if (!res.headersSent) {
+              res.status(503).json({ success: false, error: 'Webhook persistence failed' })
+            }
+            return
+          }
+
           if (!res.headersSent) {
             res.status(200).json({ success: true })
           }
 
+          // Best-effort in-process drain; durability relies on inbox + worker (#447).
           setImmediate(() => {
-            const processPromise = isChargeback
-              ? webhookService.processMercadoPagoChargebackNotification(
-                  tenantId,
-                  resourceId,
-                  body,
-                  req.ip ?? null,
-                )
-              : webhookService.processMercadoPagoPaymentNotification(
-                  tenantId,
-                  resourceId,
-                  req.ip ?? null,
-                )
-
-            void processPromise.catch((err: unknown) => {
+            void inboxService.processById(inboxId, req.ip ?? null).catch((err: unknown) => {
               console.warn(
                 '[mercadopago-webhook] process_error',
                 'tenant',
