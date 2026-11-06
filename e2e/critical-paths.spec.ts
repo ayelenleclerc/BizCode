@@ -125,14 +125,37 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     expect(articuloValue, 'Se espera un artículo creado en el test anterior (E2E Artículo…)').toBeTruthy()
     await lineArticulo.selectOption(articuloValue!)
 
+    // Unique quantity reduces same-day duplicate collisions on CI retries (total 121).
+    const cantidad = 2 + Math.floor(Math.random() * 8)
+    const cantidadInput = page.getByTestId('factura-line-0-cantidad')
+    await cantidadInput.clear()
+    await cantidadInput.fill(String(cantidad))
+
     await expect(page.getByTestId('btn-save-factura')).toBeEnabled({ timeout: 10_000 })
 
-    const postFactura = page.waitForResponse((r) => {
-      const u = r.url()
-      return u.includes('/api/facturas') && r.request().method() === 'POST'
-    })
+    const waitFacturaPost = () =>
+      page.waitForResponse((r) => {
+        const u = r.url()
+        return u.includes('/api/facturas') && r.request().method() === 'POST'
+      })
+
+    const postFactura = waitFacturaPost()
     await page.getByTestId('btn-save-factura').click()
-    const postResp = await postFactura
+    let postResp = await postFactura
+
+    // Anomaly gate (#200): same cliente+total+date requires explicit confirmAnomalies.
+    if (postResp.status() === 422) {
+      const bodyText = await postResp.text()
+      expect(
+        bodyText.includes('DUPLICATE_INVOICE_CONFIRM_REQUIRED'),
+        `POST /api/facturas → ${postResp.status()} ${bodyText.slice(0, 500)}`,
+      ).toBeTruthy()
+      await expect(page.getByTestId('factura-anomaly-confirm')).toBeVisible({ timeout: 10_000 })
+      const confirmPost = waitFacturaPost()
+      await page.getByTestId('factura-anomaly-confirm').click()
+      postResp = await confirmPost
+    }
+
     expect(
       postResp.ok(),
       `POST /api/facturas → ${postResp.status()} ${(await postResp.text()).slice(0, 500)}`,
@@ -164,26 +187,19 @@ test.describe('Critical Paths — Core Business Workflows', () => {
     }
   })
 
-  // Test 9: Keyboard shortcuts work (F3 = New, F5 = Save)
+  // Test 9: Keyboard shortcuts work (F3 = New, Esc = Cancel)
   test('Keyboard shortcuts (F3=New, F5=Save, Esc=Cancel)', async ({ page }) => {
     await page.goto('/clientes', { waitUntil: 'load' })
-    await page.waitForTimeout(300)
+    // Wait for SPA hydration before sending hotkeys (CI preview can lag past 300ms).
+    await expect(page.getByTestId('btn-nuevo-cliente')).toBeVisible({ timeout: 15_000 })
+    await page.getByTestId('search-clientes').click()
 
-    // F3 should trigger new
     await page.keyboard.press('F3')
-    await page.waitForTimeout(300)
+    await expect(page.getByTestId('cliente-form-dialog')).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByTestId('cliente-form')).toBeVisible()
 
-    // A form should appear (or modal should be visible)
-    // Check for input fields that appear when form opens
-    const formPresent = await page.locator('input[type="text"]').first().isVisible()
-    expect(formPresent).toBe(true)
-
-    // Esc should close the form
     await page.keyboard.press('Escape')
-    await page.waitForTimeout(300)
-
-    // Form should close
-    // This depends on the form implementation
+    await expect(page.getByTestId('cliente-form-dialog')).toBeHidden({ timeout: 10_000 })
   })
 
   // Test 10: Responsive — App works on mobile viewport
