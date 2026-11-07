@@ -65,6 +65,46 @@ push / pull_request
 | `push` | `main`, `develop` |
 | `pull_request` | targeting `main` or `develop` |
 
+## Branch protection (`main` / `develop`) — #451
+
+**CI job exists ≠ remote enforcement.** Workflows can run on every PR while GitHub still allows a direct push or a merge that ignores failing checks, until branch protection (or a ruleset) requires those checks.
+
+| Branch | Role | Remote enforcement (#451) |
+|---|---|---|
+| `main` | Stable baseline | Protected: required **`Quality Gate`**, CODEOWNERS reviews, dismiss stale reviews, `enforce_admins`, no force-push, no branch deletion, conversation resolution required, strict up-to-date branch |
+| `develop` | Integration (+ staging deploy on push) | Same profile as `main`, plus required **`Secret scan`** (Gitleaks job name). Direct push and force-push are blocked for everyone including admins when `enforce_admins` is on |
+
+**Required status check names (exact strings):**
+
+| Check | Workflow / job | Why required |
+|---|---|---|
+| `Quality Gate` | `CI Quality Gate` → job `Quality Gate` ([`ci.yml`](../../../.github/workflows/ci.yml)) | type-check, lint, tests, coverage, OpenAPI, docs drift, i18n, E2E smoke, integration |
+| `Secret scan` | `Gitleaks` → job `Secret scan` ([`gitleaks.yml`](../../../.github/workflows/gitleaks.yml)) | blocks merges that introduce secrets (`develop` only as extra vs historical `main` profile) |
+
+**Not required for merge** (may still run; marking them required risks soft-lock when SKIPPED or token-missing): Deploy / Publish GHCR, `update-status`, ZAP Baseline, Snyk, Docs governance, Documentation links, CodeQL, and the rest of the QA Validation matrix. Prefer green CI as process; only the two contexts above are hard gates on `develop`.
+
+**Cursor → merge flow**
+
+1. Branch from updated `develop` (`feature/*`, `fix/*`, `docs/*`, `chore/*`, `test/*`).
+2. Open a Pull Request **targeting `develop`** (not `main`).
+3. Wait for required checks: **`Quality Gate`** and **`Secret scan`**.
+4. CODEOWNERS review when GitHub requests it (payments / fiscal / auth paths are covered by [`.github/CODEOWNERS`](../../../.github/CODEOWNERS)).
+5. Merge only when required checks are green; do not force-push to `develop` or `main`.
+6. Releases: merge `develop` → `main` separately; do not treat protecting `develop` as a reason to bulk-merge to `main`.
+
+**Operator runbook (apply / verify)** — payload file: [`.github/branch-protection/develop-protection.json`](../../../.github/branch-protection/develop-protection.json).
+
+```bash
+# Verify
+gh api repos/ayelenleclerc/BizCode/branches/develop/protection --jq "{checks: .required_status_checks.contexts, enforce_admins: .enforce_admins.enabled}"
+
+# Apply (maintainer; same body for a temporary sandbox target first)
+gh api -X PUT repos/ayelenleclerc/BizCode/branches/develop/protection \
+  --input .github/branch-protection/develop-protection.json
+```
+
+**Controlled validation (#451, 2026-11-07):** temporary target `sandbox/451-branch-protection` received the same payload; probe PR [#457](https://github.com/ayelenleclerc/BizCode/pull/457) reported `mergeStateStatus=BLOCKED` and `gh pr merge` failed with *base branch policy prohibits the merge*. The identical payload was then applied to `develop` (contexts `Quality Gate`, `Secret scan`; `enforce_admins=true`). Sandbox branch and probe PR were removed afterward.
+
 ## Secret scanning (#216)
 
 Workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.yml) runs Gitleaks on push/PR to `main`/`develop` and fails on findings. Config: [`.gitleaks.toml`](../../../.gitleaks.toml). See [secrets management / Doppler](secrets-management-and-doppler.md).
@@ -280,8 +320,8 @@ Daily usage checklist:
 1. Create issue from `Task` template.
 2. Add issue to Project.
 3. Open PR with `Closes #<issue>`.
-4. Verify required checks (`Quality Gate`, `Docs governance`, `Documentation links`, security/CodeQL checks as enabled).
-5. Merge only when CI is green.
+4. Verify **required** checks on `develop`: `Quality Gate` and `Secret scan` (other workflows may still run; see [Branch protection](#branch-protection-main--develop--451)).
+5. Merge only when required checks are green; never force-push to `develop` or `main`.
 
 ## Scheduled operational jobs (host cron)
 

@@ -43,6 +43,44 @@ push / pull_request → job quality (ubuntu-latest):
 | `push` | `main`, `develop` |
 | `pull_request` | para `main` ou `develop` |
 
+## Proteção de branches (`main` / `develop`) — #451
+
+**Existir job de CI ≠ enforcement remoto.** Os workflows podem rodar em cada PR e o GitHub ainda permitir push direto ou merge que ignore checks falhos até a branch protection (ou um ruleset) exigi-los.
+
+| Branch | Papel | Enforcement remoto (#451) |
+|---|---|---|
+| `main` | Baseline estável | Protegida: required **`Quality Gate`**, reviews CODEOWNERS, dismiss stale, `enforce_admins`, sem force-push, sem exclusão do branch, resolução de conversas, branch estritamente atualizado |
+| `develop` | Integração (+ deploy staging no push) | Mesmo perfil de `main`, mais required **`Secret scan`** (nome do job Gitleaks). Push direto e force-push bloqueados também para admins com `enforce_admins` |
+
+**Nomes exatos dos checks required:**
+
+| Check | Workflow / job | Motivo |
+|---|---|---|
+| `Quality Gate` | `CI Quality Gate` → job `Quality Gate` ([`ci.yml`](../../../.github/workflows/ci.yml)) | type-check, lint, testes, cobertura, OpenAPI, drift de docs, i18n, E2E smoke, integração |
+| `Secret scan` | `Gitleaks` → job `Secret scan` ([`gitleaks.yml`](../../../.github/workflows/gitleaks.yml)) | bloqueia merges que introduzam segredos (extra em `develop` vs perfil histórico de `main`) |
+
+**Não required para merge** (podem continuar rodando; marcá-los required arrisca soft-lock se ficarem SKIPPED ou sem token): Deploy / Publish GHCR, `update-status`, ZAP Baseline, Snyk, Docs governance, Documentation links, CodeQL e o restante de QA Validation. Preferir CI verde como processo; só esses dois contexts são gate duro em `develop`.
+
+**Fluxo Cursor → merge**
+
+1. Branch a partir de `develop` atualizado (`feature/*`, `fix/*`, `docs/*`, `chore/*`, `test/*`).
+2. Abrir Pull Request **para `develop`** (não `main`).
+3. Aguardar checks required: **`Quality Gate`** e **`Secret scan`**.
+4. Review CODEOWNERS quando o GitHub solicitar (pagamentos / fiscal / auth cobertos por [`.github/CODEOWNERS`](../../../.github/CODEOWNERS)).
+5. Merge só com checks required verdes; não fazer force-push em `develop` nem `main`.
+6. Releases: merge `develop` → `main` em separado; proteger `develop` não implica merge em massa para `main`.
+
+**Runbook do operador** — payload: [`.github/branch-protection/develop-protection.json`](../../../.github/branch-protection/develop-protection.json).
+
+```bash
+gh api repos/ayelenleclerc/BizCode/branches/develop/protection --jq "{checks: .required_status_checks.contexts, enforce_admins: .enforce_admins.enabled}"
+
+gh api -X PUT repos/ayelenleclerc/BizCode/branches/develop/protection \
+  --input .github/branch-protection/develop-protection.json
+```
+
+**Validação controlada (#451, 2026-11-07):** o target temporário `sandbox/451-branch-protection` recebeu o mesmo payload; o PR probe [#457](https://github.com/ayelenleclerc/BizCode/pull/457) reportou `mergeStateStatus=BLOCKED` e `gh pr merge` falhou com *base branch policy prohibits the merge*. Em seguida o mesmo payload foi aplicado a `develop` (contexts `Quality Gate`, `Secret scan`; `enforce_admins=true`). Branch sandbox e PR probe foram removidos.
+
 ## Varredura de segredos (#216)
 
 O workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.yml) executa Gitleaks em push/PR para `main`/`develop` e falha se houver achados. Config: [`.gitleaks.toml`](../../../.gitleaks.toml). Ver [gestão de segredos / Doppler](gestao-segredos-e-doppler.md).
@@ -256,7 +294,7 @@ Checklist diário de uso:
 1. Criar issue usando o template `Task`.
 2. Adicionar issue ao Project.
 3. Abrir PR com `Closes #<issue>`.
-4. Verificar checks (`Quality Gate`, `Docs governance`, links Markdown em `docs/`, segurança/CodeQL conforme configurado).
+4. Verificar checks **required** em `develop`: `Quality Gate` e `Secret scan` (outros workflows podem continuar rodando; ver [Proteção de branches](#proteção-de-branches-main--develop--451)).
 5. Fazer merge somente com CI em verde.
 
 ## Jobs operacionais agendados (cron no host)
