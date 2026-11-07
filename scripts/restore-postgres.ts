@@ -9,37 +9,21 @@
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { gunzipSync } from 'node:zlib'
 import { loadPostgresBackupConfig } from './lib/postgres-backup/config'
 import { decryptBackupBlob } from './lib/postgres-backup/crypto'
 import { parseBackupFileName } from './lib/postgres-backup/naming'
+import {
+  parseRestorePostgresArgs,
+  RESTORE_REQUIRES_YES,
+} from './lib/postgres-backup/restoreArgs'
 import { runPsqlRestore } from './lib/postgres-backup/runtime'
 
-function parseArgs(argv: string[]): {
-  list: boolean
-  yes: boolean
-  file: string | null
-  db: string | null
-} {
-  let list = false
-  let yes = false
-  let file: string | null = null
-  let db: string | null = null
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i]
-    if (a === '--list') list = true
-    else if (a === '--yes' || a === '-y') yes = true
-    else if (a === '--file' || a === '-f') {
-      file = argv[++i] ?? null
-    } else if (a === '--db') {
-      db = argv[++i] ?? null
-    }
-  }
-  return { list, yes, file, db }
-}
+export { parseRestorePostgresArgs, RESTORE_REQUIRES_YES } from './lib/postgres-backup/restoreArgs'
 
 async function main(): Promise<void> {
-  const args = parseArgs(process.argv.slice(2))
+  const args = parseRestorePostgresArgs(process.argv.slice(2))
   let cfg
   try {
     cfg = loadPostgresBackupConfig()
@@ -91,7 +75,7 @@ async function main(): Promise<void> {
     console.error(
       JSON.stringify({
         ok: false,
-        error: 'Refusing destructive restore without --yes',
+        error: RESTORE_REQUIRES_YES,
       }),
     )
     process.exitCode = 1
@@ -121,4 +105,9 @@ async function main(): Promise<void> {
   }
 }
 
-void main()
+const isDirectRun = process.argv[1]
+  ? path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+  : false
+if (isDirectRun) {
+  void main()
+}

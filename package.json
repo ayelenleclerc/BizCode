@@ -87,6 +87,7 @@
     "backup:postgres": "tsx scripts/backup-postgres.ts",
     "backup:postgres:restore": "tsx scripts/restore-postgres.ts",
     "backup:postgres:prune": "tsx scripts/prune-postgres-backups.ts",
+    "backup:postgres:drill": "tsx scripts/postgres-backup-restore-drill.ts",
     "arca:retry-pending": "tsx scripts/arca-retry-pending.ts",
     "arca:retry-pending-job": "tsx scripts/arca-retry-pending-job.ts",
     "sat:catalog-seed": "tsx scripts/sat-catalog-seed.ts",

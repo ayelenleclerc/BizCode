@@ -12,6 +12,7 @@ Descreve o pipeline de backup automático de PostgreSQL no repositório: `pg_dum
 |------|-------------------|
 | Job de backup | [`scripts/backup-postgres.ts`](../../../scripts/backup-postgres.ts) — `npm run backup:postgres` |
 | Restore | [`scripts/restore-postgres.ts`](../../../scripts/restore-postgres.ts) — `npm run backup:postgres:restore -- --list` / `--file … --yes` |
+| Drill de integridade isolado (#449) | [`scripts/postgres-backup-restore-drill.ts`](../../../scripts/postgres-backup-restore-drill.ts) — `npm run backup:postgres:drill` |
 | Prune | [`scripts/prune-postgres-backups.ts`](../../../scripts/prune-postgres-backups.ts) — `npm run backup:postgres:prune` |
 | Crypto / retenção | [`scripts/lib/postgres-backup/`](../../../scripts/lib/postgres-backup/) |
 | Wrappers cron (Linux) | `scripts/backup-postgres.sh`, `restore-postgres.sh`, `prune-postgres-backups.sh` |
@@ -56,6 +57,23 @@ npm run backup:postgres:restore -- --file .bizcode-backups/<file>.sql.gz.enc --d
 ```
 
 Preferir base dedicada para drills. Não apontar para produção sem janela de mudança aprovada.
+
+## Drill isolado do piloto (#449)
+
+Backup → restore → verificação de contagens em um banco **lateral** (nunca produção):
+
+```bash
+export BACKUP_ENCRYPTION_KEY='…efêmera…'
+export BIZCODE_POSTGRES_CONTAINER='bizcode-postgres-1'
+export BIZCODE_POSTGRES_DB='bizcode_dev'
+npm run backup:postgres:drill
+```
+
+O drill cria `bizcode_restore_drill_449`, restaura, compara contagens de tabelas críticas (`Tenant`, `AppUser`, `Cliente`, `Factura`, ledger de pagamentos se existirem) e remove o banco lateral. O resumo JSON não deve incluir segredos. Registrar evidência em [SEC-015](../certificacion-iso/sec/sec-015-evidencias-teste-restauracao.md).
+
+**Job vs implantação:** scripts e cron em [ciclo-ci-cd.md](ciclo-ci-cd.md) implementam o **job**. Provisionamento do host, cron ao vivo e DR de staging continuam operacionais (#152 / [recuperacao-de-desastres.md](recuperacao-de-desastres.md)); este drill **não** fecha o AC de staging de #197.
+
+**RPO/RTO propostos para o piloto (mesmos alvos de #197):** RPO &lt; 24 h; RTO &lt; 4 h. Não há réplica/failover automático evidenciado no repositório.
 
 ## Política de armazenamento remoto
 
