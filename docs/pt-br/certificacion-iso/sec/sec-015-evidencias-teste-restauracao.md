@@ -1,16 +1,16 @@
 # Registro de evidências de teste de restauração
 
 | Código do documento | SEC-015 |
-| Versão | 0.2 |
-| Data | 2026-08-25 |
+| Versão | 0.3 |
+| Data | 2026-11-07 |
 | Autor | BizCode |
 | Nível de requisito | Altamente recomendado |
 | Aplicabilidade normativa | ISO/IEC 27001:2022 |
-| Estado de evidência | Parcial — smoke restore Docker local; drill staging pendente (#197) |
+| Estado de evidência | Parcial — drill de integridade Docker local (#449); drill staging pendente (#197) |
 
 ## Declaração de fora de escopo
 
-Um **smoke local** **não** satisfaz o AC de drill staging de [#197](https://github.com/ayelenleclerc/BizCode/issues/197).
+Um **smoke/drill local** **não** satisfaz o AC de drill staging de [#197](https://github.com/ayelenleclerc/BizCode/issues/197).
 
 ## Propósito
 
@@ -21,6 +21,7 @@ Registrar exercícios de restore cronometrados (local e staging) frente a RTO &l
 | Data (UTC) | Ambiente | Tipo | Artefato | BD destino | Tempo restore | RTO vs &lt;4h | Operador | Notas |
 |------------|----------|------|----------|------------|---------------|-------------|----------|-------|
 | 2026-08-25T16:00:47Z | Docker local `bizcode_db` `:5432` | Smoke local | `bizcode-pg-bizcode_dev-20260825T160047Z.sql.gz.enc` | `bizcode_restore_smoke_197` (removida) | Backup ~1.8 s; restore ~2.8 s; total ~5.4 s | Cumpre (só path) | Agente Eng (#197) | Chave efêmera; **não** staging; não fecha AC #197 |
+| 2026-11-07T22:02:03Z | Docker local `bizcode-postgres-1` `:5432` | Drill integridade piloto (#449) | `bizcode-pg-bizcode_dev-20261107T220203Z.sql.gz.enc` (~13 KB; removido) | `bizcode_restore_drill_449` (removida) | Drill total ~5.4 s; mismatches=0 | Cumpre (path + contagens) | Agente Eng (#449) | `pnpm run backup:postgres:drill`; chave efêmera; **não** staging; não fecha AC #197 |
 | _(pendente)_ | Staging remoto | Drill semestral | _(pendente)_ | _(pendente)_ | _(pendente)_ | _(pendente)_ | _(pendente)_ | Requer host `STAGING_DEPLOY_*` |
 
 ## Histórico
@@ -29,3 +30,4 @@ Registrar exercícios de restore cronometrados (local e staging) frente a RTO &l
 |--------|------|-------|--------|
 | 0.1 | 2026-04-01 | BizCode | Stub inicial |
 | 0.2 | 2026-08-25 | BizCode | Linha smoke local #197 |
+| 0.3 | 2026-11-07 | BizCode | Linha drill de integridade piloto #449 |

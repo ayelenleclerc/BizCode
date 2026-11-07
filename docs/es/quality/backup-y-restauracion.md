@@ -12,6 +12,7 @@ Describe el pipeline de backup automático de PostgreSQL en el repositorio: `pg_
 |-------|----------------|
 | Job de backup | [`scripts/backup-postgres.ts`](../../../scripts/backup-postgres.ts) — `npm run backup:postgres` |
 | Restore | [`scripts/restore-postgres.ts`](../../../scripts/restore-postgres.ts) — `npm run backup:postgres:restore -- --list` / `--file … --yes` |
+| Drill de integridad aislado (#449) | [`scripts/postgres-backup-restore-drill.ts`](../../../scripts/postgres-backup-restore-drill.ts) — `npm run backup:postgres:drill` |
 | Prune | [`scripts/prune-postgres-backups.ts`](../../../scripts/prune-postgres-backups.ts) — `npm run backup:postgres:prune` |
 | Crypto / retención | [`scripts/lib/postgres-backup/`](../../../scripts/lib/postgres-backup/) |
 | Wrappers cron (Linux) | `scripts/backup-postgres.sh`, `restore-postgres.sh`, `prune-postgres-backups.sh` |
@@ -56,6 +57,23 @@ npm run backup:postgres:restore -- --file .bizcode-backups/<file>.sql.gz.enc --d
 ```
 
 Preferir una base dedicada para drills. No apuntar a producción sin ventana de cambio aprobada.
+
+## Drill aislado del piloto (#449)
+
+Backup → restore → verificación de conteos en una base **lateral** (nunca producción):
+
+```bash
+export BACKUP_ENCRYPTION_KEY='…efímera…'
+export BIZCODE_POSTGRES_CONTAINER='bizcode-postgres-1'
+export BIZCODE_POSTGRES_DB='bizcode_dev'
+npm run backup:postgres:drill
+```
+
+El drill crea `bizcode_restore_drill_449`, restaura, compara conteos de tablas críticas (`Tenant`, `AppUser`, `Cliente`, `Factura`, ledger de pagos si existen) y elimina la BD lateral. El resumen JSON no debe incluir secretos. Registrar evidencia en [SEC-015](../certificacion-iso/sec/sec-015-evidencias-prueba-restauracion.md).
+
+**Job vs despliegue:** los scripts y el cron en [ciclo-ci-cd.md](ciclo-ci-cd.md) implementan el **job**. El aprovisionamiento del host, el cron en vivo y el DR de staging siguen siendo operativos (#152 / [recuperacion-ante-desastres.md](recuperacion-ante-desastres.md)); este drill **no** cierra el AC de staging de #197.
+
+**RPO/RTO propuestos para el piloto (mismos objetivos que #197):** RPO &lt; 24 h; RTO &lt; 4 h. No hay réplica/failover automático evidenciado en el repo.
 
 ## Política de almacenamiento remoto
 

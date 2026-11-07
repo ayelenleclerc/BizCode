@@ -119,6 +119,172 @@ export async function runPsqlRestore(
   }
 }
 
+const SAFE_IDENT = /^[A-Za-z_][A-Za-z0-9_]*$/
+
+/**
+ * @en Validates and double-quotes a PostgreSQL identifier (db/table name).
+ * @es Valida y entrecomilla un identificador PostgreSQL (nombre de BD/tabla).
+ * @pt-BR Valida e coloca aspas em um identificador PostgreSQL (nome de BD/tabela).
+ */
+export function quotePgIdent(name: string): string {
+  if (!SAFE_IDENT.test(name)) {
+    throw new Error(`Unsafe PostgreSQL identifier: ${name}`)
+  }
+  return `"${name}"`
+}
+
+async function runPsqlAdmin(
+  cfg: PostgresBackupConfig,
+  sql: string,
+  adminDb = 'postgres',
+): Promise<RunResult> {
+  if (cfg.useDocker) {
+    return runCommand(
+      'docker',
+      [
+        'exec',
+        '-i',
+        cfg.dockerContainer,
+        'psql',
+        '-U',
+        cfg.postgresUser,
+        '-d',
+        adminDb,
+        '-v',
+        'ON_ERROR_STOP=1',
+        '-t',
+        '-A',
+      ],
+      { input: Buffer.from(sql, 'utf8') },
+    )
+  }
+  return runCommand(
+    'psql',
+    ['-U', cfg.postgresUser, '-d', adminDb, '-v', 'ON_ERROR_STOP=1', '-t', '-A'],
+    { input: Buffer.from(sql, 'utf8') },
+  )
+}
+
+/**
+ * @en Ensures a database exists (CREATE DATABASE IF NOT EXISTS via catalog check).
+ * @es Asegura que exista una base (CREATE DATABASE tras chequear el catálogo).
+ * @pt-BR Garante que o banco exista (CREATE DATABASE após checar o catálogo).
+ */
+export async function ensureDatabaseExists(
+  cfg: PostgresBackupConfig,
+  dbName: string,
+): Promise<void> {
+  const q = quotePgIdent(dbName)
+  const check = await runPsqlAdmin(
+    cfg,
+    `SELECT 1 FROM pg_database WHERE datname = '${dbName.replace(/'/g, "''")}';`,
+  )
+  if (check.code !== 0) {
+    throw new Error(
+      `ensureDatabaseExists check failed (exit ${check.code}): ${check.stderr.trim() || 'no stderr'}`,
+    )
+  }
+  if (check.stdout.toString('utf8').trim() === '1') return
+
+  const created = await runPsqlAdmin(cfg, `CREATE DATABASE ${q};`)
+  if (created.code !== 0) {
+    throw new Error(
+      `CREATE DATABASE failed (exit ${created.code}): ${created.stderr.trim() || 'no stderr'}`,
+    )
+  }
+}
+
+/**
+ * @en Drops a database if it exists (terminates sessions first). Never drops the configured source DB.
+ * @es Elimina una base si existe (termina sesiones antes). Nunca elimina la BD origen configurada.
+ * @pt-BR Remove um banco se existir (encerra sessões antes). Nunca remove a BD origem configurada.
+ */
+export async function dropDatabaseIfExists(
+  cfg: PostgresBackupConfig,
+  dbName: string,
+): Promise<void> {
+  if (dbName === cfg.postgresDb) {
+    throw new Error(`Refusing to drop configured source database: ${dbName}`)
+  }
+  quotePgIdent(dbName)
+  const lit = dbName.replace(/'/g, "''")
+  const terminate = await runPsqlAdmin(
+    cfg,
+    `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${lit}' AND pid <> pg_backend_pid();`,
+  )
+  if (terminate.code !== 0) {
+    throw new Error(
+      `terminate backends failed (exit ${terminate.code}): ${terminate.stderr.trim() || 'no stderr'}`,
+    )
+  }
+  const dropped = await runPsqlAdmin(cfg, `DROP DATABASE IF EXISTS ${quotePgIdent(dbName)};`)
+  if (dropped.code !== 0) {
+    throw new Error(
+      `DROP DATABASE failed (exit ${dropped.code}): ${dropped.stderr.trim() || 'no stderr'}`,
+    )
+  }
+}
+
+/**
+ * @en Returns COUNT(*) for a public table in the given database.
+ * @es Devuelve COUNT(*) de una tabla public en la base indicada.
+ * @pt-BR Retorna COUNT(*) de uma tabela public no banco indicado.
+ */
+export async function countTableRows(
+  cfg: PostgresBackupConfig,
+  dbName: string,
+  tableName: string,
+): Promise<number> {
+  quotePgIdent(dbName)
+  const table = quotePgIdent(tableName)
+  let result: RunResult
+  if (cfg.useDocker) {
+    result = await runCommand(
+      'docker',
+      [
+        'exec',
+        '-i',
+        cfg.dockerContainer,
+        'psql',
+        '-U',
+        cfg.postgresUser,
+        '-d',
+        dbName,
+        '-v',
+        'ON_ERROR_STOP=1',
+        '-t',
+        '-A',
+        '-c',
+        `SELECT COUNT(*)::text FROM ${table};`,
+      ],
+    )
+  } else {
+    result = await runCommand('psql', [
+      '-U',
+      cfg.postgresUser,
+      '-d',
+      dbName,
+      '-v',
+      'ON_ERROR_STOP=1',
+      '-t',
+      '-A',
+      '-c',
+      `SELECT COUNT(*)::text FROM ${table};`,
+    ])
+  }
+  if (result.code !== 0) {
+    throw new Error(
+      `countTableRows ${dbName}.${tableName} failed (exit ${result.code}): ${result.stderr.trim() || 'no stderr'}`,
+    )
+  }
+  const raw = result.stdout.toString('utf8').trim()
+  const n = Number.parseInt(raw, 10)
+  if (!Number.isFinite(n)) {
+    throw new Error(`countTableRows ${dbName}.${tableName}: unexpected output ${JSON.stringify(raw)}`)
+  }
+  return n
+}
+
 /**
  * @en Soft-fail optional S3/R2 upload via AWS CLI (no SDK in repo).
  * @es Upload S3/R2 opcional vía AWS CLI (soft-fail; sin SDK en el repo).

@@ -12,6 +12,7 @@ Describes the automated PostgreSQL backup pipeline shipped in-repo: logical `pg_
 |-------|----------------|
 | Backup job | [`scripts/backup-postgres.ts`](../../../scripts/backup-postgres.ts) — `npm run backup:postgres` |
 | Restore | [`scripts/restore-postgres.ts`](../../../scripts/restore-postgres.ts) — `npm run backup:postgres:restore -- --list` / `--file … --yes` |
+| Isolated integrity drill (#449) | [`scripts/postgres-backup-restore-drill.ts`](../../../scripts/postgres-backup-restore-drill.ts) — `npm run backup:postgres:drill` |
 | Prune | [`scripts/prune-postgres-backups.ts`](../../../scripts/prune-postgres-backups.ts) — `npm run backup:postgres:prune` |
 | Crypto / retention | [`scripts/lib/postgres-backup/`](../../../scripts/lib/postgres-backup/) |
 | Cron wrappers (Linux) | `scripts/backup-postgres.sh`, `restore-postgres.sh`, `prune-postgres-backups.sh` |
@@ -57,6 +58,25 @@ npm run backup:postgres:restore -- --file .bizcode-backups/<file>.sql.gz.enc --d
 ```
 
 Prefer a dedicated restore database for drills. Do not point at production without an approved change window.
+
+## Pilot isolated drill (#449)
+
+Verifiable backup → restore → count check on a **side database** (never production):
+
+```bash
+# Export ephemeral BACKUP_ENCRYPTION_KEY and the real Docker container name
+# (compose may name it e.g. bizcode-postgres-1, not the default bizcode_db).
+export BACKUP_ENCRYPTION_KEY='…ephemeral…'
+export BIZCODE_POSTGRES_CONTAINER='bizcode-postgres-1'
+export BIZCODE_POSTGRES_DB='bizcode_dev'
+npm run backup:postgres:drill
+```
+
+The drill creates `bizcode_restore_drill_449`, restores into it, compares row counts for critical tables (`Tenant`, `AppUser`, `Cliente`, `Factura`, payment ledger tables when present), then drops the side DB. JSON summary must not include secrets. Record evidence in [SEC-015](../certificacion-iso/sec/sec-015-restore-test-evidence-register.md).
+
+**Job vs deployment:** scripts and cron schedule in [ci-cd.md](ci-cd.md) implement the backup **job**. Host provisioning, live cron installation, and staging DR remain operational (#152 / [#197](disaster-recovery.md)); this drill does **not** close staging AC for #197.
+
+**Pilot RPO/RTO (proposed, same targets as #197 docs):** RPO &lt; 24 hours (nightly backup window); RTO &lt; 4 hours (restore from encrypted backup + redeploy). No automated replica/failover is evidenced in-repo.
 
 ## Remote storage policy
 

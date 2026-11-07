@@ -14,6 +14,18 @@ import {
   selectBackupsToPrune,
 } from '../../scripts/lib/postgres-backup/retention'
 import { loadPostgresBackupConfig } from '../../scripts/lib/postgres-backup/config'
+import {
+  dropDatabaseIfExists,
+  quotePgIdent,
+} from '../../scripts/lib/postgres-backup/runtime'
+import {
+  parseRestorePostgresArgs,
+  RESTORE_REQUIRES_YES,
+} from '../../scripts/lib/postgres-backup/restoreArgs'
+import {
+  DRILL_CRITICAL_TABLES,
+  DRILL_SIDE_DB,
+} from '../../scripts/lib/postgres-backup/drill'
 
 describe('postgres backup naming', () => {
   it('builds and parses round-trip file names', () => {
@@ -90,5 +102,48 @@ describe('postgres backup config', () => {
     expect(cfg.useDocker).toBe(true)
     expect(cfg.s3Uri).toBeNull()
     expect(cfg.backupDir).toContain('.bizcode-backups')
+  })
+})
+
+describe('postgres restore CLI args (#449)', () => {
+  it('parses --file and requires --yes for destructive restore', () => {
+    const withoutYes = parseRestorePostgresArgs(['--file', 'x.sql.gz.enc'])
+    expect(withoutYes.yes).toBe(false)
+    expect(withoutYes.file).toBe('x.sql.gz.enc')
+    expect(RESTORE_REQUIRES_YES).toMatch(/--yes/)
+
+    const withYes = parseRestorePostgresArgs([
+      '--file',
+      'x.sql.gz.enc',
+      '--yes',
+      '--db',
+      'bizcode_restore_drill_449',
+    ])
+    expect(withYes.yes).toBe(true)
+    expect(withYes.db).toBe('bizcode_restore_drill_449')
+  })
+})
+
+describe('postgres backup runtime helpers (#449)', () => {
+  it('quotePgIdent accepts safe names and rejects injection', () => {
+    expect(quotePgIdent('Tenant')).toBe('"Tenant"')
+    expect(() => quotePgIdent('Tenant; DROP')).toThrow(/Unsafe/)
+    expect(() => quotePgIdent('a-b')).toThrow(/Unsafe/)
+  })
+
+  it('refuses to drop the configured source database', async () => {
+    const cfg = loadPostgresBackupConfig({ BACKUP_ENCRYPTION_KEY: 'secret' })
+    await expect(dropDatabaseIfExists(cfg, cfg.postgresDb)).rejects.toThrow(
+      /Refusing to drop configured source database/,
+    )
+  })
+})
+
+describe('postgres backup restore drill constants (#449)', () => {
+  it('uses a fixed side DB distinct from default source', () => {
+    expect(DRILL_SIDE_DB).toBe('bizcode_restore_drill_449')
+    expect(DRILL_CRITICAL_TABLES).toContain('Tenant')
+    expect(DRILL_CRITICAL_TABLES).toContain('PaymentTransaction')
+    expect(DRILL_CRITICAL_TABLES).toContain('MercadoPagoWebhookInbox')
   })
 })
