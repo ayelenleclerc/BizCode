@@ -96535,13 +96535,13 @@ true
 }
 ```
 
-### Mercado Pago payment webhook (#176)
+### Mercado Pago payment webhook (#176/#447)
 
 - **Method:** `POST`
 - **Path:** `/api/webhooks/mercadopago`
 - **Tags:** mercadopago
 
-Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSecret` from Mercado Pago configuration (#174). Responds `200` immediately and processes the payment asynchronously: on `approved`, creates a customer receipt (`ReciboCobro`) with `mercadopago` payment method and invoice allocation; updates `Factura.mpEstado`. Chargeback notifications (`type: chargebacks`) enqueue `MercadoPagoChargeback` and notify managers; no automatic credit note (#179). Idempotent per `mpPaymentId` (`MercadoPagoProcessedPayment`) for payment events. Rate-limited per IP.
+Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSecret` from Mercado Pago configuration (#174). Persists a durable inbox row (`MercadoPagoWebhookInbox`) **before** responding `200` (#447). On persistence failure returns `503` so Mercado Pago can retry. Processing is asynchronous (best-effort in-process + `pnpm run mercadopago:webhook-inbox` worker): on `approved`, creates a customer receipt (`ReciboCobro`) with `mercadopago` payment method and invoice allocation; updates `Factura.mpEstado`. Chargeback notifications (`type: chargebacks`) enqueue `MercadoPagoChargeback` and notify managers; no automatic credit note (#179). Accounting effects are idempotent per `tenantId + mpPaymentId` (`MercadoPagoProcessedPayment`, #446). Rate-limited per IP.
 
 #### Request Body
 
@@ -96592,7 +96592,7 @@ Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSe
 
 #### Responses
 
-##### Status: 200 Notification accepted (processing may continue asynchronously)
+##### Status: 200 Notification durably accepted in inbox (processing may continue asynchronously)
 
 ###### Content-Type: application/json
 
@@ -96609,6 +96609,59 @@ Public IPN endpoint (no JWT). Validates `x-signature` with the tenant `webhookSe
 ```
 
 ##### Status: 400 Invalid signature or payload
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 503 Inbox persistence failed — client should retry
 
 ###### Content-Type: application/json
 
