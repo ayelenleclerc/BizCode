@@ -1,13 +1,19 @@
 /**
- * @en Thin facade over MercadoPagoWebhookService for the multi-provider module (#377).
- *   Syncs PaymentTransaction after MP webhook side-effects (ReciboCobro stays in MP service).
- * @es Fachada delgada sobre MercadoPagoWebhookService (#377).
- *   Sincroniza PaymentTransaction tras efectos del webhook MP.
- * @pt-BR Fachada fina sobre MercadoPagoWebhookService (#377).
- *   Sincroniza PaymentTransaction após efeitos do webhook MP.
+ * @en Thin facade over MercadoPagoWebhookService for the multi-provider module (#377/#448).
+ *   Syncs PaymentTransaction after MP webhook side-effects with verified amount/currency when possible.
+ * @es Fachada delgada sobre MercadoPagoWebhookService (#377/#448).
+ *   Sincroniza PaymentTransaction tras efectos del webhook MP con monto/moneda verificables cuando sea posible.
+ * @pt-BR Fachada fina sobre MercadoPagoWebhookService (#377/#448).
+ *   Sincroniza PaymentTransaction após efeitos do webhook MP com valor/moeda verificáveis quando possível.
  */
 
-import type { PrismaClient } from '@prisma/client'
+import type { Prisma, PrismaClient } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library'
+import { decryptFiscalSecret } from '../fiscal/ar/fiscalSecrets'
+import {
+  fetchMercadoPagoPayment,
+  MercadoPagoApiError,
+} from '../integrations/mercadopago/mercadoPagoApiClient'
 import { MercadoPagoWebhookService } from '../services/MercadoPagoWebhookService'
 import type { ServiceResult } from '../services/serviceResults'
 import { bootstrapPaymentProviders } from './bootstrapPaymentProviders'
@@ -29,6 +35,17 @@ function mapMpEstado(status: string | null | undefined): PaymentStatus {
   if (normalized === 'pending') return 'pending'
   if (normalized === 'expired') return 'expired'
   return 'unknown'
+}
+
+type ResolvedAmount = {
+  amount: Decimal
+  currency: string
+  verified: boolean
+  metadata?: Prisma.InputJsonValue
+}
+
+function isUsableAmount(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0
 }
 
 export class PaymentWebhookService {
@@ -78,6 +95,74 @@ export class PaymentWebhookService {
     await this.mpWebhook.processChargebackNotification(tenantId, chargebackId, body as never, ipAddress)
   }
 
+  /**
+   * @en Resolves amount/currency from MP API then ReciboCobro; otherwise marks unverified (#448).
+   * @es Resuelve monto/moneda desde API MP y luego ReciboCobro; si no, marca no verificado (#448).
+   * @pt-BR Resolve valor/moeda pela API MP e depois ReciboCobro; senão marca não verificado (#448).
+   */
+  private async resolveVerifiedAmount(
+    tenantId: number,
+    paymentId: string,
+    reciboCobroId: number | null,
+  ): Promise<ResolvedAmount> {
+    const mpRow = await this.prisma.mercadoPagoConfig.findUnique({ where: { tenantId } })
+    if (mpRow?.accessTokenEncrypted) {
+      try {
+        const accessToken = decryptFiscalSecret(mpRow.accessTokenEncrypted)
+        const payment = await fetchMercadoPagoPayment(accessToken, paymentId)
+        if (isUsableAmount(payment.transaction_amount)) {
+          const currency =
+            typeof payment.currency_id === 'string' && payment.currency_id.trim()
+              ? payment.currency_id.trim().toUpperCase().slice(0, 3)
+              : 'ARS'
+          return {
+            amount: new Decimal(payment.transaction_amount),
+            currency,
+            verified: true,
+            metadata: { amountSource: 'mercadopago_payment' },
+          }
+        }
+      } catch (err: unknown) {
+        if (!(err instanceof MercadoPagoApiError)) {
+          console.warn(
+            '[payment-webhook] amount_fetch_error',
+            'tenant',
+            tenantId,
+            'payment',
+            paymentId,
+            'detail',
+            err instanceof Error ? err.message : err,
+          )
+        }
+      }
+    }
+
+    if (reciboCobroId != null) {
+      const recibo = await this.prisma.reciboCobro.findFirst({
+        where: { id: reciboCobroId, tenantId },
+        select: { totalCobrado: true },
+      })
+      if (recibo && recibo.totalCobrado.gt(0)) {
+        return {
+          amount: recibo.totalCobrado,
+          currency: 'ARS',
+          verified: true,
+          metadata: { amountSource: 'recibo_cobro' },
+        }
+      }
+    }
+
+    return {
+      amount: new Decimal(0),
+      currency: 'ARS',
+      verified: false,
+      metadata: {
+        amountPending: true,
+        reason: 'no_verified_amount_source',
+      },
+    }
+  }
+
   private async syncTransactionAfterWebhook(tenantId: number, paymentId: string): Promise<void> {
     const processed = await this.prisma.mercadoPagoProcessedPayment.findUnique({
       where: { tenantId_mpPaymentId: { tenantId, mpPaymentId: paymentId } },
@@ -89,6 +174,14 @@ export class PaymentWebhookService {
       select: { id: true, mpEstado: true },
     })
     if (!factura) return
+
+    const resolved = await this.resolveVerifiedAmount(
+      tenantId,
+      paymentId,
+      processed.reciboCobroId,
+    )
+    const status = mapMpEstado(processed.estado ?? factura.mpEstado)
+    const providerStatus = processed.estado ?? factura.mpEstado
 
     const key = invoiceIdempotencyKey('mercadopago', factura.id)
     const existing = await this.transactions.findByIdempotencyKey(tenantId, key)
@@ -102,14 +195,16 @@ export class PaymentWebhookService {
           externalReference: `${tenantId}:${factura.id}`,
           internalReference: `factura:${factura.id}`,
           paymentType: 'webhook',
-          status: mapMpEstado(processed.estado ?? factura.mpEstado),
-          providerStatus: processed.estado ?? factura.mpEstado,
-          amount: 0,
-          currency: 'ARS',
+          status,
+          providerStatus,
+          amount: resolved.amount,
+          currency: resolved.currency,
+          amountVerified: resolved.verified,
+          rawMetadata: resolved.metadata ?? undefined,
           idempotencyKey: key,
           facturaId: factura.id,
           reciboCobroId: processed.reciboCobroId,
-          approvedAt: mapMpEstado(processed.estado) === 'approved' ? new Date() : null,
+          approvedAt: status === 'approved' ? new Date() : null,
         },
       })
       return
@@ -119,10 +214,14 @@ export class PaymentWebhookService {
       tenantId,
       invoiceId: factura.id,
       provider: 'mercadopago',
-      status: mapMpEstado(processed.estado ?? factura.mpEstado),
-      providerStatus: processed.estado ?? factura.mpEstado,
+      status,
+      providerStatus,
       externalPaymentId: paymentId,
       reciboCobroId: processed.reciboCobroId,
+      amount: resolved.verified ? resolved.amount : undefined,
+      currency: resolved.verified ? resolved.currency : undefined,
+      amountVerified: resolved.verified ? true : undefined,
+      rawMetadata: resolved.verified ? resolved.metadata : undefined,
     })
   }
 }

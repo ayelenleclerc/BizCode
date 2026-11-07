@@ -2215,6 +2215,10 @@ model PaymentTransaction {
   providerStatus    String?      @db.VarChar(40)
   amount            Decimal      @db.Decimal(14, 2)
   currency          String       @default("ARS") @db.VarChar(3)
+  /// @en False when amount/currency were not verified from provider or accounting source (#448).
+  /// @es False cuando amount/currency no se verificaron desde el proveedor o fuente contable (#448).
+  /// @pt-BR False quando amount/currency não foram verificados no provedor ou fonte contábil (#448).
+  amountVerified    Boolean      @default(true)
   checkoutUrl       String?      @db.VarChar(500)
   preferenceId      String?      @db.VarChar(80)
   idempotencyKey    String       @db.VarChar(120)
