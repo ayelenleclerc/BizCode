@@ -175,18 +175,25 @@ export class PaymentWebhookService {
     })
     if (!factura) return
 
-    const resolved = await this.resolveVerifiedAmount(
-      tenantId,
-      paymentId,
-      processed.reciboCobroId,
-    )
     const status = mapMpEstado(processed.estado ?? factura.mpEstado)
     const providerStatus = processed.estado ?? factura.mpEstado
-
     const key = invoiceIdempotencyKey('mercadopago', factura.id)
     const existing = await this.transactions.findByIdempotencyKey(tenantId, key)
+
+    // Skip MP amount lookup when ledger already has a verified amount (duplicate webhooks).
+    const needsAmountResolution = !existing || existing.amountVerified === false
+    const resolved = needsAmountResolution
+      ? await this.resolveVerifiedAmount(tenantId, paymentId, processed.reciboCobroId)
+      : null
+
     if (!existing) {
       // Backfill a ledger row if checkout happened before PaymentTransaction existed.
+      const amount = resolved ?? {
+        amount: new Decimal(0),
+        currency: 'ARS',
+        verified: false,
+        metadata: { amountPending: true, reason: 'no_verified_amount_source' },
+      }
       await this.prisma.paymentTransaction.create({
         data: {
           tenantId,
@@ -197,10 +204,10 @@ export class PaymentWebhookService {
           paymentType: 'webhook',
           status,
           providerStatus,
-          amount: resolved.amount,
-          currency: resolved.currency,
-          amountVerified: resolved.verified,
-          rawMetadata: resolved.metadata ?? undefined,
+          amount: amount.amount,
+          currency: amount.currency,
+          amountVerified: amount.verified,
+          rawMetadata: amount.metadata ?? undefined,
           idempotencyKey: key,
           facturaId: factura.id,
           reciboCobroId: processed.reciboCobroId,
@@ -218,10 +225,10 @@ export class PaymentWebhookService {
       providerStatus,
       externalPaymentId: paymentId,
       reciboCobroId: processed.reciboCobroId,
-      amount: resolved.verified ? resolved.amount : undefined,
-      currency: resolved.verified ? resolved.currency : undefined,
-      amountVerified: resolved.verified ? true : undefined,
-      rawMetadata: resolved.verified ? resolved.metadata : undefined,
+      amount: resolved?.verified ? resolved.amount : undefined,
+      currency: resolved?.verified ? resolved.currency : undefined,
+      amountVerified: resolved?.verified ? true : undefined,
+      rawMetadata: resolved?.verified ? resolved.metadata : undefined,
     })
   }
 }
