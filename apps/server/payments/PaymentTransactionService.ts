@@ -4,7 +4,7 @@
  * @pt-BR Persiste linhas PaymentTransaction genéricas com dual-write em Factura.mp* (#377).
  */
 
-import type { PaymentTransaction, PrismaClient } from '@prisma/client'
+import type { PaymentTransaction, Prisma, PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import type { CreatePaymentResult, PaymentProviderCode, PaymentStatus } from './types'
 
@@ -37,6 +37,7 @@ export class PaymentTransactionService {
   }
 
   toCreatePaymentResult(tx: PaymentTransaction): CreatePaymentResult {
+    const amountVerified = tx.amountVerified !== false
     return {
       status: tx.status as PaymentStatus,
       provider: tx.providerCode as PaymentProviderCode,
@@ -44,8 +45,9 @@ export class PaymentTransactionService {
       checkoutUrl: tx.checkoutUrl ?? undefined,
       expiresAt: tx.expiredAt ?? undefined,
       providerStatus: tx.providerStatus ?? undefined,
-      amount: Number(tx.amount),
-      currency: tx.currency,
+      // #448: never expose unverified placeholder amounts as real checkout amounts
+      amount: amountVerified ? Number(tx.amount) : undefined,
+      currency: amountVerified ? tx.currency : undefined,
       externalPaymentId: tx.externalPaymentId ?? undefined,
     }
   }
@@ -59,6 +61,7 @@ export class PaymentTransactionService {
     paymentType?: string
   }): Promise<PaymentTransaction> {
     const amount = new Decimal(input.result.amount ?? 0)
+    const amountVerified = input.result.amount != null && Number(input.result.amount) > 0
     const data = {
       providerCode: input.provider,
       externalPaymentId: input.result.externalPaymentId ?? null,
@@ -69,6 +72,7 @@ export class PaymentTransactionService {
       providerStatus: input.result.providerStatus ?? null,
       amount,
       currency: input.result.currency ?? 'ARS',
+      amountVerified,
       checkoutUrl: input.result.checkoutUrl ?? null,
       preferenceId: input.result.preferenceId ?? null,
       facturaId: input.invoiceId,
@@ -106,12 +110,22 @@ export class PaymentTransactionService {
     providerStatus?: string | null
     externalPaymentId?: string | null
     reciboCobroId?: number | null
+    /** @en When set and existing row is unverified, upgrades amount (#448). */
+    amount?: Decimal
+    currency?: string
+    amountVerified?: boolean
+    rawMetadata?: Prisma.InputJsonValue
   }): Promise<void> {
     const idempotencyKey = invoiceIdempotencyKey(input.provider, input.invoiceId)
     const existing = await this.findByIdempotencyKey(input.tenantId, idempotencyKey)
     if (!existing) return
 
     const now = new Date()
+    const shouldUpgradeAmount =
+      input.amountVerified === true &&
+      input.amount != null &&
+      existing.amountVerified === false
+
     await this.prisma.paymentTransaction.update({
       where: { id: existing.id },
       data: {
@@ -126,6 +140,14 @@ export class PaymentTransactionService {
           input.status === 'refunded' || input.status === 'partially_refunded'
             ? now
             : existing.refundedAt,
+        ...(shouldUpgradeAmount
+          ? {
+              amount: input.amount,
+              currency: input.currency ?? existing.currency,
+              amountVerified: true,
+              rawMetadata: input.rawMetadata ?? existing.rawMetadata ?? undefined,
+            }
+          : {}),
       },
     })
   }

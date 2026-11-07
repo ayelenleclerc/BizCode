@@ -77,6 +77,7 @@
     "tipos-cambio:bcra": "tsx scripts/tipos-cambio-bcra-job.ts",
     "mercadopago:reconciliacion": "tsx scripts/mercadopago-reconciliacion-job.ts",
     "mercadopago:webhook-inbox": "tsx scripts/mercadopago-webhook-inbox-job.ts",
+    "backfill:payment-transaction-amounts": "tsx scripts/backfill-payment-transaction-amounts-448.ts",
     "meli:token-refresh": "tsx scripts/meli-token-refresh-job.ts",
     "meli:catalog-sync": "tsx scripts/meli-catalog-sync-job.ts",
     "meli:stock-reconcile": "tsx scripts/meli-stock-reconcile-job.ts",

@@ -245,6 +245,25 @@ describe('Mercado Pago webhook API (#176/#447)', () => {
       reciboCobroId: 50,
       processedAt: new Date(),
     } as never)
+    // Ledger already exists with verified amount — duplicate must not re-fetch MP (#448).
+    vi.mocked(prisma.paymentTransaction.findUnique).mockResolvedValue({
+      id: 10,
+      tenantId: 1,
+      providerCode: 'mercadopago',
+      amount: new Decimal('2500.00'),
+      currency: 'ARS',
+      amountVerified: true,
+      status: 'approved',
+      providerStatus: 'approved',
+      externalPaymentId: PAYMENT_ID,
+      reciboCobroId: 50,
+      idempotencyKey: `mercadopago:factura:7`,
+      approvedAt: new Date(),
+      rejectedAt: null,
+      cancelledAt: null,
+      refundedAt: null,
+      rawMetadata: null,
+    } as never)
 
     const app = createApp(prisma)
     const headers = buildHeaders(PAYMENT_ID, WEBHOOK_SECRET)
