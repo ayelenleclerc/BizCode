@@ -1,7 +1,7 @@
 import type { Application, Request, Response } from 'express'
 import { requirePermission, type AuthenticatedRequest } from '../auth'
-import { validateBody } from '../middleware/validateBody'
-import { empresaUpdateBodySchema } from '../schemas/domain'
+import { validateBodyForTenant } from '../middleware/validateBodyForTenant'
+import { buildEmpresaUpdateBodySchema } from '../schemas/domain'
 import type { EmpresaInput } from '@bizcode/types'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
@@ -33,7 +33,7 @@ export function registerEmpresaRoutes(app: Application, ctx: RestRouteContext): 
   app.put(
     '/api/empresa',
     requirePermission('settings.business.manage'),
-    validateBody(empresaUpdateBodySchema),
+    validateBodyForTenant(ctx.prisma, buildEmpresaUpdateBodySchema),
     async (req: Request, res: Response) => {
       try {
         const tenantId = getTenantId(req)

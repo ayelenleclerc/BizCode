@@ -49,8 +49,9 @@
     "hintFormat": "Apenas .csv. Máx. 1 MB e até 2000 linhas de dados."
   },
   "iva": {
-    "1": "21%",
-    "2": "10,5%",
+    "exempt": "Isento",
+    "1": "Alíquota 1",
+    "2": "Alíquota 2",
     "3": "Isento"
   },
   "form": {
@@ -105,8 +106,8 @@
     "servicioNoStockHint": "Serviços não usam estoque nem mínimos de inventário.",
     "selectRubro": "Selecionar...",
     "condIvaOptions": {
-      "1": "21%",
-      "2": "10,5%",
+      "1": "Alíquota 1",
+      "2": "Alíquota 2",
       "3": "Isento"
     },
     "multicurrency": {

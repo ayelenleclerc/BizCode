@@ -49,8 +49,9 @@
     "hintFormat": ".csv only. Max 1 MB and up to 2000 data rows."
   },
   "iva": {
-    "1": "21%",
-    "2": "10.5%",
+    "exempt": "Exempt",
+    "1": "Rate 1",
+    "2": "Rate 2",
     "3": "Exempt"
   },
   "form": {
@@ -105,8 +106,8 @@
     "servicioNoStockHint": "Services do not use inventory stock or minimums.",
     "selectRubro": "Select...",
     "condIvaOptions": {
-      "1": "21%",
-      "2": "10.5%",
+      "1": "Rate 1",
+      "2": "Rate 2",
       "3": "Exempt"
     },
     "multicurrency": {

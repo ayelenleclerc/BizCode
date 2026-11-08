@@ -19859,6 +19859,9 @@ components:
         metodoPago:
           type: string
           enum: [transferencia, cheque, efectivo, echeq]
+          description: >
+            `echeq` is accepted only when the tenant has module `fiscal.cheques` enabled
+            (AR-only). Runtime rejects `echeq` otherwise (#440 / #231).
         cbu:
           type: string
           nullable: true
@@ -19918,6 +19921,9 @@ components:
         metodoPago:
           type: string
           enum: [transferencia, cheque, efectivo, echeq]
+          description: >
+            `echeq` requires module `fiscal.cheques` (AR-only). Without that module the API
+            rejects `echeq` at validation time (#440 / #231).
         cbu:
           type: string
           maxLength: 22

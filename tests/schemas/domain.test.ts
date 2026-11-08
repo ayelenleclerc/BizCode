@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   articuloBodySchema,
   clienteBodySchema,
+  buildEmpresaUpdateBodySchema,
   empresaUpdateBodySchema,
   facturaBodySchema,
   logisticaReportesQuerySchema,
@@ -133,7 +134,7 @@ describe('rubroBodySchema', () => {
 })
 
 describe('empresaUpdateBodySchema', () => {
-  it('parses valid company settings', () => {
+  it('parses valid company settings (AR default)', () => {
     const out = empresaUpdateBodySchema.parse({
       nombre: '  Mi Empresa  ',
       cuit: '20-12345678-6',
@@ -160,6 +161,30 @@ describe('empresaUpdateBodySchema', () => {
       nombre: 'Co',
       cuit: '20-12345678-6',
       puntoVenta: 10000,
+      tipoFactura: 'B',
+    })
+    expect(r.success).toBe(false)
+  })
+
+  it('accepts a valid Uruguayan RUT for UY jurisdiction', () => {
+    const schema = buildEmpresaUpdateBodySchema('UY')
+    const out = schema.parse({
+      nombre: 'Empresa UY',
+      cuit: '01-234567-8908',
+      puntoVenta: 1,
+      tipoFactura: 'B',
+      condicionIva: 'IVA',
+    })
+    expect(out.cuit).toBe('01-234567-8908')
+    expect(out.condicionIva).toBe('IVA')
+  })
+
+  it('rejects Argentine CUIT under UY jurisdiction', () => {
+    const schema = buildEmpresaUpdateBodySchema('UY')
+    const r = schema.safeParse({
+      nombre: 'Empresa UY',
+      cuit: '20-12345678-6',
+      puntoVenta: 1,
       tipoFactura: 'B',
     })
     expect(r.success).toBe(false)

@@ -72,7 +72,7 @@
   },
   "fiscalProviders": {
     "title": "Fiscal e-invoicing (multi-organism)",
-    "subtitle": "ARCA (Argentina) issues CAE via homologación mock; Mexico SAT CFDI uses a PAC homologación mock (#210). Uruguay DGI and Chile SII remain capability stubs.",
+    "subtitle": "ARCA (Argentina), Mexico SAT CFDI, and Uruguay DGI CFE use homologación mocks. Chile SII remains a capability stub. Live DGI SOAP/REST is not evidenced (#207).",
     "loading": "Loading fiscal providers…",
     "defaultBadge": "Default",
     "configuredBadge": "Configured",
