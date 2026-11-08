@@ -79,9 +79,18 @@ Scripts #150. **Sin** failover de réplica documentado.
 3. Rebuild; restore desde backup **limpio**.  
 4. Notificaciones legales/clientes; post-mortem.
 
+## Reconciliación de evidencia (#449 vs #197) — 2026-11-08
+
+| Ítem | Evidencia | ¿Cierra AC #197? |
+|------|-----------|------------------|
+| Drill de integridad local (`pnpm run backup:postgres:drill`) | Fila SEC-015 2026-11-07; [backup-y-restauracion.md](backup-y-restauracion.md) | **No** |
+| Drill DR staging / remoto | Host pendiente (`STAGING_DEPLOY_*`) | **Requerido** — abierto |
+| Status page pública | No en el repo | **Requerido** para SLA de uptime operable |
+| Contactos de emergencia | Plantilla | **No** — completar ops |
+
 ## Drill semestral staging — AC pendiente
 
-#197 permanece **OPEN** hasta drill staging + monitoreo público. Smoke Docker local en SEC-015 no cierra ese AC.
+#197 permanece **OPEN** hasta drill staging + monitoreo público. Smoke Docker local / drill #449 en SEC-015 **no** cierra ese AC.
 
 ## Relacionado
 
@@ -99,3 +108,4 @@ Scripts #150. **Sin** failover de réplica documentado.
 | Versión | Fecha | Autor | Resumen |
 |---------|-------|-------|---------|
 | 0.1 | 2026-08-25 | BizCode | Runbooks DR iniciales #197 |
+| 0.2 | 2026-11-08 | BizCode | Gaps explícitos #449 vs staging/status para #197 |

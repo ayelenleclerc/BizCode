@@ -47,6 +47,7 @@ Opciones en [#194](https://github.com/ayelenleclerc/BizCode/issues/194). El MVP 
 
 ## Relacionado
 
+- [Readiness de seguridad pre-comercial](readiness-seguridad-precomercial.md) — go/no-go CI vs AC antes de datos reales (evaluación #194; no cierra el issue)
 - [seguridad.md](../seguridad.md)
 - [escaneo-dependencias-y-triage.md](escaneo-dependencias-y-triage.md)
 - [ciclo-ci-cd.md](ciclo-ci-cd.md)

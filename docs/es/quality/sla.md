@@ -19,8 +19,19 @@ Software multi-tenant BizCode (API + UI web) según suscripción. Quedan fuera f
 | Uptime mensual | 99.9% (~43.8 min/mes) | Monitor HTTP(S) a `/api/health` + status page | **No evidenciado** — activación pendiente |
 | API P95 | &lt; 500 ms | Métricas de app (#151) | Parcial |
 | Primera respuesta soporte | P1 &lt; 4 hs hábiles; P2 &lt; 24 hs | Tickets (operador) | **No evidenciado** |
-| RTO | &lt; 4 hs | Drill de restore | Smoke local: [SEC-015](../certificacion-iso/sec/sec-015-evidencias-prueba-restauracion.md); staging **pendiente** |
-| RPO | &lt; 24 hs | Backup diario | Parcial — [backup-y-restauracion.md](backup-y-restauracion.md) |
+| RTO | &lt; 4 hs | Drill de restore | Drill de integridad local #449 en [SEC-015](../certificacion-iso/sec/sec-015-evidencias-prueba-restauracion.md) (2026-11-07); staging **pendiente** — **no** cierra #197 |
+| RPO | &lt; 24 hs | Backup diario | Parcial — [backup-y-restauracion.md](backup-y-restauracion.md) (#150 / #449) |
+
+### Reconciliación con #449 (2026-11-08)
+
+| Afirmación | Estado |
+|------------|--------|
+| Drill local `backup:postgres:drill` + fila SEC-015 | **Evidenciado** (#449) |
+| Drill DR staging / remoto | **No evidenciado** — #197 sigue abierto |
+| Status page + monitor de uptime | **No evidenciado** — 99.9% sigue **aspiracional** |
+| Contactos de emergencia completos | Solo plantilla en [recuperacion-ante-desastres.md](recuperacion-ante-desastres.md) |
+
+No presentar 99.9% de uptime como operable en contratos hasta monitoreo + status page en vivo.
 
 Horario hábil por defecto: lun–vie 09:00–18:00 America/Argentina/Buenos_Aires.
 
@@ -65,3 +76,4 @@ Ley argentina; tribunales CABA salvo MSA. **Confirmar con asesoría legal.**
 | Versión | Fecha | Autor | Resumen |
 |---------|-------|-------|---------|
 | 0.1 | 2026-08-25 | BizCode | Plantilla SLA inicial #197 |
+| 0.2 | 2026-11-08 | BizCode | Reconciliar evidencia RTO/RPO con #449; gaps staging/status |

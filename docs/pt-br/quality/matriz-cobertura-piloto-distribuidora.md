@@ -65,3 +65,11 @@ A integridade de **saldos/estoque** é afirmada em integração PostgreSQL — n
 | GAP-P1-stock-void | P1 | Void cria NC e zera CC; não restaura estoque |
 | GAP-P1-pedido-http | P1 | Cobertura HTTP pack/ship/deliver/collect fraca na API |
 | RISK-e2e-env | — | E2E exige seed + API; CI Quality Gate já configura |
+
+## Gates pré-comerciais (piloto ≠ comercial)
+
+| Gate | Issue | Status do piloto (2026-11-08) |
+|---|---|---|
+| Segurança antes de dados reais | [#194](https://github.com/ayelenleclerc/BizCode/issues/194) | CI automatizado presente; relatório externo **vazio** — ver [prontidao-seguranca-precomercial.md](prontidao-seguranca-precomercial.md) |
+| SLA / DR operável | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) | Drill local #449 evidenciado; drill staging + status page **pendentes** |
+| FCEM MiPyME (Lei 27440) | [#239](https://github.com/ayelenleclerc/BizCode/issues/239) | **Diferido** — pendente decisão de negócio; sem código WSFECM; não implementar até **sim** explícito |

@@ -54,6 +54,7 @@ Options from [#194](https://github.com/ayelenleclerc/BizCode/issues/194): specia
 
 ## Related
 
+- [Pre-commercial security readiness](pre-commercial-security-readiness.md) — CI vs AC go/no-go before real data (#194 evaluation; does not close the issue)
 - [security.md](../security.md)
 - [dependency-scanning-and-triage.md](dependency-scanning-and-triage.md)
 - [ci-cd.md](ci-cd.md)
