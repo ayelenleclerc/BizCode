@@ -19,8 +19,19 @@ BizCode provides multi-tenant business software (API + web UI) as configured for
 | Monthly uptime | 99.9% (~43.8 min downtime / month) | External HTTP(S) monitor on `/api/health` (e.g. UptimeRobot) + public status page | **Not evidenced** — pending operator activation |
 | API response time P95 | &lt; 500 ms (read-heavy authenticated routes under normal load) | App metrics / observability (#151) | Partial — in-app metrics exist; no contractual export evidenced |
 | First support response | P1 &lt; 4 business hours; P2 &lt; 24 business hours | Ticket system (operator-owned) | **Not evidenced** in repo |
-| RTO | &lt; 4 hours | Timed restore / failover drill | Local restore smoke: [SEC-015](../certificacion-iso/sec/sec-015-restore-test-evidence-register.md); staging drill **pending** |
-| RPO | &lt; 24 hours | Backup schedule (nightly) | Partial — [backup-and-restore.md](backup-and-restore.md) (#150) |
+| RTO | &lt; 4 hours | Timed restore / failover drill | Local integrity drill #449 in [SEC-015](../certificacion-iso/sec/sec-015-restore-test-evidence-register.md) (2026-11-07); staging drill **pending** — does **not** close #197 |
+| RPO | &lt; 24 hours | Backup schedule (nightly) | Partial — [backup-and-restore.md](backup-and-restore.md) (#150 / #449 job + local drill) |
+
+### Reconciliation with #449 (2026-11-08)
+
+| Claim | Status |
+|-------|--------|
+| Local `backup:postgres:drill` + SEC-015 row | **Evidenced** (#449) |
+| Staging / remote DR drill | **Not evidenced** — keeps #197 open |
+| Public status page + uptime monitor | **Not evidenced** — 99.9% uptime remains **aspirational** |
+| Emergency contacts filled | **Template only** in [disaster-recovery.md](disaster-recovery.md) |
+
+Do **not** present 99.9% uptime as operable in contracts until monitoring + status page are live.
 
 Business hours default: Monday–Friday 09:00–18:00 America/Argentina/Buenos_Aires (operator may publish a different calendar in the contract).
 
@@ -83,3 +94,4 @@ Until completed, uptime SLA is **aspirational**:
 | Version | Date | Author | Summary |
 |---------|------|--------|---------|
 | 0.1 | 2026-08-25 | BizCode | Initial SLA template for #197 |
+| 0.2 | 2026-11-08 | BizCode | Reconcile RTO/RPO evidence with #449; mark staging/status gaps |

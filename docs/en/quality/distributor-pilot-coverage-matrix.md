@@ -71,3 +71,11 @@ Integrity of **saldos/stock** is asserted in PostgreSQL integration tests — no
 | GAP-P1-stock-void | P1 | Void creates NC and zeros CC; does not restore `Articulo.stock` / depósito |
 | GAP-P1-pedido-http | P1 | pack/ship/deliver/collect HTTP coverage thin in API tests |
 | RISK-e2e-env | — | E2E needs seeded superadmin + running API; CI already wires this in Quality Gate |
+
+## Pre-commercial gates (pilot exit ≠ commercial)
+
+| Gate | Issue | Pilot status (2026-11-08) |
+|---|---|---|
+| Security before real data | [#194](https://github.com/ayelenleclerc/BizCode/issues/194) | Automated CI present; external report **empty** — see [pre-commercial-security-readiness.md](pre-commercial-security-readiness.md) |
+| SLA / DR operable | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) | Local drill #449 evidenced; staging drill + status page **pending** |
+| FCEM MiPyME (Ley 27440) | [#239](https://github.com/ayelenleclerc/BizCode/issues/239) | **Deferred** — pending business decision; no WSFECM code in repo; do not implement until explicit **sí** |

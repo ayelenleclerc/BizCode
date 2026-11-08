@@ -124,6 +124,15 @@ R = Responsible, A = Accountable, C = Consulted, I = Informed.
 
 ---
 
+## Evidence reconciliation (#449 vs #197) — 2026-11-08
+
+| Item | Evidence | Closes #197 AC? |
+|------|----------|-----------------|
+| Isolated local integrity drill (`pnpm run backup:postgres:drill`) | [SEC-015](../certificacion-iso/sec/sec-015-restore-test-evidence-register.md) row 2026-11-07; [backup-and-restore.md](backup-and-restore.md) | **No** |
+| Staging / remote semiannual DR drill | Pending host (`STAGING_DEPLOY_*`) | **Required** — still open |
+| Public status page | Not in repo | **Required** for operable uptime SLA |
+| Emergency contacts table above | Template placeholders | **No** — ops fill-in |
+
 ## Semiannual DR drill (staging) — pending AC
 
 1. Use staging host with `STAGING_DEPLOY_*` configured.
@@ -132,7 +141,7 @@ R = Responsible, A = Accountable, C = Consulted, I = Informed.
 4. Record in SEC-015; compare to &lt; 4h target.
 5. **Issue #197 stays OPEN** until this drill and public uptime monitoring are done.
 
-Local Docker restore smoke (dev `:5432`) is documented separately in SEC-015 and does **not** close the staging AC.
+Local Docker restore smoke / #449 integrity drill (dev `:5432`) is documented in SEC-015 and does **not** close the staging AC.
 
 ## Related
 
@@ -151,3 +160,4 @@ Local Docker restore smoke (dev `:5432`) is documented separately in SEC-015 and
 | Version | Date | Author | Summary |
 |---------|------|--------|---------|
 | 0.1 | 2026-08-25 | BizCode | Initial DR runbooks for #197 |
+| 0.2 | 2026-11-08 | BizCode | Explicit #449 vs staging/status gaps for #197 |

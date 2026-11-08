@@ -47,6 +47,7 @@ Opções em [#194](https://github.com/ayelenleclerc/BizCode/issues/194). O MVP a
 
 ## Relacionado
 
+- [Prontidão de segurança pré-comercial](prontidao-seguranca-precomercial.md) — go/no-go CI vs AC antes de dados reais (avaliação #194; não fecha a issue)
 - [seguranca.md](../seguranca.md)
 - [varredura-dependencias-e-triagem.md](varredura-dependencias-e-triagem.md)
 - [ciclo-ci-cd.md](ciclo-ci-cd.md)
