@@ -32014,7 +32014,7 @@ Requires module `finance.receipts` and permission `suppliers.read`.
 
   - **`metodoPago` (required)**
 
-    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"` — \`echeq\` is accepted only when the tenant has module \`fiscal.cheques\` enabled (AR-only). Runtime rejects \`echeq\` otherwise (#440 / #231).
 
   - **`numero` (required)**
 
@@ -32493,7 +32493,7 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 
 - **`metodoPago` (required)**
 
-  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"` — \`echeq\` requires module \`fiscal.cheques\` (AR-only). Without that module the API rejects \`echeq\` at validation time (#440 / #231).
 
 - **`total` (required)**
 
@@ -32616,7 +32616,7 @@ Creates `ReciboPago` with tenant-correlative `numero`, posts `pago` ledger movem
 
   - **`metodoPago` (required)**
 
-    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"` — \`echeq\` is accepted only when the tenant has module \`fiscal.cheques\` enabled (AR-only). Runtime rejects \`echeq\` otherwise (#440 / #231).
 
   - **`numero` (required)**
 
@@ -33105,7 +33105,7 @@ Sets estado `anulado` and posts compensating ledger movement. Audit `recibo_pago
 
   - **`metodoPago` (required)**
 
-    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"` — \`echeq\` is accepted only when the tenant has module \`fiscal.cheques\` enabled (AR-only). Runtime rejects \`echeq\` otherwise (#440 / #231).
 
   - **`numero` (required)**
 
@@ -176057,7 +176057,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
 * **`metodoPago` (required)**
 
-  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"` — \`echeq\` is accepted only when the tenant has module \`fiscal.cheques\` enabled (AR-only). Runtime rejects \`echeq\` otherwise (#440 / #231).
 
 * **`numero` (required)**
 
@@ -176239,7 +176239,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
 * **`metodoPago` (required)**
 
-  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+  `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"` — \`echeq\` requires module \`fiscal.cheques\` (AR-only). Without that module the API rejects \`echeq\` at validation time (#440 / #231).
 
 * **`total` (required)**
 
@@ -177323,7 +177323,7 @@ Rate-limited mutation; requires products.manage. USD only.
 
   - **`metodoPago` (required)**
 
-    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"`
+    `string`, possible values: `"transferencia", "cheque", "efectivo", "echeq"` — \`echeq\` is accepted only when the tenant has module \`fiscal.cheques\` enabled (AR-only). Runtime rejects \`echeq\` otherwise (#440 / #231).
 
   - **`numero` (required)**
 

@@ -94,6 +94,9 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
     tenant: {
       findUnique: vi.fn().mockResolvedValue({ id: 1, name: 'Demo Tenant', slug: 'demo', active: true }),
     },
+    tenantConfig: {
+      findUnique: vi.fn().mockResolvedValue({ jurisdiccionFiscal: 'AR' }),
+    },
     appSession: {
       create: vi.fn().mockResolvedValue({ id: 1 }),
       findFirst: vi.fn().mockResolvedValue(null),

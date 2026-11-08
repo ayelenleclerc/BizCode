@@ -163,7 +163,7 @@ undefined#/allOf/0/properties/data/items
 
 ## metodoPago
 
-
+`echeq` is accepted only when the tenant has module `fiscal.cheques` enabled (AR-only). Runtime rejects `echeq` otherwise (#440 / #231).
 
 `metodoPago`
 

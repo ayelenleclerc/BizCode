@@ -110,7 +110,7 @@ Portfolio check to endorse when metodoPago is cheque or echeq (#231).
 
 ## metodoPago
 
-
+`echeq` requires module `fiscal.cheques` (AR-only). Without that module the API rejects `echeq` at validation time (#440 / #231).
 
 `metodoPago`
 

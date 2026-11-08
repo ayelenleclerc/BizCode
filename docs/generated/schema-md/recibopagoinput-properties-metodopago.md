@@ -4,7 +4,7 @@
 undefined#/properties/metodoPago
 ```
 
-
+`echeq` requires module `fiscal.cheques` (AR-only). Without that module the API rejects `echeq` at validation time (#440 / #231).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                         |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------- |
