@@ -43,6 +43,44 @@ push / pull_request → job quality (ubuntu-latest):
 | `push` | `main`, `develop` |
 | `pull_request` | hacia `main` o `develop` |
 
+## Protección de ramas (`main` / `develop`) — #451
+
+**Que el job de CI exista ≠ enforcement remoto.** Los workflows pueden ejecutarse en cada PR y, aun así, GitHub permite push directo o merge que ignore checks fallidos hasta que la branch protection (o un ruleset) los exija.
+
+| Rama | Rol | Enforcement remoto (#451) |
+|---|---|---|
+| `main` | Baseline estable | Protegida: required **`Quality Gate`**, revisiones CODEOWNERS, dismiss stale, `enforce_admins`, sin force-push, sin borrado de rama, resolución de conversaciones, rama estrictamente actualizada |
+| `develop` | Integración (+ deploy staging en push) | Mismo perfil que `main`, más required **`Secret scan`** (nombre del job Gitleaks). Push directo y force-push bloqueados también para admins con `enforce_admins` |
+
+**Nombres exactos de checks required:**
+
+| Check | Workflow / job | Motivo |
+|---|---|---|
+| `Quality Gate` | `CI Quality Gate` → job `Quality Gate` ([`ci.yml`](../../../.github/workflows/ci.yml)) | type-check, lint, tests, cobertura, OpenAPI, drift de docs, i18n, E2E smoke, integración |
+| `Secret scan` | `Gitleaks` → job `Secret scan` ([`gitleaks.yml`](../../../.github/workflows/gitleaks.yml)) | bloquea merges que introduzcan secretos (extra en `develop` respecto al perfil histórico de `main`) |
+
+**No required para merge** (pueden seguir corriendo; marcarlos required arriesga soft-lock si quedan SKIPPED o sin token): Deploy / Publish GHCR, `update-status`, ZAP Baseline, Snyk, Docs governance, Documentation links, CodeQL y el resto de QA Validation. Preferir CI verde como proceso; solo esos dos contexts son compuerta dura en `develop`.
+
+**Flujo Cursor → merge**
+
+1. Rama desde `develop` actualizado (`feature/*`, `fix/*`, `docs/*`, `chore/*`, `test/*`).
+2. Abrir Pull Request **hacia `develop`** (no `main`).
+3. Esperar checks required: **`Quality Gate`** y **`Secret scan`**.
+4. Revisión CODEOWNERS cuando GitHub la pida (pagos / fiscal / auth cubiertos por [`.github/CODEOWNERS`](../../../.github/CODEOWNERS)).
+5. Merge solo con checks required en verde; no force-push a `develop` ni `main`.
+6. Releases: merge `develop` → `main` por separado; proteger `develop` no implica merge masivo a `main`.
+
+**Runbook operador** — payload: [`.github/branch-protection/develop-protection.json`](../../../.github/branch-protection/develop-protection.json).
+
+```bash
+gh api repos/ayelenleclerc/BizCode/branches/develop/protection --jq "{checks: .required_status_checks.contexts, enforce_admins: .enforce_admins.enabled}"
+
+gh api -X PUT repos/ayelenleclerc/BizCode/branches/develop/protection \
+  --input .github/branch-protection/develop-protection.json
+```
+
+**Validación controlada (#451, 2026-11-07):** el target temporal `sandbox/451-branch-protection` recibió el mismo payload; el PR probe [#457](https://github.com/ayelenleclerc/BizCode/pull/457) reportó `mergeStateStatus=BLOCKED` y `gh pr merge` falló con *base branch policy prohibits the merge*. Luego se aplicó el mismo payload a `develop` (contexts `Quality Gate`, `Secret scan`; `enforce_admins=true`). Se eliminaron la rama sandbox y el PR probe.
+
 ## Escaneo de secretos (#216)
 
 El workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.yml) ejecuta Gitleaks en push/PR a `main`/`develop` y falla si hay hallazgos. Config: [`.gitleaks.toml`](../../../.gitleaks.toml). Ver [gestión de secretos / Doppler](gestion-secretos-y-doppler.md).
@@ -266,7 +304,7 @@ Checklist de uso diario:
 1. Crear issue con template `Task`.
 2. Agregar issue al Project.
 3. Abrir PR con `Closes #<issue>`.
-4. Verificar checks (`Quality Gate`, `Docs governance`, enlaces Markdown en `docs/`, seguridad/CodeQL si aplica).
+4. Verificar checks **required** en `develop`: `Quality Gate` y `Secret scan` (otros workflows pueden seguir corriendo; ver [Protección de ramas](#protección-de-ramas-main--develop--451)).
 5. Mergear cuando CI esté verde.
 
 ## Jobs operativos programados (cron en el host)
