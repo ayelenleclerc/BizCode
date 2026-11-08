@@ -74,6 +74,7 @@ Additional coverage exclusions (bundler entries, `server/main.ts`, etc.) only wi
 | Tier 3 ceiling | Ratchet upward only; no silent widening of `include` | ADR + strategy updates |
 | API contract vs OpenAPI | All paths in `tests/api/contract.test.ts` pass | `npm run test` |
 | E2E (Playwright) | Smoke + critical paths in `e2e/` pass on Chromium | `npm run test:e2e` |
+| Distributor pilot (#450) | Coverage matrix + circuito integridad (stock/CC) + E2E pedidos/cobros | [distributor-pilot-coverage-matrix.md](distributor-pilot-coverage-matrix.md) |
 | Integration (PostgreSQL) | `tests/integration/**` pass | `npm run test:integration` |
 | Accessibility | `jest-axe` smoke + `@axe-core/playwright` on critical surfaces + ESLint `jsx-a11y` | `npm run test:a11y`, Playwright specs, `npm run lint` |
 

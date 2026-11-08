@@ -74,6 +74,7 @@ Exclusiones adicionales solo con **ADR** y cambio en `vitest.config.ts` — ver 
 | Nivel 3 techo | Solo ratchet ascendente; sin ampliar `include` en silencio | ADR + estrategia |
 | Contrato API vs OpenAPI | Pasan las rutas en `tests/api/contract.test.ts` | `npm run test` |
 | E2E (Playwright) | Smoke + rutas críticas en `e2e/` en Chromium | `npm run test:e2e` |
+| Piloto distribuidora (#450) | Matriz de cobertura + circuito integridad (stock/CC) + E2E pedidos/cobros | [matriz-cobertura-piloto-distribuidora.md](matriz-cobertura-piloto-distribuidora.md) |
 | Integración (PostgreSQL) | `tests/integration/**` | `npm run test:integration` |
 | Accesibilidad | Smoke `jest-axe` + `@axe-core/playwright` en superficies críticas + ESLint `jsx-a11y` | `npm run test:a11y`, specs Playwright, `npm run lint` |
 
