@@ -28,7 +28,7 @@ Opciones consideradas:
 1. Cada país posee un `FiscalRuleSet` en `packages/types/src/fiscal/countries/`.
 2. `registry.ts` expone `getFiscalRules`, `subjectPaysVat`, `getVatRateCodes`, `getDocumentKinds`.
 3. Algoritmos puros de identificador viven en `packages/types/src/fiscal/identifiers/` y se re-exportan desde `apps/web/src/lib/validators.ts`.
-4. `validateBodyForTenant(prisma, buildSchema)` resuelve la jurisdicción del tenant y construye esquemas Zod por request (cliente, proveedor, empresa).
+4. `validateBodyForTenant(prisma, buildSchema)` resuelve la jurisdicción del tenant y construye esquemas Zod por request (cliente, proveedor y empresa).
 5. Los selects de UI se derivan del registro (`apps/web/src/lib/fiscal/uiOptions.ts`). `calculateInvoice` recibe la jurisdicción.
 6. `fiscal.libro_iva` es AR-only; `echeq` solo se acepta en recibos de proveedor cuando `fiscal.cheques` está habilitado.
 7. Las condiciones fiscales de UY y CL son **modelo de producto** (quién paga IVA), no catálogo oficial DGI/SII.
