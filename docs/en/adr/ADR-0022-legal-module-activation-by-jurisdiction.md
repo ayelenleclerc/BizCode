@@ -52,3 +52,10 @@ Options considered:
 - [ADR-0007](ADR-0007-dual-deployment-and-fiscal-modularity.md) — dual deployment and fiscal modularity
 - [legal-module-activation-by-jurisdiction.md](../quality/legal-module-activation-by-jurisdiction.md)
 - [multi-country-fiscal-base.md](../quality/multi-country-fiscal-base.md)
+
+## Revision
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-08-31 | Accepted with #437 / PR #438 |
+| 1.1 | 2026-11-08 | ES/PT-BR ADR copies added for docs governance (#437 reconcile) |

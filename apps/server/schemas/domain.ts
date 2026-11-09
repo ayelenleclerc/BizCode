@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { validateCUIT } from '../../web/src/lib/validators'
 import {
   DEFAULT_FISCAL_JURISDICTION,
   getFiscalRules,
@@ -1363,187 +1362,211 @@ const empresaTipoFacturaSchema = z.enum(['A', 'B', 'C'], {
   errorMap: () => ({ message: 'tipoFactura must be one of: A, B, C' }),
 })
 
-const empresaCondicionIvaSchema = z.enum(['RI', 'Mono', 'CF', 'Exento'], {
-  errorMap: () => ({ message: 'condicionIva must be one of: RI, Mono, CF, Exento' }),
-})
-
-export const empresaUpdateBodySchema = z
-  .object({
-    nombre: z.string({ required_error: 'nombre is required', invalid_type_error: 'nombre must be a string' }),
-    cuit: z.string({ required_error: 'cuit is required', invalid_type_error: 'cuit must be a string' }),
-    domicilio: z.union([z.string(), z.null(), z.undefined()]).optional(),
-    puntoVenta: z.number({ invalid_type_error: 'puntoVenta must be an integer' }),
-    tipoFactura: empresaTipoFacturaSchema,
-    logoUrl: z.union([z.string(), z.null(), z.undefined()]).optional(),
-    recordatorioDiasGracia: z.number({ invalid_type_error: 'recordatorioDiasGracia must be an integer' }).optional(),
-    timezone: z.string({ invalid_type_error: 'timezone must be a string' }).optional(),
-    recordatorioHoraInicio: z
-      .number({ invalid_type_error: 'recordatorioHoraInicio must be an integer' })
-      .optional(),
-    recordatorioHoraFin: z.number({ invalid_type_error: 'recordatorioHoraFin must be an integer' }).optional(),
-    condicionIva: empresaCondicionIvaSchema.optional(),
-    ingresosBrutos: z.union([z.string(), z.null(), z.undefined()]).optional(),
-    fechaInicioActividades: z.union([z.string(), z.null(), z.undefined()]).optional(),
-  })
-  .superRefine((data, ctx) => {
-    const nombre = data.nombre.trim()
-    if (nombre.length < 1 || nombre.length > 40) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'nombre must be between 1 and 40 characters', path: ['nombre'] })
-    }
-    normalizeOptStr(data.domicilio === undefined ? undefined : data.domicilio, 40, 'domicilio', ctx)
-    const cuitTrim = data.cuit.trim()
-    if (cuitTrim.length === 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cuit is required', path: ['cuit'] })
-    } else if (!validateCUIT(cuitTrim)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cuit must be a valid Argentine CUIT', path: ['cuit'] })
-    }
-    if (!Number.isInteger(data.puntoVenta) || data.puntoVenta < 1 || data.puntoVenta > 9999) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'puntoVenta must be an integer between 1 and 9999',
-        path: ['puntoVenta'],
-      })
-    }
-    if (data.logoUrl !== undefined && data.logoUrl !== null && typeof data.logoUrl === 'string') {
-      const logo = data.logoUrl.trim()
-      if (logo.length > 255) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'logoUrl must be at most 255 characters', path: ['logoUrl'] })
+/**
+ * @en Builds company-settings body schema for a jurisdiction (#440 residual): tax id and optional
+ *   subject condition come from FiscalRuleSet; invoice letter enum remains A|B|C pending product model.
+ * @es Esquema de empresa por jurisdicción (#440 residual): identificador fiscal y condición opcional
+ *   desde FiscalRuleSet; letra A|B|C queda hasta modelo de producto.
+ * @pt-BR Esquema de empresa por jurisdição (#440 residual): identificador fiscal e condição opcional
+ *   via FiscalRuleSet; letra A|B|C permanece até modelo de produto.
+ */
+export function buildEmpresaUpdateBodySchema(jurisdiction: FiscalJurisdictionCode) {
+  const rules = getFiscalRules(jurisdiction)
+  return z
+    .object({
+      nombre: z.string({ required_error: 'nombre is required', invalid_type_error: 'nombre must be a string' }),
+      cuit: z.string({ required_error: 'cuit is required', invalid_type_error: 'cuit must be a string' }),
+      domicilio: z.union([z.string(), z.null(), z.undefined()]).optional(),
+      puntoVenta: z.number({ invalid_type_error: 'puntoVenta must be an integer' }),
+      tipoFactura: empresaTipoFacturaSchema,
+      logoUrl: z.union([z.string(), z.null(), z.undefined()]).optional(),
+      recordatorioDiasGracia: z.number({ invalid_type_error: 'recordatorioDiasGracia must be an integer' }).optional(),
+      timezone: z.string({ invalid_type_error: 'timezone must be a string' }).optional(),
+      recordatorioHoraInicio: z
+        .number({ invalid_type_error: 'recordatorioHoraInicio must be an integer' })
+        .optional(),
+      recordatorioHoraFin: z.number({ invalid_type_error: 'recordatorioHoraFin must be an integer' }).optional(),
+      condicionIva: z.string({ invalid_type_error: 'condicionIva must be a string' }).optional(),
+      ingresosBrutos: z.union([z.string(), z.null(), z.undefined()]).optional(),
+      fechaInicioActividades: z.union([z.string(), z.null(), z.undefined()]).optional(),
+    })
+    .superRefine((data, ctx) => {
+      const nombre = data.nombre.trim()
+      if (nombre.length < 1 || nombre.length > 40) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'nombre must be between 1 and 40 characters', path: ['nombre'] })
       }
-      if (logo.length > 0) {
-        try {
-          const parsed = new URL(logo)
-          if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'logoUrl must be an http or https URL', path: ['logoUrl'] })
-          }
-        } catch {
-          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'logoUrl must be a valid URL', path: ['logoUrl'] })
+      normalizeOptStr(data.domicilio === undefined ? undefined : data.domicilio, 40, 'domicilio', ctx)
+      const cuitTrim = data.cuit.trim()
+      if (cuitTrim.length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'cuit is required', path: ['cuit'] })
+      } else if (!rules.taxId.validate(cuitTrim)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `cuit must be a valid ${rules.taxId.kind.toUpperCase()}`,
+          path: ['cuit'],
+        })
+      }
+      if (data.condicionIva !== undefined) {
+        const conditions = rules.subjectTaxConditions.map((c) => c.code)
+        if (!conditions.includes(data.condicionIva)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `condicionIva must be one of: ${conditions.join(', ')}`,
+            path: ['condicionIva'],
+          })
         }
       }
-    }
-    if (data.recordatorioDiasGracia !== undefined) {
-      const grace = data.recordatorioDiasGracia
-      if (!Number.isInteger(grace) || grace < 0 || grace > 365) {
+      if (!Number.isInteger(data.puntoVenta) || data.puntoVenta < 1 || data.puntoVenta > 9999) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'recordatorioDiasGracia must be an integer between 0 and 365',
-          path: ['recordatorioDiasGracia'],
+          message: 'puntoVenta must be an integer between 1 and 9999',
+          path: ['puntoVenta'],
         })
       }
-    }
-    if (data.timezone !== undefined) {
-      const tz = data.timezone.trim()
-      if (tz.length < 1 || tz.length > 64 || !isValidIanaTimeZone(tz)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'timezone must be a valid IANA time zone',
-          path: ['timezone'],
-        })
+      if (data.logoUrl !== undefined && data.logoUrl !== null && typeof data.logoUrl === 'string') {
+        const logo = data.logoUrl.trim()
+        if (logo.length > 255) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'logoUrl must be at most 255 characters', path: ['logoUrl'] })
+        }
+        if (logo.length > 0) {
+          try {
+            const parsed = new URL(logo)
+            if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+              ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'logoUrl must be an http or https URL', path: ['logoUrl'] })
+            }
+          } catch {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'logoUrl must be a valid URL', path: ['logoUrl'] })
+          }
+        }
       }
-    }
-    if (data.recordatorioHoraInicio !== undefined) {
-      const h = data.recordatorioHoraInicio
-      if (!Number.isInteger(h) || h < 0 || h > 23) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'recordatorioHoraInicio must be an integer between 0 and 23',
-          path: ['recordatorioHoraInicio'],
-        })
+      if (data.recordatorioDiasGracia !== undefined) {
+        const grace = data.recordatorioDiasGracia
+        if (!Number.isInteger(grace) || grace < 0 || grace > 365) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'recordatorioDiasGracia must be an integer between 0 and 365',
+            path: ['recordatorioDiasGracia'],
+          })
+        }
       }
-    }
-    if (data.recordatorioHoraFin !== undefined) {
-      const h = data.recordatorioHoraFin
-      if (!Number.isInteger(h) || h < 1 || h > 24) {
+      if (data.timezone !== undefined) {
+        const tz = data.timezone.trim()
+        if (tz.length < 1 || tz.length > 64 || !isValidIanaTimeZone(tz)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'timezone must be a valid IANA time zone',
+            path: ['timezone'],
+          })
+        }
+      }
+      if (data.recordatorioHoraInicio !== undefined) {
+        const h = data.recordatorioHoraInicio
+        if (!Number.isInteger(h) || h < 0 || h > 23) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'recordatorioHoraInicio must be an integer between 0 and 23',
+            path: ['recordatorioHoraInicio'],
+          })
+        }
+      }
+      if (data.recordatorioHoraFin !== undefined) {
+        const h = data.recordatorioHoraFin
+        if (!Number.isInteger(h) || h < 1 || h > 24) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'recordatorioHoraFin must be an integer between 1 and 24',
+            path: ['recordatorioHoraFin'],
+          })
+        }
+      }
+      const start = data.recordatorioHoraInicio
+      const end = data.recordatorioHoraFin
+      if (start !== undefined && end !== undefined && start >= end) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'recordatorioHoraFin must be an integer between 1 and 24',
+          message: 'recordatorioHoraFin must be greater than recordatorioHoraInicio',
           path: ['recordatorioHoraFin'],
         })
       }
-    }
-    const start = data.recordatorioHoraInicio
-    const end = data.recordatorioHoraFin
-    if (start !== undefined && end !== undefined && start >= end) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'recordatorioHoraFin must be greater than recordatorioHoraInicio',
-        path: ['recordatorioHoraFin'],
-      })
-    }
-    if (data.ingresosBrutos !== undefined && data.ingresosBrutos !== null && typeof data.ingresosBrutos === 'string') {
-      const ib = data.ingresosBrutos.trim()
-      if (ib.length > 30) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'ingresosBrutos must be at most 30 characters',
-          path: ['ingresosBrutos'],
-        })
+      if (data.ingresosBrutos !== undefined && data.ingresosBrutos !== null && typeof data.ingresosBrutos === 'string') {
+        const ib = data.ingresosBrutos.trim()
+        if (ib.length > 30) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'ingresosBrutos must be at most 30 characters',
+            path: ['ingresosBrutos'],
+          })
+        }
       }
-    }
-    if (
-      data.fechaInicioActividades !== undefined &&
-      data.fechaInicioActividades !== null &&
-      typeof data.fechaInicioActividades === 'string'
-    ) {
-      const raw = data.fechaInicioActividades.trim()
-      if (raw.length > 0 && !/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'fechaInicioActividades must be YYYY-MM-DD',
-          path: ['fechaInicioActividades'],
-        })
+      if (
+        data.fechaInicioActividades !== undefined &&
+        data.fechaInicioActividades !== null &&
+        typeof data.fechaInicioActividades === 'string'
+      ) {
+        const raw = data.fechaInicioActividades.trim()
+        if (raw.length > 0 && !/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'fechaInicioActividades must be YYYY-MM-DD',
+            path: ['fechaInicioActividades'],
+          })
+        }
       }
-    }
-  })
-  .transform((data): EmpresaInput => {
-    const dom =
-      data.domicilio === undefined
-        ? null
-        : data.domicilio === null
+    })
+    .transform((data): EmpresaInput => {
+      const dom =
+        data.domicilio === undefined
           ? null
-          : data.domicilio.trim() === ''
+          : data.domicilio === null
             ? null
-            : data.domicilio.trim()
-    const logo =
-      data.logoUrl === undefined
-        ? null
-        : data.logoUrl === null
+            : data.domicilio.trim() === ''
+              ? null
+              : data.domicilio.trim()
+      const logo =
+        data.logoUrl === undefined
           ? null
-          : data.logoUrl.trim() === ''
+          : data.logoUrl === null
             ? null
-            : data.logoUrl.trim()
-    const ingresosBrutos =
-      data.ingresosBrutos === undefined
-        ? undefined
-        : data.ingresosBrutos === null
-          ? null
-          : data.ingresosBrutos.trim() === ''
+            : data.logoUrl.trim() === ''
+              ? null
+              : data.logoUrl.trim()
+      const ingresosBrutos =
+        data.ingresosBrutos === undefined
+          ? undefined
+          : data.ingresosBrutos === null
             ? null
-            : data.ingresosBrutos.trim()
-    const fechaInicioActividades =
-      data.fechaInicioActividades === undefined
-        ? undefined
-        : data.fechaInicioActividades === null
-          ? null
-          : data.fechaInicioActividades.trim() === ''
+            : data.ingresosBrutos.trim() === ''
+              ? null
+              : data.ingresosBrutos.trim()
+      const fechaInicioActividades =
+        data.fechaInicioActividades === undefined
+          ? undefined
+          : data.fechaInicioActividades === null
             ? null
-            : data.fechaInicioActividades.trim()
+            : data.fechaInicioActividades.trim() === ''
+              ? null
+              : data.fechaInicioActividades.trim()
 
-    return {
-      nombre: data.nombre.trim(),
-      cuit: data.cuit.trim(),
-      domicilio: dom,
-      puntoVenta: data.puntoVenta,
-      tipoFactura: data.tipoFactura,
-      logoUrl: logo,
-      recordatorioDiasGracia: data.recordatorioDiasGracia,
-      timezone: data.timezone?.trim(),
-      recordatorioHoraInicio: data.recordatorioHoraInicio,
-      recordatorioHoraFin: data.recordatorioHoraFin,
-      condicionIva: data.condicionIva,
-      ingresosBrutos,
-      fechaInicioActividades,
-    }
-  })
+      return {
+        nombre: data.nombre.trim(),
+        cuit: data.cuit.trim(),
+        domicilio: dom,
+        puntoVenta: data.puntoVenta,
+        tipoFactura: data.tipoFactura,
+        logoUrl: logo,
+        recordatorioDiasGracia: data.recordatorioDiasGracia,
+        timezone: data.timezone?.trim(),
+        recordatorioHoraInicio: data.recordatorioHoraInicio,
+        recordatorioHoraFin: data.recordatorioHoraFin,
+        condicionIva: data.condicionIva,
+        ingresosBrutos,
+        fechaInicioActividades,
+      }
+    })
+}
+
+/** @deprecated Prefer `buildEmpresaUpdateBodySchema` via `validateBodyForTenant`; AR default for tests. */
+export const empresaUpdateBodySchema = buildEmpresaUpdateBodySchema(DEFAULT_FISCAL_JURISDICTION)
 
 const pedidoItemLineSchema = z
   .object({

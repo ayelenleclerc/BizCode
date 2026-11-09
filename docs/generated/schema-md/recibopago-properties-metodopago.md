@@ -4,7 +4,7 @@
 undefined#/properties/metodoPago
 ```
 
-
+`echeq` is accepted only when the tenant has module `fiscal.cheques` enabled (AR-only). Runtime rejects `echeq` otherwise (#440 / #231).
 
 | Abstract            | Extensible | Status         | Identifiable            | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                               |
 | :------------------ | :--------- | :------------- | :---------------------- | :---------------- | :-------------------- | :------------------ | :--------------------------------------------------------------------------------------- |

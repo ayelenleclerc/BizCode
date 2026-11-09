@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { useTranslation } from 'react-i18next'
 import { ApiRequestFailedError, articulosAPI, rubrosAPI, type CsvBulkImportResult } from '@/lib/api'
@@ -7,6 +7,8 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
 import KeyboardHint, { useGlobalListShortcuts } from '@/components/shared/KeyboardHint'
 import { Articulo, Rubro } from '@bizcode/types'
+import { useFeatureFlags } from '@/contexts/FeatureFlagsContext'
+import { vatRateOptions } from '@/lib/fiscal/uiOptions'
 import ArticuloForm from './ArticuloForm'
 
 type ImportDialogKind = 'rubros' | 'articulos'
@@ -14,6 +16,8 @@ type ImportDialogKind = 'rubros' | 'articulos'
 export default function ArticulosPage() {
   const { t } = useTranslation('articulos')
   const { t: tc } = useTranslation('common')
+  const { jurisdiccionFiscal } = useFeatureFlags()
+  const ivaChoices = useMemo(() => vatRateOptions(jurisdiccionFiscal), [jurisdiccionFiscal])
   const listShortcuts = useGlobalListShortcuts()
   const [articulos, setArticulos] = useState<Articulo[]>([])
   const [rubros, setRubros] = useState<Rubro[]>([])
@@ -154,7 +158,11 @@ export default function ArticulosPage() {
     setArticulos(data || [])
   }
 
-  const ivaLabel = (condIva: string) => t(`iva.${condIva}` as `iva.1` | `iva.2` | `iva.3`)
+  const ivaLabel = (condIva: string) => {
+    const opt = ivaChoices.find((c) => c.code === condIva)
+    if (!opt) return condIva
+    return opt.exempt ? t('iva.exempt') : opt.rateLabel
+  }
 
   const importPrefix: 'importRubros' | 'importArticulos' | null =
     importDialog === 'rubros' ? 'importRubros' : importDialog === 'articulos' ? 'importArticulos' : null

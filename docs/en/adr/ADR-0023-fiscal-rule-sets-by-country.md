@@ -28,7 +28,7 @@ Options considered:
 1. Each country owns a `FiscalRuleSet` in `packages/types/src/fiscal/countries/` (tax id, bank account or `null`, subject tax conditions with `paysVat`, VAT rate codes, document kinds or `null`, VAT rates, provider code).
 2. `registry.ts` exposes `getFiscalRules`, `subjectPaysVat`, `getVatRateCodes`, `getDocumentKinds`. `fiscal-jurisdictions.ts` is derived from the registry so there is one source of truth.
 3. Pure identifier algorithms live in `packages/types/src/fiscal/identifiers/` and are re-exported from `apps/web/src/lib/validators.ts`.
-4. `validateBodyForTenant(prisma, buildSchema)` resolves the tenant jurisdiction and builds Zod schemas per request. Customer and supplier body schemas are factories.
+4. `validateBodyForTenant(prisma, buildSchema)` resolves the tenant jurisdiction and builds Zod schemas per request. Customer, supplier and company (`empresa`) body schemas are factories.
 5. UI selects for tax conditions, VAT rates and invoice letters are derived from the registry (`apps/web/src/lib/fiscal/uiOptions.ts`). `calculateInvoice` takes the jurisdiction and uses `subjectPaysVat`.
 6. `fiscal.libro_iva` is AR-only and gates Libro IVA routes/UI; `echeq` is accepted on supplier receipts only when `fiscal.cheques` is enabled.
 7. Subject tax conditions for UY and CL are a **product model** (who pays VAT), not an official DGI/SII catalog — documented in each country file's JSDoc until a tax adviser validates them.
@@ -45,3 +45,10 @@ Options considered:
 - Issue [#440](https://github.com/ayelenleclerc/BizCode/issues/440)
 - [ADR-0007](ADR-0007-dual-deployment-and-fiscal-modularity.md), [ADR-0022](ADR-0022-legal-module-activation-by-jurisdiction.md)
 - Quality guide: [fiscal-rule-sets-by-country.md](../quality/fiscal-rule-sets-by-country.md)
+
+## Revision
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-09-03 | Accepted with #440 / PR #441 |
+| 1.1 | 2026-11-08 | Company schema factory + ES/PT-BR ADR copies (#440 residual reconcile) |
