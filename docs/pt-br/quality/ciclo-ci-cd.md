@@ -28,7 +28,7 @@ BizCode é um **workspace pnpm** (`apps/web`, `apps/server`, `packages/types`, `
 ## Estágios
 
 ```
-push / pull_request → job quality (ubuntu-latest):
+push / pull_request → job quality (ubuntu-24.04):
   checkout → Node 22 → npm ci → pnpm audit HIGH+ (bloqueante) → prisma generate → prisma validate → prisma migrate deploy →
   type-check → docs:validate → docs:generate → verificação pós-processo TypeDoc → git diff (docs gerados / SBOM) → lint →
   contract tests (OpenAPI/Ajv) → test:coverage → check:i18n →

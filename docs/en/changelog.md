@@ -14,7 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- **CI Quality Gate Playwright install flake:** `Install Playwright Chromium` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) retries up to 3 times with `apt-get update` backoff when Ubuntu mirror DNS fails (`Temporary failure resolving *.ubuntu.com`).
+- **CI Quality Gate Playwright install flake:** Quality Gate job pinned to `ubuntu-24.04` (avoid `ubuntu-latest`/`resolute` apt DNS flakes); `Install Playwright Chromium` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) forces apt IPv4, retries `--with-deps` up to 3 times, then falls back to browser-only CDN install.
 - **CI Quality Gate / Deploy security gates (PR #445):** dependency overrides and bumps clear Trivy CRITICAL (`handlebars`, `proxy-addr`, `shell-quote`) and `pnpm audit --audit-level=high` blockers; documented temporary `ignoreCves` for unfixed Expo `node-forge` (`CVE-2026-85393`) and app `zod@3` (`CVE-2023-54404`) in [ADR-0017](adr/ADR-0017-dependency-scanning.md). Chile SII service/UI unit coverage extended for the 66% lines floor. Restored `docs:openapi-md` by dropping mismatched `@vue/*` overrides (Vue is only a Scalar docs transitive) and aligning the lockfile Vue tree.
 
 ### Added
