@@ -7,3 +7,7 @@ Canonical guide (trilingual quality docs):
 - Português (Brasil): [docs/pt-br/quality/sla.md](pt-br/quality/sla.md)
 
 Locale map: [DOCUMENT_LOCALE_MAP.md](DOCUMENT_LOCALE_MAP.md).
+
+Uptime monitor evidence register (empty until ops activates a live monitor): [evidence/uptime-monitor-register.md](evidence/uptime-monitor-register.md).
+
+First-party status UI path: `/status` (`apps/web/src/pages/status/`).

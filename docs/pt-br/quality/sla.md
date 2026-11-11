@@ -16,7 +16,7 @@ Software multi-tenant BizCode (API + UI web) conforme assinatura. Exclui falhas 
 
 | Métrica | Alvo | Como medir (ops) | Estado de evidência |
 |---------|------|------------------|---------------------|
-| Uptime mensal | 99.9% (~43.8 min/mês) | Monitor HTTP(S) em `/api/health` + status page | **Não evidenciado** — ativação pendente |
+| Uptime mensal | 99.9% (~43.8 min/mês) | Monitor HTTP(S) em `/api/health` + status page | **Parcial** — UI first-party `/status` no repo (lê `/api/health`); monitor externo + URL implantada **Não evidenciados** ([uptime-monitor-register.md](../../evidence/uptime-monitor-register.md) vazio) |
 | API P95 | &lt; 500 ms | Métricas do app (#151) | Parcial |
 | Primeira resposta suporte | P1 &lt; 4 h úteis; P2 &lt; 24 h | Tickets (operador) | **Não evidenciado** |
 | RTO | &lt; 4 h | Drill de restore | Drill de integridade local #449 em [SEC-015](../certificacion-iso/sec/sec-015-evidencias-teste-restauracao.md) (2026-11-07); staging **pendente** — **não** fecha #197 |
@@ -28,10 +28,11 @@ Software multi-tenant BizCode (API + UI web) conforme assinatura. Exclui falhas 
 |-----------|--------|
 | Drill local `backup:postgres:drill` + linha SEC-015 | **Evidenciado** (#449) |
 | Drill DR staging / remoto | **Não evidenciado** — #197 permanece aberto |
-| Status page + monitor de uptime | **Não evidenciado** — 99.9% permanece **aspiracional** |
+| Status page first-party (`/status`) | **Evidenciado no repo** (`apps/web/src/pages/status/`) — não é monitor contratual live |
+| Monitor externo + URL de status implantada | **Não evidenciado** — 99.9% permanece **aspiracional**; registro vazio |
 | Contatos de emergência preenchidos | Apenas modelo em [recuperacao-de-desastres.md](recuperacao-de-desastres.md) |
 
-Não apresentar 99.9% de uptime como operável em contratos até monitoramento + status page ao vivo.
+Não apresentar 99.9% de uptime como operável em contratos até monitoramento externo live registrado em [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md).
 
 Horário útil padrão: seg–sex 09:00–18:00 America/Argentina/Buenos_Aires.
 
@@ -56,13 +57,14 @@ Lei argentina; tribunais CABA salvo MSA. **Confirmar com assessoria jurídica.**
 ## Ativação de monitoramento público (checklist ops)
 
 1. Monitor UptimeRobot (ou equiv.) em `GET https://<prod>/api/health` a cada 5 min.  
-2. Status page pública.  
-3. Registrar URLs nos contatos de emergência.  
+2. Expor a UI first-party em `https://<prod>/status` (e opcionalmente uma status page de terceiros).  
+3. Registrar URLs em [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md) e contatos de emergência.  
 4. Não afirmar “monitoramento público ativo” até 1–3.
 
 ## Relacionado
 
 - [Recuperação de desastres](recuperacao-de-desastres.md)
+- [Registro de monitor de uptime](../../evidence/uptime-monitor-register.md)
 - [Ambientes de implantação](entornos-implantacao.md)
 - [SRV-003](../certificacion-iso/srv/srv-003-catalogo-sla.md)
 
@@ -77,3 +79,4 @@ Lei argentina; tribunais CABA salvo MSA. **Confirmar com assessoria jurídica.**
 |--------|------|-------|--------|
 | 0.1 | 2026-08-25 | BizCode | Modelo SLA inicial #197 |
 | 0.2 | 2026-11-08 | BizCode | Reconciliar evidência RTO/RPO com #449; gaps staging/status |
+| 0.3 | 2026-11-11 | BizCode | Página `/status` first-party no repo; registro de monitor vazio; 99.9% ainda aspiracional |

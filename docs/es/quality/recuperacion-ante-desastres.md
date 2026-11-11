@@ -85,16 +85,28 @@ Scripts #150. **Sin** failover de réplica documentado.
 |------|-----------|------------------|
 | Drill de integridad local (`pnpm run backup:postgres:drill`) | Fila SEC-015 2026-11-07; [backup-y-restauracion.md](backup-y-restauracion.md) | **No** |
 | Drill DR staging / remoto | Host pendiente (`STAGING_DEPLOY_*`) | **Requerido** — abierto |
-| Status page pública | No en el repo | **Requerido** para SLA de uptime operable |
+| Status page first-party (`/status`) | En repo (`apps/web/src/pages/status/`) | **Parcial** — UI evidenciada; URL live + monitor externo pendientes |
+| Monitor externo de uptime | [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md) | **Requerido** — registro vacío |
 | Contactos de emergencia | Plantilla | **No** — completar ops |
 
 ## Drill semestral staging — AC pendiente
 
-#197 permanece **OPEN** hasta drill staging + monitoreo público. Smoke Docker local / drill #449 en SEC-015 **no** cierra ese AC.
+Checklist cronometrado (no marcar completo sin evidencia de reloj de pared):
+
+1. Confirmar host staging con `STAGING_DEPLOY_*` ([entornos-despliegue.md](entornos-despliegue.md)).
+2. Registrar hora de inicio (UTC); snapshot/backup.
+3. Simular fallo (detener app/DB solo en staging).
+4. Restaurar desde backup; redesplegar; verificar `/api/health` y `/status`.
+5. Registrar hora de fin; calcular RTO; comparar con &lt; 4 h.
+6. Añadir fila SEC-015 con RTO medido.
+7. **#197 permanece OPEN** hasta este drill **y** una entrada live en [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md).
+
+Smoke Docker local / drill #449 en SEC-015 **no** cierra ese AC.
 
 ## Relacionado
 
 - [SLA](sla.md)
+- [Registro de monitor de uptime](../../evidence/uptime-monitor-register.md)
 - [Backup y restauración](backup-y-restauracion.md)
 - [SEC-014](../certificacion-iso/sec/sec-014-continuidad-recuperacion.md)
 
@@ -109,3 +121,4 @@ Scripts #150. **Sin** failover de réplica documentado.
 |---------|-------|-------|---------|
 | 0.1 | 2026-08-25 | BizCode | Runbooks DR iniciales #197 |
 | 0.2 | 2026-11-08 | BizCode | Gaps explícitos #449 vs staging/status para #197 |
+| 0.3 | 2026-11-11 | BizCode | `/status` first-party + checklist drill staging cronometrado; registro de monitor vacío |
