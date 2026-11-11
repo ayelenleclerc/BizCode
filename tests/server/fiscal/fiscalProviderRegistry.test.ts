@@ -17,6 +17,7 @@ import { ArcaFiscalAdapter } from '../../../apps/server/fiscal/arca/ArcaFiscalAd
 import { UruguayDgiFiscalAdapter } from '../../../apps/server/fiscal/uy/UruguayDgiFiscalAdapter'
 import { MexicoSatFiscalAdapter } from '../../../apps/server/fiscal/mx/MexicoSatFiscalAdapter'
 import { ChileSiiFiscalAdapter } from '../../../apps/server/fiscal/cl/ChileSiiFiscalAdapter'
+import { BrazilSefazNfeFiscalAdapter } from '../../../apps/server/fiscal/br/BrazilSefazNfeFiscalAdapter'
 
 const prisma = {} as unknown as PrismaClient
 
@@ -60,23 +61,24 @@ describe('bootstrapFiscalProviders', () => {
     resetFiscalProvidersBootstrap()
   })
 
-  it('registers arca_wsfe, uruguay_dgi, chile_sii and mexico_sat_pac factories', () => {
+  it('registers arca_wsfe, uruguay_dgi, chile_sii, mexico_sat_pac and brazil_sefaz_nfe factories', () => {
     bootstrapFiscalProviders()
 
     expect(listRegisteredFiscalProviders().sort()).toEqual(
-      ['arca_wsfe', 'chile_sii', 'mexico_sat_pac', 'uruguay_dgi'].sort(),
+      ['arca_wsfe', 'brazil_sefaz_nfe', 'chile_sii', 'mexico_sat_pac', 'uruguay_dgi'].sort(),
     )
     expect(getFiscalProviderAdapter('arca_wsfe', prisma)).toBeInstanceOf(ArcaFiscalAdapter)
     expect(getFiscalProviderAdapter('uruguay_dgi', prisma)).toBeInstanceOf(UruguayDgiFiscalAdapter)
     expect(getFiscalProviderAdapter('chile_sii', prisma)).toBeInstanceOf(ChileSiiFiscalAdapter)
     expect(getFiscalProviderAdapter('mexico_sat_pac', prisma)).toBeInstanceOf(MexicoSatFiscalAdapter)
+    expect(getFiscalProviderAdapter('brazil_sefaz_nfe', prisma)).toBeInstanceOf(BrazilSefazNfeFiscalAdapter)
   })
 
   it('is idempotent: calling it twice does not throw or duplicate registrations', () => {
     bootstrapFiscalProviders()
     bootstrapFiscalProviders()
     expect(listRegisteredFiscalProviders().sort()).toEqual(
-      ['arca_wsfe', 'chile_sii', 'mexico_sat_pac', 'uruguay_dgi'].sort(),
+      ['arca_wsfe', 'brazil_sefaz_nfe', 'chile_sii', 'mexico_sat_pac', 'uruguay_dgi'].sort(),
     )
   })
 
@@ -88,6 +90,6 @@ describe('bootstrapFiscalProviders', () => {
 
     resetFiscalProvidersBootstrap()
     bootstrapFiscalProviders()
-    expect(listRegisteredFiscalProviders().length).toBe(4)
+    expect(listRegisteredFiscalProviders().length).toBe(5)
   })
 })
