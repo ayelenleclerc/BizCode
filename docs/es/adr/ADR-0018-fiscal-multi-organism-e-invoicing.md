@@ -17,7 +17,7 @@ Opciones consideradas:
 
 ## Decisión
 
-1. **Contrato `FiscalProviderAdapter`** (`apps/server/fiscal/FiscalProviderAdapter.ts`): `validateConfiguration`, `authenticate`, `authorizeDocument`, `getDocumentStatus`, opcionales `cancel` / `getLastAuthorizedNumber` / `healthCheck`, y `getCapabilities()`. Códigos de proveedor (`FiscalProviderCode`, `apps/server/fiscal/types.ts`): `arca_wsfe`, `uruguay_dgi`, `mexico_sat_pac`.
+1. **Contrato `FiscalProviderAdapter`** (`apps/server/fiscal/FiscalProviderAdapter.ts`): `validateConfiguration`, `authenticate`, `authorizeDocument`, `getDocumentStatus`, opcionales `cancel` / `getLastAuthorizedNumber` / `healthCheck`, y `getCapabilities()`. Códigos de proveedor (`FiscalProviderCode`, `apps/server/fiscal/types.ts`): `arca_wsfe`, `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`.
 2. **Registro + bootstrap** (`fiscalProviderRegistry.ts`, `bootstrapFiscalProviders.ts`) reflejan `connectorRegistry.ts` / `bootstrapEcommerceConnectors.ts`: factories de adapter indexadas por código de proveedor, bootstrap idempotente, helpers de reset solo para tests.
 3. **`ArcaFiscalAdapter`** (`apps/server/fiscal/arca/ArcaFiscalAdapter.ts`) envuelve el `ArcaService` existente sin cambios — **no se crea un segundo cliente WSAA/WSFE**; cada llamada delega en el mock de homologación de `ArcaService`. `getCapabilities()` reporta `implemented: true`.
 4. **Mocks de homologación** para `uruguay_dgi` ([ADR-0025](ADR-0025-uruguay-dgi-cfe-mock.md)), `chile_sii` ([ADR-0026](ADR-0026-chile-sii-dte-mock.md)) y `mexico_sat_pac` ([ADR-0024](ADR-0024-mexico-sat-cfdi-mock-pac.md)): `getCapabilities()` reporta `implemented: true`; DGI/SII/PAC live SOAP/REST/XML sigue **no evidenciado**.
@@ -25,13 +25,13 @@ Opciones consideradas:
 6. **Servicios:** `FiscalProviderConfigService` (lectura/escritura dual entre `TenantFiscalConfig` y `FiscalProviderConfig` para `arca_wsfe`, listado de capacidades, resolución del proveedor por defecto), `FiscalDocumentService` (orquestación idempotente de autorización, resuelve el adapter y persiste un intento `FiscalDocument`), `FiscalDocumentRetryService` (generaliza `ArcaService.retryPending` a través de `FiscalDocumentService`). `FacturaService` ahora llama a `FiscalDocumentService.authorizeInvoice` / `authorizeCreditNote` en vez de `ArcaService` directamente (el flag `skipArcaCae` conserva su nombre por compatibilidad).
 7. **Rutas:** `registerFiscalRoutes.ts` expone el contrato agnóstico de proveedor (`GET`/`PUT /api/fiscal/providers/config`, `POST /api/fiscal/providers/validate`, `GET /api/fiscal/providers/capabilities`, `POST /api/fiscal/documents/{facturaId}/authorize`). `registerArcaRoutes.ts` se refactoriza para **delegar** en los mismos servicios (`FiscalProviderConfigService`, `ArcaFiscalAdapter`, `FiscalDocumentService`) manteniendo los mismos paths y formas de respuesta de `/api/arca/*` por compatibilidad; el `padron` específico de AR queda fuera del contrato fiscal genérico.
 8. **Abstracción de renderer:** interfaz `FiscalDocumentRenderer<T>` + `ArcaFiscalDocumentRenderer` que envuelve el `buildFacturaPdfImages` existente (QR/código de barras); `facturaPdf.ts` llama al renderer en vez del helper directamente, sin mover el resto del layout PDF específico de AR.
-9. **UI:** `FiscalProviderSection.tsx` lista las capacidades y el estado por tenant de cada proveedor registrado (con el mismo flag de módulo `billing.arca_cae`) y monta debajo `ArcaFiscalSection` sin cambios para las credenciales de `arca_wsfe`, ya que es el único proveedor con adapter funcional hoy.
+9. **UI:** `FiscalProviderSection.tsx` lista las capacidades y el estado por tenant de cada proveedor registrado (gating de módulo por jurisdicción) y monta secciones de credenciales/config por proveedor (p. ej. `ArcaFiscalSection` para `arca_wsfe`; secciones UY/CL/MX para sus mocks). Los mocks de homologación reportan `implemented: true`; los clientes live DGI/SII/PAC siguen Not evidenced.
 
 ## Consecuencias
 
 - **Positivo:** ARCA se comporta como un adapter intercambiable en vez de una implementación paralela y hardcodeada; agregar un cliente real de DGI/SAT en el futuro implica implementar `FiscalProviderAdapter` y registrar una factory, sin tocar `FacturaService`, rutas ni el wiring de UI; los stubs de capacidades permiten que UI y rutas degraden con claridad (`implemented: false`, HTTP 501) en vez de fallar en silencio o inventar datos; los consumidores y tests existentes de `/api/arca/*` (`tests/api/arca.test.ts`) siguen funcionando sin cambios.
 - **Negativo:** una capa extra de indirección (`FiscalDocumentService` → adapter → `ArcaService`) por cada solicitud de CAE; dos fuentes de configuración (`TenantFiscalConfig` y `FiscalProviderConfig`) deben mantenerse consistentes hasta que todos los tenants estén migrados y la tabla legada se deprecie en un ADR futuro.
-- **No evidenciado en el código actual:** cliente SOAP real de AFIP, cliente real de DGI (Uruguay), cliente real de SAT/PAC (México). Solo está evidenciado el mock de homologación de ARCA (`arcaWsfeMock.ts`); los stubs no deben tratarse como integraciones funcionales.
+- **No evidenciado en el código actual:** cliente SOAP real de AFIP, cliente live DGI (Uruguay), cliente live SII (Chile), cliente live SAT/PAC (México). Los **mocks** de homologación están evidenciados para `arca_wsfe`, `uruguay_dgi`, `chile_sii` y `mexico_sat_pac` (`implemented: true` en el registro de proveedores fiscales). Brasil / NF-e **no** está registrado. Los mocks no deben tratarse como integraciones live con el organismo.
 - **Seguimiento:** se requiere un ADR futuro antes de eliminar `TenantFiscalConfig` (lectura dual) o antes de implementar clientes live DGI/SII/PAC. Mock CFE Uruguay: [ADR-0025](ADR-0025-uruguay-dgi-cfe-mock.md); mock DTE Chile: [ADR-0026](ADR-0026-chile-sii-dte-mock.md); mock PAC México: [ADR-0024](ADR-0024-mexico-sat-cfdi-mock-pac.md); PAC / DGI / SII live siguen sin evidenciarse.
 
 ## Referencias
@@ -41,3 +41,10 @@ Opciones consideradas:
 - [Inventario fiscal multi-organismo (#378)](../quality/inventario-fiscal-multi-organismo-378.md)
 - [Cómo agregar un adapter de proveedor fiscal](../guides/como-agregar-un-adapter-fiscal.md)
 - [vision-producto-y-despliegue.md](../quality/vision-producto-y-despliegue.md) (PROD-VISION-001)
+
+## Revisión
+
+| Versión | Fecha | Resumen |
+|---------|-------|---------|
+| 1.0 | 2026-08-06 | Aceptado con #378 |
+| 1.1 | 2026-11-11 | Códigos de proveedor + consecuencias: `chile_sii`; mocks UY/CL/MX vs live (higiene #210) |

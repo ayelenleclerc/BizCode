@@ -17,7 +17,7 @@ Options considered:
 
 ## Decision
 
-1. **`FiscalProviderAdapter` contract** (`apps/server/fiscal/FiscalProviderAdapter.ts`): `validateConfiguration`, `authenticate`, `authorizeDocument`, `getDocumentStatus`, optional `cancel` / `getLastAuthorizedNumber` / `healthCheck`, and `getCapabilities()`. Provider codes (`FiscalProviderCode`, `apps/server/fiscal/types.ts`): `arca_wsfe`, `uruguay_dgi`, `mexico_sat_pac`.
+1. **`FiscalProviderAdapter` contract** (`apps/server/fiscal/FiscalProviderAdapter.ts`): `validateConfiguration`, `authenticate`, `authorizeDocument`, `getDocumentStatus`, optional `cancel` / `getLastAuthorizedNumber` / `healthCheck`, and `getCapabilities()`. Provider codes (`FiscalProviderCode`, `apps/server/fiscal/types.ts`): `arca_wsfe`, `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`.
 2. **Registry + bootstrap** (`fiscalProviderRegistry.ts`, `bootstrapFiscalProviders.ts`) mirror `connectorRegistry.ts` / `bootstrapEcommerceConnectors.ts`: adapter factories keyed by provider code, idempotent bootstrap, test-only reset helpers.
 3. **`ArcaFiscalAdapter`** (`apps/server/fiscal/arca/ArcaFiscalAdapter.ts`) wraps the existing `ArcaService` unchanged — **no second WSAA/WSFE client is created**; every call delegates to `ArcaService`'s homologación mock. `getCapabilities()` reports `implemented: true`.
 4. **Homologación mocks** for `uruguay_dgi` ([ADR-0025](ADR-0025-uruguay-dgi-cfe-mock.md)), `chile_sii` ([ADR-0026](ADR-0026-chile-sii-dte-mock.md)) and `mexico_sat_pac` ([ADR-0024](ADR-0024-mexico-sat-cfdi-mock-pac.md)): `getCapabilities()` reports `implemented: true`; live DGI/SII/PAC REST/SOAP/XML remains **Not evidenced**.
@@ -25,13 +25,13 @@ Options considered:
 6. **Services:** `FiscalProviderConfigService` (dual-read/dual-write between `TenantFiscalConfig` and `FiscalProviderConfig` for `arca_wsfe`, capability listing, default-provider resolution), `FiscalDocumentService` (idempotent authorization orchestration, resolves the adapter and persists one `FiscalDocument` attempt), `FiscalDocumentRetryService` (generalizes `ArcaService.retryPending` through `FiscalDocumentService`). `FacturaService` now calls `FiscalDocumentService.authorizeInvoice` / `authorizeCreditNote` instead of `ArcaService` directly (the `skipArcaCae` flag name is unchanged for compatibility).
 7. **Routes:** `registerFiscalRoutes.ts` exposes the provider-agnostic contract (`GET`/`PUT /api/fiscal/providers/config`, `POST /api/fiscal/providers/validate`, `GET /api/fiscal/providers/capabilities`, `POST /api/fiscal/documents/{facturaId}/authorize`). `registerArcaRoutes.ts` is refactored to **delegate** to the same services (`FiscalProviderConfigService`, `ArcaFiscalAdapter`, `FiscalDocumentService`) while keeping identical `/api/arca/*` paths and response shapes for backward compatibility; AR-specific `padron` stays out of the generic fiscal contract.
 8. **Renderer abstraction:** `FiscalDocumentRenderer<T>` interface + `ArcaFiscalDocumentRenderer` wrapping the existing `buildFacturaPdfImages` (QR/barcode); `facturaPdf.ts` calls the renderer instead of the helper directly, without moving the rest of the AR-specific PDF layout code.
-9. **UI:** `FiscalProviderSection.tsx` lists every registered provider's capabilities and tenant status (gated by the existing `billing.arca_cae` module flag) and mounts `ArcaFiscalSection` unchanged underneath for `arca_wsfe` credentials, since it is the only provider with a working adapter today.
+9. **UI:** `FiscalProviderSection.tsx` lists every registered provider's capabilities and tenant status (module gating per jurisdiction) and mounts provider-specific credential/config sections (e.g. `ArcaFiscalSection` for `arca_wsfe`; UY/CL/MX config sections for their mocks). Homologación mocks report `implemented: true`; live DGI/SII/PAC clients remain Not evidenced.
 
 ## Consequences
 
 - **Positive:** ARCA behaves as one interchangeable adapter instead of a parallel, hardcoded implementation; adding a real DGI/SAT client later means implementing `FiscalProviderAdapter` and registering a factory, without touching `FacturaService`, routes, or UI wiring; capability stubs let the UI and routes degrade gracefully (`implemented: false`, HTTP 501) instead of silently failing or inventing data; existing `/api/arca/*` consumers and tests (`tests/api/arca.test.ts`) keep working unchanged.
 - **Negative:** One extra indirection layer (`FiscalDocumentService` → adapter → `ArcaService`) for every CAE request; two config sources (`TenantFiscalConfig` and `FiscalProviderConfig`) must be kept consistent until every tenant is migrated and the legacy table is deprecated in a future ADR.
-- **Not evidenced in current codebase:** live SOAP AFIP client, live DGI (Uruguay) client, live SAT/PAC (Mexico) client. Only ARCA's homologación mock (`arcaWsfeMock.ts`) is evidenced; the stubs must not be treated as functional integrations.
+- **Not evidenced in current codebase:** live SOAP AFIP client, live DGI (Uruguay) client, live SII (Chile) client, live SAT/PAC (Mexico) client. Homologación **mocks** are evidenced for `arca_wsfe`, `uruguay_dgi`, `chile_sii`, and `mexico_sat_pac` (`implemented: true` in the fiscal provider registry). Brazil / NF-e is **not** registered. Mocks must not be treated as live authority integrations.
 - **Follow-up:** a future ADR is required before removing `TenantFiscalConfig` (dual-read) or before implementing live DGI/SII/PAC clients. Uruguay CFE mock: [ADR-0025](ADR-0025-uruguay-dgi-cfe-mock.md); Chile DTE mock: [ADR-0026](ADR-0026-chile-sii-dte-mock.md); Mexico mock PAC: [ADR-0024](ADR-0024-mexico-sat-cfdi-mock-pac.md); live commercial PAC / DGI / SII remain Not evidenced.
 
 ## References
@@ -41,3 +41,10 @@ Options considered:
 - [Fiscal multi-organism inventory (#378)](../quality/fiscal-multi-organism-inventory-378.md)
 - [How to add a fiscal provider adapter](../guides/how-to-add-a-fiscal-adapter.md)
 - [product-vision-and-deployment.md](../quality/product-vision-and-deployment.md) (PROD-VISION-001)
+
+## Revision
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-08-06 | Accepted with #378 |
+| 1.1 | 2026-11-11 | Provider codes + consequences: `chile_sii`; UY/CL/MX mocks vs live (#210 hygiene) |
