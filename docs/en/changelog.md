@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **OWASP ZAP baseline triage (#194 residual):** [`.zap/rules.tsv`](../../.zap/rules.tsv) pins rule `10049` IGNORE for ephemeral API 404 noise (evidence run `43072369954`); [`.github/workflows/zap.yml`](../../.github/workflows/zap.yml) removes `-I`, pins `ubuntu-24.04`, and fixes `zap-out` writability. Readiness/penetration-testing docs EN/ES/PT updated; #194 stays open (empty external register; Snyk token ops).
 - **Fiscal reconcile close-out docs (#452):** [legal-module-activation-by-jurisdiction.md](quality/legal-module-activation-by-jurisdiction.md) (and ES/PT-BR locale copies) no longer describe UY/CL/BR as capability stubs; they document registered homologación mocks (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`) vs live clients Not evidenced (ADRs 0024–0027). Regional live residuals remain open (#207/#208/#210/#211).
 
 ### Fixed

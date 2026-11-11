@@ -1,4 +1,6 @@
 # ZAP baseline rules (#194). Columns: ruleId<TAB>action<TAB>optional comment
 # Actions: IGNORE | WARN | FAIL
-# Keep empty of IGNORE lines until CI noise is triaged; then pin known false positives here.
-# Enabling job failure on unignored WARN/FAIL: remove -I from .github/workflows/zap.yml after triage.
+# Triage evidence: develop run 43072369954 (2026-11-11) — PASS 67, WARN-NEW 1 (10049 x2), FAIL-NEW 0.
+# Targets were http://127.0.0.1:3001 and /sitemap.xml (both 404 on ephemeral API-only server).
+# After this file is populated, zap.yml must NOT pass -I so unignored WARN/FAIL fail CI.
+10049	IGNORE	Ephemeral API-only CI target: 404 HTML/sitemap without Cache-Control; re-evaluate on staging UI (ZAP_TARGET_URL)

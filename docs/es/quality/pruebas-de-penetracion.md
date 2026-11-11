@@ -12,7 +12,7 @@ Describe cómo BizCode prepara y registra las **pruebas de penetración** antes 
 |---------|-----------|-----------------|
 | `pnpm audit --audit-level=high` | Quality Gate | Sí (HIGH+) |
 | Snyk | [`.github/workflows/snyk.yml`](../../../.github/workflows/snyk.yml) | Sí con `SNYK_TOKEN` |
-| OWASP ZAP baseline | [`.github/workflows/zap.yml`](../../../.github/workflows/zap.yml) | No hasta quitar `-I` tras triage |
+| OWASP ZAP baseline | [`.github/workflows/zap.yml`](../../../.github/workflows/zap.yml) (`ubuntu-24.04`) | Sí — WARN/FAIL no ignorados fallan el job; triage en [`.zap/rules.tsv`](../../../.zap/rules.tsv) |
 | Informe pentest externo | Ops + [registro](../../evidence/pentest-report-register.md) | Requerido para el AC completo de #194 |
 
 **Los informes ZAP de CI no sustituyen el informe de pentest externo.**
@@ -23,8 +23,8 @@ Describe cómo BizCode prepara y registra las **pruebas de penetración** antes 
 2. Objetivo por defecto: API efímera en `http://127.0.0.1:3001`.
 3. Variable de repositorio opcional `ZAP_TARGET_URL` (solo staging/no prod). Fail-closed si el valor es inválido. **No** apuntar a producción con datos o secretos reales.
 4. Docker con `--network host`.
-5. Reglas: [`.zap/rules.tsv`](../../../.zap/rules.tsv); tras triage, quitar `-I` para fallar en WARN/FAIL restantes.
-6. Artefacto `zap-baseline-report` (14 días). No versionar reportes sin revisión.
+5. Reglas: [`.zap/rules.tsv`](../../../.zap/rules.tsv). El ruido triado usa `IGNORE` (con comentario de evidencia). El workflow **no** pasa `-I`; WARN/FAIL restantes fallan CI. Evidencia (2026-11-11, run `43072369954`): único WARN fue regla `10049` en 404 del API efímero — `IGNORE` fijado.
+6. Artefacto `zap-baseline-report` (14 días; `zap-out` con permisos de escritura antes del contenedor). No versionar reportes sin revisión.
 
 ## Checklist de ingeniería pre-engagement
 

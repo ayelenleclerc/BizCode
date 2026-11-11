@@ -1,7 +1,8 @@
 # OWASP ZAP baseline DAST (#194)
 # Default: ephemeral API on the runner (Postgres service + pnpm run server).
 # Optional repository variable ZAP_TARGET_URL (staging/non-prod only) overrides the target.
-# Never configure production with live secrets. Blocking fail_action is deferred until triage
+# Never configure production with live secrets.
+# Unignored WARN/FAIL fail the job (no -I). Triaged noise is pinned in .zap/rules.tsv
 # (see docs/en/quality/penetration-testing.md).
 
 name: OWASP ZAP Baseline
@@ -23,7 +24,8 @@ concurrency:
 jobs:
   zap_baseline:
     name: ZAP Baseline
-    runs-on: ubuntu-latest
+    # Pin 24.04: same rationale as Quality Gate (avoid ubuntu-latest → resolute apt/DNS drift).
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     services:
@@ -126,8 +128,11 @@ jobs:
         run: |
           set -euo pipefail
           TARGET='${{ steps.target.outputs.url }}'
+          # Writable mount for reports (ZAP container user otherwise hits AccessDeniedException).
+          mkdir -p zap-out
+          chmod a+rwx zap-out
           # --network host: ZAP container must reach ephemeral API on the runner.
-          # -I: do not fail the job on WARN alerts until rules are triaged (.zap/rules.tsv).
+          # No -I: unignored WARN/FAIL fail CI; IGNORE only via .zap/rules.tsv triage.
           docker run --rm --network host \
             -v "${{ github.workspace }}/zap-out:/zap/wrk:rw" \
             -v "${{ github.workspace }}/.zap:/zap/bizcode-rules:ro" \
@@ -136,8 +141,7 @@ jobs:
               -c /zap/bizcode-rules/rules.tsv \
               -J zap-report.json \
               -r zap-report.html \
-              -w zap-report.md \
-              -I
+              -w zap-report.md
           ls -la zap-out
 
       - name: Upload ZAP report
