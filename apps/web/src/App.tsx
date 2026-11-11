@@ -11,6 +11,7 @@ import RecuentosPage from './pages/recuentos'
 import FacturacionPage from './pages/facturacion'
 import LoginPage from './pages/login'
 import PrivacyPage from './pages/privacidad'
+import StatusPage from './pages/status'
 import LandingPage from './pages/saas/LandingPage'
 import RegistroPage from './pages/saas/RegistroPage'
 import UsersPage from './pages/users'
@@ -145,6 +146,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
       <Route path="/privacidad" element={<PrivacyPage />} />
+      <Route path="/status" element={<StatusPage />} />
       <Route path="/registro" element={<RegistroPage />} />
       <Route
         path="/portal/:tenantSlug"

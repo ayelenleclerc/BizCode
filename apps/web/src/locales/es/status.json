@@ -1,0 +1,23 @@
+{
+  "title": "Estado del sistema",
+  "intro": "Comprobación en vivo del endpoint de salud de la API de BizCode. Esta página no sustituye un monitor de uptime externo ni un SLA contractual hasta que ops active el monitoreo.",
+  "loading": "Comprobando salud de la API…",
+  "refresh": "Actualizar",
+  "stateOk": "Operativo",
+  "stateDegraded": "Degradado",
+  "stateUnavailable": "No disponible",
+  "apiStatus": "Estado de la API",
+  "database": "Base de datos",
+  "dbOk": "Alcanzable",
+  "dbDown": "No alcanzable",
+  "dbLatency": "Latencia DB",
+  "uptime": "Uptime del proceso",
+  "seconds": "{{value}} s",
+  "milliseconds": "{{value}} ms",
+  "version": "Versión",
+  "checkedAt": "Comprobado a las",
+  "errorTitle": "No se pudo contactar la API",
+  "errorBody": "El endpoint de salud no respondió. El servicio puede estar caído o la red no está disponible.",
+  "backToLogin": "Volver al inicio de sesión",
+  "ariaStatus": "Estado actual del sistema"
+}

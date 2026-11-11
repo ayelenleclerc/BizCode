@@ -1,0 +1,23 @@
+{
+  "title": "System status",
+  "intro": "Live check of the BizCode API health endpoint. This page does not replace an external uptime monitor or contractual SLA until ops activates monitoring.",
+  "loading": "Checking API health…",
+  "refresh": "Refresh",
+  "stateOk": "Operational",
+  "stateDegraded": "Degraded",
+  "stateUnavailable": "Unavailable",
+  "apiStatus": "API status",
+  "database": "Database",
+  "dbOk": "Reachable",
+  "dbDown": "Unreachable",
+  "dbLatency": "DB latency",
+  "uptime": "Process uptime",
+  "seconds": "{{value}} s",
+  "milliseconds": "{{value}} ms",
+  "version": "Version",
+  "checkedAt": "Checked at",
+  "errorTitle": "Could not reach the API",
+  "errorBody": "The health endpoint did not respond. The service may be offline or the network is unavailable.",
+  "backToLogin": "Back to login",
+  "ariaStatus": "Current system status"
+}

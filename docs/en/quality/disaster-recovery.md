@@ -130,22 +130,28 @@ R = Responsible, A = Accountable, C = Consulted, I = Informed.
 |------|----------|-----------------|
 | Isolated local integrity drill (`pnpm run backup:postgres:drill`) | [SEC-015](../certificacion-iso/sec/sec-015-restore-test-evidence-register.md) row 2026-11-07; [backup-and-restore.md](backup-and-restore.md) | **No** |
 | Staging / remote semiannual DR drill | Pending host (`STAGING_DEPLOY_*`) | **Required** — still open |
-| Public status page | Not in repo | **Required** for operable uptime SLA |
+| First-party status page (`/status`) | In repo (`apps/web/src/pages/status/`) | **Partial** — UI evidenced; live URL + external monitor still required |
+| External uptime monitor | [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md) | **Required** — register empty |
 | Emergency contacts table above | Template placeholders | **No** — ops fill-in |
 
 ## Semiannual DR drill (staging) — pending AC
 
-1. Use staging host with `STAGING_DEPLOY_*` configured.
-2. Snapshot/backup; simulate failure (stop services).
-3. Restore from backup; measure wall-clock RTO.
-4. Record in SEC-015; compare to &lt; 4h target.
-5. **Issue #197 stays OPEN** until this drill and public uptime monitoring are done.
+Timed checklist (do **not** mark complete without wall-clock evidence):
+
+1. Confirm staging host with `STAGING_DEPLOY_*` configured ([deployment-environments.md](deployment-environments.md)).
+2. Record start time (UTC); take snapshot/backup.
+3. Simulate failure (stop app/DB services on staging only).
+4. Restore from backup; redeploy; verify `/api/health` and `/status`.
+5. Record end time; compute RTO; compare to &lt; 4h target.
+6. Append SEC-015 row with measured RTO; note gaps.
+7. **Issue #197 stays OPEN** until this drill **and** a live entry in [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md) exist.
 
 Local Docker restore smoke / #449 integrity drill (dev `:5432`) is documented in SEC-015 and does **not** close the staging AC.
 
 ## Related
 
 - [SLA](sla.md)
+- [Uptime monitor register](../../evidence/uptime-monitor-register.md)
 - [Backup and restore](backup-and-restore.md)
 - [Incident response](incident-response.md)
 - [SEC-014](../certificacion-iso/sec/sec-014-business-continuity-recovery-plan.md)
@@ -161,3 +167,4 @@ Local Docker restore smoke / #449 integrity drill (dev `:5432`) is documented in
 |---------|------|--------|---------|
 | 0.1 | 2026-08-25 | BizCode | Initial DR runbooks for #197 |
 | 0.2 | 2026-11-08 | BizCode | Explicit #449 vs staging/status gaps for #197 |
+| 0.3 | 2026-11-11 | BizCode | `/status` first-party + timed staging drill checklist; monitor register empty |

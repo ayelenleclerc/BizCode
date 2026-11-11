@@ -16,7 +16,7 @@ BizCode provides multi-tenant business software (API + web UI) as configured for
 
 | Metric | Target | How to measure (ops) | Evidence status |
 |--------|--------|----------------------|-----------------|
-| Monthly uptime | 99.9% (~43.8 min downtime / month) | External HTTP(S) monitor on `/api/health` (e.g. UptimeRobot) + public status page | **Not evidenced** — pending operator activation |
+| Monthly uptime | 99.9% (~43.8 min downtime / month) | External HTTP(S) monitor on `/api/health` (e.g. UptimeRobot) + public status page | **Partial** — first-party `/status` UI in repo (reads `/api/health`); external monitor + deployed public URL **Not evidenced** ([uptime-monitor-register.md](../../evidence/uptime-monitor-register.md) empty) |
 | API response time P95 | &lt; 500 ms (read-heavy authenticated routes under normal load) | App metrics / observability (#151) | Partial — in-app metrics exist; no contractual export evidenced |
 | First support response | P1 &lt; 4 business hours; P2 &lt; 24 business hours | Ticket system (operator-owned) | **Not evidenced** in repo |
 | RTO | &lt; 4 hours | Timed restore / failover drill | Local integrity drill #449 in [SEC-015](../certificacion-iso/sec/sec-015-restore-test-evidence-register.md) (2026-11-07); staging drill **pending** — does **not** close #197 |
@@ -28,10 +28,11 @@ BizCode provides multi-tenant business software (API + web UI) as configured for
 |-------|--------|
 | Local `backup:postgres:drill` + SEC-015 row | **Evidenced** (#449) |
 | Staging / remote DR drill | **Not evidenced** — keeps #197 open |
-| Public status page + uptime monitor | **Not evidenced** — 99.9% uptime remains **aspirational** |
+| First-party status page (`/status`) | **Evidenced in repo** (`apps/web/src/pages/status/`) — not a live contractual monitor |
+| External uptime monitor + deployed status URL | **Not evidenced** — 99.9% uptime remains **aspirational**; register empty |
 | Emergency contacts filled | **Template only** in [disaster-recovery.md](disaster-recovery.md) |
 
-Do **not** present 99.9% uptime as operable in contracts until monitoring + status page are live.
+Do **not** present 99.9% uptime as operable in contracts until external monitoring is live and recorded in [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md).
 
 Business hours default: Monday–Friday 09:00–18:00 America/Argentina/Buenos_Aires (operator may publish a different calendar in the contract).
 
@@ -73,13 +74,14 @@ Governing law: República Argentina. Courts: Ciudad Autónoma de Buenos Aires, u
 Until completed, uptime SLA is **aspirational**:
 
 1. Create UptimeRobot (or equivalent) monitor: `GET https://<prod-host>/api/health` every 5 minutes.
-2. Publish a status page (Statuspage.io, Better Stack, or equivalent) with the same check.
-3. Record public URLs in the emergency contacts table (operator fill-in) and in SEC-015 notes when live.
+2. Expose the first-party status UI at `https://<prod-host>/status` (and optionally a third-party status page with the same check).
+3. Record public URLs in [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md), the emergency contacts table, and SEC-015 notes when live.
 4. Do **not** claim “active public monitoring” in sales material until steps 1–3 are done.
 
 ## Related
 
 - [Disaster recovery](disaster-recovery.md)
+- [Uptime monitor register](../../evidence/uptime-monitor-register.md)
 - [Deployment environments](deployment-environments.md)
 - [Observability](observability.md)
 - [SRV-003 SLA catalog](../certificacion-iso/srv/srv-003-sla-catalog.md)
@@ -95,3 +97,4 @@ Until completed, uptime SLA is **aspirational**:
 |---------|------|--------|---------|
 | 0.1 | 2026-08-25 | BizCode | Initial SLA template for #197 |
 | 0.2 | 2026-11-08 | BizCode | Reconcile RTO/RPO evidence with #449; mark staging/status gaps |
+| 0.3 | 2026-11-11 | BizCode | First-party `/status` page in repo; empty uptime-monitor-register; 99.9% still aspirational |
