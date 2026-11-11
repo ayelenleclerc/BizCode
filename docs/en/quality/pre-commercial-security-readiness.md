@@ -2,7 +2,7 @@
 
 **Document role:** Go/no-go evaluation of security controls **before real customer data / real charges**.  
 **Related issue:** [#194](https://github.com/ayelenleclerc/BizCode/issues/194) · parent block [#452](https://github.com/ayelenleclerc/BizCode/issues/452)  
-**Evidence date:** 2026-11-08 against `develop` (branch `docs/194-security-readiness-gate`).
+**Evidence date:** 2026-11-11 against `develop` (ZAP triage branch `fix/194-zap-baseline-triage`; prior readiness 2026-11-08).
 
 This document does **not** hire a vendor, invent findings, or close #194. An empty [pentest report register](../../evidence/pentest-report-register.md) remains a blocking residual for full AC.
 
@@ -11,7 +11,7 @@ This document does **not** hire a vendor, invent findings, or close #194. An emp
 | In scope | Out of scope |
 |----------|--------------|
 | Inventory CI controls vs issue AC | Contracting Option A/B/C vendors |
-| Explicit gaps (ZAP `-I`, Snyk token, empty register) | Simulated external report / fake findings |
+| Explicit gaps (Snyk token, empty register; ZAP triage status) | Simulated external report / fake findings |
 | Go/no-go for **real data** use | Closing #194 or claiming commercial launch ready |
 | Cross-links to penetration-testing + pilot matrix | Implementing FCEM / status page / staging DR |
 
@@ -19,8 +19,8 @@ This document does **not** hire a vendor, invent findings, or close #194. An emp
 
 | #194 AC (issue) | Repo evidence | Status |
 |-----------------|---------------|--------|
-| Automated scan (ZAP + Snyk) in CI/CD before prod deploy | [`.github/workflows/zap.yml`](../../../.github/workflows/zap.yml); [`.github/workflows/snyk.yml`](../../../.github/workflows/snyk.yml); `pnpm audit --audit-level=high` in Quality Gate | **Partial** — ZAP runs but `-I` (does not fail on WARN); Snyk **skips** when `SNYK_TOKEN` unset |
-| Zero Critical/High unmitigated before launch | Audit + Snyk (when token) + dependency triage docs (#219) | **Conditional** — CI HIGH+ gate exists for audit; Snyk not guaranteed without secret; ZAP WARN not merge-blocking |
+| Automated scan (ZAP + Snyk) in CI/CD before prod deploy | [`.github/workflows/zap.yml`](../../../.github/workflows/zap.yml) (no `-I`; `ubuntu-24.04`; rules in [`.zap/rules.tsv`](../../../.zap/rules.tsv)); [`.github/workflows/snyk.yml`](../../../.github/workflows/snyk.yml); `pnpm audit --audit-level=high` in Quality Gate | **Partial** — ZAP baseline is merge-blocking for unignored WARN/FAIL; Snyk **skips** when `SNYK_TOKEN` unset |
+| Zero Critical/High unmitigated before launch | Audit + Snyk (when token) + dependency triage docs (#219) | **Conditional** — CI HIGH+ gate exists for audit; Snyk not guaranteed without secret; ZAP blocks unignored alerts |
 | External pentest report + remediation plan | [pentest-report-register.md](../../evidence/pentest-report-register.md) | **Not evidenced** — register empty |
 | Critical findings from external report mitigated before commercial launch | N/A until report exists | **Blocked** on vendor/budget decision (#452) |
 
@@ -50,19 +50,19 @@ All of the following:
 
 1. External pentest register still empty **and** product owner has not accepted residual risk in writing for a named limited pilot.
 2. `SNYK_TOKEN` unset in the repository that deploys the commercial host (Snyk gate skipped).
-3. ZAP still using `-I` without documented triage of remaining WARN rules **and** no compensating control (WAF / staging review) accepted by owner.
+3. ~~ZAP still using `-I` without triage~~ — **mitigated 2026-11-11** (`-I` removed; `10049` IGNORE documented for ephemeral API 404s). Staging UI via `ZAP_TARGET_URL` should re-check cache rules.
 4. Open Critical/High dependency findings without ADR/exception.
 
-**Verdict 2026-11-08:** **NO-GO for real data** — automated MVP (Option D) partially present; external report AC unmet; ZAP non-blocking; Snyk conditional.
+**Verdict 2026-11-11:** **NO-GO for real data** — ZAP CI gate hardened; external report AC still unmet; Snyk conditional on `SNYK_TOKEN`.
 
 ## Explicit gaps (do not invent)
 
 | Gap | Location | Impact |
 |-----|----------|--------|
 | Empty external report register | `docs/evidence/pentest-report-register.md` | Blocks full #194 AC |
-| ZAP `-I` | `.github/workflows/zap.yml` | WARN does not fail CI |
 | Optional Snyk | `.github/workflows/snyk.yml` | Gate skipped without `SNYK_TOKEN` |
 | Vendor hire | Budget / #452 | Not a Cursor coding task |
+| ZAP `-I` (historical) | Removed from `.github/workflows/zap.yml` | Mitigated — see [`.zap/rules.tsv`](../../../.zap/rules.tsv) |
 
 ## Related
 
@@ -80,3 +80,4 @@ All of the following:
 | Version | Date | Author | Summary |
 |---------|------|--------|---------|
 | 0.1 | 2026-11-08 | BizCode | Initial readiness gate evaluation for #194 |
+| 0.2 | 2026-11-11 | BizCode | ZAP triage: remove `-I`, pin `10049` IGNORE, ubuntu-24.04; NO-GO remains (empty register) |

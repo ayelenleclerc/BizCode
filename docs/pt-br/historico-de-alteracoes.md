@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Triagem ZAP baseline (#194 residual):** [`.zap/rules.tsv`](../../.zap/rules.tsv) fixa `10049` IGNORE por ruído 404 da API efêmera (evidência run `43072369954`); [`.github/workflows/zap.yml`](../../.github/workflows/zap.yml) remove `-I`, fixa `ubuntu-24.04` e corrige escrita de `zap-out`. Docs de prontidão/penetração EN/ES/PT atualizados; #194 permanece OPEN (registro externo vazio; token Snyk ops).
 - **Fechamento documental reconciliação fiscal (#452):** [ativacao-modulos-legais-por-jurisdicao.md](quality/ativacao-modulos-legais-por-jurisdicao.md) (e cópias EN/ES) deixa de descrever UY/CL/BR como stubs de capacidade; documenta mocks de homologação registrados (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`) versus clientes live Not evidenced (ADR 0024–0027). Residuais live regionais permanecem abertos (#207/#208/#210/#211).
 
 ### Corrigido

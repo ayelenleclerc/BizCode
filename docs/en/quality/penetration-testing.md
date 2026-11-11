@@ -12,7 +12,7 @@ Describes how BizCode prepares for and records **security penetration testing** 
 |---------|----------|---------------|
 | `pnpm audit --audit-level=high` | Quality Gate ([`ci.yml`](../../../.github/workflows/ci.yml)) | Yes (HIGH+) |
 | Snyk | [`.github/workflows/snyk.yml`](../../../.github/workflows/snyk.yml) | Yes when `SNYK_TOKEN` set (HIGH+ with fix) |
-| OWASP ZAP baseline | [`.github/workflows/zap.yml`](../../../.github/workflows/zap.yml) | No until rules triage removes `-I` (WARN noise) |
+| OWASP ZAP baseline | [`.github/workflows/zap.yml`](../../../.github/workflows/zap.yml) (`ubuntu-24.04`) | Yes — unignored WARN/FAIL fail the job; triage in [`.zap/rules.tsv`](../../../.zap/rules.tsv) |
 | External pentest report | Ops + [evidence register](../../evidence/pentest-report-register.md) | Required for full #194 AC |
 
 **ZAP CI reports are not a substitute for an external pentest report.**
@@ -23,8 +23,8 @@ Describes how BizCode prepares for and records **security penetration testing** 
 2. Default target: ephemeral API (`pnpm run server` + Postgres service) at `http://127.0.0.1:3001`.
 3. Optional GitHub Actions **repository variable** `ZAP_TARGET_URL` (must be `http://` or `https://`, staging/non-prod only). Fail-closed if the value is malformed. **Do not** set production URLs with live customer data or secrets.
 4. Scanner runs in Docker with `--network host` so the container can reach the runner API.
-5. Rules file: [`.zap/rules.tsv`](../../../.zap/rules.tsv). After triage, IGNORE known false positives; then remove `-I` from the workflow to fail on remaining WARN/FAIL.
-6. Artifact: `zap-baseline-report` (HTML/JSON/Markdown under `zap-out/`). Retention 14 days. Do not commit reports that may contain environment details into git without review.
+5. Rules file: [`.zap/rules.tsv`](../../../.zap/rules.tsv). Triaged noise uses `IGNORE` (evidence-commented). The workflow does **not** pass `-I`; remaining WARN/FAIL fail CI. Evidence (2026-11-11, run `43072369954`): only WARN was rule `10049` on ephemeral API 404s — pinned `IGNORE`.
+6. Artifact: `zap-baseline-report` (HTML/JSON/Markdown under `zap-out/`; directory made world-writable before the container write). Retention 14 days. Do not commit reports that may contain environment details into git without review.
 
 ## Pre-engagement engineering checklist
 
