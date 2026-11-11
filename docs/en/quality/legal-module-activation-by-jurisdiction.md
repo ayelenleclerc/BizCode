@@ -82,7 +82,7 @@ Every path that creates a tenant writes `jurisdiccionFiscal` explicitly through 
 
 ## Out of scope
 
-No real filing against any tax authority is implemented. DGI (Uruguay), SII (Chile) and NF-e (Brazil) remain capability stubs that fail explicitly. Mexico CFDI uses a homologación mock PAC ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)); live commercial PAC clients remain Not evidenced. Per-jurisdiction licensing, mentioned as an activation axis in ADR-0007, is not implemented: activation is by configuration only.
+No real filing against any tax authority is implemented. Homologación **mocks** are registered for Uruguay DGI ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)), Chile SII ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)), Mexico SAT CFDI ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)), and Brazil SEFAZ NF-e ([ADR-0027](../adr/ADR-0027-brazil-sefaz-nfe-mock.md)) (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`; `implemented: true` in the fiscal provider registry). Live commercial DGI/SII/PAC/SEFAZ clients remain **Not evidenced**. Per-jurisdiction licensing, mentioned as an activation axis in ADR-0007, is not implemented: activation is by configuration only.
 
 ## Evidence
 

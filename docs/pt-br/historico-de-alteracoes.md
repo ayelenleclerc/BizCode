@@ -8,6 +8,10 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Alterado
+
+- **Fechamento documental reconciliação fiscal (#452):** [ativacao-modulos-legais-por-jurisdicao.md](quality/ativacao-modulos-legais-por-jurisdicao.md) (e cópias EN/ES) deixa de descrever UY/CL/BR como stubs de capacidade; documenta mocks de homologação registrados (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`) versus clientes live Not evidenced (ADR 0024–0027). Residuais live regionais permanecem abertos (#207/#208/#210/#211).
+
 ### Corrigido
 
 - **Gates de segurança CI Quality Gate / Deploy (PR #445):** overrides e bumps de dependências eliminam CRITICAL do Trivy (`handlebars`, `proxy-addr`, `shell-quote`) e bloqueios de `pnpm audit --audit-level=high`; `ignoreCves` temporários documentados para `node-forge` do Expo sem fix (`CVE-2026-85393`) e `zod@3` do app (`CVE-2023-54404`) em [ADR-0017](adr/ADR-0017-varredura-dependencias.md). Cobertura unitária Chile SII (serviço/UI) ampliada para o piso de 66% de linhas. `docs:openapi-md` restaurado removendo overrides `@vue/*` incompatíveis (Vue é só transitivo do Scalar/docs) e realinhando a árvore Vue no lockfile.
