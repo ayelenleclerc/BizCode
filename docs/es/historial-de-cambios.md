@@ -8,8 +8,13 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Cambiado
+
+- **Cierre documental reconciliación fiscal (#452):** [activacion-modulos-legales-por-jurisdiccion.md](quality/activacion-modulos-legales-por-jurisdiccion.md) (y copias EN/PT-BR) deja de describir UY/CL/BR como stubs de capacidad; documenta mocks de homologación registrados (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`) frente a clientes live Not evidenced (ADR 0024–0027). Residuales live regionales siguen abiertos (#207/#208/#210/#211).
+
 ### Corregido
 
+- **Flake de instalación Playwright en CI Quality Gate:** job Quality Gate fijado a `ubuntu-24.04` (evitar flakes apt/DNS de `ubuntu-latest`/`resolute`); `Install Playwright Chromium` en [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) fuerza IPv4 en apt, reintenta `--with-deps` hasta 3 veces y cae a instalación solo-browser vía CDN.
 - **Gates de seguridad CI Quality Gate / Deploy (PR #445):** overrides y bumps de dependencias eliminan CRITICAL de Trivy (`handlebars`, `proxy-addr`, `shell-quote`) y bloqueos de `pnpm audit --audit-level=high`; `ignoreCves` temporales documentados para `node-forge` de Expo sin fix (`CVE-2026-85393`) y `zod@3` de la app (`CVE-2023-54404`) en [ADR-0017](adr/ADR-0017-escaneo-dependencias.md). Cobertura unitaria Chile SII (servicio/UI) ampliada para el suelo de 66% de líneas. Se restauró `docs:openapi-md` quitando overrides `@vue/*` incompatibles (Vue solo es transitivo de Scalar/docs) y realineando el árbol Vue del lockfile.
 
 ### Agregado

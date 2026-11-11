@@ -9,7 +9,8 @@ on:
 jobs:
   quality:
     name: Quality Gate
-    runs-on: ubuntu-latest
+    # Pin 24.04: ubuntu-latest drifted to resolute with flaky apt/DNS on Playwright --with-deps.
+    runs-on: ubuntu-24.04
 
     services:
       postgres:
@@ -183,7 +184,24 @@ jobs:
         run: pnpm run check:i18n
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: |
+          # Prefer IPv4 for apt (IPv6 unreachable is a common GH runner failure mode).
+          echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4 >/dev/null
+          # Retry apt/DNS flakes; fall back to browser-only (Playwright CDN) if OS deps stay unreachable.
+          for attempt in 1 2 3; do
+            if npx playwright install --with-deps chromium; then
+              exit 0
+            fi
+            echo "::warning::Playwright --with-deps attempt ${attempt}/3 failed; refreshing apt and retrying"
+            sudo apt-get update -y || true
+            sleep $((attempt * 15))
+          done
+          echo "::warning::Falling back to Playwright Chromium without OS --with-deps (CDN browser download)"
+          if npx playwright install chromium; then
+            exit 0
+          fi
+          echo "::error::Playwright Chromium install failed (with-deps retries and browser-only fallback)"
+          exit 1
 
       - name: Ephemeral SuperAdmin password for E2E
         run: |

@@ -32,7 +32,7 @@ push / pull_request
       │
       ▼
 ┌──────────────────────────────────────────────────────────────┐
-│  Job: quality (ubuntu-latest)                              │
+│  Job: quality (ubuntu-24.04)                               │
 │                                                              │
 │  1. Checkout                                                 │
 │  2. Setup Node.js 22 (cache: npm)                           │

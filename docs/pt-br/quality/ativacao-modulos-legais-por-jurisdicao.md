@@ -82,7 +82,7 @@ Todos os caminhos que criam um tenant escrevem `jurisdiccionFiscal` explicitamen
 
 ## Fora de escopo
 
-Nenhuma transmissão real a órgão fiscal é implementada. DGI (Uruguai), SII (Chile) e NF-e (Brasil) continuam sendo stubs que falham de forma explícita. CFDI México usa um mock PAC de homologação ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)); clientes PAC comerciais live não estão evidenciados. O licenciamento por jurisdição, mencionado como eixo de ativação no ADR-0007, não está implementado: a ativação é apenas por configuração.
+Nenhuma transmissão real a órgão fiscal é implementada. Há **mocks** de homologação registrados para DGI Uruguai ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)), SII Chile ([ADR-0026](../adr/ADR-0026-chile-sii-dte-mock.md)), CFDI México SAT ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)) e NF-e SEFAZ Brasil ([ADR-0027](../adr/ADR-0027-brazil-sefaz-nfe-mock.md)) (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`; `implemented: true` no registro de provedores fiscais). Clientes comerciais live DGI/SII/PAC/SEFAZ permanecem **Not evidenced**. O licenciamento por jurisdição, mencionado como eixo de ativação no ADR-0007, não está implementado: a ativação é apenas por configuração.
 
 ## Evidência
 
