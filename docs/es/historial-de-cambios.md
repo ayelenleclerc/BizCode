@@ -14,6 +14,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Corregido
 
+- **Flake de instalación Playwright en CI Quality Gate:** el paso `Install Playwright Chromium` en [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) reintenta hasta 3 veces con backoff y `apt-get update` cuando falla el DNS de mirrors Ubuntu (`Temporary failure resolving *.ubuntu.com`).
 - **Gates de seguridad CI Quality Gate / Deploy (PR #445):** overrides y bumps de dependencias eliminan CRITICAL de Trivy (`handlebars`, `proxy-addr`, `shell-quote`) y bloqueos de `pnpm audit --audit-level=high`; `ignoreCves` temporales documentados para `node-forge` de Expo sin fix (`CVE-2026-85393`) y `zod@3` de la app (`CVE-2023-54404`) en [ADR-0017](adr/ADR-0017-escaneo-dependencias.md). Cobertura unitaria Chile SII (servicio/UI) ampliada para el suelo de 66% de líneas. Se restauró `docs:openapi-md` quitando overrides `@vue/*` incompatibles (Vue solo es transitivo de Scalar/docs) y realineando el árbol Vue del lockfile.
 
 ### Agregado

@@ -183,7 +183,18 @@ jobs:
         run: pnpm run check:i18n
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: |
+          # Retry apt/DNS flakes on GitHub-hosted runners (Temporary failure resolving *.ubuntu.com).
+          for attempt in 1 2 3; do
+            if npx playwright install --with-deps chromium; then
+              exit 0
+            fi
+            echo "::warning::Playwright Chromium install attempt ${attempt}/3 failed; refreshing apt and retrying"
+            sudo apt-get update -y || true
+            sleep $((attempt * 15))
+          done
+          echo "::error::Playwright Chromium install failed after 3 attempts (apt/DNS or browser download)"
+          exit 1
 
       - name: Ephemeral SuperAdmin password for E2E
         run: |
