@@ -22,6 +22,7 @@ import {
   resolveJurisdiction,
   validateRUT,
   validateRUTCL,
+  validateCNPJ,
 } from '@bizcode/types'
 import type { ServiceResult } from '../services/serviceResults'
 import { ArcaService, type FiscalConfigInput } from './ar/ArcaService'
@@ -394,6 +395,59 @@ export class FiscalProviderConfigService {
         enabled: true,
         isDefault,
         taxIdentifier: rut,
+        legalName: input.legalName?.trim() || null,
+        encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
+        configVersion: (existing?.configVersion ?? 0) + 1,
+      },
+    })
+    return { ok: true, data: { id: row.id } }
+  }
+
+  async upsertBrazilSefazConfig(
+    tenantId: number,
+    input: { cnpj: string; ambiente?: FiscalEnvironment; legalName?: string },
+  ): Promise<ServiceResult<{ id: number }>> {
+    const cnpjRaw = input.cnpj.trim()
+    if (!validateCNPJ(cnpjRaw)) {
+      return { ok: false, status: 400, error: 'INVALID_CNPJ' }
+    }
+    const cnpj = cnpjRaw.replace(/\D/g, '')
+    const ambiente: FiscalEnvironment = input.ambiente ?? 'homologacion'
+    const bundle = { cnpj, ambiente, mock: true as const }
+    const existing = await this.prisma.fiscalProviderConfig.findUnique({
+      where: { tenantId_providerCode: { tenantId, providerCode: 'brazil_sefaz_nfe' } },
+    })
+    const anyDefault = await this.prisma.fiscalProviderConfig.findFirst({
+      where: { tenantId, isDefault: true },
+    })
+    const isDefault = existing?.isDefault ?? anyDefault == null
+
+    if (isDefault && !existing?.isDefault) {
+      await this.prisma.fiscalProviderConfig.updateMany({
+        where: { tenantId, isDefault: true },
+        data: { isDefault: false },
+      })
+    }
+
+    const row = await this.prisma.fiscalProviderConfig.upsert({
+      where: { tenantId_providerCode: { tenantId, providerCode: 'brazil_sefaz_nfe' } },
+      create: {
+        tenantId,
+        providerCode: 'brazil_sefaz_nfe',
+        countryCode: 'BR',
+        environment: ambiente,
+        enabled: true,
+        isDefault,
+        taxIdentifier: cnpj,
+        legalName: input.legalName?.trim() || null,
+        encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
+        configVersion: 1,
+      },
+      update: {
+        environment: ambiente,
+        enabled: true,
+        isDefault,
+        taxIdentifier: cnpj,
         legalName: input.legalName?.trim() || null,
         encryptedConfig: encryptFiscalSecret(JSON.stringify(bundle)),
         configVersion: (existing?.configVersion ?? 0) + 1,

@@ -44,7 +44,7 @@ Opciones consideradas:
 - **Positivo:** Una instalación de un solo país deja de ofrecer el resto, en registro público y selector de super-admin.
 - **Positivo:** Sin migración de datos: `jurisdiccionFiscal` ya existe con default `'AR'`.
 - **Negativo:** El aprovisionamiento depende de variables de entorno del servidor; un `BIZCODE_DEFAULT_JURISDICTION` mal configurado cambia los módulos de tenants nuevos. Mitigado por fallback al comportamiento previo si no están definidas o son inválidas.
-- **No evidenciado:** Licenciamiento por jurisdicción (ADR-0007 menciona licencia como eje; solo hay configuración), e integración **live** contra organismos extranjeros (DGI, SII, SAT, NF-e). Inventario: los adaptadores UY/CL/MX son **mocks** con `implemented: true` en el registro de proveedores fiscales (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`); SOAP/REST/PAC + certificado live sigue Not evidenced. Brasil / NF-e **no** está registrado en el fiscal provider registry.
+- **No evidenciado:** Licenciamiento por jurisdicción (ADR-0007 menciona licencia como eje; solo hay configuración), e integración **live** contra organismos extranjeros (DGI, SII, SAT, SEFAZ/NF-e). Inventario: los adaptadores UY/CL/MX/BR son **mocks** con `implemented: true` en el registro de proveedores fiscales (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`); SOAP/REST/PAC/SEFAZ + certificado live sigue Not evidenced.
 
 ## Referencias
 

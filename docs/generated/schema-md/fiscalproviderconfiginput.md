@@ -20,6 +20,7 @@ undefined
 | :-------------------------- | :------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------- |
 | [ambiente](#ambiente)       | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-ambiente.md "undefined#/properties/ambiente")       |
 | [certificate](#certificate) | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-certificate.md "undefined#/properties/certificate") |
+| [cnpj](#cnpj)               | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-cnpj.md "undefined#/properties/cnpj")               |
 | [cuit](#cuit)               | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-cuit.md "undefined#/properties/cuit")               |
 | [legalName](#legalname)     | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-legalname.md "undefined#/properties/legalName")     |
 | [privateKey](#privatekey)   | `string` | Optional | cannot be null | [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-privatekey.md "undefined#/properties/privateKey")   |
@@ -71,6 +72,30 @@ undefined
 ### certificate Type
 
 `string`
+
+## cnpj
+
+Tax ID CNPJ for brazil\_sefaz\_nfe (#211) mock config
+
+`cnpj`
+
+* is optional
+
+* Type: `string`
+
+* cannot be null
+
+* defined in: [FiscalProviderConfigInput](fiscalproviderconfiginput-properties-cnpj.md "undefined#/properties/cnpj")
+
+### cnpj Type
+
+`string`
+
+### cnpj Constraints
+
+**maximum length**: the maximum number of characters for this string is: `18`
+
+**minimum length**: the minimum number of characters for this string is: `14`
 
 ## cuit
 
@@ -152,12 +177,13 @@ undefined
 
 **enum**: the value of this property must be equal to one of the following values:
 
-| Value              | Explanation |
-| :----------------- | :---------- |
-| `"arca_wsfe"`      |             |
-| `"uruguay_dgi"`    |             |
-| `"chile_sii"`      |             |
-| `"mexico_sat_pac"` |             |
+| Value                | Explanation |
+| :------------------- | :---------- |
+| `"arca_wsfe"`        |             |
+| `"uruguay_dgi"`      |             |
+| `"chile_sii"`        |             |
+| `"mexico_sat_pac"`   |             |
+| `"brazil_sefaz_nfe"` |             |
 
 ## rfc
 

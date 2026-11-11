@@ -88,6 +88,21 @@ export const MODULE_CATALOG = {
     plan: 'starter',
     price: 0,
   },
+  /**
+   * @en Brazil SEFAZ NF-e stamping (homologación mock in #211; live SEFAZ later).
+   * @es Emisión NF-e SEFAZ Brasil (mock de homologación en #211; SEFAZ live después).
+   * @pt-BR Emissão NF-e SEFAZ Brasil (mock de homologação em #211; SEFAZ live depois).
+   */
+  'billing.nfe_sefaz': {
+    label: 'SEFAZ NF-e (Brasil)',
+    required: false,
+    requiredInProd: false,
+    requiredInProdForCountries: ['BR'],
+    availableForCountries: ['BR'],
+    dependencies: ['core.invoicing'],
+    plan: 'starter',
+    price: 0,
+  },
   'billing.credit_notes': {
     label: 'Notas de credito',
     required: false,
@@ -528,6 +543,7 @@ export const DEFAULT_MODULES = [
   'billing.cfdi_sat',
   'billing.dgi_cfe',
   'billing.dte_sii',
+  'billing.nfe_sefaz',
   'billing.credit_notes',
   'finance.collections',
   'finance.receipts',

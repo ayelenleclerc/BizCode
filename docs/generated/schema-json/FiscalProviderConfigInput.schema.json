@@ -11,6 +11,12 @@
     "certificate": {
       "type": "string"
     },
+    "cnpj": {
+      "description": "Tax ID CNPJ for brazil_sefaz_nfe (#211) mock config",
+      "maxLength": 18,
+      "minLength": 14,
+      "type": "string"
+    },
     "cuit": {
       "type": "string"
     },

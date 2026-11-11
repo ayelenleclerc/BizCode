@@ -41,7 +41,7 @@ Opções consideradas:
 - **Positivo:** Instalação single-country deixa de oferecer as demais.
 - **Positivo:** Sem migração de dados.
 - **Negativo:** Provisionamento depende de env vars do servidor; mitigado por fallback.
-- **Não evidenciado:** Licenciamento por jurisdição (ADR-0007 menciona licença como eixo; só há configuração), e integração **live** com organismos estrangeiros (DGI, SII, SAT, NF-e). Inventário: adaptadores UY/CL/MX são **mocks** com `implemented: true` no registro de provedores fiscais (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`); SOAP/REST/PAC + certificado live permanece Not evidenced. Brasil / NF-e **não** está no fiscal provider registry.
+- **Não evidenciado:** Licenciamento por jurisdição (ADR-0007 menciona licença como eixo; só há configuração), e integração **live** com organismos estrangeiros (DGI, SII, SAT, SEFAZ/NF-e). Inventário: adaptadores UY/CL/MX/BR são **mocks** com `implemented: true` no registro de provedores fiscais (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`); SOAP/REST/PAC/SEFAZ + certificado live permanece Not evidenced.
 
 ## Referências
 

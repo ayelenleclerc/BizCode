@@ -104,12 +104,13 @@ undefined#/properties/data
 
 **enum**: the value of this property must be equal to one of the following values:
 
-| Value              | Explanation |
-| :----------------- | :---------- |
-| `"arca_wsfe"`      |             |
-| `"uruguay_dgi"`    |             |
-| `"chile_sii"`      |             |
-| `"mexico_sat_pac"` |             |
+| Value                | Explanation |
+| :------------------- | :---------- |
+| `"arca_wsfe"`        |             |
+| `"uruguay_dgi"`      |             |
+| `"chile_sii"`        |             |
+| `"mexico_sat_pac"`   |             |
+| `"brazil_sefaz_nfe"` |             |
 
 ## status
 

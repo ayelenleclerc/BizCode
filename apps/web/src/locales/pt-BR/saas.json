@@ -16,7 +16,8 @@
       "AR": "CUIT",
       "UY": "RUT",
       "CL": "RUT",
-      "MX": "RFC"
+      "MX": "RFC",
+      "BR": "CNPJ"
     },
     "email": "E-mail (usuÃ¡rio owner)",
     "phone": "Telefone (opcional)",

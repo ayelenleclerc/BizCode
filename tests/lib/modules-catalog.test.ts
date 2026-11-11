@@ -66,6 +66,14 @@ describe('module catalog', () => {
     expect(result.errors).toEqual([])
   })
 
+  it('validates Brazilian defaults including billing.nfe_sefaz in prod', () => {
+    const brDefaults = getDefaultModulesForJurisdiction('BR')
+    expect(brDefaults).toContain('billing.nfe_sefaz')
+    const result = validateModuleSet([...brDefaults], 'prod', 'BR')
+    expect(result.valid).toBe(true)
+    expect(result.errors).toEqual([])
+  })
+
   it('flags missing required modules in prod', () => {
     const withoutCore = DEFAULT_MODULES.filter((k) => k !== 'core.auth')
     const result = validateModuleSet(withoutCore, 'prod')

@@ -26,6 +26,11 @@
         "label": "Identificação fiscal (RFC)",
         "hint": "Pessoa moral 12 caracteres ou física 13 (homoclave incluída)",
         "invalid": "RFC inválido"
+      },
+      "BR": {
+        "label": "Identificação fiscal (CNPJ)",
+        "hint": "Formato XX.XXX.XXX/XXXX-XX (14 dígitos)",
+        "invalid": "CNPJ inválido"
       }
     },
     "domicilio": "Endereço",
@@ -181,6 +186,24 @@
     "errors": {
       "loadFailed": "Não foi possível carregar a configuração SII Chile",
       "saveFailed": "Não foi possível salvar a configuração SII Chile"
+    }
+  },
+  "brazilSefaz": {
+    "title": "SEFAZ NF-e (Brasil) — mock",
+    "subtitle": "Mock de homologação NF-e — armazena apenas CNPJ brasileiro. SEFAZ SOAP/REST e ICP-Brasil live não estão evidenciados neste build (#211).",
+    "loading": "Carregando configuração SEFAZ Brasil…",
+    "configuredHint": "Configurado para CNPJ {{cnpj}} ({{ambiente}}).",
+    "notConfigured": "O mock NF-e SEFAZ Brasil ainda não está configurado.",
+    "cnpj": "CNPJ",
+    "ambiente": "Ambiente",
+    "ambienteHomologacion": "Homologação (mock)",
+    "ambienteProduccion": "Produção (não habilitada neste build)",
+    "save": "Salvar configuração SEFAZ Brasil",
+    "saving": "Salvando…",
+    "saveSuccess": "Configuração SEFAZ Brasil salva",
+    "errors": {
+      "loadFailed": "Não foi possível carregar a configuração SEFAZ Brasil",
+      "saveFailed": "Não foi possível salvar a configuração SEFAZ Brasil"
     }
   },
   "mercadopago": {

@@ -57,6 +57,11 @@
         "label": "RFC",
         "placeholder": "XEXX010101000",
         "invalid": "RFC inválido"
+      },
+      "BR": {
+        "label": "CNPJ",
+        "placeholder": "11.222.333/0001-81",
+        "invalid": "CNPJ inválido"
       }
     },
     "condIva": "Condición IVA",

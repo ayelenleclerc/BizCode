@@ -2032,14 +2032,19 @@ export const arcaAPI = {
 }
 
 /**
- * @en Multi-organism fiscal e-invoicing types (#378, ADR-0018). `arca_wsfe` is the only
- *   provider with a working adapter; `uruguay_dgi`/`mexico_sat_pac` are capability-only stubs.
- * @es Tipos de facturación electrónica multi-organismo (#378, ADR-0018). `arca_wsfe` es el
- *   único proveedor con adapter funcional; `uruguay_dgi`/`mexico_sat_pac` son stubs de capacidades.
- * @pt-BR Tipos de nota fiscal eletrônica multi-organismo (#378, ADR-0018). `arca_wsfe` é o
- *   único provedor com adapter funcional; `uruguay_dgi`/`mexico_sat_pac` são stubs de capacidades.
+ * @en Multi-organism fiscal e-invoicing types (#378, ADR-0018). Homologación mocks include
+ *   `arca_wsfe`, `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`.
+ * @es Tipos de facturación electrónica multi-organismo (#378, ADR-0018). Los mocks de homologación
+ *   incluyen `arca_wsfe`, `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`.
+ * @pt-BR Tipos de nota fiscal eletrônica multi-organismo (#378, ADR-0018). Os mocks de homologação
+ *   incluem `arca_wsfe`, `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`.
  */
-export type FiscalProviderCode = 'arca_wsfe' | 'uruguay_dgi' | 'chile_sii' | 'mexico_sat_pac'
+export type FiscalProviderCode =
+  | 'arca_wsfe'
+  | 'uruguay_dgi'
+  | 'chile_sii'
+  | 'mexico_sat_pac'
+  | 'brazil_sefaz_nfe'
 
 export type FiscalProviderCapabilities = {
   provider: FiscalProviderCode
@@ -2077,6 +2082,7 @@ export type FiscalProviderConfigInput = {
   ambiente?: 'homologacion' | 'produccion'
   rfc?: string
   rut?: string
+  cnpj?: string
   legalName?: string
 }
 

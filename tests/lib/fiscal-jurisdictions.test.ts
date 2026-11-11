@@ -9,9 +9,9 @@ import {
 } from '../../packages/types/src/fiscal-jurisdictions'
 
 describe('fiscal jurisdictions catalog (#207)', () => {
-  it('exposes Argentina, Uruguay, Chile and Mexico', () => {
-    expect([...FISCAL_JURISDICTION_CODES]).toEqual(['AR', 'UY', 'CL', 'MX'])
-    expect(Object.keys(FISCAL_JURISDICTIONS)).toEqual(['AR', 'UY', 'CL', 'MX'])
+  it('exposes Argentina, Uruguay, Chile, Mexico and Brazil', () => {
+    expect([...FISCAL_JURISDICTION_CODES]).toEqual(['AR', 'UY', 'CL', 'MX', 'BR'])
+    expect(Object.keys(FISCAL_JURISDICTIONS)).toEqual(['AR', 'UY', 'CL', 'MX', 'BR'])
   })
 
   it('defaults to Argentina to preserve the historical behaviour', () => {
@@ -28,6 +28,7 @@ describe('fiscal jurisdictions catalog (#207)', () => {
     expect(FISCAL_JURISDICTIONS.AR.vatRates).toEqual({ standard: 21, reduced: 10.5 })
     expect(FISCAL_JURISDICTIONS.UY.vatRates).toEqual({ standard: 22, reduced: 10 })
     expect(FISCAL_JURISDICTIONS.MX.vatRates).toEqual({ standard: 16, reduced: 0 })
+    expect(FISCAL_JURISDICTIONS.BR.vatRates).toEqual({ standard: 18, reduced: 12 })
   })
 
   it('maps each jurisdiction to its tax identifier kind, currency and provider', () => {
@@ -46,6 +47,11 @@ describe('fiscal jurisdictions catalog (#207)', () => {
       currency: 'MXN',
       providerCode: 'mexico_sat_pac',
     })
+    expect(FISCAL_JURISDICTIONS.BR).toMatchObject({
+      taxIdKind: 'cnpj',
+      currency: 'BRL',
+      providerCode: 'brazil_sefaz_nfe',
+    })
   })
 
   describe('isFiscalJurisdictionCode', () => {
@@ -53,10 +59,11 @@ describe('fiscal jurisdictions catalog (#207)', () => {
       expect(isFiscalJurisdictionCode('AR')).toBe(true)
       expect(isFiscalJurisdictionCode('UY')).toBe(true)
       expect(isFiscalJurisdictionCode('MX')).toBe(true)
+      expect(isFiscalJurisdictionCode('BR')).toBe(true)
     })
 
     it('rejects unsupported or non-string values', () => {
-      expect(isFiscalJurisdictionCode('BR')).toBe(false)
+      expect(isFiscalJurisdictionCode('ZZ')).toBe(false)
       expect(isFiscalJurisdictionCode('ar')).toBe(false)
       expect(isFiscalJurisdictionCode('')).toBe(false)
       expect(isFiscalJurisdictionCode(null)).toBe(false)
@@ -69,10 +76,11 @@ describe('fiscal jurisdictions catalog (#207)', () => {
     it('returns the code when supported', () => {
       expect(resolveJurisdiction('UY')).toBe('UY')
       expect(resolveJurisdiction('MX')).toBe('MX')
+      expect(resolveJurisdiction('BR')).toBe('BR')
     })
 
     it('falls back to the default for unknown or absent values', () => {
-      expect(resolveJurisdiction('BR')).toBe('AR')
+      expect(resolveJurisdiction('ZZ')).toBe('AR')
       expect(resolveJurisdiction(null)).toBe('AR')
       expect(resolveJurisdiction(undefined)).toBe('AR')
     })

@@ -1,28 +1,29 @@
 /**
  * @en Shared types for the multi-organism fiscal e-invoicing module (#378, ADR-0018).
- *   Homologación mocks: ARCA, Mexico SAT PAC (#210), Uruguay DGI CFE (#207), Chile SII DTE (#208).
- *   Live AFIP/DGI/PAC/SII remain Not evidenced until a future ADR.
+ *   Homologación mocks: ARCA, Mexico SAT PAC (#210), Uruguay DGI CFE (#207), Chile SII DTE (#208),
+ *   Brazil SEFAZ NF-e (#211). Live AFIP/DGI/PAC/SII/SEFAZ remain Not evidenced until a future ADR.
  * @es Tipos compartidos del módulo fiscal multi-organismo (#378, ADR-0018).
- *   Mocks de homologación: ARCA, PAC SAT México (#210), CFE DGI Uruguay (#207), DTE SII Chile (#208).
- *   AFIP/DGI/PAC/SII live siguen sin evidenciarse hasta un ADR futuro.
+ *   Mocks de homologación: ARCA, PAC SAT México (#210), CFE DGI Uruguay (#207), DTE SII Chile (#208),
+ *   NF-e SEFAZ Brasil (#211). AFIP/DGI/PAC/SII/SEFAZ live siguen sin evidenciarse hasta un ADR futuro.
  * @pt-BR Tipos compartilhados do módulo fiscal multi-organismo (#378, ADR-0018).
- *   Mocks de homologação: ARCA, PAC SAT México (#210), CFE DGI Uruguai (#207), DTE SII Chile (#208).
- *   AFIP/DGI/PAC/SII live permanecem não evidenciados até um ADR futuro.
+ *   Mocks de homologação: ARCA, PAC SAT México (#210), CFE DGI Uruguai (#207), DTE SII Chile (#208),
+ *   NF-e SEFAZ Brasil (#211). AFIP/DGI/PAC/SII/SEFAZ live permanecem não evidenciados até um ADR futuro.
  */
 
 /**
  * @en Registered fiscal provider codes. Homologación mocks: `arca_wsfe`, `mexico_sat_pac`,
- *   `uruguay_dgi`, `chile_sii` (#378/#210/#207/#208).
+ *   `uruguay_dgi`, `chile_sii`, `brazil_sefaz_nfe` (#378/#210/#207/#208/#211).
  * @es Códigos de proveedor fiscal registrados. Mocks de homologación: `arca_wsfe`, `mexico_sat_pac`,
- *   `uruguay_dgi`, `chile_sii` (#378/#210/#207/#208).
+ *   `uruguay_dgi`, `chile_sii`, `brazil_sefaz_nfe` (#378/#210/#207/#208/#211).
  * @pt-BR Códigos de provedor fiscal registrados. Mocks de homologação: `arca_wsfe`, `mexico_sat_pac`,
- *   `uruguay_dgi`, `chile_sii` (#378/#210/#207/#208).
+ *   `uruguay_dgi`, `chile_sii`, `brazil_sefaz_nfe` (#378/#210/#207/#208/#211).
  */
 export const FISCAL_PROVIDER_CODES = [
   'arca_wsfe',
   'uruguay_dgi',
   'chile_sii',
   'mexico_sat_pac',
+  'brazil_sefaz_nfe',
 ] as const
 
 export type FiscalProviderCode = (typeof FISCAL_PROVIDER_CODES)[number]
@@ -32,7 +33,7 @@ export function isFiscalProviderCode(value: unknown): value is FiscalProviderCod
 }
 
 /** @en ISO-3166-1 alpha-2 country code the provider issues documents for. */
-export type FiscalCountryCode = 'AR' | 'UY' | 'CL' | 'MX'
+export type FiscalCountryCode = 'AR' | 'UY' | 'CL' | 'MX' | 'BR'
 
 /**
  * @en Normalized environment. Mirrors ArcaService's `ambiente` vocabulary (the only
