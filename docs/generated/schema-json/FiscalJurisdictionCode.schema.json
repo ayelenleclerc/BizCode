@@ -5,7 +5,8 @@
     "AR",
     "UY",
     "CL",
-    "MX"
+    "MX",
+    "BR"
   ],
   "title": "FiscalJurisdictionCode",
   "type": "string"

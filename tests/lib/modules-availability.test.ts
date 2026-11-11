@@ -28,12 +28,14 @@ const ARGENTINE_ONLY_MODULES = [
 const MEXICO_ONLY_MODULES = ['billing.cfdi_sat'] as const
 const URUGUAY_ONLY_MODULES = ['billing.dgi_cfe'] as const
 const CHILE_ONLY_MODULES = ['billing.dte_sii'] as const
+const BRAZIL_ONLY_MODULES = ['billing.nfe_sefaz'] as const
 
 const COUNTRY_RESTRICTED_MODULES = [
   ...ARGENTINE_ONLY_MODULES,
   ...MEXICO_ONLY_MODULES,
   ...URUGUAY_ONLY_MODULES,
   ...CHILE_ONLY_MODULES,
+  ...BRAZIL_ONLY_MODULES,
 ] as const
 
 describe('module availability per jurisdiction (#437)', () => {
@@ -99,8 +101,21 @@ describe('default modules per jurisdiction (#437)', () => {
     expect(chilean).toContain('core.invoicing')
     expect(chilean).not.toContain('billing.cfdi_sat')
     expect(chilean).not.toContain('billing.dgi_cfe')
+    expect(chilean).not.toContain('billing.nfe_sefaz')
     for (const key of ARGENTINE_ONLY_MODULES) {
       expect(chilean).not.toContain(key)
+    }
+  })
+
+  it('includes Brazil NF-e in Brazilian defaults and drops foreign legal modules', () => {
+    const brazilian = getDefaultModulesForJurisdiction('BR')
+    expect(brazilian).toContain('billing.nfe_sefaz')
+    expect(brazilian).toContain('core.invoicing')
+    expect(brazilian).not.toContain('billing.cfdi_sat')
+    expect(brazilian).not.toContain('billing.dte_sii')
+    expect(brazilian).not.toContain('billing.dgi_cfe')
+    for (const key of ARGENTINE_ONLY_MODULES) {
+      expect(brazilian).not.toContain(key)
     }
   })
 

@@ -22,6 +22,7 @@ MVP that removes the Argentine assumptions hard-coded across invoicing so a tena
 - Live DGI (Uruguay) SOAP/REST and digital certificates — **Not evidenced**. Homologación CFE mock is evidenced under `apps/server/fiscal/uy/` ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)); module `billing.dgi_cfe`.
 - The Argentine CAE circuit is untouched and is still a local mock: `arcaWsfeMock.ts` computes the CAE arithmetically and the real WSFE client remains pending in #133.
 - Mexico CFDI live PAC (Facturama/Finkok) remains Not evidenced; `mexico_sat_pac` is a homologación mock ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)). See [mexico-fiscal-jurisdiction.md](mexico-fiscal-jurisdiction.md).
+- Brazil SEFAZ live remains Not evidenced; `brazil_sefaz_nfe` is a homologación mock ([ADR-0027](../adr/ADR-0027-brazil-sefaz-nfe-mock.md)). See [brazil-fiscal-jurisdiction.md](brazil-fiscal-jurisdiction.md).
 
 ## Jurisdiction catalog
 

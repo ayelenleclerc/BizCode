@@ -65,7 +65,8 @@
       "AR": { "label": "CUIT", "invalid": "CUIT inválido" },
       "UY": { "label": "RUT", "invalid": "RUT inválido" },
       "CL": { "label": "RUT", "invalid": "RUT inválido" },
-      "MX": { "label": "RFC", "invalid": "RFC inválido" }
+      "MX": { "label": "RFC", "invalid": "RFC inválido" },
+      "BR": { "label": "CNPJ", "invalid": "CNPJ inválido" }
     },
     "condIva": "Regime fiscal",
     "telef": "Telefone",

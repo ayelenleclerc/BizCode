@@ -55,6 +55,10 @@ export function getFiscalProviderAdapter(
       const factory = registry.get('mexico_sat_pac')
       return factory ? factory(prisma) : null
     }
+    case 'brazil_sefaz_nfe': {
+      const factory = registry.get('brazil_sefaz_nfe')
+      return factory ? factory(prisma) : null
+    }
     default:
       return null
   }

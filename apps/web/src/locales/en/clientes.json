@@ -57,6 +57,11 @@
         "label": "Tax ID (RFC)",
         "placeholder": "XEXX010101000",
         "invalid": "Invalid RFC"
+      },
+      "BR": {
+        "label": "Tax ID (CNPJ)",
+        "placeholder": "11.222.333/0001-81",
+        "invalid": "Invalid CNPJ"
       }
     },
     "condIva": "VAT Status",

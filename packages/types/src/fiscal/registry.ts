@@ -11,6 +11,7 @@ import { AR_FISCAL_RULES } from './countries/ar'
 import { UY_FISCAL_RULES } from './countries/uy'
 import { CL_FISCAL_RULES } from './countries/cl'
 import { MX_FISCAL_RULES } from './countries/mx'
+import { BR_FISCAL_RULES } from './countries/br'
 import type { FiscalRuleSet, SubjectTaxCondition, VatRateCode } from './types'
 
 /**
@@ -18,7 +19,7 @@ import type { FiscalRuleSet, SubjectTaxCondition, VatRateCode } from './types'
  * @es El orden importa: es el orden en que la interfaz ofrece las jurisdicciones.
  * @pt-BR A ordem importa: e a ordem em que a interface oferece as jurisdicoes.
  */
-export const FISCAL_JURISDICTION_CODES = ['AR', 'UY', 'CL', 'MX'] as const
+export const FISCAL_JURISDICTION_CODES = ['AR', 'UY', 'CL', 'MX', 'BR'] as const
 
 export type FiscalJurisdictionCode = (typeof FISCAL_JURISDICTION_CODES)[number]
 
@@ -34,6 +35,7 @@ export const FISCAL_RULE_SETS: Record<FiscalJurisdictionCode, FiscalRuleSet> = {
   UY: UY_FISCAL_RULES,
   CL: CL_FISCAL_RULES,
   MX: MX_FISCAL_RULES,
+  BR: BR_FISCAL_RULES,
 }
 
 /**

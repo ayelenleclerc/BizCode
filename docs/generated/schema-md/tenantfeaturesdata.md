@@ -69,6 +69,7 @@ Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validatio
 | `"UY"` |             |
 | `"CL"` |             |
 | `"MX"` |             |
+| `"BR"` |             |
 
 ## jurisdiccionesHabilitadas
 

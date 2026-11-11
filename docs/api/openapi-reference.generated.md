@@ -218,7 +218,7 @@ Public endpoint. Reports the jurisdictions enabled by BIZCODE\_FISCAL\_JURISDICT
 
   - **`default` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`enabled` (required)**
 
@@ -228,7 +228,7 @@ Public endpoint. Reports the jurisdictions enabled by BIZCODE\_FISCAL\_JURISDICT
 
     - **`code` (required)**
 
-      `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+      `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
     - **`label` (required)**
 
@@ -2958,7 +2958,7 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -2974,7 +2974,7 @@ Returns module and integration keys enabled for the authenticated user's tenant.
 
     **Items:**
 
-    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 - **`success` (required)**
 
@@ -6059,7 +6059,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -6370,7 +6370,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -6833,7 +6833,7 @@ Returns plan limits, enabled plan features, and current usage for the authentica
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -43685,7 +43685,7 @@ Requires `sales.create`.
 - **Path:** `/api/fiscal/providers/config`
 - **Tags:** fiscal
 
-Requires `settings.fiscal.manage`. Lists every registered provider (`arca_wsfe`, `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`) with capabilities and configuration status. Never returns certificate/private key material.
+Requires `settings.fiscal.manage`. Lists every registered provider (`arca_wsfe`, `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`) with capabilities and configuration status. Never returns certificate/private key material.
 
 #### Responses
 
@@ -43717,7 +43717,7 @@ Requires `settings.fiscal.manage`. Lists every registered provider (`arca_wsfe`,
 
     - **`provider` (required)**
 
-      `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+      `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
     - **`supportsCancel` (required)**
 
@@ -43761,7 +43761,7 @@ Requires `settings.fiscal.manage`. Lists every registered provider (`arca_wsfe`,
 
   - **`provider` (required)**
 
-    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
   - **`environment`**
 
@@ -43999,7 +43999,7 @@ Requires `settings.fiscal.manage`. Only `provider: arca_wsfe` is implemented tod
 
 - **`provider` (required)**
 
-  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
 - **`ambiente`**
 
@@ -44008,6 +44008,10 @@ Requires `settings.fiscal.manage`. Only `provider: arca_wsfe` is implemented tod
 - **`certificate`**
 
   `string`
+
+- **`cnpj`**
+
+  `string` — Tax ID CNPJ for brazil\_sefaz\_nfe (#211) mock config
 
 - **`cuit`**
 
@@ -44040,6 +44044,7 @@ Requires `settings.fiscal.manage`. Only `provider: arca_wsfe` is implemented tod
   "ambiente": "homologacion",
   "rfc": "",
   "rut": "",
+  "cnpj": "",
   "legalName": ""
 }
 ```
@@ -44352,7 +44357,7 @@ Requires `settings.fiscal.manage`. Records `lastValidationAt`/`validationStatus`
 
 - **`provider` (required)**
 
-  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
 **Example:**
 
@@ -44662,7 +44667,7 @@ Requires `settings.fiscal.manage`. Records `lastValidationAt`/`validationStatus`
 - **Path:** `/api/fiscal/providers/capabilities`
 - **Tags:** fiscal
 
-Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe`, `mexico_sat_pac`, `uruguay_dgi` and `chile_sii` report `implemented: true` as homologación mocks today. Live AFIP SOAP, DGI, SII XML/XAdES and commercial PAC clients remain Not evidenced.
+Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe`, `mexico_sat_pac`, `uruguay_dgi`, `chile_sii` and `brazil_sefaz_nfe` report `implemented: true` as homologación mocks today. Live AFIP SOAP, DGI, SII XML/XAdES and commercial PAC clients remain Not evidenced.
 
 #### Responses
 
@@ -44690,7 +44695,7 @@ Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe`, `mexico_sat_p
 
   - **`provider` (required)**
 
-    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
   - **`supportsCancel` (required)**
 
@@ -44925,7 +44930,7 @@ Requires `sales.create`. Resolves the tenant's default fiscal provider (`arca_ws
 
   - **`provider` (required)**
 
-    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
   - **`status` (required)**
 
@@ -45374,7 +45379,7 @@ Requires `sales.create`. Mexico SAT CFDI requires `reasonCode` 01-04. Providers 
 
   - **`provider` (required)**
 
-    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
   - **`status` (required)**
 
@@ -196791,7 +196796,7 @@ Originating invoice header (selected columns)
 
 * **`provider` (required)**
 
-  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
 * **`supportsCancel` (required)**
 
@@ -196858,7 +196863,7 @@ Originating invoice header (selected columns)
 
   - **`provider` (required)**
 
-    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
   - **`supportsCancel` (required)**
 
@@ -196932,7 +196937,7 @@ Originating invoice header (selected columns)
 
   - **`provider` (required)**
 
-    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
   - **`supportsCancel` (required)**
 
@@ -196976,7 +196981,7 @@ Originating invoice header (selected columns)
 
 * **`provider` (required)**
 
-  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
 * **`environment`**
 
@@ -197060,7 +197065,7 @@ Originating invoice header (selected columns)
 
     - **`provider` (required)**
 
-      `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+      `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
     - **`supportsCancel` (required)**
 
@@ -197104,7 +197109,7 @@ Originating invoice header (selected columns)
 
   - **`provider` (required)**
 
-    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
   - **`environment`**
 
@@ -197175,7 +197180,7 @@ Originating invoice header (selected columns)
 
 * **`provider` (required)**
 
-  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
 * **`ambiente`**
 
@@ -197184,6 +197189,10 @@ Originating invoice header (selected columns)
 * **`certificate`**
 
   `string`
+
+* **`cnpj`**
+
+  `string` — Tax ID CNPJ for brazil\_sefaz\_nfe (#211) mock config
 
 * **`cuit`**
 
@@ -197216,6 +197225,7 @@ Originating invoice header (selected columns)
   "ambiente": "homologacion",
   "rfc": "",
   "rut": "",
+  "cnpj": "",
   "legalName": ""
 }
 ```
@@ -197324,7 +197334,7 @@ Originating invoice header (selected columns)
 
 * **`provider` (required)**
 
-  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+  `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
 **Example:**
 
@@ -198161,7 +198171,7 @@ Originating invoice header (selected columns)
 
   - **`provider` (required)**
 
-    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac"`
+    `string`, possible values: `"arca_wsfe", "uruguay_dgi", "chile_sii", "mexico_sat_pac", "brazil_sefaz_nfe"`
 
   - **`status` (required)**
 
@@ -214089,7 +214099,7 @@ Sales breakdown by operation currency (#206).
 
 * **`jurisdiccionFiscal` (required)**
 
-  `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+  `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 * **`modules` (required)**
 
@@ -214105,7 +214115,7 @@ Sales breakdown by operation currency (#206).
 
   **Items:**
 
-  `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+  `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 **Example:**
 
@@ -214142,7 +214152,7 @@ Sales breakdown by operation currency (#206).
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 
@@ -214158,7 +214168,7 @@ Sales breakdown by operation currency (#206).
 
     **Items:**
 
-    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 * **`success` (required)**
 
@@ -214559,7 +214569,7 @@ Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validatio
 
 * **`jurisdiccionFiscal` (required)**
 
-  `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+  `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
 * **`modules` (required)**
 
@@ -214632,7 +214642,7 @@ Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validatio
 
   - **`jurisdiccionFiscal` (required)**
 
-    `string`, possible values: `"AR", "UY", "CL", "MX"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
+    `string`, possible values: `"AR", "UY", "CL", "MX", "BR"` — Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which modules are mandatory in production. Defaults to \`AR\`.
 
   - **`modules` (required)**
 

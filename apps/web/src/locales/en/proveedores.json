@@ -65,7 +65,8 @@
       "AR": { "label": "CUIT", "invalid": "Invalid CUIT" },
       "UY": { "label": "RUT", "invalid": "Invalid RUT" },
       "CL": { "label": "RUT", "invalid": "Invalid RUT" },
-      "MX": { "label": "RFC", "invalid": "Invalid RFC" }
+      "MX": { "label": "RFC", "invalid": "Invalid RFC" },
+      "BR": { "label": "CNPJ", "invalid": "Invalid CNPJ" }
     },
     "condIva": "VAT condition",
     "telef": "Phone",

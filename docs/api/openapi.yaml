@@ -4389,7 +4389,7 @@ paths:
       summary: Multi-organism fiscal provider status per tenant (#378)
       description: |
         Requires `settings.fiscal.manage`. Lists every registered provider (`arca_wsfe`,
-        `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`) with capabilities and configuration status.
+        `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`) with capabilities and configuration status.
         Never returns certificate/private key material.
       responses:
         '200':
@@ -4477,7 +4477,7 @@ paths:
       summary: Static capability declaration for every registered fiscal provider (#378)
       description: |
         Requires `settings.fiscal.manage`. No tenant context; `arca_wsfe`, `mexico_sat_pac`,
-        `uruguay_dgi` and `chile_sii` report `implemented: true` as homologación mocks today.
+        `uruguay_dgi`, `chile_sii` and `brazil_sefaz_nfe` report `implemented: true` as homologación mocks today.
         Live AFIP SOAP, DGI, SII XML/XAdES and commercial PAC clients remain Not evidenced.
       responses:
         '200':
@@ -24993,7 +24993,7 @@ components:
 
     FiscalProviderCode:
       type: string
-      enum: [arca_wsfe, uruguay_dgi, chile_sii, mexico_sat_pac]
+      enum: [arca_wsfe, uruguay_dgi, chile_sii, mexico_sat_pac, brazil_sefaz_nfe]
 
     FiscalProviderCapabilities:
       type: object
@@ -25073,6 +25073,7 @@ components:
           enum: [homologacion, produccion]
         rfc: { type: string, minLength: 12, maxLength: 13 }
         rut: { type: string, minLength: 8, maxLength: 20, description: Tax ID RUT for uruguay_dgi (#207) or chile_sii (#208) mock config; algorithm depends on provider }
+        cnpj: { type: string, minLength: 14, maxLength: 18, description: Tax ID CNPJ for brazil_sefaz_nfe (#211) mock config }
         legalName: { type: string, maxLength: 160 }
 
     FiscalDocumentCancelInput:
@@ -31004,7 +31005,7 @@ components:
 
     FiscalJurisdictionCode:
       type: string
-      enum: [AR, UY, CL, MX]
+      enum: [AR, UY, CL, MX, BR]
       description: >-
         Tenant tax jurisdiction (#207, #210). Drives VAT rates, tax identifier validation and which
         modules are mandatory in production. Defaults to `AR`.

@@ -26,6 +26,11 @@
         "label": "Tax ID (RFC)",
         "hint": "Legal entity 12 characters or individual 13 (including homoclave)",
         "invalid": "Invalid RFC"
+      },
+      "BR": {
+        "label": "Tax ID (CNPJ)",
+        "hint": "Format XX.XXX.XXX/XXXX-XX (14 digits)",
+        "invalid": "Invalid CNPJ"
       }
     },
     "domicilio": "Address",
@@ -181,6 +186,24 @@
     "errors": {
       "loadFailed": "Could not load Chile SII settings",
       "saveFailed": "Could not save Chile SII settings"
+    }
+  },
+  "brazilSefaz": {
+    "title": "SEFAZ NF-e (Brazil) — mock",
+    "subtitle": "Homologación mock NF-e — stores Brazilian CNPJ only. Live SEFAZ SOAP/REST and ICP-Brasil are not evidenced in this build (#211).",
+    "loading": "Loading Brazil SEFAZ settings…",
+    "configuredHint": "Configured for CNPJ {{cnpj}} ({{ambiente}}).",
+    "notConfigured": "Brazil SEFAZ NF-e mock is not configured yet.",
+    "cnpj": "CNPJ",
+    "ambiente": "Environment",
+    "ambienteHomologacion": "Homologación (mock)",
+    "ambienteProduccion": "Production (not enabled in this build)",
+    "save": "Save Brazil SEFAZ settings",
+    "saving": "Saving…",
+    "saveSuccess": "Brazil SEFAZ settings saved",
+    "errors": {
+      "loadFailed": "Could not load Brazil SEFAZ settings",
+      "saveFailed": "Could not save Brazil SEFAZ settings"
     }
   },
   "mercadopago": {

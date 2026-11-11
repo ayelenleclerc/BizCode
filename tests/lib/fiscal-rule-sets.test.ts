@@ -108,7 +108,9 @@ describe('per-country fiscal rule registry (#440)', () => {
 
     it('charges no VAT to a final consumer in every jurisdiction', () => {
       for (const code of FISCAL_JURISDICTION_CODES) {
-        const result = calculateInvoice(items, 'CF', code)
+        const nonPaying = getSubjectTaxConditions(code).find((c) => !c.paysVat)
+        expect(nonPaying).toBeDefined()
+        const result = calculateInvoice(items, nonPaying!.code, code)
         expect(result.iva1).toBe(0)
         expect(result.iva2).toBe(0)
       }

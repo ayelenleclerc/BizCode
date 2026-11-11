@@ -44,7 +44,7 @@ Options considered:
 - **Positive:** An installation deployed for a single country stops offering the rest, in both the public registration and the super-admin selector.
 - **Positive:** No data migration: `jurisdiccionFiscal` already exists with default `'AR'` and existing tenants keep their value.
 - **Negative:** Tenant provisioning now depends on server environment variables; a misconfigured `BIZCODE_DEFAULT_JURISDICTION` changes which modules new tenants receive. Mitigated by falling back to the previous behaviour on unset or invalid values.
-- **Not evidenced:** Per-jurisdiction licensing (ADR-0007 mentions license as an activation axis; only configuration is implemented), and any **live** filing against a foreign tax authority (DGI, SII, SAT, NF-e). Inventory: UY/CL/MX adapters are **mocks** with `implemented: true` in the fiscal provider registry (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`); live SOAP/REST/PAC + certificate remains Not evidenced. Brazil / NF-e is **not** registered in the fiscal provider registry.
+- **Not evidenced:** Per-jurisdiction licensing (ADR-0007 mentions license as an activation axis; only configuration is implemented), and any **live** filing against a foreign tax authority (DGI, SII, SAT, SEFAZ/NF-e). Inventory: UY/CL/MX/BR adapters are **mocks** with `implemented: true` in the fiscal provider registry (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`); live SOAP/REST/PAC/SEFAZ + certificate remains Not evidenced.
 
 ## References
 

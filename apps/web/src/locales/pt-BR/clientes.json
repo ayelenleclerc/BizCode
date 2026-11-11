@@ -57,6 +57,11 @@
         "label": "Identificação fiscal (RFC)",
         "placeholder": "XEXX010101000",
         "invalid": "RFC inválido"
+      },
+      "BR": {
+        "label": "Identificação fiscal (CNPJ)",
+        "placeholder": "11.222.333/0001-81",
+        "invalid": "CNPJ inválido"
       }
     },
     "condIva": "Regime Fiscal",

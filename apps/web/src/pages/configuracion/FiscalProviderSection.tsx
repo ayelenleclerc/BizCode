@@ -7,6 +7,7 @@ import ArcaFiscalSection from './ArcaFiscalSection'
 import MexicoSatFiscalSection from './MexicoSatFiscalSection'
 import UruguayDgiFiscalSection from './UruguayDgiFiscalSection'
 import ChileSiiFiscalSection from './ChileSiiFiscalSection'
+import BrazilSefazFiscalSection from './BrazilSefazFiscalSection'
 
 /**
  * @en Multi-organism fiscal e-invoicing section (#378, #210, #207, #208). Lists providers and mounts
@@ -123,6 +124,7 @@ export default function FiscalProviderSection() {
       <MexicoSatFiscalSection />
       <UruguayDgiFiscalSection />
       <ChileSiiFiscalSection />
+      <BrazilSefazFiscalSection />
     </>
   )
 }

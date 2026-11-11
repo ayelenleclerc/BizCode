@@ -4,7 +4,8 @@
     "arca_wsfe",
     "uruguay_dgi",
     "chile_sii",
-    "mexico_sat_pac"
+    "mexico_sat_pac",
+    "brazil_sefaz_nfe"
   ],
   "title": "FiscalProviderCode",
   "type": "string"

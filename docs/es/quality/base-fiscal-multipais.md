@@ -22,6 +22,7 @@ MVP que elimina los supuestos argentinos cableados en la facturación para que u
 - DGI (Uruguay) SOAP/REST live y certificados digitales — **no evidenciado**. El mock CFE de homologación está en `apps/server/fiscal/uy/` ([ADR-0025](../adr/ADR-0025-uruguay-dgi-cfe-mock.md)); módulo `billing.dgi_cfe`.
 - El circuito CAE argentino no se toca y sigue siendo un mock local: `arcaWsfeMock.ts` calcula el CAE con aritmética y el cliente WSFE real continúa pendiente en #133.
 - PAC live de CFDI México (Facturama/Finkok) sigue sin evidenciarse; `mexico_sat_pac` es mock de homologación ([ADR-0024](../adr/ADR-0024-mexico-sat-cfdi-mock-pac.md)). Ver [jurisdiccion-fiscal-mexico.md](jurisdiccion-fiscal-mexico.md).
+- SEFAZ live de Brasil sigue sin evidenciarse; `brazil_sefaz_nfe` es mock de homologación ([ADR-0027](../adr/ADR-0027-brazil-sefaz-nfe-mock.md)). Ver [jurisdiccion-fiscal-brasil.md](jurisdiccion-fiscal-brasil.md).
 
 ## Catálogo de jurisdicciones
 
