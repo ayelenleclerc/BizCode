@@ -74,7 +74,7 @@ Contagem indicativa (conservadora: evidência de produto é majoritariamente **P
 | A.5.27 | Aprendizado com incidentes | Partial | Post-mortem documentado |
 | A.5.28 | Coleta de evidência | Partial | Audit events / forense |
 | A.5.29 | Segurança durante disrupção | Partial | Runbooks DR [#197](https://github.com/ayelenleclerc/BizCode/issues/197); drill staging pendente |
-| A.5.30 | Continuidade TIC | Partial | SEC-014/015 + backup #150; status page + drill staging pendentes (#197) |
+| A.5.30 | Continuidade TIC | Partial | SEC-014/015 + backup #150; UI `/status` first-party no repo; residual #197 = monitor externo de uptime + drill RTO staging (`STAGING_DEPLOY_*`) |
 | A.5.31 | Requisitos legais e contratuais | Partial | Privacidade #195; ADR-0007 |
 | A.5.32 | Direitos de propriedade intelectual | Not evidenced | Sem política IP |
 | A.5.33 | Proteção de registros | Partial | Auditoria / templates ISO |

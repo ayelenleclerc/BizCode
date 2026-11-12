@@ -10,6 +10,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Reconciliación drift docs ZAP /status (#194/#197 residual):** CI/CD EN/ES/PT ya no afirman ZAP `-I`; ISO A.5.30 + RSK R-11 distinguen `/status` in-repo de monitor externo + drill staging — #194/#197 siguen OPEN (registers vacíos; ops pendiente).
 - **Registro de evidencia piloto post-RBAC (#450):** matriz EN/ES/PT (Evidence + registro de ejecución) documenta `vitest` `tests/api/pedidos.test.ts` PASS (13/13) tras #474 (RBAC 403 ship/deliver/collect) — #194/#197/#239 siguen OPEN.
 - **RBAC HTTP logística de pedidos (#450 residual):** `tests/api/pedidos.test.ts` aserta 403 en `ship` (`warehouse_op` / sin `orders.dispatch`), `deliver` (`logistics_planner` / sin `orders.deliver.confirm`) y `collect` (`warehouse_op` / sin perms de cobro); pack 403 ya cubierto.
 - **Transiciones API mock FCEM (#239 residual):** `tests/api/fcem.test.ts` cubre `POST .../aceptar`, `.../rechazar`, `.../aceptar-tacita` (asserts OpenAPI) y `422 FCEM_NOT_PENDING`; contrato mock ADR-0028. AFIP / WSFECM live siguen Not evidenced — #239 permanece OPEN.

@@ -34,7 +34,7 @@ Mitigar · Aceptar · Transferir · Evitar (por fila).
 | R-08 | Mitigar | Operar proceso de privacidad según #195 | Product owner | Continuo | #195 |
 | R-09 | Mitigar | Fijar Actions; revisar SBOM; bloquear deps High+ | Ingeniería | Continuo | CI / SBOM |
 | R-10 | Mitigar | Forzar TLS + WAF en edges hosted | Ops plataforma | Antes de SaaS GA | #217 |
-| R-11 | Mitigar | Docs SLA/DR publicados; activar status page; completar drill staging | Product owner | AC restantes #197 | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
+| R-11 | Mitigar | Docs SLA/DR + `/status` in-repo publicados; activar monitor externo de uptime; completar drill staging | Product owner | AC restantes #197 | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
 | R-12 | Mitigar | Briefing de concienciación a operadores; registro de asistencia | Product owner | 90 días tras merge #196 | RR.HH. / ops |
 
 ## Temas de brecha cerrados por este issue (#196)

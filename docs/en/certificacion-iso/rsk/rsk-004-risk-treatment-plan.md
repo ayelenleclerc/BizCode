@@ -34,7 +34,7 @@ Mitigate · Accept · Transfer · Avoid (stated per row).
 | R-08 | Mitigate | Operate privacy request process per #195 docs | Product owner | Continuous | #195 |
 | R-09 | Mitigate | Pin Actions; review SBOM on release; block High+ deps | Engineering | Continuous | CI / SBOM |
 | R-10 | Mitigate | Enforce TLS + WAF on hosted edges per Cloudflare/deploy docs | Platform ops | Before SaaS GA | #217 |
-| R-11 | Mitigate | SLA/DR docs published; activate status page; complete staging drill | Product owner | Remaining #197 AC | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
+| R-11 | Mitigate | SLA/DR docs + in-repo `/status` published; activate external uptime monitor; complete staging drill | Product owner | Remaining #197 AC | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) |
 | R-12 | Mitigate | Deliver operator security awareness briefing; keep attendance record (org) | Product owner | Within 90 days of #196 merge | HR / ops |
 
 ## Gap themes already closed by this issue (#196)
