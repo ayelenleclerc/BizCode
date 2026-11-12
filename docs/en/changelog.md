@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **SLA/DR staging readiness (#197 residual):** pilot matrix + readiness EN/ES/PT reconcile `/status` as in-repo evidence and FCEM MVP in `develop`; `pnpm run dr:staging:check` fail-closed without `STAGING_DEPLOY_*`; empty [uptime-monitor-register.md](../evidence/uptime-monitor-register.md) unchanged — #197 stays open.
 - **Public status page (#197 residual):** first-party `/status` UI reads `GET /api/health` (ok/degraded/unavailable); empty [uptime-monitor-register.md](../evidence/uptime-monitor-register.md); SLA/DR EN/ES/PT updated. 99.9% uptime remains aspirational; staging DR drill still pending — #197 stays open.
 - **OWASP ZAP baseline triage (#194 residual):** [`.zap/rules.tsv`](../../.zap/rules.tsv) pins rule `10049` IGNORE for ephemeral API 404 noise (evidence run `43072369954`); [`.github/workflows/zap.yml`](../../.github/workflows/zap.yml) removes `-I`, pins `ubuntu-24.04`, and fixes `zap-out` writability. Readiness/penetration-testing docs EN/ES/PT updated; #194 stays open (empty external register; Snyk token ops).
 - **Fiscal reconcile close-out docs (#452):** [legal-module-activation-by-jurisdiction.md](quality/legal-module-activation-by-jurisdiction.md) (and ES/PT-BR locale copies) no longer describe UY/CL/BR as capability stubs; they document registered homologación mocks (`uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`) vs live clients Not evidenced (ADRs 0024–0027). Regional live residuals remain open (#207/#208/#210/#211).

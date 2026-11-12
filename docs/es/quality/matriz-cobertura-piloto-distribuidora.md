@@ -68,8 +68,8 @@ La integridad de **saldos/stock** se afirma en integración PostgreSQL — no so
 
 ## Compuertas pre-comerciales (piloto ≠ comercial)
 
-| Compuerta | Issue | Estado piloto (2026-11-08) |
+| Compuerta | Issue | Estado piloto (2026-11-12) |
 |---|---|---|
 | Seguridad antes de datos reales | [#194](https://github.com/ayelenleclerc/BizCode/issues/194) | CI automatizado presente; informe externo **vacío** — ver [readiness-seguridad-precomercial.md](readiness-seguridad-precomercial.md) |
-| SLA / DR operable | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) | Drill local #449 evidenciado; drill staging + status page **pendientes** |
-| FCEM MiPyME (Ley 27440) | [#239](https://github.com/ayelenleclerc/BizCode/issues/239) | **En progreso (MVP mock)** — detección local + mock WSFECM + UI aceptar/rechazar ([ADR-0028](../adr/ADR-0028-fcem-mipyme-mock.md)); residual AFIP live mantiene #239 abierto |
+| SLA / DR operable | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) | Drill local #449 evidenciado; `/status` first-party **en el repo**; residual = monitor externo live + drill staging (`pnpm run dr:staging:check` fail-closed sin `STAGING_DEPLOY_*`) |
+| FCEM MiPyME (Ley 27440) | [#239](https://github.com/ayelenleclerc/BizCode/issues/239) | **MVP mock en `develop`** ([ADR-0028](../adr/ADR-0028-fcem-mipyme-mock.md), PR #468); residual AFIP live mantiene #239 abierto |
