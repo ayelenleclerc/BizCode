@@ -57,6 +57,8 @@ La integridad de **saldos/stock** se afirma en integración PostgreSQL — no so
 |---|---|---|---|---|
 | 2026-11-08 | `test/450-piloto-coverage-matrix` | integración piloto | PASS (3/3) | Postgres local tras migrate |
 | 2026-11-08 | `test/450-piloto-coverage-matrix` | E2E piloto + smoke | PASS (6/6) | API local `:3001` + superadmin seed; rate-limit HTTP elevado en local |
+| 2026-11-12 | `test/450-pedido-http-transitions` | `vitest` `tests/api/pedidos.test.ts` | PASS (10/10) | Cierre GAP-P1-pedido-http (pack/ship/deliver/collect + 409) |
+| 2026-11-12 | `93966d18` / `docs/450-evidence-refresh` | `vitest` `tests/api/pedidos.test.ts` + `facturas-void.test.ts` + `fcem.test.ts` | PASS (29/29) | Refresh post-#471/#472; FCEM = solo mock (#239 AFIP live Not evidenced) |
 
 ## Defectos / riesgos residuales
 

@@ -64,6 +64,7 @@ Integrity of **saldos/stock** is asserted in PostgreSQL integration tests — no
 | 2026-11-08 | `test/450-piloto-coverage-matrix` | `test:integration` piloto-distribuidora-circuit | PASS (3/3) | Local Docker Postgres after `migrate deploy` |
 | 2026-11-08 | `test/450-piloto-coverage-matrix` | `test:e2e` piloto-circuit + smoke | PASS (6/6) | Local API `:3001` + seeded superadmin; raised HTTP rate-limit envs for local runs |
 | 2026-11-12 | `test/450-pedido-http-transitions` | `vitest` `tests/api/pedidos.test.ts` | PASS (10/10) | Closed GAP-P1-pedido-http (pack/ship/deliver/collect + 409) |
+| 2026-11-12 | `93966d18` / `docs/450-evidence-refresh` | `vitest` `tests/api/pedidos.test.ts` + `facturas-void.test.ts` + `fcem.test.ts` | PASS (29/29) | Post-#471/#472 evidence refresh; FCEM = mock only (#239 AFIP live Not evidenced) |
 
 ## Defects / residual risks
 
