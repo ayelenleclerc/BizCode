@@ -19,6 +19,7 @@ function moduleDef(key: ModuleKey): ModuleDef {
 
 const ARGENTINE_ONLY_MODULES = [
   'billing.arca_cae',
+  'billing.fcem_mipyme',
   'finance.retenciones',
   'fiscal.remito',
   'fiscal.cheques',
