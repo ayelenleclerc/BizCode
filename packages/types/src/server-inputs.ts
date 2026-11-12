@@ -520,6 +520,10 @@ export type EmpresaInput = {
   condicionIva?: string
   ingresosBrutos?: string | null
   fechaInicioActividades?: string | null
+  /** @en MiPyME flag for FCEM detection (#239). */
+  esMipyme?: boolean
+  /** @en Optional FCEM amount threshold; null clears to app default (#239). */
+  fcemUmbralMonto?: number | null
 }
 
 export type PedidoItemInput = {

@@ -21,6 +21,8 @@ undefined
 | [condicionIva](#condicioniva)                     | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-condicioniva.md "undefined#/properties/condicionIva")                     |
 | [cuit](#cuit)                                     | `string`  | Required | cannot be null | [EmpresaInput](empresainput-properties-cuit.md "undefined#/properties/cuit")                                     |
 | [domicilio](#domicilio)                           | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-domicilio.md "undefined#/properties/domicilio")                           |
+| [esMipyme](#esmipyme)                             | `boolean` | Optional | cannot be null | [EmpresaInput](empresainput-properties-esmipyme.md "undefined#/properties/esMipyme")                             |
+| [fcemUmbralMonto](#fcemumbralmonto)               | `number`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-fcemumbralmonto.md "undefined#/properties/fcemUmbralMonto")               |
 | [fechaInicioActividades](#fechainicioactividades) | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-fechainicioactividades.md "undefined#/properties/fechaInicioActividades") |
 | [ingresosBrutos](#ingresosbrutos)                 | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-ingresosbrutos.md "undefined#/properties/ingresosBrutos")                 |
 | [logoUrl](#logourl)                               | `string`  | Optional | cannot be null | [EmpresaInput](empresainput-properties-logourl.md "undefined#/properties/logoUrl")                               |
@@ -104,6 +106,46 @@ undefined
 ### domicilio Constraints
 
 **maximum length**: the maximum number of characters for this string is: `40`
+
+## esMipyme
+
+MiPyME flag for local FCEM detection (#239).
+
+`esMipyme`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [EmpresaInput](empresainput-properties-esmipyme.md "undefined#/properties/esMipyme")
+
+### esMipyme Type
+
+`boolean`
+
+## fcemUmbralMonto
+
+Optional FCEM amount threshold (ARS); null uses app default (#239).
+
+`fcemUmbralMonto`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [EmpresaInput](empresainput-properties-fcemumbralmonto.md "undefined#/properties/fcemUmbralMonto")
+
+### fcemUmbralMonto Type
+
+`number`
+
+### fcemUmbralMonto Constraints
+
+**minimum**: the value of this number must greater than or equal to: `0`
 
 ## fechaInicioActividades
 

@@ -4383,6 +4383,194 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/fcem/facturas/{facturaId}:
+    get:
+      tags: [afip]
+      summary: Evaluate FCEM MiPyME status for a factura (#239)
+      description: |
+        Requires module `billing.fcem_mipyme` and `sales.create`.
+        Returns local detection + acceptance state. Live WSFECM / AFIP ConsultaObligado Not evidenced.
+      parameters:
+        - name: facturaId
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: FCEM status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FcemStatusEnvelope'
+        '404':
+          description: Factura not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fcem/facturas/{facturaId}/emitir:
+    post:
+      tags: [afip]
+      summary: Emit FCEM via homologación mock WSFECM (#239)
+      description: |
+        Requires module `billing.fcem_mipyme` and `sales.create`.
+        Issues a synthetic CAE and sets `pendiente_aceptacion`. Live WSFECM Not evidenced.
+      parameters:
+        - name: facturaId
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: FCEM emitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FcemStatusEnvelope'
+        '422':
+          description: Not required or already emitted/resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          description: Factura not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fcem/facturas/{facturaId}/aceptar:
+    post:
+      tags: [afip]
+      summary: Accept FCEM locally (receptor) (#239)
+      description: Requires module `billing.fcem_mipyme` and `sales.create`. Live AFIP acceptance Not evidenced.
+      parameters:
+        - name: facturaId
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FcemStatusEnvelope'
+        '422':
+          description: Not pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          description: Factura not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fcem/facturas/{facturaId}/rechazar:
+    post:
+      tags: [afip]
+      summary: Reject FCEM locally (receptor) (#239)
+      description: Requires module `billing.fcem_mipyme` and `sales.create`. Live AFIP rejection Not evidenced.
+      parameters:
+        - name: facturaId
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 200 }
+      responses:
+        '200':
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FcemStatusEnvelope'
+        '422':
+          description: Not pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          description: Factura not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/fcem/facturas/{facturaId}/aceptar-tacita:
+    post:
+      tags: [afip]
+      summary: Simulate tacit FCEM acceptance locally (#239)
+      description: |
+        Requires module `billing.fcem_mipyme` and `sales.create`.
+        Local test helper only — no calendar job / live AFIP tacit window Not evidenced.
+      parameters:
+        - name: facturaId
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Tacit acceptance recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FcemStatusEnvelope'
+        '422':
+          description: Not pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '404':
+          description: Factura not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/fiscal/providers/config:
     get:
       tags: [fiscal]
@@ -24991,6 +25179,58 @@ components:
             cae: { type: string }
             caeVto: { type: string, format: date-time }
 
+    FcemEstado:
+      anyOf:
+        - type: 'null'
+        - type: string
+          enum: [pendiente_aceptacion, aceptada, rechazada_por_receptor, aceptada_tacita]
+
+    FcemDetection:
+      type: object
+      required: [required, reasons, umbralAplicado, fcemTipoCbte]
+      properties:
+        required: { type: boolean }
+        reasons:
+          type: array
+          items: { type: string }
+        umbralAplicado: { type: number }
+        fcemTipoCbte: { type: integer, nullable: true }
+
+    FcemStatus:
+      type: object
+      required:
+        - facturaId
+        - fcemEstado
+        - fcemTipoCbte
+        - fcemPlazoPagoDias
+        - fcemRejectReason
+        - fcemEmittedAt
+        - fcemResolvedAt
+        - cae
+        - caeVto
+        - detection
+      properties:
+        facturaId: { type: integer }
+        fcemEstado:
+          $ref: '#/components/schemas/FcemEstado'
+        fcemTipoCbte: { type: integer, nullable: true }
+        fcemPlazoPagoDias: { type: integer, nullable: true }
+        fcemRejectReason: { type: string, nullable: true }
+        fcemEmittedAt: { type: string, format: date-time, nullable: true }
+        fcemResolvedAt: { type: string, format: date-time, nullable: true }
+        cae: { type: string, nullable: true }
+        caeVto: { type: string, format: date-time, nullable: true }
+        detection:
+          $ref: '#/components/schemas/FcemDetection'
+
+    FcemStatusEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          $ref: '#/components/schemas/FcemStatus'
+
     FiscalProviderCode:
       type: string
       enum: [arca_wsfe, uruguay_dgi, chile_sii, mexico_sat_pac, brazil_sefaz_nfe]
@@ -30113,6 +30353,14 @@ components:
           nullable: true
           format: date
           description: Activity start date (YYYY-MM-DD).
+        esMipyme:
+          type: boolean
+          description: MiPyME flag for local FCEM detection (#239). Live AFIP MiPyME catalog Not evidenced.
+        fcemUmbralMonto:
+          type: number
+          nullable: true
+          minimum: 0
+          description: Optional FCEM amount threshold (ARS); null uses app default (#239).
 
     EmpresaInput:
       type: object
@@ -30165,6 +30413,14 @@ components:
           type: string
           nullable: true
           format: date
+        esMipyme:
+          type: boolean
+          description: MiPyME flag for local FCEM detection (#239).
+        fcemUmbralMonto:
+          type: number
+          nullable: true
+          minimum: 0
+          description: Optional FCEM amount threshold (ARS); null uses app default (#239).
 
     EmpresaEnvelope:
       type: object

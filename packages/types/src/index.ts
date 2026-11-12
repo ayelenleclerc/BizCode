@@ -1,4 +1,5 @@
 export * from './domain'
+export * from './fcem'
 export * from './rbac'
 export * from './api-contracts'
 export * from './modules'

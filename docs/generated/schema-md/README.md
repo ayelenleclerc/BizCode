@@ -428,6 +428,14 @@
 
 * [FacturasPendientesEnvelope](./facturaspendientesenvelope.md) – `-`
 
+* [FcemDetection](./fcemdetection.md) – `-`
+
+* [FcemEstado](./fcemestado.md) – `-`
+
+* [FcemStatus](./fcemstatus.md) – `-`
+
+* [FcemStatusEnvelope](./fcemstatusenvelope.md) – `-`
+
 * [FefoAllocation](./fefoallocation.md) – `-`
 
 * [FefoAllocationListEnvelope](./fefoallocationlistenvelope.md) – `-`
@@ -2095,6 +2103,8 @@
 * [Untitled array in FacturaPendienteClienteListEnvelope](./facturapendienteclientelistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in FacturasPendientesEnvelope](./facturaspendientesenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in FcemDetection](./fcemdetection-properties-reasons.md) – `undefined#/properties/reasons`
 
 * [Untitled array in FefoAllocationListEnvelope](./fefoallocationlistenvelope-properties-data.md) – `undefined#/properties/data`
 

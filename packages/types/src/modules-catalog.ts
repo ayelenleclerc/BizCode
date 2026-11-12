@@ -44,6 +44,20 @@ export const MODULE_CATALOG = {
     price: 0,
   },
   /**
+   * @en FCEM MiPyME (Ley 27440) local detection + mock WSFECM (#239). Live AFIP WSFECM Not evidenced.
+   * @es FCEM MiPyME (Ley 27440) detección local + mock WSFECM (#239). WSFECM AFIP live no evidenciado.
+   * @pt-BR FCEM MiPyME (Lei 27440) detecção local + mock WSFECM (#239). WSFECM AFIP live não evidenciado.
+   */
+  'billing.fcem_mipyme': {
+    label: 'FCEM MiPyME',
+    required: false,
+    requiredInProd: false,
+    availableForCountries: ['AR'],
+    dependencies: ['core.invoicing', 'billing.arca_cae'],
+    plan: 'starter',
+    price: 0,
+  },
+  /**
    * @en Mexico SAT CFDI stamping via PAC (homologación mock in #210; live PAC later).
    * @es Timbrado CFDI SAT México vía PAC (mock de homologación en #210; PAC live después).
    * @pt-BR Timbramento CFDI SAT México via PAC (mock de homologação em #210; PAC live depois).

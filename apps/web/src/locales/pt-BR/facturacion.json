@@ -144,6 +144,21 @@
     "caeNumber": "CAE: {{cae}}",
     "caeVto": "Venc.: {{date}}"
   },
+  "fcem": {
+    "column": "FCEM MiPyME",
+    "emit": "Emitir FCEM (mock)",
+    "emitLoading": "Emitindo FCEM…",
+    "accept": "Aceitar FCEM",
+    "reject": "Rejeitar FCEM",
+    "acceptTacita": "Simular aceitação tácita",
+    "error": "Não foi possível concluir a ação FCEM",
+    "estado": {
+      "pendiente_aceptacion": "FCEM pendente de aceitação",
+      "aceptada": "FCEM aceita",
+      "rechazada_por_receptor": "FCEM rejeitada",
+      "aceptada_tacita": "FCEM aceitação tácita"
+    }
+  },
   "cfdi": {
     "stamp": "Timbrar CFDI (mock)",
     "stampLoading": "Timbrando CFDI…",

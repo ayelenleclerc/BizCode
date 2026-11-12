@@ -881,6 +881,24 @@ model Factura {
   caeVto                DateTime?
   estadoCae             String    @default("pending") @db.VarChar(20)
   estado                String    @default("A") @db.VarChar(1) // A=activa, A=anulada
+  /// @en FCEM MiPyME acceptance state (#239): null = not FCEM; pendiente_aceptacion | aceptada | rechazada_por_receptor | aceptada_tacita.
+  /// @es Estado de aceptación FCEM MiPyME (#239): null = no FCEM; pendiente_aceptacion | aceptada | rechazada_por_receptor | aceptada_tacita.
+  /// @pt-BR Estado de aceitação FCEM MiPyME (#239): null = não FCEM; pendiente_aceptacion | aceptada | rechazada_por_receptor | aceptada_tacita.
+  fcemEstado            String?   @db.VarChar(32)
+  /// @en AFIP FCEM voucher type code (#239), e.g. 201/206/211. Live WSFECM Not evidenced.
+  /// @es Código de tipo de comprobante FCEM AFIP (#239), p. ej. 201/206/211. WSFECM live no evidenciado.
+  /// @pt-BR Código de tipo de comprovante FCEM AFIP (#239), ex. 201/206/211. WSFECM live não evidenciado.
+  fcemTipoCbte          Int?
+  /// @en Declared payment term in days for FCEM (#239).
+  /// @es Plazo de pago declarado en días para FCEM (#239).
+  /// @pt-BR Prazo de pagamento declarado em dias para FCEM (#239).
+  fcemPlazoPagoDias     Int?
+  /// @en Receptor rejection reason when fcemEstado = rechazada_por_receptor (#239).
+  /// @es Motivo de rechazo del receptor cuando fcemEstado = rechazada_por_receptor (#239).
+  /// @pt-BR Motivo de rejeição do receptor quando fcemEstado = rechazada_por_receptor (#239).
+  fcemRejectReason      String?   @db.VarChar(200)
+  fcemEmittedAt         DateTime?
+  fcemResolvedAt        DateTime?
   /// Mercado Pago checkout preference (#175)
   mpPreferenceId        String?   @db.VarChar(60)
   mpPaymentLink         String?   @db.VarChar(500)
@@ -964,6 +982,7 @@ model Factura {
   @@index([tenantId, depositoId])
   @@index([tenantId, tipoCambioId])
   @@index([tenantId, monedaOperacion])
+  @@index([tenantId, fcemEstado])
 }
 
 /// @en Detected billing anomaly for audit (#200 Fase 1).
@@ -1715,6 +1734,14 @@ model ParamEmpresa {
   ingresosBrutos         String?   @db.VarChar(30)
   /// Activity start date (optional, PDF header)
   fechaInicioActividades DateTime? @db.Date
+  /// @en When true, tenant is treated as MiPyME for FCEM detection (#239). Live AFIP MiPyME catalog Not evidenced.
+  /// @es Si es true, el tenant se trata como MiPyME para detección FCEM (#239). Catálogo MiPyME AFIP live no evidenciado.
+  /// @pt-BR Se true, o tenant é tratado como MiPyME para detecção FCEM (#239). Catálogo MiPyME AFIP live não evidenciado.
+  esMipyme               Boolean   @default(false)
+  /// @en Configurable FCEM amount threshold (ARS); null uses app default constant (#239).
+  /// @es Umbral monetario FCEM configurable (ARS); null usa la constante por defecto de la app (#239).
+  /// @pt-BR Limiar monetário FCEM configurável (ARS); null usa a constante padrão do app (#239).
+  fcemUmbralMonto        Decimal?  @db.Decimal(14, 2)
 }
 
 model TenantFiscalConfig {

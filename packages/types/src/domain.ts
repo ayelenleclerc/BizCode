@@ -400,6 +400,18 @@ export interface Factura {
   cae?: string | null
   caeVto?: Date | string | null
   estadoCae?: 'pending' | 'issued' | 'failed' | null
+  /** @en FCEM acceptance state (#239); null = not FCEM. */
+  fcemEstado?:
+    | 'pendiente_aceptacion'
+    | 'aceptada'
+    | 'rechazada_por_receptor'
+    | 'aceptada_tacita'
+    | null
+  fcemTipoCbte?: number | null
+  fcemPlazoPagoDias?: number | null
+  fcemRejectReason?: string | null
+  fcemEmittedAt?: Date | string | null
+  fcemResolvedAt?: Date | string | null
   items?: FacturaItem[]
   createdAt?: Date
   updatedAt?: Date
@@ -446,6 +458,10 @@ export interface EmpresaConfig {
   condicionIva: string
   ingresosBrutos: string | null
   fechaInicioActividades: string | null
+  /** @en MiPyME flag for FCEM detection (#239). */
+  esMipyme: boolean
+  /** @en Optional FCEM amount threshold; null = app default (#239). */
+  fcemUmbralMonto: number | null
 }
 
 /** @deprecated Use EmpresaConfig — kept for legacy references */

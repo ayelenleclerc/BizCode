@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cae": {
+      "nullable": true,
+      "type": "string"
+    },
+    "caeVto": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "detection": {
+      "$ref": "./FcemDetection.schema.json"
+    },
+    "facturaId": {
+      "type": "integer"
+    },
+    "fcemEmittedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "fcemEstado": {
+      "$ref": "./FcemEstado.schema.json"
+    },
+    "fcemPlazoPagoDias": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "fcemRejectReason": {
+      "nullable": true,
+      "type": "string"
+    },
+    "fcemResolvedAt": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "fcemTipoCbte": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "facturaId",
+    "fcemEstado",
+    "fcemTipoCbte",
+    "fcemPlazoPagoDias",
+    "fcemRejectReason",
+    "fcemEmittedAt",
+    "fcemResolvedAt",
+    "cae",
+    "caeVto",
+    "detection"
+  ],
+  "title": "FcemStatus",
+  "type": "object"
+}

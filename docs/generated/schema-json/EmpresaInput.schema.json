@@ -19,6 +19,16 @@
       "nullable": true,
       "type": "string"
     },
+    "esMipyme": {
+      "description": "MiPyME flag for local FCEM detection (#239).",
+      "type": "boolean"
+    },
+    "fcemUmbralMonto": {
+      "description": "Optional FCEM amount threshold (ARS); null uses app default (#239).",
+      "minimum": 0,
+      "nullable": true,
+      "type": "number"
+    },
     "fechaInicioActividades": {
       "format": "date",
       "nullable": true,
