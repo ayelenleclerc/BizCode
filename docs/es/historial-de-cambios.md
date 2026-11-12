@@ -10,6 +10,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Registro de evidencia piloto post-RBAC (#450):** matriz EN/ES/PT (Evidence + registro de ejecución) documenta `vitest` `tests/api/pedidos.test.ts` PASS (13/13) tras #474 (RBAC 403 ship/deliver/collect) — #194/#197/#239 siguen OPEN.
 - **RBAC HTTP logística de pedidos (#450 residual):** `tests/api/pedidos.test.ts` aserta 403 en `ship` (`warehouse_op` / sin `orders.dispatch`), `deliver` (`logistics_planner` / sin `orders.deliver.confirm`) y `collect` (`warehouse_op` / sin perms de cobro); pack 403 ya cubierto.
 - **Transiciones API mock FCEM (#239 residual):** `tests/api/fcem.test.ts` cubre `POST .../aceptar`, `.../rechazar`, `.../aceptar-tacita` (asserts OpenAPI) y `422 FCEM_NOT_PENDING`; contrato mock ADR-0028. AFIP / WSFECM live siguen Not evidenced — #239 permanece OPEN.
 - **Anulación de factura restaura stock (#450 GAP-P1-stock-void):** `FacturaService.void` espeja create — `applyStockDepositoDelta(+qty)` o incremento de `Articulo.stock`; omite restore si `Pedido.origen` es meli/tiendanube/woocommerce; OpenAPI + ADR-0012; matriz piloto EN/ES/PT marca Cubierto.

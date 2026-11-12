@@ -20,7 +20,7 @@
 | Artigos + preços | P0 | `e2e/critical-paths.spec.ts`, `tests/api/factura-stock.test.ts` | Coberto |
 | Estoque na fatura | P0 | `tests/integration/piloto-distribuidora-circuit.integration.test.ts`, `tests/api/factura-stock.test.ts` | Coberto |
 | Pedido → confirm → invoice | P0 | Integração piloto; E2E `e2e/piloto-circuit.spec.ts` | Coberto |
-| Pedido pack/ship/deliver/collect HTTP | P1 | Unit/UI (#391); API pack/ship/deliver/collect + 409 ilegal em `tests/api/pedidos.test.ts` | Coberto |
+| Pedido pack/ship/deliver/collect HTTP | P1 | Unit/UI (#391); API pack/ship/deliver/collect + 409 ilegal + RBAC 403 (pack/ship/deliver/collect) em `tests/api/pedidos.test.ts` | Coberto |
 | Alta fatura UI | P0 | `e2e/critical-paths.spec.ts` | Coberto |
 | Conta corrente + cobrança parcial | P0 | Integração piloto (recibos) + `tests/integration/cliente-cuenta-corriente.integration.test.ts` (#232) | Coberto |
 | Anulação / NC → CC coerente | P0 | Integração piloto + `tests/api/facturas-void.test.ts` | Coberto |
@@ -28,7 +28,7 @@
 | Rejeição por falta de estoque | P0 | Integração piloto + `tests/api/factura-stock.test.ts` | Coberto |
 | Superfície UI cobranças | P0 | `e2e/piloto-circuit.spec.ts` | Coberto |
 | Isolamento tenant / RLS | P0 | `tests/api/tenant-isolation.test.ts`, `tests/api/rls-isolation.test.ts`, integração API | Coberto |
-| Permissões RBAC | P0 | Testes de domínio + [matriz RBAC](matriz-rbac-funcoes-permissoes-scopes.md) | Coberto |
+| Permissões RBAC | P0 | Testes de domínio + [matriz RBAC](matriz-rbac-funcoes-permissoes-scopes.md); HTTP 403 logística em `tests/api/pedidos.test.ts` (#474) | Coberto |
 | Webhook MP / retry | P0 (pagamentos) | `tests/api/mercadopago-webhook.test.ts` (#447) | Coberto (sem E2E de rede flaky) |
 | Backup / restore | P0 (ops) | `pnpm run backup:postgres:drill`, SEC-015 (#449) | Coberto |
 | Falha de rede E2E | Futuro | Não automatizado no CI | Futuro |
@@ -59,6 +59,7 @@ A integridade de **saldos/estoque** é afirmada em integração PostgreSQL — n
 | 2026-11-08 | `test/450-piloto-coverage-matrix` | E2E piloto + smoke | PASS (6/6) | API local `:3001` + seed superadmin; rate-limit HTTP elevado no local |
 | 2026-11-12 | `test/450-pedido-http-transitions` | `vitest` `tests/api/pedidos.test.ts` | PASS (10/10) | Fechamento GAP-P1-pedido-http (pack/ship/deliver/collect + 409) |
 | 2026-11-12 | `93966d18` / `docs/450-evidence-refresh` | `vitest` `tests/api/pedidos.test.ts` + `facturas-void.test.ts` + `fcem.test.ts` | PASS (29/29) | Refresh pós-#471/#472; FCEM = apenas mock (#239 AFIP live Not evidenced) |
+| 2026-11-12 | `7fa9b50a` / `test/450-pedido-rbac-transitions` (#474) | `vitest` `tests/api/pedidos.test.ts` | PASS (13/13) | RBAC 403 ship/deliver/collect (+ pack); #194/#197/#239 permanecem OPEN |
 
 ## Defeitos / riscos residuais
 

@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Pilot evidence register post-RBAC (#450):** matrix EN/ES/PT Evidence + execution register record `vitest` `tests/api/pedidos.test.ts` PASS (13/13) after #474 (RBAC 403 ship/deliver/collect) — #194/#197/#239 remain OPEN.
 - **Pedido logistics RBAC HTTP (#450 residual):** `tests/api/pedidos.test.ts` asserts 403 on `ship` (`warehouse_op` / no `orders.dispatch`), `deliver` (`logistics_planner` / no `orders.deliver.confirm`), and `collect` (`warehouse_op` / no cobro perms); pack 403 already covered.
 - **FCEM mock API transitions (#239 residual):** `tests/api/fcem.test.ts` covers `POST .../aceptar`, `.../rechazar`, `.../aceptar-tacita` (OpenAPI asserts) and `422 FCEM_NOT_PENDING`; ADR-0028 mock contract. Live AFIP / WSFECM remain Not evidenced — #239 stays open.
 - **Invoice void restores stock (#450 GAP-P1-stock-void):** `FacturaService.void` mirrors create — `applyStockDepositoDelta(+qty)` or `Articulo.stock` increment; skips restore when linked `Pedido.origen` is meli/tiendanube/woocommerce; OpenAPI + ADR-0012 updated; pilot matrix EN/ES/PT marks the row Covered.
