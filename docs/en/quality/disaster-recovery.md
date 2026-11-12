@@ -129,16 +129,18 @@ R = Responsible, A = Accountable, C = Consulted, I = Informed.
 | Item | Evidence | Closes #197 AC? |
 |------|----------|-----------------|
 | Isolated local integrity drill (`pnpm run backup:postgres:drill`) | [SEC-015](../certificacion-iso/sec/sec-015-restore-test-evidence-register.md) row 2026-11-07; [backup-and-restore.md](backup-and-restore.md) | **No** |
-| Staging / remote semiannual DR drill | Pending host (`STAGING_DEPLOY_*`) | **Required** — still open |
-| First-party status page (`/status`) | In repo (`apps/web/src/pages/status/`) | **Partial** — UI evidenced; live URL + external monitor still required |
+| Staging / remote semiannual DR drill | Pending host (`STAGING_DEPLOY_*`); precondition check `pnpm run dr:staging:check` | **Required** — still open |
+| First-party status page (`/status`) | In repo (`apps/web/src/pages/status/`) | **Evidenced in repo** — deployed public URL + external monitor still required |
 | External uptime monitor | [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md) | **Required** — register empty |
 | Emergency contacts table above | Template placeholders | **No** — ops fill-in |
 
 ## Semiannual DR drill (staging) — pending AC
 
+**Precondition:** `pnpm run dr:staging:check` exits 0 only when all of `STAGING_DEPLOY_HOST`, `STAGING_DEPLOY_USER`, `STAGING_DEPLOY_SSH_KEY`, and `STAGING_DEPLOY_PATH` are set in the environment (same fail-closed gate as [`.github/workflows/staging.yml`](../../../.github/workflows/staging.yml)). Without them the check exits non-zero and prints this checklist — it does **not** claim a completed drill.
+
 Timed checklist (do **not** mark complete without wall-clock evidence):
 
-1. Confirm staging host with `STAGING_DEPLOY_*` configured ([deployment-environments.md](deployment-environments.md)).
+1. Confirm staging host with `STAGING_DEPLOY_*` configured ([deployment-environments.md](deployment-environments.md)); run `pnpm run dr:staging:check`.
 2. Record start time (UTC); take snapshot/backup.
 3. Simulate failure (stop app/DB services on staging only).
 4. Restore from backup; redeploy; verify `/api/health` and `/status`.
@@ -146,7 +148,7 @@ Timed checklist (do **not** mark complete without wall-clock evidence):
 6. Append SEC-015 row with measured RTO; note gaps.
 7. **Issue #197 stays OPEN** until this drill **and** a live entry in [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md) exist.
 
-Local Docker restore smoke / #449 integrity drill (dev `:5432`) is documented in SEC-015 and does **not** close the staging AC.
+Local Docker restore smoke / #449 integrity drill (dev `:5432`) is documented in SEC-015 and does **not** close the staging AC. [`docker-compose.staging.yml`](../../../docker-compose.staging.yml) may be used for **local practice only** — it is **not** the remote staging AC.
 
 ## Related
 
@@ -168,3 +170,4 @@ Local Docker restore smoke / #449 integrity drill (dev `:5432`) is documented in
 | 0.1 | 2026-08-25 | BizCode | Initial DR runbooks for #197 |
 | 0.2 | 2026-11-08 | BizCode | Explicit #449 vs staging/status gaps for #197 |
 | 0.3 | 2026-11-11 | BizCode | `/status` first-party + timed staging drill checklist; monitor register empty |
+| 0.4 | 2026-11-12 | BizCode | `dr:staging:check` fail-closed; `/status` evidenced in repo; compose.staging = local practice only |
