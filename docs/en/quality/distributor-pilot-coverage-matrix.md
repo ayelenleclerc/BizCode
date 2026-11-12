@@ -20,7 +20,7 @@
 | Artículos + prices | P0 | `e2e/critical-paths.spec.ts`, `tests/api/factura-stock.test.ts` | Covered |
 | Stock on invoice | P0 | `tests/integration/piloto-distribuidora-circuit.integration.test.ts`, `tests/api/factura-stock.test.ts` | Covered |
 | Pedido → confirm → invoice | P0 | Integration piloto circuit; E2E `e2e/piloto-circuit.spec.ts` (UI create/confirm) | Covered |
-| Pedido pack/ship/deliver/collect HTTP | P1 | Unit/UI (#391); API pack/ship/deliver/collect + illegal 409 in `tests/api/pedidos.test.ts` | Covered |
+| Pedido pack/ship/deliver/collect HTTP | P1 | Unit/UI (#391); API pack/ship/deliver/collect + illegal 409 + RBAC 403 (pack/ship/deliver/collect) in `tests/api/pedidos.test.ts` | Covered |
 | Factura UI create | P0 | `e2e/critical-paths.spec.ts` | Covered |
 | Cuenta corriente + cobro parcial | P0 | Integration piloto (recibos) + `tests/integration/cliente-cuenta-corriente.integration.test.ts` (#232) | Covered |
 | Void / NC → CC coherent | P0 | Integration piloto + `tests/api/facturas-void.test.ts` | Covered |
@@ -28,7 +28,7 @@
 | Insufficient stock reject | P0 | Integration piloto + `tests/api/factura-stock.test.ts` | Covered |
 | Cobros UI surface | P0 | `e2e/piloto-circuit.spec.ts` (`cobros-page`, `cobro-form`) | Covered |
 | Tenant / RLS isolation | P0 | `tests/api/tenant-isolation.test.ts`, `tests/api/rls-isolation.test.ts`, `tests/integration/api.integration.test.ts` | Covered |
-| RBAC permissions | P0 | Domain API tests + [rbac-matrix](rbac-matrix-roles-permissions-scopes.md) | Covered |
+| RBAC permissions | P0 | Domain API tests + [rbac-matrix](rbac-matrix-roles-permissions-scopes.md); logistics HTTP 403 in `tests/api/pedidos.test.ts` (#474) | Covered |
 | Mercado Pago webhook / retry | P0 (payments) | `tests/api/mercadopago-webhook.test.ts`, inbox services (#447) | Covered (unit/API; not E2E network flaky) |
 | Backup / restore integrity | P0 (ops) | `pnpm run backup:postgres:drill`, SEC-015 (#449) | Covered |
 | Network failure E2E | Future | Not automated in CI (flaky) | Future |
@@ -65,6 +65,7 @@ Integrity of **saldos/stock** is asserted in PostgreSQL integration tests — no
 | 2026-11-08 | `test/450-piloto-coverage-matrix` | `test:e2e` piloto-circuit + smoke | PASS (6/6) | Local API `:3001` + seeded superadmin; raised HTTP rate-limit envs for local runs |
 | 2026-11-12 | `test/450-pedido-http-transitions` | `vitest` `tests/api/pedidos.test.ts` | PASS (10/10) | Closed GAP-P1-pedido-http (pack/ship/deliver/collect + 409) |
 | 2026-11-12 | `93966d18` / `docs/450-evidence-refresh` | `vitest` `tests/api/pedidos.test.ts` + `facturas-void.test.ts` + `fcem.test.ts` | PASS (29/29) | Post-#471/#472 evidence refresh; FCEM = mock only (#239 AFIP live Not evidenced) |
+| 2026-11-12 | `7fa9b50a` / `test/450-pedido-rbac-transitions` (#474) | `vitest` `tests/api/pedidos.test.ts` | PASS (13/13) | RBAC 403 ship/deliver/collect (+ pack); #194/#197/#239 remain OPEN |
 
 ## Defects / residual risks
 
