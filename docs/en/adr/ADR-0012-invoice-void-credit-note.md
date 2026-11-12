@@ -19,7 +19,7 @@ Global [`writeAuditEvent`](../../../server/audit.ts) swallows errors so other fl
 1. **Canonical API:** extend **`PUT /api/facturas/:id/void`** only (no `POST /anular`, no deprecation of `PUT /void`).
 2. **Module:** `requireModule('billing.credit_notes')` on `PUT /void` and on `GET /api/notas-credito*`.
 3. **Permission:** keep **`sales.cancel`** (manager, owner, billing).
-4. **Transaction** (single `$transaction`): set `Factura.estado` to `N`, decrement `Cliente.balance`, create `NotaCredito`, create `AuditEvent` (`factura_void`, metadata `motivo`, `notaCreditoId`). Any step failure rolls back all.
+4. **Transaction** (single `$transaction`): set `Factura.estado` to `N`, reverse cuenta corriente via NC, create `NotaCredito`, restore physical stock mirroring invoice create (`applyStockDepositoDelta(+qty)` when `Factura.depositoId` is set, else `Articulo.stock` increment; skip services / null `articuloId`; skip when linked `Pedido.origen` is `meli` | `tiendanube` | `woocommerce`), create `AuditEvent` (`factura_void`, metadata `motivo`, `notaCreditoId`). Any step failure rolls back all. Stock restore added for pilot GAP-P1-stock-void (#450).
 5. **Response envelope:** `{ success, data: { factura, notaCredito, updatedCliente } }` — update API client, OpenAPI, tests, and UI in the same delivery phase.
 6. **`NotaCredito.estadoCae` on create:**
    - If origin `Factura.estadoCae === 'issued'`: set **`pending`**, then async `ArcaService.requestCaeForNotaCredito` when `billing.arca_cae` is enabled (homologación mock, #133).
@@ -32,7 +32,7 @@ Global [`writeAuditEvent`](../../../server/audit.ts) swallows errors so other fl
 
 - **Positive:** One contract; NC and balance always consistent with audit; clear CAE lifecycle for fiscal vs non-fiscal invoices.
 - **Negative:** Tenants without `billing.credit_notes` cannot void via API until the module is enabled.
-- **Out of scope:** Full WSFE credit-note production flow beyond mock; global refactor of `writeAuditEvent`.
+- **Out of scope:** Full WSFE credit-note production flow beyond mock; global refactor of `writeAuditEvent`; stock restore on partial NC (`createPartialCreditNote`); FEFO/lote inbound on void.
 
 ## References
 

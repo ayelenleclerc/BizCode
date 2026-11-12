@@ -24,7 +24,7 @@
 | Factura UI create | P0 | `e2e/critical-paths.spec.ts` | Covered |
 | Cuenta corriente + cobro parcial | P0 | Integration piloto (recibos) + `tests/integration/cliente-cuenta-corriente.integration.test.ts` (#232) | Covered |
 | Void / NC → CC coherent | P0 | Integration piloto + `tests/api/facturas-void.test.ts` | Covered |
-| Void restores stock | P1 | `FacturaService.void` does **not** restore stock today | Gap P1 |
+| Void restores stock | P1 | `FacturaService.void` restores `Articulo.stock` / depósito (mirror of create; skip marketplace `Pedido.origen`) — `tests/api/facturas-void.test.ts`, piloto integration | Covered |
 | Insufficient stock reject | P0 | Integration piloto + `tests/api/factura-stock.test.ts` | Covered |
 | Cobros UI surface | P0 | `e2e/piloto-circuit.spec.ts` (`cobros-page`, `cobro-form`) | Covered |
 | Tenant / RLS isolation | P0 | `tests/api/tenant-isolation.test.ts`, `tests/api/rls-isolation.test.ts`, `tests/integration/api.integration.test.ts` | Covered |
@@ -69,7 +69,6 @@ Integrity of **saldos/stock** is asserted in PostgreSQL integration tests — no
 
 | ID | Severity | Description |
 |---|---|---|
-| GAP-P1-stock-void | P1 | Void creates NC and zeros CC; does not restore `Articulo.stock` / depósito |
 | RISK-e2e-env | — | E2E needs seeded superadmin + running API; CI already wires this in Quality Gate |
 
 ## Pre-commercial gates (pilot exit ≠ commercial)

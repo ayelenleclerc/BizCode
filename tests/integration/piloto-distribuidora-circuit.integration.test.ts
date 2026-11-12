@@ -269,8 +269,8 @@ describe('Piloto distribuidora — circuito integración (#450)', () => {
       .expect(200)
     expect(Number.parseFloat(String(saldoAfter.body.data.saldo))).toBeCloseTo(0, 2)
 
-    // Void restores CC via NC; stock restore is not part of FacturaService.void (gap P1 documented in matrix).
+    // Void restores CC via NC and stock (#450 GAP-P1-stock-void).
     const articulo = await prisma.articulo.findFirstOrThrow({ where: { id: articuloId } })
-    expect(Number(articulo.stock)).toBe(9)
+    expect(Number(articulo.stock)).toBe(10)
   })
 })

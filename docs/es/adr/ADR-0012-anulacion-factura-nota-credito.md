@@ -19,7 +19,7 @@ Para #146, la **anulación fiscal** implica: anular factura, revertir saldo del 
 1. **API canónica:** extender solo **`PUT /api/facturas/:id/void`** (sin `POST /anular`, sin deprecar `PUT /void`).
 2. **Módulo:** `requireModule('billing.credit_notes')` en `PUT /void` y en `GET /api/notas-credito*`.
 3. **Permiso:** mantener **`sales.cancel`**.
-4. **Transacción única:** `Factura.estado` → `N`, decremento de `Cliente.balance`, alta de `NotaCredito`, `AuditEvent` (`factura_void`). Fallo en cualquier paso → rollback.
+4. **Transacción única:** `Factura.estado` → `N`, reversión de cuenta corriente vía NC, alta de `NotaCredito`, restauración de stock físico espejando el alta (`applyStockDepositoDelta(+qty)` si hay `Factura.depositoId`, si no incremento de `Articulo.stock`; omite servicios / `articuloId` nulo; omite si `Pedido.origen` vinculado es `meli` | `tiendanube` | `woocommerce`), `AuditEvent` (`factura_void`). Fallo en cualquier paso → rollback. Restauración de stock añadida por GAP-P1-stock-void (#450).
 5. **Respuesta:** `{ success, data: { factura, notaCredito, updatedCliente } }` — actualizar cliente API, OpenAPI, tests y UI en la misma fase.
 6. **`NotaCredito.estadoCae` al crear:**
    - Si la factura origen tiene `estadoCae === 'issued'`: **`pending`** y luego CAE async con `billing.arca_cae` (mock #133).
@@ -32,7 +32,7 @@ Para #146, la **anulación fiscal** implica: anular factura, revertir saldo del 
 
 - **Positivo:** contrato único; NC, saldo y auditoría coherentes; CAE explícito según factura fiscal o no.
 - **Negativo:** sin módulo `billing.credit_notes` no hay void por API.
-- **Fuera de alcance:** WSFE NC productivo completo; refactor global de auditoría.
+- **Fuera de alcance:** WSFE NC productivo completo; refactor global de auditoría; restore de stock en NC parcial; reversión FEFO/lote en void.
 
 ## Referencias
 

@@ -50,6 +50,12 @@ describe('FacturaService', () => {
         create: vi.fn(),
         update: vi.fn(),
       },
+      pedido: {
+        findFirst: vi.fn().mockResolvedValue(null),
+      },
+      recuento: {
+        findFirst: vi.fn().mockResolvedValue(null),
+      },
       notaCredito: {
         aggregate: vi.fn().mockResolvedValue({ _sum: { monto: null } }),
       },
@@ -91,6 +97,8 @@ describe('FacturaService', () => {
       tipo: 'B',
       prefijo: '0001',
       numero: 1,
+      depositoId: null,
+      items: [] as { articuloId: number | null; cantidad: Decimal }[],
     }
     const notaRow = {
       id: 9,
@@ -105,6 +113,7 @@ describe('FacturaService', () => {
       notaCredito: { create: vi.fn().mockResolvedValue(notaRow) },
       retencionAplicada: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
       auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      articulo: { update: vi.fn() },
     }
     vi.mocked(prisma.factura.findFirst).mockResolvedValue(facturaRow as never)
     vi.mocked(prisma.$transaction).mockImplementation(async (fn) => {
@@ -133,6 +142,8 @@ describe('FacturaService', () => {
       tipo: 'B',
       prefijo: '0001',
       numero: 1,
+      depositoId: null,
+      items: [] as { articuloId: number | null; cantidad: Decimal }[],
     }
     const notaRow = {
       id: 10,
@@ -147,6 +158,7 @@ describe('FacturaService', () => {
       notaCredito: { create: vi.fn().mockResolvedValue(notaRow) },
       retencionAplicada: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
       auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      articulo: { update: vi.fn() },
     }
     vi.mocked(prisma.factura.findFirst).mockResolvedValue(facturaRow as never)
     vi.mocked(prisma.notaCredito.aggregate).mockResolvedValue({
@@ -177,6 +189,8 @@ describe('FacturaService', () => {
       tipo: 'B',
       prefijo: '0001',
       numero: 1,
+      depositoId: null,
+      items: [],
     } as never)
     vi.mocked(prisma.notaCredito.aggregate).mockResolvedValue({
       _sum: { monto: new Decimal(100) },
@@ -190,6 +204,99 @@ describe('FacturaService', () => {
       expect(result.error).toBe('Invoice already fully credited')
     }
     expect(prisma.$transaction).not.toHaveBeenCalled()
+  })
+
+  it('void restores Articulo.stock when factura has no depositoId (#450)', async () => {
+    const facturaRow = {
+      id: 1,
+      estado: 'A',
+      total: new Decimal(100),
+      clienteId: 3,
+      estadoCae: 'pending',
+      tipo: 'B',
+      prefijo: '0001',
+      numero: 1,
+      depositoId: null,
+      items: [{ articuloId: 7, cantidad: new Decimal(2) }],
+    }
+    const notaRow = {
+      id: 9,
+      estadoCae: 'not_required',
+      facturaOrigenId: 1,
+      monto: new Decimal(100),
+      createdAt: new Date(),
+    }
+    const articuloUpdate = vi.fn().mockResolvedValue({ id: 7, stock: 12 })
+    const tx = {
+      ...createCcTxLayer(),
+      factura: { update: vi.fn().mockResolvedValue({ ...facturaRow, estado: 'N' }) },
+      notaCredito: { create: vi.fn().mockResolvedValue(notaRow) },
+      retencionAplicada: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
+      auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      articulo: { update: articuloUpdate },
+    }
+    vi.mocked(prisma.factura.findFirst).mockResolvedValue(facturaRow as never)
+    vi.mocked(prisma.articulo.findMany).mockResolvedValue([{ id: 7, tipo: 'articulo' }] as never)
+    vi.mocked(prisma.$transaction).mockImplementation(async (fn) => {
+      if (typeof fn === 'function') return fn(tx as never)
+      return fn
+    })
+
+    const result = await service.void(1, 1, 'Motivo largo para void', {
+      userId: 1,
+      ipAddress: '127.0.0.1',
+    })
+
+    expect(result.ok).toBe(true)
+    expect(articuloUpdate).toHaveBeenCalledWith({
+      where: { id: 7 },
+      data: { stock: { increment: 2 } },
+    })
+  })
+
+  it('void does not restore stock when linked Pedido.origen is meli (#450)', async () => {
+    const facturaRow = {
+      id: 1,
+      estado: 'A',
+      total: new Decimal(100),
+      clienteId: 3,
+      estadoCae: 'pending',
+      tipo: 'B',
+      prefijo: '0001',
+      numero: 1,
+      depositoId: null,
+      items: [{ articuloId: 7, cantidad: new Decimal(2) }],
+    }
+    const notaRow = {
+      id: 11,
+      estadoCae: 'not_required',
+      facturaOrigenId: 1,
+      monto: new Decimal(100),
+      createdAt: new Date(),
+    }
+    const articuloUpdate = vi.fn()
+    const tx = {
+      ...createCcTxLayer(),
+      factura: { update: vi.fn().mockResolvedValue({ ...facturaRow, estado: 'N' }) },
+      notaCredito: { create: vi.fn().mockResolvedValue(notaRow) },
+      retencionAplicada: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
+      auditEvent: { create: vi.fn().mockResolvedValue({ id: 1 }) },
+      articulo: { update: articuloUpdate },
+    }
+    vi.mocked(prisma.factura.findFirst).mockResolvedValue(facturaRow as never)
+    vi.mocked(prisma.pedido.findFirst).mockResolvedValue({ origen: 'meli' } as never)
+    vi.mocked(prisma.$transaction).mockImplementation(async (fn) => {
+      if (typeof fn === 'function') return fn(tx as never)
+      return fn
+    })
+
+    const result = await service.void(1, 1, 'Motivo largo marketplace', {
+      userId: 1,
+      ipAddress: '127.0.0.1',
+    })
+
+    expect(result.ok).toBe(true)
+    expect(articuloUpdate).not.toHaveBeenCalled()
   })
 
   it('createPartialCreditNote issues NC without voiding factura (#344)', async () => {

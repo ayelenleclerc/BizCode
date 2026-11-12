@@ -19,7 +19,7 @@ Para #146, **anulação fiscal** = anular fatura, reverter saldo do cliente, cri
 1. **API canônica:** estender apenas **`PUT /api/facturas/:id/void`** (sem `POST /anular`, sem deprecar `PUT /void`).
 2. **Módulo:** `requireModule('billing.credit_notes')` em `PUT /void` e `GET /api/notas-credito*`.
 3. **Permissão:** manter **`sales.cancel`**.
-4. **Transação única:** `Factura.estado` → `N`, decremento de `Cliente.balance`, `NotaCredito`, `AuditEvent` (`factura_void`). Qualquer falha → rollback.
+4. **Transação única:** `Factura.estado` → `N`, reversão de conta corrente via NC, `NotaCredito`, restauração de estoque físico espelhando a criação (`applyStockDepositoDelta(+qty)` se houver `Factura.depositoId`, senão incremento de `Articulo.stock`; omite serviços / `articuloId` nulo; omite se `Pedido.origen` vinculado for `meli` | `tiendanube` | `woocommerce`), `AuditEvent` (`factura_void`). Qualquer falha → rollback. Restauração de estoque adicionada por GAP-P1-stock-void (#450).
 5. **Resposta:** `{ success, data: { factura, notaCredito, updatedCliente } }` — atualizar API client, OpenAPI, testes e UI na mesma fase.
 6. **`NotaCredito.estadoCae` na criação:**
    - Fatura origem com `estadoCae === 'issued'`: **`pending`** e CAE async com `billing.arca_cae` (mock #133).
@@ -32,7 +32,7 @@ Para #146, **anulação fiscal** = anular fatura, reverter saldo do cliente, cri
 
 - **Positivo:** contrato único; NC, saldo e auditoria consistentes.
 - **Negativo:** sem `billing.credit_notes` não há void pela API.
-- **Fora de escopo:** WSFE NC completo; refactor global de auditoria.
+- **Fora de escopo:** WSFE NC completo; refactor global de auditoria; restore de estoque em NC parcial; reversão FEFO/lote no void.
 
 ## Referências
 
