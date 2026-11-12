@@ -36,7 +36,7 @@ Registrar los riesgos de seguridad de la información más críticos a partir de
 | R-08 | Cumplimiento incompleto de privacidad / titular | M | M | Product owner | A.5.34 | Docs #195 |
 | R-09 | Compromiso supply-chain (npm / Actions) | M | H | Ingeniería | A.5.21 | Lockfile + audit; SBOM generado |
 | R-10 | Exposición SaaS sin TLS / WAF mal configurado | M | H | Ops plataforma | A.8.20, A.5.23 | Helmet/CORS; Cloudflare #217 |
-| R-11 | Brecha de continuidad (sin SLA / RTO no probado) | H | H | Product owner | A.5.29, A.5.30 | Docs SLA/DR (#197); **uptime público + RTO staging** siguen abiertos |
+| R-11 | Brecha de continuidad (sin SLA / RTO no probado) | H | H | Product owner | A.5.29, A.5.30 | Docs SLA/DR + UI `/status` in-repo (#197); **monitor externo de uptime + RTO staging** siguen abiertos (`/status` ≠ monitor live) |
 | R-12 | Concienciación insuficiente de operadores | M | M | Product owner | A.6.3 | Sin registros de formación |
 
 Tratamiento: [RSK-004](rsk-004-plan-tratamiento-riesgos.md). Contexto: [gap Anexo A](../../quality/analisis-brechas-anexo-a-iso27001.md).

@@ -36,7 +36,7 @@ Record the most critical information-security risks identified from the Annex A 
 | R-08 | Incomplete privacy / data-subject fulfilment | M | M | Product owner | A.5.34 | #195 docs; operational fulfilment maturity varies |
 | R-09 | Supply-chain compromise (npm package / CI action) | M | H | Engineering | A.5.21 | Lockfile + audit gates; no full SBOM process ownership beyond generated SBOM |
 | R-10 | SaaS/hosted exposure without TLS or WAF misconfig | M | H | Platform ops | A.8.20, A.5.23 | Helmet/CORS in app; Cloudflare docs #217; operator must enable |
-| R-11 | Business continuity gap (no SLA / unproven RTO) | H | H | Product owner | A.5.29, A.5.30 | SLA/DR docs shipped (#197); **public uptime + staging RTO** still open |
+| R-11 | Business continuity gap (no SLA / unproven RTO) | H | H | Product owner | A.5.29, A.5.30 | SLA/DR docs + in-repo `/status` UI (#197); **external uptime monitor + staging RTO** still open (`/status` ≠ live monitor) |
 | R-12 | Insufficient security awareness for operators | M | M | Product owner | A.6.3 | No training records in repo |
 
 Treatment actions: [RSK-004](rsk-004-risk-treatment-plan.md). Gap context: [Annex A gap](../../quality/iso27001-annex-a-gap-analysis.md).

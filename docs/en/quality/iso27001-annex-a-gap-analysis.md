@@ -83,7 +83,7 @@ Counts are indicative of this initial pass (conservative: product evidence is mo
 | A.5.27 | Learning from information security incidents | Partial | Post-mortem section in incident-response; no filled lessons register |
 | A.5.28 | Collection of evidence | Partial | Audit events + forensic listing noted in incident-response / IAM audit |
 | A.5.29 | Information security during disruption | Partial | DR runbooks [#197](https://github.com/ayelenleclerc/BizCode/issues/197) [disaster-recovery.md](disaster-recovery.md); staging drill pending |
-| A.5.30 | ICT readiness for business continuity | Partial | SEC-014/015 + backup #150; public status page + staging RTO drill still pending (#197) |
+| A.5.30 | ICT readiness for business continuity | Partial | SEC-014/015 + backup #150; first-party `/status` UI in repo; residual #197 = external uptime monitor + staging RTO drill (`STAGING_DEPLOY_*`) |
 | A.5.31 | Legal, statutory, regulatory and contractual requirements | Partial | Privacy Ley 25326/GDPR (#195); fiscal modularity ADR-0007; not a full legal register |
 | A.5.32 | Intellectual property rights | Not evidenced | No IP policy in repo |
 | A.5.33 | Protection of records | Partial | Audit events, ISO records templates; retention incomplete |

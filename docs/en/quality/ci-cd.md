@@ -114,7 +114,7 @@ Workflow [`.github/workflows/gitleaks.yml`](../../../.github/workflows/gitleaks.
 - **Dependabot:** [`.github/dependabot.yml`](../../../.github/dependabot.yml) (weekly npm + GitHub Actions, patch groups).
 - **pnpm audit:** blocking HIGH+ on the Quality Gate (see [ADR-0017](../adr/ADR-0017-dependency-scanning.md)).
 - **Snyk:** [`.github/workflows/snyk.yml`](../../../.github/workflows/snyk.yml) — requires `SNYK_TOKEN`; fails on HIGH+ with available fix.
-- **OWASP ZAP baseline (#194):** [`.github/workflows/zap.yml`](../../../.github/workflows/zap.yml) — ephemeral API or optional repository variable `ZAP_TARGET_URL` (staging/non-prod); artifact `zap-baseline-report`; does not fail on WARN while `-I` is set (see [penetration-testing.md](penetration-testing.md)).
+- **OWASP ZAP baseline (#194):** [`.github/workflows/zap.yml`](../../../.github/workflows/zap.yml) — ephemeral API or optional repository variable `ZAP_TARGET_URL` (staging/non-prod); artifact `zap-baseline-report`; **no `-I`** — unignored WARN/FAIL fail CI; IGNORE only via [`.zap/rules.tsv`](../../../.zap/rules.tsv) triage (see [penetration-testing.md](penetration-testing.md)).
 - **Trivy images:** after Docker build in [`.github/workflows/deploy.yml`](../../../.github/workflows/deploy.yml), fail on CRITICAL before GHCR publish.
 - Triage: [dependency scanning and triage](dependency-scanning-and-triage.md).
 

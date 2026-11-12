@@ -74,7 +74,7 @@ Conteo indicativo (conservador: la evidencia de producto es mayormente **Partial
 | A.5.27 | Aprendizaje de incidentes | Partial | Post-mortem documentado; sin registro lleno |
 | A.5.28 | Recolección de evidencia | Partial | Audit events / forense documentado |
 | A.5.29 | Seguridad durante la disrupción | Partial | Runbooks DR [#197](https://github.com/ayelenleclerc/BizCode/issues/197); drill staging pendiente |
-| A.5.30 | Continuidad TIC | Partial | SEC-014/015 + backup #150; status page + drill staging pendientes (#197) |
+| A.5.30 | Continuidad TIC | Partial | SEC-014/015 + backup #150; UI `/status` first-party en repo; residual #197 = monitor externo de uptime + drill RTO staging (`STAGING_DEPLOY_*`) |
 | A.5.31 | Requisitos legales y contractuales | Partial | Privacidad #195; ADR-0007 |
 | A.5.32 | Derechos de propiedad intelectual | Not evidenced | Sin política IP |
 | A.5.33 | Protección de registros | Partial | Auditoría / plantillas ISO |

@@ -36,7 +36,7 @@ Registrar os riscos de segurança da informação mais críticos a partir do gap
 | R-08 | Cumprimento incompleto de privacidade / titular | M | M | Product owner | A.5.34 | Docs #195 |
 | R-09 | Compromisso supply-chain (npm / Actions) | M | H | Engenharia | A.5.21 | Lockfile + audit; SBOM gerado |
 | R-10 | Exposição SaaS sem TLS / WAF mal configurado | M | H | Ops plataforma | A.8.20, A.5.23 | Helmet/CORS; Cloudflare #217 |
-| R-11 | Lacuna de continuidade (sem SLA / RTO não provado) | H | H | Product owner | A.5.29, A.5.30 | Docs SLA/DR (#197); **uptime público + RTO staging** ainda abertos |
+| R-11 | Lacuna de continuidade (sem SLA / RTO não provado) | H | H | Product owner | A.5.29, A.5.30 | Docs SLA/DR + UI `/status` in-repo (#197); **monitor externo de uptime + RTO staging** ainda abertos (`/status` ≠ monitor live) |
 | R-12 | Conscientização insuficiente de operadores | M | M | Product owner | A.6.3 | Sem registros de treinamento |
 
 Tratamento: [RSK-004](rsk-004-plano-tratamento-riscos.md). Contexto: [gap Anexo A](../../quality/analise-lacunas-anexo-a-iso27001.md).
