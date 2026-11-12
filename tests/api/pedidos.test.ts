@@ -110,6 +110,7 @@ describe('Pedidos API', () => {
     process.env.NODE_ENV = 'test'
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'seller'
+    delete process.env.BIZCODE_TEST_MODULES
   })
 
   it('GET /api/pedidos returns paginated list', async () => {
@@ -192,5 +193,132 @@ describe('Pedidos API', () => {
     expect(res.status).toBe(403)
     expect(res.body.error).toBe('module_not_enabled')
     expect(res.body.module).toBe('billing.orders')
+  })
+
+  it('POST /api/pedidos/:id/pack ships logistics happy path pack→ship→deliver (#450)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const packed = { ...PEDIDO_ROW, estado: 'packed' }
+    const shipped = { ...PEDIDO_ROW, estado: 'shipped' }
+    const delivered = { ...PEDIDO_ROW, estado: 'delivered' }
+    const findFirst = vi
+      .fn()
+      // pack: ownership + applySimpleTransition
+      .mockResolvedValueOnce({ id: 1 })
+      .mockResolvedValueOnce({ id: 1, estado: 'confirmed' })
+      // ship
+      .mockResolvedValueOnce({ id: 1 })
+      .mockResolvedValueOnce({ id: 1, estado: 'packed' })
+      // deliver
+      .mockResolvedValueOnce({ id: 1 })
+      .mockResolvedValueOnce({ id: 1, estado: 'shipped' })
+    const update = vi
+      .fn()
+      .mockResolvedValueOnce(packed)
+      .mockResolvedValueOnce(shipped)
+      .mockResolvedValueOnce(delivered)
+    const base = buildPrismaMock()
+    const app = createApp(
+      buildPrismaMock({
+        pedido: {
+          count: base.pedido.count,
+          findMany: base.pedido.findMany,
+          findFirst,
+          create: base.pedido.create,
+          update,
+        },
+      }),
+    )
+
+    const packRes = await request(app).post('/api/pedidos/1/pack')
+    expect(packRes.status).toBe(200)
+    expect(packRes.body.data.estado).toBe('packed')
+    await assertMatchesOpenApi('/api/pedidos/{id}/pack', 'post', '200', packRes.body)
+
+    const shipRes = await request(app).post('/api/pedidos/1/ship')
+    expect(shipRes.status).toBe(200)
+    expect(shipRes.body.data.estado).toBe('shipped')
+    await assertMatchesOpenApi('/api/pedidos/{id}/ship', 'post', '200', shipRes.body)
+
+    const deliverRes = await request(app).post('/api/pedidos/1/deliver')
+    expect(deliverRes.status).toBe(200)
+    expect(deliverRes.body.data.estado).toBe('delivered')
+    await assertMatchesOpenApi('/api/pedidos/{id}/deliver', 'post', '200', deliverRes.body)
+  })
+
+  it('POST /api/pedidos/:id/ship rejects illegal transition from draft (#450)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const findFirst = vi
+      .fn()
+      .mockResolvedValueOnce({ id: 1 })
+      .mockResolvedValueOnce({ id: 1, estado: 'draft' })
+    const base = buildPrismaMock()
+    const app = createApp(
+      buildPrismaMock({
+        pedido: {
+          count: base.pedido.count,
+          findMany: base.pedido.findMany,
+          findFirst,
+          create: base.pedido.create,
+          update: base.pedido.update,
+        },
+      }),
+    )
+    const res = await request(app).post('/api/pedidos/1/ship')
+    expect(res.status).toBe(409)
+    expect(res.body.error).toBe('INVALID_STATE_TRANSITION')
+    await assertMatchesOpenApi('/api/pedidos/{id}/ship', 'post', '409', res.body)
+  })
+
+  it('POST /api/pedidos/:id/collect marks collected when factura is fully paid (#450)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'owner'
+    const collected = {
+      ...PEDIDO_ROW,
+      estado: 'collected',
+      facturaId: 9,
+      factura: { id: 9, tipo: 'A', prefijo: 1, numero: 1, total: 100 },
+    }
+    const findFirst = vi
+      .fn()
+      // ownership → collect gate → applySimpleTransition
+      .mockResolvedValueOnce({ id: 1 })
+      .mockResolvedValueOnce({ id: 1, estado: 'delivered', facturaId: 9 })
+      .mockResolvedValueOnce({ id: 1, estado: 'delivered', facturaId: 9 })
+    const update = vi.fn().mockResolvedValue(collected)
+    const base = buildPrismaMock()
+    const app = createApp(
+      buildPrismaMock({
+        pedido: {
+          count: base.pedido.count,
+          findMany: base.pedido.findMany,
+          findFirst,
+          create: base.pedido.create,
+          update,
+        },
+        factura: {
+          findMany: base.factura.findMany,
+          findFirst: vi.fn().mockResolvedValue({
+            id: 9,
+            clienteId: 1,
+            total: { minus: () => ({ lessThanOrEqualTo: () => true }) },
+          }),
+          count: base.factura.count,
+          create: base.factura.create,
+        },
+        reciboCobroImputacion: {
+          aggregate: vi.fn().mockResolvedValue({ _sum: { importe: 100 } }),
+        },
+      }),
+    )
+    const res = await request(app).post('/api/pedidos/1/collect')
+    expect(res.status).toBe(200)
+    expect(res.body.data.estado).toBe('collected')
+    await assertMatchesOpenApi('/api/pedidos/{id}/collect', 'post', '200', res.body)
+  })
+
+  it('returns 403 on pack without orders.pick (#450)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'seller'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).post('/api/pedidos/1/pack')
+    expect(res.status).toBe(403)
   })
 })

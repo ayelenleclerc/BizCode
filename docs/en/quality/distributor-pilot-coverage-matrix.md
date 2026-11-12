@@ -20,7 +20,7 @@
 | Artículos + prices | P0 | `e2e/critical-paths.spec.ts`, `tests/api/factura-stock.test.ts` | Covered |
 | Stock on invoice | P0 | `tests/integration/piloto-distribuidora-circuit.integration.test.ts`, `tests/api/factura-stock.test.ts` | Covered |
 | Pedido → confirm → invoice | P0 | Integration piloto circuit; E2E `e2e/piloto-circuit.spec.ts` (UI create/confirm) | Covered |
-| Pedido pack/ship/deliver/collect HTTP | P1 | Unit/UI (#391); **gap** in `tests/api/pedidos.test.ts` transitions | Gap P1 |
+| Pedido pack/ship/deliver/collect HTTP | P1 | Unit/UI (#391); API pack/ship/deliver/collect + illegal 409 in `tests/api/pedidos.test.ts` | Covered |
 | Factura UI create | P0 | `e2e/critical-paths.spec.ts` | Covered |
 | Cuenta corriente + cobro parcial | P0 | Integration piloto (recibos) + `tests/integration/cliente-cuenta-corriente.integration.test.ts` (#232) | Covered |
 | Void / NC → CC coherent | P0 | Integration piloto + `tests/api/facturas-void.test.ts` | Covered |
@@ -63,13 +63,13 @@ Integrity of **saldos/stock** is asserted in PostgreSQL integration tests — no
 |---|---|---|---|---|
 | 2026-11-08 | `test/450-piloto-coverage-matrix` | `test:integration` piloto-distribuidora-circuit | PASS (3/3) | Local Docker Postgres after `migrate deploy` |
 | 2026-11-08 | `test/450-piloto-coverage-matrix` | `test:e2e` piloto-circuit + smoke | PASS (6/6) | Local API `:3001` + seeded superadmin; raised HTTP rate-limit envs for local runs |
+| 2026-11-12 | `test/450-pedido-http-transitions` | `vitest` `tests/api/pedidos.test.ts` | PASS (10/10) | Closed GAP-P1-pedido-http (pack/ship/deliver/collect + 409) |
 
 ## Defects / residual risks
 
 | ID | Severity | Description |
 |---|---|---|
 | GAP-P1-stock-void | P1 | Void creates NC and zeros CC; does not restore `Articulo.stock` / depósito |
-| GAP-P1-pedido-http | P1 | pack/ship/deliver/collect HTTP coverage thin in API tests |
 | RISK-e2e-env | — | E2E needs seeded superadmin + running API; CI already wires this in Quality Gate |
 
 ## Pre-commercial gates (pilot exit ≠ commercial)

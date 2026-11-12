@@ -20,7 +20,7 @@
 | Artigos + preços | P0 | `e2e/critical-paths.spec.ts`, `tests/api/factura-stock.test.ts` | Coberto |
 | Estoque na fatura | P0 | `tests/integration/piloto-distribuidora-circuit.integration.test.ts`, `tests/api/factura-stock.test.ts` | Coberto |
 | Pedido → confirm → invoice | P0 | Integração piloto; E2E `e2e/piloto-circuit.spec.ts` | Coberto |
-| Pedido pack/ship/deliver/collect HTTP | P1 | Unit/UI (#391); **gap** em `tests/api/pedidos.test.ts` | Gap P1 |
+| Pedido pack/ship/deliver/collect HTTP | P1 | Unit/UI (#391); API pack/ship/deliver/collect + 409 ilegal em `tests/api/pedidos.test.ts` | Coberto |
 | Alta fatura UI | P0 | `e2e/critical-paths.spec.ts` | Coberto |
 | Conta corrente + cobrança parcial | P0 | Integração piloto (recibos) + `tests/integration/cliente-cuenta-corriente.integration.test.ts` (#232) | Coberto |
 | Anulação / NC → CC coerente | P0 | Integração piloto + `tests/api/facturas-void.test.ts` | Coberto |
@@ -63,7 +63,6 @@ A integridade de **saldos/estoque** é afirmada em integração PostgreSQL — n
 | ID | Severidade | Descrição |
 |---|---|---|
 | GAP-P1-stock-void | P1 | Void cria NC e zera CC; não restaura estoque |
-| GAP-P1-pedido-http | P1 | Cobertura HTTP pack/ship/deliver/collect fraca na API |
 | RISK-e2e-env | — | E2E exige seed + API; CI Quality Gate já configura |
 
 ## Gates pré-comerciais (piloto ≠ comercial)
