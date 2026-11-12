@@ -10,6 +10,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Cobertura HTTP logística de pedidos (#450 GAP-P1-pedido-http):** `tests/api/pedidos.test.ts` cubre `POST .../pack|ship|deliver|collect` (asserts OpenAPI), 409 por transición ilegal y RBAC en pack; matriz piloto EN/ES/PT marca la fila Cubierto y elimina GAP-P1-pedido-http. Residual P1: GAP-P1-stock-void.
 - **Preparación drill staging SLA/DR (#197 residual):** matriz/readiness EN/ES/PT; `pnpm run dr:staging:check` fail-closed; registro de monitor vacío — #197 permanece OPEN.
 - **Página de estado pública (#197 residual):** UI first-party `/status` lee `GET /api/health` (ok/degraded/unavailable); [uptime-monitor-register.md](../evidence/uptime-monitor-register.md) vacío; SLA/DR EN/ES/PT actualizados. 99.9% sigue aspiracional; drill staging pendiente — #197 permanece OPEN.
 - **Triaje ZAP baseline (#194 residual):** [`.zap/rules.tsv`](../../.zap/rules.tsv) fija `10049` IGNORE por ruido 404 del API efímero (evidencia run `43072369954`); [`.github/workflows/zap.yml`](../../.github/workflows/zap.yml) quita `-I`, fija `ubuntu-24.04` y corrige escritura de `zap-out`. Docs readiness/penetración EN/ES/PT actualizados; #194 permanece OPEN (registro externo vacío; token Snyk ops).
