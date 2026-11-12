@@ -73,6 +73,8 @@ const FACTURA_VOID_ROW = {
   tipo: 'B',
   prefijo: '0001',
   numero: 42,
+  depositoId: null as number | null,
+  items: [] as { articuloId: number | null; cantidad: Decimal }[],
 }
 
 const ORDEN_ENTREGA_ROW = {
@@ -311,6 +313,7 @@ function basePrismaForMutations(): {
   }
   prisma.auditEvent = { create: auditCreate }
   prisma.recuento = { findFirst: vi.fn().mockResolvedValue(null) }
+  prisma.pedido = { findFirst: vi.fn().mockResolvedValue(null) }
   prisma.appUser = {
     count: vi.fn().mockResolvedValue(1),
     findMany: vi.fn().mockResolvedValue([]),

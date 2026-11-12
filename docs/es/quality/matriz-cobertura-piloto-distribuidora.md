@@ -24,7 +24,7 @@
 | Alta factura UI | P0 | `e2e/critical-paths.spec.ts` | Cubierto |
 | Cuenta corriente + cobro parcial | P0 | Integración piloto (recibos) + `tests/integration/cliente-cuenta-corriente.integration.test.ts` (#232) | Cubierto |
 | Anulación / NC → CC coherente | P0 | Integración piloto + `tests/api/facturas-void.test.ts` | Cubierto |
-| Anulación restaura stock | P1 | `FacturaService.void` **no** restaura stock hoy | Gap P1 |
+| Anulación restaura stock | P1 | `FacturaService.void` restaura `Articulo.stock` / depósito (espejo de create; omite marketplace `Pedido.origen`) — `tests/api/facturas-void.test.ts`, integración piloto | Cubierto |
 | Rechazo por falta de stock | P0 | Integración piloto + `tests/api/factura-stock.test.ts` | Cubierto |
 | Superficie UI cobros | P0 | `e2e/piloto-circuit.spec.ts` | Cubierto |
 | Aislamiento tenant / RLS | P0 | `tests/api/tenant-isolation.test.ts`, `tests/api/rls-isolation.test.ts`, integración API | Cubierto |
@@ -62,7 +62,6 @@ La integridad de **saldos/stock** se afirma en integración PostgreSQL — no so
 
 | ID | Severidad | Descripción |
 |---|---|---|
-| GAP-P1-stock-void | P1 | Void crea NC y salda CC; no restaura stock |
 | RISK-e2e-env | — | E2E requiere seed + API; CI Quality Gate ya lo cablea |
 
 ## Compuertas pre-comerciales (piloto ≠ comercial)

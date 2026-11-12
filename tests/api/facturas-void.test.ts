@@ -21,6 +21,8 @@ const FACTURA_ACTIVA = {
   tipo: 'B',
   prefijo: '0001',
   numero: 1,
+  depositoId: null as number | null,
+  items: [] as { articuloId: number | null; cantidad: Decimal }[],
 }
 
 const NOTA_CREDITO = {
@@ -57,9 +59,14 @@ function buildPrismaMock(overrides: Partial<Record<string, unknown>> = {}): Pris
       update: vi.fn().mockResolvedValue({ id: 1, rsocial: 'Cliente', balance: 0, creditLimit: null }),
     }),
     movimientoClienteCC: createMovimientoClienteCCPrismaMock(),
-    articulo: { findMany: vi.fn().mockResolvedValue([]) },
+    articulo: {
+      findMany: vi.fn().mockResolvedValue([]),
+      update: vi.fn().mockResolvedValue({ id: 7, stock: 10 }),
+    },
     rubro: { findMany: vi.fn().mockResolvedValue([]) },
     formaPago: { findMany: vi.fn().mockResolvedValue([]) },
+    pedido: { findFirst: vi.fn().mockResolvedValue(null) },
+    recuento: { findFirst: vi.fn().mockResolvedValue(null) },
     factura: {
       findMany: vi.fn().mockResolvedValue([]),
       findFirst: vi.fn().mockResolvedValue(FACTURA_ACTIVA),
@@ -290,5 +297,38 @@ describe('PUT /api/facturas/:id/void', () => {
       .expect(500)
 
     expect(res.body.success).toBe(false)
+  })
+
+  it('restores Articulo.stock on void when lines have articuloId (#450)', async () => {
+    const facturaConItems = {
+      ...FACTURA_ACTIVA,
+      depositoId: null,
+      items: [{ articuloId: 7, cantidad: new Decimal(3) }],
+    }
+    const articuloUpdate = vi.fn().mockResolvedValue({ id: 7, stock: 13 })
+    const prisma = buildPrismaMock({
+      factura: {
+        findMany: vi.fn().mockResolvedValue([]),
+        findFirst: vi.fn().mockResolvedValue(facturaConItems),
+        create: vi.fn().mockResolvedValue(null),
+        update: vi.fn().mockResolvedValue({ ...facturaConItems, estado: 'N' }),
+        aggregate: vi.fn().mockResolvedValue({ _count: { id: 0 }, _sum: { total: null } }),
+      },
+      articulo: {
+        findMany: vi.fn().mockResolvedValue([{ id: 7, tipo: 'articulo' }]),
+        update: articuloUpdate,
+      },
+    })
+    const app = createApp(prisma)
+
+    await request(app)
+      .put('/api/facturas/1/void')
+      .send({ motivo: 'Error en el precio' })
+      .expect(200)
+
+    expect(articuloUpdate).toHaveBeenCalledWith({
+      where: { id: 7 },
+      data: { stock: { increment: 3 } },
+    })
   })
 })

@@ -717,9 +717,9 @@ export class FacturaService {
   }
 
   /**
-   * @en Voids an active invoice, creates a credit note, reverses balance, and records audit in one transaction.
-   * @es Anula factura vigente, crea nota de crédito, revierte saldo y audita en una transacción.
-   * @pt-BR Anula fatura ativa, cria nota de crédito, reverte saldo e audita em uma transação.
+   * @en Voids an active invoice, creates a credit note, reverses balance, restores stock (mirror of create), and audits in one transaction (#450).
+   * @es Anula factura vigente, crea nota de crédito, revierte saldo, restaura stock (espejo de create) y audita en una transacción (#450).
+   * @pt-BR Anula fatura ativa, cria nota de crédito, reverte saldo, restaura estoque (espelho de create) e audita em uma transação (#450).
    */
   async void(
     tenantId: number,
@@ -738,6 +738,10 @@ export class FacturaService {
         tipo: true,
         prefijo: true,
         numero: true,
+        depositoId: true,
+        items: {
+          select: { articuloId: true, cantidad: true },
+        },
       },
     })
 
@@ -761,56 +765,127 @@ export class FacturaService {
       return { ok: false, status: 422, error: 'Invoice already fully credited' }
     }
 
-    const result = await this.prisma.$transaction(async (tx) => {
-      const voided = await tx.factura.update({
-        where: { id },
-        data: { estado: 'N' },
-      })
-
-      await tx.retencionAplicada.deleteMany({
-        where: { tenantId, facturaId: id },
-      })
-
-      const notaCredito = await tx.notaCredito.create({
-        data: {
-          tenantId,
-          facturaOrigenId: id,
-          motivo,
-          monto: ncMonto,
-          estadoCae: notaCreditoEstadoCae,
-          createdById: audit.userId,
-        },
-      })
-
-      const facturaRef = `${factura.tipo}-${factura.prefijo}-${factura.numero}`
-      const ccService = new ClienteCuentaCorrienteService(tx)
-      await ccService.recordFromNotaCredito(
-        tenantId,
-        notaCredito,
-        factura.clienteId,
-        facturaRef,
-        audit.userId!,
-      )
-
-      const updatedCliente = await tx.cliente.findFirstOrThrow({
-        where: { id: factura.clienteId },
-        select: { id: true, rsocial: true, balance: true, creditLimit: true },
-      })
-
-      await tx.auditEvent.create({
-        data: {
-          tenantId,
-          userId: audit.userId,
-          action: 'factura_void',
-          resource: 'factura',
-          resourceId: String(id),
-          ipAddress: audit.ipAddress,
-          metadata: { motivo, notaCreditoId: notaCredito.id },
-        },
-      })
-
-      return { factura: voided, notaCredito, updatedCliente }
+    /**
+     * @en Marketplace invoice paths skipped stock on create via Pedido.origen (#186); do not restore.
+     * @es Rutas marketplace omitieron stock en create vía Pedido.origen (#186); no restaurar.
+     * @pt-BR Rotas marketplace omitiram estoque no create via Pedido.origen (#186); não restaurar.
+     */
+    const linkedPedido = await this.prisma.pedido.findFirst({
+      where: { tenantId, facturaId: id },
+      select: { origen: true },
     })
+    const skipStockRestore =
+      linkedPedido?.origen === 'meli' ||
+      linkedPedido?.origen === 'tiendanube' ||
+      linkedPedido?.origen === 'woocommerce'
+
+    const articuloIds = [
+      ...new Set(
+        factura.items
+          .map((it) => it.articuloId)
+          .filter((aid): aid is number => aid != null && aid >= 1),
+      ),
+    ]
+    const articulos =
+      articuloIds.length > 0
+        ? await this.prisma.articulo.findMany({
+            where: { tenantId, id: { in: articuloIds } },
+            select: { id: true, tipo: true },
+          })
+        : []
+    const tipoById = new Map(articulos.map((a) => [a.id, a.tipo]))
+    const qtyByArticulo = skipStockRestore
+      ? new Map<number, number>()
+      : aggregateItemQuantities(
+          factura.items.map((it) => ({
+            articuloId: it.articuloId,
+            cantidad: Number(it.cantidad),
+            precio: 0,
+            dscto: 0,
+            subtotal: 0,
+          })),
+          tipoById,
+        )
+
+    if (qtyByArticulo.size > 0) {
+      const recuentoBlock = await assertNoOpenRecuento(this.prisma, tenantId, factura.depositoId)
+      if (!recuentoBlock.ok) return recuentoBlock
+    }
+
+    let result: FacturaVoidResult
+    try {
+      result = await this.prisma.$transaction(async (tx) => {
+        const voided = await tx.factura.update({
+          where: { id },
+          data: { estado: 'N' },
+        })
+
+        await tx.retencionAplicada.deleteMany({
+          where: { tenantId, facturaId: id },
+        })
+
+        const notaCredito = await tx.notaCredito.create({
+          data: {
+            tenantId,
+            facturaOrigenId: id,
+            motivo,
+            monto: ncMonto,
+            estadoCae: notaCreditoEstadoCae,
+            createdById: audit.userId,
+          },
+        })
+
+        const facturaRef = `${factura.tipo}-${factura.prefijo}-${factura.numero}`
+        const ccService = new ClienteCuentaCorrienteService(tx)
+        await ccService.recordFromNotaCredito(
+          tenantId,
+          notaCredito,
+          factura.clienteId,
+          facturaRef,
+          audit.userId!,
+        )
+
+        const updatedCliente = await tx.cliente.findFirstOrThrow({
+          where: { id: factura.clienteId },
+          select: { id: true, rsocial: true, balance: true, creditLimit: true },
+        })
+
+        for (const [articuloId, qty] of qtyByArticulo) {
+          if (factura.depositoId != null) {
+            await applyStockDepositoDelta(tx, {
+              tenantId,
+              articuloId,
+              depositoId: factura.depositoId,
+              delta: qty,
+            })
+          } else {
+            await tx.articulo.update({
+              where: { id: articuloId },
+              data: { stock: { increment: qty } },
+            })
+          }
+        }
+
+        await tx.auditEvent.create({
+          data: {
+            tenantId,
+            userId: audit.userId,
+            action: 'factura_void',
+            resource: 'factura',
+            resourceId: String(id),
+            ipAddress: audit.ipAddress,
+            metadata: { motivo, notaCreditoId: notaCredito.id },
+          },
+        })
+
+        return { factura: voided, notaCredito, updatedCliente }
+      })
+    } catch (err) {
+      if (err instanceof Error && err.message === 'INSUFFICIENT_DEPOSIT_STOCK') {
+        return { ok: false, status: 422, error: 'INSUFFICIENT_STOCK' }
+      }
+      throw err
+    }
 
     if (factura.estadoCae === 'issued') {
       void this.fiscalDocumentService.authorizeCreditNote(tenantId, result.notaCredito.id).catch(() => {
@@ -822,6 +897,17 @@ export class FacturaService {
       await this.fidelizacionService.revertirFromFactura(tenantId, id, audit.userId)
     } catch {
       /* Loyalty reversal must not fail invoice void */
+    }
+
+    if (qtyByArticulo.size > 0) {
+      const meliStock = new MeliStockSyncService(this.prisma)
+      const tnStock = new TiendanubeStockSyncService(this.prisma)
+      const wcStock = new WooCommerceStockSyncService(this.prisma)
+      for (const articuloId of qtyByArticulo.keys()) {
+        void meliStock.syncStockToMeli(tenantId, articuloId).catch(() => undefined)
+        void tnStock.syncStockToTiendanube(tenantId, articuloId).catch(() => undefined)
+        void wcStock.syncStockToWooCommerce(tenantId, articuloId).catch(() => undefined)
+      }
     }
 
     return { ok: true, data: result }

@@ -10,6 +10,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Anulación de factura restaura stock (#450 GAP-P1-stock-void):** `FacturaService.void` espeja create — `applyStockDepositoDelta(+qty)` o incremento de `Articulo.stock`; omite restore si `Pedido.origen` es meli/tiendanube/woocommerce; OpenAPI + ADR-0012; matriz piloto EN/ES/PT marca Cubierto.
 - **Cobertura HTTP logística de pedidos (#450 GAP-P1-pedido-http):** `tests/api/pedidos.test.ts` cubre `POST .../pack|ship|deliver|collect` (asserts OpenAPI), 409 por transición ilegal y RBAC en pack; matriz piloto EN/ES/PT marca la fila Cubierto y elimina GAP-P1-pedido-http. Residual P1: GAP-P1-stock-void.
 - **Preparación drill staging SLA/DR (#197 residual):** matriz/readiness EN/ES/PT; `pnpm run dr:staging:check` fail-closed; registro de monitor vacío — #197 permanece OPEN.
 - **Página de estado pública (#197 residual):** UI first-party `/status` lee `GET /api/health` (ok/degraded/unavailable); [uptime-monitor-register.md](../evidence/uptime-monitor-register.md) vacío; SLA/DR EN/ES/PT actualizados. 99.9% sigue aspiracional; drill staging pendiente — #197 permanece OPEN.

@@ -96146,7 +96146,7 @@ Requires `reports.operational.read`. Non-fiscal preview without CAE; no valid AF
 - **Path:** `/api/facturas/{id}/void`
 - **Tags:** facturas
 
-Sets `estado` to `N` (anulada), reverses the customer balance by the invoice total, creates a tenant-scoped `NotaCredito`, and records `AuditEvent` `factura_void` with motivo and `notaCreditoId` in metadata — all in one database transaction. Requires `sales.cancel` and module `billing.credit_notes`. When the source invoice has `estadoCae === issued`, the credit note CAE is requested asynchronously via AFIP adapter.
+Sets `estado` to `N` (anulada), reverses the customer balance by the invoice total, creates a tenant-scoped `NotaCredito`, restores physical catalog stock mirroring create (`StockDeposito` when `Factura.depositoId` is set, else `Articulo.stock`; services and null `articuloId` ignored; skipped when a linked `Pedido.origen` is `meli`/`tiendanube`/`woocommerce`), and records `AuditEvent` `factura_void` with motivo and `notaCreditoId` in metadata — all in one database transaction. Requires `sales.cancel` and module `billing.credit_notes`. When the source invoice has `estadoCae === issued`, the credit note CAE is requested asynchronously via AFIP adapter. Partial credit notes and FEFO/lote reversal are out of scope for this operation.
 
 #### Request Body
 
