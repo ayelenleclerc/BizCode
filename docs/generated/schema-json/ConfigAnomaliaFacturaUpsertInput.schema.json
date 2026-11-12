@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "discountThresholdPct": {
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "minHistory": {
+      "maximum": 1000,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "newCustomerCreditFraction": {
+      "maximum": 1,
+      "minimum": 0.01,
+      "type": "number"
+    },
+    "zScoreThreshold": {
+      "maximum": 20,
+      "minimum": 0.1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "minHistory",
+    "zScoreThreshold",
+    "discountThresholdPct",
+    "newCustomerCreditFraction"
+  ],
+  "title": "ConfigAnomaliaFacturaUpsertInput",
+  "type": "object"
+}

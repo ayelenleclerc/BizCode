@@ -24,6 +24,7 @@ import {
 import FiscalProviderSection from './FiscalProviderSection'
 import PrintDevicesSection from './PrintDevicesSection'
 import ProveedorAlertasConfigSection from './ProveedorAlertasConfigSection'
+import AnomaliaFacturaConfigSection from './AnomaliaFacturaConfigSection'
 import FiscalRetencionesSection from './FiscalRetencionesSection'
 import PortalConfigSection from './PortalConfigSection'
 import PaymentProviderSection from './PaymentProviderSection'
@@ -672,6 +673,7 @@ export default function EmpresaPage() {
       <PrintDevicesSection />
       <FiscalRetencionesSection />
       <ProveedorAlertasConfigSection />
+      <AnomaliaFacturaConfigSection />
       <IfModule flag="clients.portal">
         <PortalConfigSection />
       </IfModule>

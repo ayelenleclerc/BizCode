@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "discountThresholdPct": {
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "minHistory": {
+      "maximum": 1000,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "newCustomerCreditFraction": {
+      "maximum": 1,
+      "minimum": 0.01,
+      "type": "number"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "zScoreThreshold": {
+      "maximum": 20,
+      "minimum": 0.1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "minHistory",
+    "zScoreThreshold",
+    "discountThresholdPct",
+    "newCustomerCreditFraction",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "ConfigAnomaliaFactura",
+  "type": "object"
+}

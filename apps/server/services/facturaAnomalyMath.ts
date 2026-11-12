@@ -26,10 +26,43 @@ export type FacturaAnomalyWarning = {
   detalle?: Record<string, number | string | boolean | null>
 }
 
+export type FacturaAnomalyThresholds = {
+  minHistory: number
+  zScoreThreshold: number
+  discountThresholdPct: number
+  newCustomerCreditFraction: number
+}
+
+export const DEFAULT_FACTURA_ANOMALY_THRESHOLDS: FacturaAnomalyThresholds = {
+  minHistory: ANOMALY_MIN_HISTORY,
+  zScoreThreshold: ANOMALY_ZSCORE_THRESHOLD,
+  discountThresholdPct: ANOMALY_DISCOUNT_THRESHOLD_PCT,
+  newCustomerCreditFraction: ANOMALY_NEW_CUSTOMER_CREDIT_FRACTION,
+}
+
 export type LineDiscountInput = {
   cantidad: number
   precio: number
   dscto: number
+}
+
+/**
+ * @en Merge partial thresholds over MVP defaults.
+ * @es Fusiona umbrales parciales sobre defaults MVP.
+ * @pt-BR Mescla limiares parciais sobre defaults MVP.
+ */
+export function resolveFacturaAnomalyThresholds(
+  partial?: Partial<FacturaAnomalyThresholds> | null,
+): FacturaAnomalyThresholds {
+  return {
+    minHistory: partial?.minHistory ?? DEFAULT_FACTURA_ANOMALY_THRESHOLDS.minHistory,
+    zScoreThreshold: partial?.zScoreThreshold ?? DEFAULT_FACTURA_ANOMALY_THRESHOLDS.zScoreThreshold,
+    discountThresholdPct:
+      partial?.discountThresholdPct ?? DEFAULT_FACTURA_ANOMALY_THRESHOLDS.discountThresholdPct,
+    newCustomerCreditFraction:
+      partial?.newCustomerCreditFraction ??
+      DEFAULT_FACTURA_ANOMALY_THRESHOLDS.newCustomerCreditFraction,
+  }
 }
 
 /**
@@ -89,7 +122,9 @@ export function evaluateFacturaAnomalies(input: {
   hasDuplicateSameDay: boolean
   creditLimit: number | null
   lines: LineDiscountInput[]
+  thresholds?: Partial<FacturaAnomalyThresholds> | null
 }): FacturaAnomalyWarning[] {
+  const t = resolveFacturaAnomalyThresholds(input.thresholds)
   const warnings: FacturaAnomalyWarning[] = []
 
   if (input.hasDuplicateSameDay) {
@@ -101,34 +136,35 @@ export function evaluateFacturaAnomalies(input: {
     })
   }
 
-  if (input.priorInvoiceCount > ANOMALY_MIN_HISTORY && input.priorTotals.length > ANOMALY_MIN_HISTORY) {
+  if (input.priorInvoiceCount > t.minHistory && input.priorTotals.length > t.minHistory) {
     const { mean, stddev } = populationStdDev(input.priorTotals)
     const z = zScore(input.total, mean, stddev)
-    if (z != null && Math.abs(z) > ANOMALY_ZSCORE_THRESHOLD) {
+    if (z != null && Math.abs(z) > t.zScoreThreshold) {
       warnings.push({
         tipo: 'monto_inusual',
         severidad: 'warning',
-        descripcion: 'Invoice total is unusual versus customer history (Z-score > 3)',
+        descripcion: `Invoice total is unusual versus customer history (Z-score > ${t.zScoreThreshold})`,
         detalle: {
           total: input.total,
           mean: Math.round(mean * 100) / 100,
           stddev: Math.round(stddev * 100) / 100,
           zScore: Math.round(z * 100) / 100,
           historyCount: input.priorInvoiceCount,
+          zScoreThreshold: t.zScoreThreshold,
         },
       })
     }
   }
 
   const avgDiscount = weightedAverageDiscountPct(input.lines)
-  if (avgDiscount > ANOMALY_DISCOUNT_THRESHOLD_PCT) {
+  if (avgDiscount > t.discountThresholdPct) {
     warnings.push({
       tipo: 'descuento_excesivo',
       severidad: 'warning',
-      descripcion: `Weighted average line discount ${avgDiscount.toFixed(1)}% exceeds ${ANOMALY_DISCOUNT_THRESHOLD_PCT}%`,
+      descripcion: `Weighted average line discount ${avgDiscount.toFixed(1)}% exceeds ${t.discountThresholdPct}%`,
       detalle: {
         averageDiscountPct: Math.round(avgDiscount * 100) / 100,
-        thresholdPct: ANOMALY_DISCOUNT_THRESHOLD_PCT,
+        thresholdPct: t.discountThresholdPct,
       },
     })
   }
@@ -137,7 +173,7 @@ export function evaluateFacturaAnomalies(input: {
     input.priorInvoiceCount <= 1 &&
     input.creditLimit != null &&
     input.creditLimit > 0 &&
-    input.total > input.creditLimit * ANOMALY_NEW_CUSTOMER_CREDIT_FRACTION
+    input.total > input.creditLimit * t.newCustomerCreditFraction
   ) {
     warnings.push({
       tipo: 'cliente_nuevo_compra_grande',
@@ -147,7 +183,7 @@ export function evaluateFacturaAnomalies(input: {
         total: input.total,
         creditLimit: input.creditLimit,
         priorInvoiceCount: input.priorInvoiceCount,
-        fraction: ANOMALY_NEW_CUSTOMER_CREDIT_FRACTION,
+        fraction: t.newCustomerCreditFraction,
       },
     })
   }

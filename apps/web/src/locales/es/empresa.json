@@ -391,6 +391,19 @@
     "save": "Guardar alertas",
     "saved": "Configuración guardada"
   },
+  "anomaliaFactura": {
+    "title": "Umbrales de anomalías de facturación",
+    "hint": "Alertas estadísticas / heurísticas de factura (#200). Los defaults coinciden con las constantes MVP hasta que guardes.",
+    "loading": "Cargando umbrales…",
+    "forbidden": "Necesitás permiso de configuración de negocio para ver o editar umbrales de anomalía.",
+    "minHistory": "Histórico mínimo de facturas antes del Z-score",
+    "zScoreThreshold": "Umbral absoluto de Z-score",
+    "discountThresholdPct": "Umbral de descuento excesivo (%)",
+    "newCustomerCreditFraction": "Fracción del límite de crédito (cliente nuevo, 0–1)",
+    "save": "Guardar umbrales",
+    "saving": "Guardando…",
+    "saved": "Umbrales guardados"
+  },
   "retenciones": {
     "title": "Retenciones y percepciones",
     "hint": "Regímenes configurables por tenant. El cálculo automático en pagos y facturas se habilitará en #229. La condición IVA de clientes/proveedores se toma del maestro existente (Padrón A4 #192 pendiente).",

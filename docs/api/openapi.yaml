@@ -42,6 +42,8 @@ tags:
     description: Logistics KPIs and operational reports (#145)
   - name: facturas
     description: Invoice management
+  - name: anomalias
+    description: Billing anomaly threshold configuration (#200 residual)
   - name: notasCredito
     description: Credit notes (invoice void flow, module billing.credit_notes, #146)
   - name: afip
@@ -4189,6 +4191,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/anomalias/config:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [anomalias]
+      summary: Get billing anomaly thresholds (#200 residual)
+      description: Requires `settings.business.manage`. Lazy-creates row with MVP defaults when missing.
+      responses:
+        '200':
+          description: Anomaly threshold config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigAnomaliaFacturaEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags: [anomalias]
+      summary: Upsert billing anomaly thresholds (#200 residual)
+      description: Requires `settings.business.manage`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigAnomaliaFacturaUpsertInput'
+      responses:
+        '200':
+          description: Updated config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigAnomaliaFacturaEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -27329,6 +27377,79 @@ components:
           type: integer
           minimum: 1
           maximum: 365
+
+    ConfigAnomaliaFactura:
+      type: object
+      required:
+        [
+          id,
+          tenantId,
+          minHistory,
+          zScoreThreshold,
+          discountThresholdPct,
+          newCustomerCreditFraction,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        minHistory:
+          type: integer
+          minimum: 1
+          maximum: 1000
+        zScoreThreshold:
+          type: number
+          minimum: 0.1
+          maximum: 20
+        discountThresholdPct:
+          type: number
+          minimum: 0
+          maximum: 100
+        newCustomerCreditFraction:
+          type: number
+          minimum: 0.01
+          maximum: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ConfigAnomaliaFacturaUpsertInput:
+      type: object
+      required:
+        [minHistory, zScoreThreshold, discountThresholdPct, newCustomerCreditFraction]
+      properties:
+        minHistory:
+          type: integer
+          minimum: 1
+          maximum: 1000
+        zScoreThreshold:
+          type: number
+          minimum: 0.1
+          maximum: 20
+        discountThresholdPct:
+          type: number
+          minimum: 0
+          maximum: 100
+        newCustomerCreditFraction:
+          type: number
+          minimum: 0.01
+          maximum: 1
+
+    ConfigAnomaliaFacturaEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          $ref: '#/components/schemas/ConfigAnomaliaFactura'
 
     ConfigFefoEnvelope:
       type: object

@@ -1011,6 +1011,33 @@ model AnomaliaDetectada {
   @@index([tenantId, clienteId])
 }
 
+/// @en Per-tenant billing anomaly thresholds (#200 residual); defaults match MVP constants.
+/// @es Umbrales de anomalía de facturación por tenant (#200 residual); defaults = constantes MVP.
+/// @pt-BR Limiares de anomalia de faturamento por tenant (#200 residual); defaults = constantes MVP.
+model ConfigAnomaliaFactura {
+  id                         Int      @id @default(autoincrement())
+  tenantId                   Int      @unique
+  tenant                     Tenant   @relation(fields: [tenantId], references: [id])
+  /// @en Min prior active invoices before Z-score rule runs.
+  /// @es Mínimo de facturas activas previas antes de aplicar Z-score.
+  /// @pt-BR Mínimo de faturas ativas anteriores antes do Z-score.
+  minHistory                 Int      @default(20)
+  /// @en Absolute Z-score threshold for monto_inusual.
+  /// @es Umbral absoluto de Z-score para monto_inusual.
+  /// @pt-BR Limiar absoluto de Z-score para monto_inusual.
+  zScoreThreshold            Decimal  @default(3) @db.Decimal(8, 4)
+  /// @en Weighted average line discount % above this → descuento_excesivo.
+  /// @es % de descuento promedio ponderado por encima → descuento_excesivo.
+  /// @pt-BR % de desconto médio ponderado acima → descuento_excesivo.
+  discountThresholdPct       Decimal  @default(30) @db.Decimal(8, 2)
+  /// @en New-customer large purchase: total > this fraction of creditLimit.
+  /// @es Compra grande cliente nuevo: total > esta fracción del creditLimit.
+  /// @pt-BR Compra grande cliente novo: total > esta fração do creditLimit.
+  newCustomerCreditFraction  Decimal  @default(0.5) @db.Decimal(8, 4)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+}
+
 /// Recurring service contract with scheduled invoicing (#245).
 model Contrato {
   id          Int       @id @default(autoincrement())
@@ -2011,6 +2038,7 @@ model Tenant {
   puntosFidelizacion               PuntosFidelizacion[]
   movimientosPuntos                MovimientoPuntos[]
   configFefo                       ConfigFefo?
+  configAnomaliaFactura            ConfigAnomaliaFactura?
   lotes                            Lote[]
   atencionBotSessions              AtencionBotSession[]
   recetasDispensacion              RecetaDispensacion[]

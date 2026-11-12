@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Limiares de anomalia de faturamento por tenant (#200 residual):** Prisma `ConfigAnomaliaFactura` + `GET/PUT /api/anomalias/config` (`settings.business.manage`); math/serviço respeitam overrides (defaults MVP); UI Empresa + OpenAPI + docs EN/ES/PT — #200 permanece OPEN (ML / FP / painel dedicado).
 - **Reconciliação drift docs ZAP /status (#194/#197 residual):** CI/CD EN/ES/PT deixam de afirmar ZAP `-I`; ISO A.5.30 + RSK R-11 distinguem `/status` in-repo de monitor externo + drill staging — #194/#197 permanecem OPEN (registers vazios; ops pendente).
 - **Registro de evidência do piloto pós-RBAC (#450):** matriz EN/ES/PT (Evidence + registro de execução) documenta `vitest` `tests/api/pedidos.test.ts` PASS (13/13) após #474 (RBAC 403 ship/deliver/collect) — #194/#197/#239 permanecem OPEN.
 - **RBAC HTTP logística de pedidos (#450 residual):** `tests/api/pedidos.test.ts` afirma 403 em `ship` (`warehouse_op` / sem `orders.dispatch`), `deliver` (`logistics_planner` / sem `orders.deliver.confirm`) e `collect` (`warehouse_op` / sem perms de cobrança); pack 403 já coberto.
