@@ -43,6 +43,7 @@ import { registerShippingCarrierRoutes } from './routes/registerShippingCarrierR
 import { registerLogisticaReportesRoutes } from './routes/registerLogisticaReportesRoutes'
 import { registerRepartosRoutes } from './routes/registerRepartosRoutes'
 import { registerArcaRoutes } from './routes/registerArcaRoutes'
+import { registerFcemRoutes } from './routes/registerFcemRoutes'
 import { registerFiscalRoutes } from './routes/registerFiscalRoutes'
 import { registerPaymentRoutes } from './routes/registerPaymentRoutes'
 import { registerCobranzasRoutes } from './routes/registerCobranzasRoutes'
@@ -163,6 +164,7 @@ export function registerRestDomainRoutes(app: Application, prisma: PrismaClient)
   registerFacturasRoutes(app, ctx)
   registerNotasCreditoRoutes(app, ctx)
   registerArcaRoutes(app, ctx)
+  registerFcemRoutes(app, ctx)
   registerFiscalRoutes(app, ctx)
   registerPaymentRoutes(app, ctx)
   registerPedidosRoutes(app, ctx)

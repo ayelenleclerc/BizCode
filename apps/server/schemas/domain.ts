@@ -1389,6 +1389,13 @@ export function buildEmpresaUpdateBodySchema(jurisdiction: FiscalJurisdictionCod
       condicionIva: z.string({ invalid_type_error: 'condicionIva must be a string' }).optional(),
       ingresosBrutos: z.union([z.string(), z.null(), z.undefined()]).optional(),
       fechaInicioActividades: z.union([z.string(), z.null(), z.undefined()]).optional(),
+      esMipyme: z.boolean({ invalid_type_error: 'esMipyme must be a boolean' }).optional(),
+      fcemUmbralMonto: z
+        .union([
+          z.number({ invalid_type_error: 'fcemUmbralMonto must be a number' }).nonnegative(),
+          z.null(),
+        ])
+        .optional(),
     })
     .superRefine((data, ctx) => {
       const nombre = data.nombre.trim()

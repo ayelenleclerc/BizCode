@@ -66,11 +66,13 @@ const empresaFormBaseSchema = z
       .refine((v) => !v || v.trim() === '' || /^\d{4}-\d{2}-\d{2}$/.test(v.trim()), {
         message: 'fechaInicioInvalid',
       }),
+    esMipyme: z.boolean(),
+    fcemUmbralMonto: z.union([z.coerce.number().nonnegative(), z.null()]),
   })
-  .refine((data) => data.recordatorioHoraInicio < data.recordatorioHoraFin, {
-    message: 'reminderWindowInvalid',
-    path: ['recordatorioHoraFin'],
-  })
+    .refine((data) => data.recordatorioHoraInicio < data.recordatorioHoraFin, {
+      message: 'reminderWindowInvalid',
+      path: ['recordatorioHoraFin'],
+    })
 
 type EmpresaFormData = z.infer<typeof empresaFormBaseSchema>
 
@@ -111,6 +113,8 @@ function configToFormValues(data: EmpresaConfig): EmpresaFormData {
     condicionIva: data.condicionIva,
     ingresosBrutos: data.ingresosBrutos ?? '',
     fechaInicioActividades: data.fechaInicioActividades ?? '',
+    esMipyme: data.esMipyme ?? false,
+    fcemUmbralMonto: data.fcemUmbralMonto ?? null,
   }
 }
 
@@ -156,6 +160,8 @@ export default function EmpresaPage() {
       condicionIva: defaultTaxCondition(jurisdiccionFiscal),
       ingresosBrutos: '',
       fechaInicioActividades: '',
+      esMipyme: false,
+      fcemUmbralMonto: null,
     },
   })
 
@@ -222,6 +228,8 @@ export default function EmpresaPage() {
         fechaInicioActividades: data.fechaInicioActividades?.trim()
           ? data.fechaInicioActividades.trim()
           : null,
+        esMipyme: data.esMipyme ?? false,
+        fcemUmbralMonto: data.fcemUmbralMonto ?? null,
       })
       if (!saved) {
         setSaveError(t('errors.saveFailed'))
@@ -410,6 +418,48 @@ export default function EmpresaPage() {
               </p>
             )}
           </div>
+
+          <IfModule flag="billing.fcem_mipyme">
+            <fieldset
+              data-testid="section-empresa-fcem"
+              className="rounded border border-slate-200 dark:border-slate-600 p-3 space-y-3"
+            >
+              <legend className="px-1 text-sm font-medium text-slate-700 dark:text-slate-300">
+                {t('form.fcemLegend')}
+              </legend>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('form.fcemHint')}</p>
+              <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                <input
+                  type="checkbox"
+                  data-testid="input-empresa-es-mipyme"
+                  {...register('esMipyme')}
+                  disabled={!canEdit}
+                  className="rounded border-slate-300 dark:border-slate-600"
+                />
+                {t('form.esMipyme')}
+              </label>
+              <div>
+                <label
+                  htmlFor="empresa-fcem-umbral"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+                >
+                  {t('form.fcemUmbralMonto')}
+                </label>
+                <input
+                  id="empresa-fcem-umbral"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  data-testid="input-empresa-fcem-umbral"
+                  {...register('fcemUmbralMonto')}
+                  readOnly={!canEdit}
+                  disabled={!canEdit}
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 disabled:opacity-70"
+                />
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('form.fcemUmbralHint')}</p>
+              </div>
+            </fieldset>
+          </IfModule>
 
           <div>
             <label htmlFor="empresa-punto-venta" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">

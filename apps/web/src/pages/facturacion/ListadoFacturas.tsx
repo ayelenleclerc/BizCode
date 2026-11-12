@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { arcaAPI, facturasAPI, fiscalAPI, printingAPI, remitosAPI, type MercadoPagoFacturaPaymentDto } from '@/lib/api'
+import {
+  arcaAPI,
+  facturasAPI,
+  fcemAPI,
+  fiscalAPI,
+  printingAPI,
+  remitosAPI,
+  type MercadoPagoFacturaPaymentDto,
+} from '@/lib/api'
 import KeyboardHint from '@/components/shared/KeyboardHint'
 import { useListKeyboardNav, useListPageHotkeys } from '@/hooks/useListPageKeyboard'
 import { CanAccess } from '@/components/CanAccess'
@@ -49,6 +57,25 @@ function CaeBadge({ estado }: { estado: Factura['estadoCae'] }) {
       className={`inline-block px-2 py-1 rounded text-xs font-semibold ${className}`}
     >
       {label}
+    </span>
+  )
+}
+
+function FcemBadge({ estado }: { estado: Factura['fcemEstado'] }) {
+  const { t } = useTranslation('facturacion')
+  if (!estado) return null
+  const className =
+    estado === 'aceptada' || estado === 'aceptada_tacita'
+      ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
+      : estado === 'rechazada_por_receptor'
+        ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
+        : 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-300'
+  return (
+    <span
+      data-testid={`factura-fcem-badge-${estado}`}
+      className={`inline-block px-2 py-1 rounded text-xs font-semibold ${className}`}
+    >
+      {t(`fcem.estado.${estado}`)}
     </span>
   )
 }
@@ -116,6 +143,8 @@ export default function ListadoFacturas({
   const [voidError, setVoidError] = useState<string | null>(null)
   const [caeLoadingId, setCaeLoadingId] = useState<number | null>(null)
   const [caeError, setCaeError] = useState<string | null>(null)
+  const [fcemLoadingId, setFcemLoadingId] = useState<number | null>(null)
+  const [fcemError, setFcemError] = useState<string | null>(null)
   const [cfdiCancelId, setCfdiCancelId] = useState<number | null>(null)
   const [cfdiCancelReason, setCfdiCancelReason] = useState<'01' | '02' | '03' | '04'>('02')
   const [cfdiCancelLoading, setCfdiCancelLoading] = useState(false)
@@ -221,6 +250,25 @@ export default function ListadoFacturas({
       setCaeError((err as Error).message || t('cae.retryError'))
     } finally {
       setCaeLoadingId(null)
+    }
+  }
+
+  const runFcemAction = async (
+    facturaId: number,
+    action: 'emitir' | 'aceptar' | 'rechazar' | 'aceptarTacita',
+  ) => {
+    setFcemLoadingId(facturaId)
+    setFcemError(null)
+    try {
+      if (action === 'emitir') await fcemAPI.emitir(facturaId)
+      else if (action === 'aceptar') await fcemAPI.aceptar(facturaId)
+      else if (action === 'rechazar') await fcemAPI.rechazar(facturaId)
+      else await fcemAPI.aceptarTacita(facturaId)
+      onFacturaUpdated?.()
+    } catch (err: unknown) {
+      setFcemError((err as Error).message || t('fcem.error'))
+    } finally {
+      setFcemLoadingId(null)
     }
   }
 
@@ -567,6 +615,61 @@ export default function ListadoFacturas({
                         <p className="text-green-800 dark:text-green-300 text-lg font-bold">${Number(factura.total).toFixed(2)}</p>
                       </div>
                     </div>
+
+                    <IfModule flag="billing.fcem_mipyme">
+                      <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('fcem.column')}>
+                        <FcemBadge estado={factura.fcemEstado} />
+                        {factura.fcemEstado == null && (
+                          <CanAccess permission="sales.create">
+                            <button
+                              type="button"
+                              data-testid={`btn-factura-fcem-emitir-${factura.id}`}
+                              disabled={fcemLoadingId === factura.id}
+                              onClick={() => void runFcemAction(factura.id, 'emitir')}
+                              className="px-3 py-2 text-sm bg-teal-100 hover:bg-teal-200 dark:bg-teal-900/40 text-teal-900 dark:text-teal-200 rounded transition disabled:opacity-50"
+                            >
+                              {fcemLoadingId === factura.id ? t('fcem.emitLoading') : t('fcem.emit')}
+                            </button>
+                          </CanAccess>
+                        )}
+                        {factura.fcemEstado === 'pendiente_aceptacion' && (
+                          <CanAccess permission="sales.create">
+                            <button
+                              type="button"
+                              data-testid={`btn-factura-fcem-aceptar-${factura.id}`}
+                              disabled={fcemLoadingId === factura.id}
+                              onClick={() => void runFcemAction(factura.id, 'aceptar')}
+                              className="px-3 py-2 text-sm bg-green-100 hover:bg-green-200 dark:bg-green-900/40 text-green-900 dark:text-green-200 rounded transition disabled:opacity-50"
+                            >
+                              {t('fcem.accept')}
+                            </button>
+                            <button
+                              type="button"
+                              data-testid={`btn-factura-fcem-rechazar-${factura.id}`}
+                              disabled={fcemLoadingId === factura.id}
+                              onClick={() => void runFcemAction(factura.id, 'rechazar')}
+                              className="px-3 py-2 text-sm bg-red-100 hover:bg-red-200 dark:bg-red-900/40 text-red-900 dark:text-red-200 rounded transition disabled:opacity-50"
+                            >
+                              {t('fcem.reject')}
+                            </button>
+                            <button
+                              type="button"
+                              data-testid={`btn-factura-fcem-tacita-${factura.id}`}
+                              disabled={fcemLoadingId === factura.id}
+                              onClick={() => void runFcemAction(factura.id, 'aceptarTacita')}
+                              className="px-3 py-2 text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded transition disabled:opacity-50"
+                            >
+                              {t('fcem.acceptTacita')}
+                            </button>
+                          </CanAccess>
+                        )}
+                      </div>
+                      {fcemError && fcemLoadingId === null && (
+                        <p className="text-sm text-red-600 dark:text-red-400" role="alert" data-testid="fcem-error">
+                          {fcemError}
+                        </p>
+                      )}
+                    </IfModule>
 
                     {(hasModule('billing.arca_cae') || useFiscalAuthorize) && (
                       <div className="flex flex-wrap gap-2" role="group" aria-label={t('cae.column')}>

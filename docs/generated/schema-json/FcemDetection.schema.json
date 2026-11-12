@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "fcemTipoCbte": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "required": {
+      "type": "boolean"
+    },
+    "umbralAplicado": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "required",
+    "reasons",
+    "umbralAplicado",
+    "fcemTipoCbte"
+  ],
+  "title": "FcemDetection",
+  "type": "object"
+}

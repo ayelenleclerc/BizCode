@@ -24,6 +24,7 @@ const TEST_DEFAULT_MODULES: ModuleKey[] = [
   'logistics.gps',
   'billing.credit_notes',
   'billing.arca_cae',
+  'billing.fcem_mipyme',
   'finance.ledger',
   'finance.retenciones',
   'fiscal.remito',

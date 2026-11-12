@@ -78,4 +78,4 @@ Integrity of **saldos/stock** is asserted in PostgreSQL integration tests — no
 |---|---|---|
 | Security before real data | [#194](https://github.com/ayelenleclerc/BizCode/issues/194) | Automated CI present; external report **empty** — see [pre-commercial-security-readiness.md](pre-commercial-security-readiness.md) |
 | SLA / DR operable | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) | Local drill #449 evidenced; staging drill + status page **pending** |
-| FCEM MiPyME (Ley 27440) | [#239](https://github.com/ayelenleclerc/BizCode/issues/239) | **Deferred** — pending business decision; no WSFECM code in repo; do not implement until explicit **sí** |
+| FCEM MiPyME (Ley 27440) | [#239](https://github.com/ayelenleclerc/BizCode/issues/239) | **In progress (MVP mock)** — local detection + mock WSFECM + accept/reject UI ([ADR-0028](../adr/ADR-0028-fcem-mipyme-mock.md)); live AFIP residual keeps #239 open |

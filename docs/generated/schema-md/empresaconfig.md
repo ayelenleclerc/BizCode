@@ -21,6 +21,8 @@ undefined#/properties/data
 | [condicionIva](#condicioniva)                     | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-condicioniva.md "undefined#/properties/condicionIva")                     |
 | [cuit](#cuit)                                     | `string`  | Required | cannot be null | [EmpresaConfig](empresaconfig-properties-cuit.md "undefined#/properties/cuit")                                     |
 | [domicilio](#domicilio)                           | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-domicilio.md "undefined#/properties/domicilio")                           |
+| [esMipyme](#esmipyme)                             | `boolean` | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-esmipyme.md "undefined#/properties/esMipyme")                             |
+| [fcemUmbralMonto](#fcemumbralmonto)               | `number`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-fcemumbralmonto.md "undefined#/properties/fcemUmbralMonto")               |
 | [fechaInicioActividades](#fechainicioactividades) | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-fechainicioactividades.md "undefined#/properties/fechaInicioActividades") |
 | [id](#id)                                         | `integer` | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-id.md "undefined#/properties/id")                                         |
 | [ingresosBrutos](#ingresosbrutos)                 | `string`  | Optional | cannot be null | [EmpresaConfig](empresaconfig-properties-ingresosbrutos.md "undefined#/properties/ingresosBrutos")                 |
@@ -106,6 +108,46 @@ Issuer VAT condition for legal invoice PDF header (#148).
 ### domicilio Constraints
 
 **maximum length**: the maximum number of characters for this string is: `40`
+
+## esMipyme
+
+MiPyME flag for local FCEM detection (#239). Live AFIP MiPyME catalog Not evidenced.
+
+`esMipyme`
+
+* is optional
+
+* Type: `boolean`
+
+* cannot be null
+
+* defined in: [EmpresaConfig](empresaconfig-properties-esmipyme.md "undefined#/properties/esMipyme")
+
+### esMipyme Type
+
+`boolean`
+
+## fcemUmbralMonto
+
+Optional FCEM amount threshold (ARS); null uses app default (#239).
+
+`fcemUmbralMonto`
+
+* is optional
+
+* Type: `number`
+
+* cannot be null
+
+* defined in: [EmpresaConfig](empresaconfig-properties-fcemumbralmonto.md "undefined#/properties/fcemUmbralMonto")
+
+### fcemUmbralMonto Type
+
+`number`
+
+### fcemUmbralMonto Constraints
+
+**minimum**: the value of this number must greater than or equal to: `0`
 
 ## fechaInicioActividades
 

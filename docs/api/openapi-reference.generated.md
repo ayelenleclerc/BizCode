@@ -43679,6 +43679,1839 @@ Requires `sales.create`.
 }
 ```
 
+### Evaluate FCEM MiPyME status for a factura (#239)
+
+- **Method:** `GET`
+- **Path:** `/api/fcem/facturas/{facturaId}`
+- **Tags:** afip
+
+Requires module `billing.fcem_mipyme` and `sales.create`. Returns local detection + acceptance state. Live WSFECM / AFIP ConsultaObligado Not evidenced.
+
+#### Responses
+
+##### Status: 200 FCEM status
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cae` (required)**
+
+    `string`
+
+  - **`caeVto` (required)**
+
+    `string`, format: `date-time`
+
+  - **`detection` (required)**
+
+    `object`
+
+    - **`fcemTipoCbte` (required)**
+
+      `integer`
+
+    - **`reasons` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`umbralAplicado` (required)**
+
+      `number`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fcemEmittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemEstado` (required)**
+
+    `object`
+
+  - **`fcemPlazoPagoDias` (required)**
+
+    `integer`
+
+  - **`fcemRejectReason` (required)**
+
+    `string`
+
+  - **`fcemResolvedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemTipoCbte` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturaId": 1,
+    "fcemEstado": "pendiente_aceptacion",
+    "fcemTipoCbte": 1,
+    "fcemPlazoPagoDias": 1,
+    "fcemRejectReason": "",
+    "fcemEmittedAt": "",
+    "fcemResolvedAt": "",
+    "cae": "",
+    "caeVto": "",
+    "detection": {
+      "required": true,
+      "reasons": [
+        ""
+      ],
+      "umbralAplicado": 1,
+      "fcemTipoCbte": 1
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Factura not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Emit FCEM via homologación mock WSFECM (#239)
+
+- **Method:** `POST`
+- **Path:** `/api/fcem/facturas/{facturaId}/emitir`
+- **Tags:** afip
+
+Requires module `billing.fcem_mipyme` and `sales.create`. Issues a synthetic CAE and sets `pendiente_aceptacion`. Live WSFECM Not evidenced.
+
+#### Responses
+
+##### Status: 200 FCEM emitted
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cae` (required)**
+
+    `string`
+
+  - **`caeVto` (required)**
+
+    `string`, format: `date-time`
+
+  - **`detection` (required)**
+
+    `object`
+
+    - **`fcemTipoCbte` (required)**
+
+      `integer`
+
+    - **`reasons` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`umbralAplicado` (required)**
+
+      `number`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fcemEmittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemEstado` (required)**
+
+    `object`
+
+  - **`fcemPlazoPagoDias` (required)**
+
+    `integer`
+
+  - **`fcemRejectReason` (required)**
+
+    `string`
+
+  - **`fcemResolvedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemTipoCbte` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturaId": 1,
+    "fcemEstado": "pendiente_aceptacion",
+    "fcemTipoCbte": 1,
+    "fcemPlazoPagoDias": 1,
+    "fcemRejectReason": "",
+    "fcemEmittedAt": "",
+    "fcemResolvedAt": "",
+    "cae": "",
+    "caeVto": "",
+    "detection": {
+      "required": true,
+      "reasons": [
+        ""
+      ],
+      "umbralAplicado": 1,
+      "fcemTipoCbte": 1
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Factura not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 Not required or already emitted/resolved
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Accept FCEM locally (receptor) (#239)
+
+- **Method:** `POST`
+- **Path:** `/api/fcem/facturas/{facturaId}/aceptar`
+- **Tags:** afip
+
+Requires module `billing.fcem_mipyme` and `sales.create`. Live AFIP acceptance Not evidenced.
+
+#### Responses
+
+##### Status: 200 Accepted
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cae` (required)**
+
+    `string`
+
+  - **`caeVto` (required)**
+
+    `string`, format: `date-time`
+
+  - **`detection` (required)**
+
+    `object`
+
+    - **`fcemTipoCbte` (required)**
+
+      `integer`
+
+    - **`reasons` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`umbralAplicado` (required)**
+
+      `number`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fcemEmittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemEstado` (required)**
+
+    `object`
+
+  - **`fcemPlazoPagoDias` (required)**
+
+    `integer`
+
+  - **`fcemRejectReason` (required)**
+
+    `string`
+
+  - **`fcemResolvedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemTipoCbte` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturaId": 1,
+    "fcemEstado": "pendiente_aceptacion",
+    "fcemTipoCbte": 1,
+    "fcemPlazoPagoDias": 1,
+    "fcemRejectReason": "",
+    "fcemEmittedAt": "",
+    "fcemResolvedAt": "",
+    "cae": "",
+    "caeVto": "",
+    "detection": {
+      "required": true,
+      "reasons": [
+        ""
+      ],
+      "umbralAplicado": 1,
+      "fcemTipoCbte": 1
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Factura not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 Not pending
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Reject FCEM locally (receptor) (#239)
+
+- **Method:** `POST`
+- **Path:** `/api/fcem/facturas/{facturaId}/rechazar`
+- **Tags:** afip
+
+Requires module `billing.fcem_mipyme` and `sales.create`. Live AFIP rejection Not evidenced.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`reason`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "reason": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Rejected
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cae` (required)**
+
+    `string`
+
+  - **`caeVto` (required)**
+
+    `string`, format: `date-time`
+
+  - **`detection` (required)**
+
+    `object`
+
+    - **`fcemTipoCbte` (required)**
+
+      `integer`
+
+    - **`reasons` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`umbralAplicado` (required)**
+
+      `number`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fcemEmittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemEstado` (required)**
+
+    `object`
+
+  - **`fcemPlazoPagoDias` (required)**
+
+    `integer`
+
+  - **`fcemRejectReason` (required)**
+
+    `string`
+
+  - **`fcemResolvedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemTipoCbte` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturaId": 1,
+    "fcemEstado": "pendiente_aceptacion",
+    "fcemTipoCbte": 1,
+    "fcemPlazoPagoDias": 1,
+    "fcemRejectReason": "",
+    "fcemEmittedAt": "",
+    "fcemResolvedAt": "",
+    "cae": "",
+    "caeVto": "",
+    "detection": {
+      "required": true,
+      "reasons": [
+        ""
+      ],
+      "umbralAplicado": 1,
+      "fcemTipoCbte": 1
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Factura not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 Not pending
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Simulate tacit FCEM acceptance locally (#239)
+
+- **Method:** `POST`
+- **Path:** `/api/fcem/facturas/{facturaId}/aceptar-tacita`
+- **Tags:** afip
+
+Requires module `billing.fcem_mipyme` and `sales.create`. Local test helper only — no calendar job / live AFIP tacit window Not evidenced.
+
+#### Responses
+
+##### Status: 200 Tacit acceptance recorded
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cae` (required)**
+
+    `string`
+
+  - **`caeVto` (required)**
+
+    `string`, format: `date-time`
+
+  - **`detection` (required)**
+
+    `object`
+
+    - **`fcemTipoCbte` (required)**
+
+      `integer`
+
+    - **`reasons` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`umbralAplicado` (required)**
+
+      `number`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fcemEmittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemEstado` (required)**
+
+    `object`
+
+  - **`fcemPlazoPagoDias` (required)**
+
+    `integer`
+
+  - **`fcemRejectReason` (required)**
+
+    `string`
+
+  - **`fcemResolvedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemTipoCbte` (required)**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturaId": 1,
+    "fcemEstado": "pendiente_aceptacion",
+    "fcemTipoCbte": 1,
+    "fcemPlazoPagoDias": 1,
+    "fcemRejectReason": "",
+    "fcemEmittedAt": "",
+    "fcemResolvedAt": "",
+    "cae": "",
+    "caeVto": "",
+    "detection": {
+      "required": true,
+      "reasons": [
+        ""
+      ],
+      "umbralAplicado": 1,
+      "fcemTipoCbte": 1
+    }
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Factura not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 Not pending
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
 ### Multi-organism fiscal provider status per tenant (#378)
 
 - **Method:** `GET`
@@ -119044,6 +120877,14 @@ Partial update of seller alert policies (#256/#265). Requires `settings.business
 
     `string`
 
+  - **`esMipyme`**
+
+    `boolean` — MiPyME flag for local FCEM detection (#239). Live AFIP MiPyME catalog Not evidenced.
+
+  - **`fcemUmbralMonto`**
+
+    `number` — Optional FCEM amount threshold (ARS); null uses app default (#239).
+
   - **`fechaInicioActividades`**
 
     `string`, format: `date` — Activity start date (YYYY-MM-DD).
@@ -119100,7 +120941,9 @@ Partial update of seller alert policies (#256/#265). Requires `settings.business
     "recordatorioHoraFin": 1,
     "condicionIva": "RI",
     "ingresosBrutos": "",
-    "fechaInicioActividades": ""
+    "fechaInicioActividades": "",
+    "esMipyme": true,
+    "fcemUmbralMonto": 0
   }
 }
 ```
@@ -119245,6 +121088,14 @@ Partial update of seller alert policies (#256/#265). Requires `settings.business
 
   `string`
 
+- **`esMipyme`**
+
+  `boolean` — MiPyME flag for local FCEM detection (#239).
+
+- **`fcemUmbralMonto`**
+
+  `number` — Optional FCEM amount threshold (ARS); null uses app default (#239).
+
 - **`fechaInicioActividades`**
 
   `string`, format: `date`
@@ -119289,7 +121140,9 @@ Partial update of seller alert policies (#256/#265). Requires `settings.business
   "recordatorioHoraFin": 1,
   "condicionIva": "RI",
   "ingresosBrutos": "",
-  "fechaInicioActividades": ""
+  "fechaInicioActividades": "",
+  "esMipyme": true,
+  "fcemUmbralMonto": 0
 }
 ```
 
@@ -119330,6 +121183,14 @@ Partial update of seller alert policies (#256/#265). Requires `settings.business
   - **`domicilio`**
 
     `string`
+
+  - **`esMipyme`**
+
+    `boolean` — MiPyME flag for local FCEM detection (#239). Live AFIP MiPyME catalog Not evidenced.
+
+  - **`fcemUmbralMonto`**
+
+    `number` — Optional FCEM amount threshold (ARS); null uses app default (#239).
 
   - **`fechaInicioActividades`**
 
@@ -119387,7 +121248,9 @@ Partial update of seller alert policies (#256/#265). Requires `settings.business
     "recordatorioHoraFin": 1,
     "condicionIva": "RI",
     "ingresosBrutos": "",
-    "fechaInicioActividades": ""
+    "fechaInicioActividades": "",
+    "esMipyme": true,
+    "fcemUmbralMonto": 0
   }
 }
 ```
@@ -196772,6 +198635,236 @@ Originating invoice header (selected columns)
 }
 ```
 
+### FcemEstado
+
+- **Type:**
+
+**Example:**
+
+### FcemDetection
+
+- **Type:**`object`
+
+* **`fcemTipoCbte` (required)**
+
+  `integer`
+
+* **`reasons` (required)**
+
+  `array`
+
+  **Items:**
+
+  `string`
+
+* **`required` (required)**
+
+  `boolean`
+
+* **`umbralAplicado` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "required": true,
+  "reasons": [
+    ""
+  ],
+  "umbralAplicado": 1,
+  "fcemTipoCbte": 1
+}
+```
+
+### FcemStatus
+
+- **Type:**`object`
+
+* **`cae` (required)**
+
+  `string`
+
+* **`caeVto` (required)**
+
+  `string`, format: `date-time`
+
+* **`detection` (required)**
+
+  `object`
+
+  - **`fcemTipoCbte` (required)**
+
+    `integer`
+
+  - **`reasons` (required)**
+
+    `array`
+
+    **Items:**
+
+    `string`
+
+  - **`required` (required)**
+
+    `boolean`
+
+  - **`umbralAplicado` (required)**
+
+    `number`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`fcemEmittedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`fcemEstado` (required)**
+
+  `object`
+
+* **`fcemPlazoPagoDias` (required)**
+
+  `integer`
+
+* **`fcemRejectReason` (required)**
+
+  `string`
+
+* **`fcemResolvedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`fcemTipoCbte` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "facturaId": 1,
+  "fcemEstado": "pendiente_aceptacion",
+  "fcemTipoCbte": 1,
+  "fcemPlazoPagoDias": 1,
+  "fcemRejectReason": "",
+  "fcemEmittedAt": "",
+  "fcemResolvedAt": "",
+  "cae": "",
+  "caeVto": "",
+  "detection": {
+    "required": true,
+    "reasons": [
+      ""
+    ],
+    "umbralAplicado": 1,
+    "fcemTipoCbte": 1
+  }
+}
+```
+
+### FcemStatusEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cae` (required)**
+
+    `string`
+
+  - **`caeVto` (required)**
+
+    `string`, format: `date-time`
+
+  - **`detection` (required)**
+
+    `object`
+
+    - **`fcemTipoCbte` (required)**
+
+      `integer`
+
+    - **`reasons` (required)**
+
+      `array`
+
+      **Items:**
+
+      `string`
+
+    - **`required` (required)**
+
+      `boolean`
+
+    - **`umbralAplicado` (required)**
+
+      `number`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fcemEmittedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemEstado` (required)**
+
+    `object`
+
+  - **`fcemPlazoPagoDias` (required)**
+
+    `integer`
+
+  - **`fcemRejectReason` (required)**
+
+    `string`
+
+  - **`fcemResolvedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`fcemTipoCbte` (required)**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "facturaId": 1,
+    "fcemEstado": "pendiente_aceptacion",
+    "fcemTipoCbte": 1,
+    "fcemPlazoPagoDias": 1,
+    "fcemRejectReason": "",
+    "fcemEmittedAt": "",
+    "fcemResolvedAt": "",
+    "cae": "",
+    "caeVto": "",
+    "detection": {
+      "required": true,
+      "reasons": [
+        ""
+      ],
+      "umbralAplicado": 1,
+      "fcemTipoCbte": 1
+    }
+  }
+}
+```
+
 ### FiscalProviderCode
 
 - **Type:**`string`
@@ -211671,6 +213764,14 @@ Sales breakdown by operation currency (#206).
 
   `string`
 
+* **`esMipyme`**
+
+  `boolean` — MiPyME flag for local FCEM detection (#239). Live AFIP MiPyME catalog Not evidenced.
+
+* **`fcemUmbralMonto`**
+
+  `number` — Optional FCEM amount threshold (ARS); null uses app default (#239).
+
 * **`fechaInicioActividades`**
 
   `string`, format: `date` — Activity start date (YYYY-MM-DD).
@@ -211721,7 +213822,9 @@ Sales breakdown by operation currency (#206).
   "recordatorioHoraFin": 1,
   "condicionIva": "RI",
   "ingresosBrutos": "",
-  "fechaInicioActividades": ""
+  "fechaInicioActividades": "",
+  "esMipyme": true,
+  "fcemUmbralMonto": 0
 }
 ```
 
@@ -211752,6 +213855,14 @@ Sales breakdown by operation currency (#206).
 * **`domicilio`**
 
   `string`
+
+* **`esMipyme`**
+
+  `boolean` — MiPyME flag for local FCEM detection (#239).
+
+* **`fcemUmbralMonto`**
+
+  `number` — Optional FCEM amount threshold (ARS); null uses app default (#239).
 
 * **`fechaInicioActividades`**
 
@@ -211797,7 +213908,9 @@ Sales breakdown by operation currency (#206).
   "recordatorioHoraFin": 1,
   "condicionIva": "RI",
   "ingresosBrutos": "",
-  "fechaInicioActividades": ""
+  "fechaInicioActividades": "",
+  "esMipyme": true,
+  "fcemUmbralMonto": 0
 }
 ```
 
@@ -211836,6 +213949,14 @@ Sales breakdown by operation currency (#206).
   - **`domicilio`**
 
     `string`
+
+  - **`esMipyme`**
+
+    `boolean` — MiPyME flag for local FCEM detection (#239). Live AFIP MiPyME catalog Not evidenced.
+
+  - **`fcemUmbralMonto`**
+
+    `number` — Optional FCEM amount threshold (ARS); null uses app default (#239).
 
   - **`fechaInicioActividades`**
 
@@ -211893,7 +214014,9 @@ Sales breakdown by operation currency (#206).
     "recordatorioHoraFin": 1,
     "condicionIva": "RI",
     "ingresosBrutos": "",
-    "fechaInicioActividades": ""
+    "fechaInicioActividades": "",
+    "esMipyme": true,
+    "fcemUmbralMonto": 0
   }
 }
 ```

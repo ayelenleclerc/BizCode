@@ -24,6 +24,8 @@ export type EmpresaConfigDto = {
   condicionIva: 'RI' | 'Mono' | 'CF' | 'Exento'
   ingresosBrutos: string | null
   fechaInicioActividades: string | null
+  esMipyme: boolean
+  fcemUmbralMonto: number | null
 }
 
 /**
@@ -54,6 +56,8 @@ function rowToDto(row: ParamEmpresa): EmpresaConfigDto {
     fechaInicioActividades: row.fechaInicioActividades
       ? row.fechaInicioActividades.toISOString().slice(0, 10)
       : null,
+    esMipyme: row.esMipyme,
+    fcemUmbralMonto: row.fcemUmbralMonto == null ? null : Number(row.fcemUmbralMonto.toString()),
   }
 }
 
@@ -95,6 +99,8 @@ export class EmpresaService {
       condicionIva: 'RI',
       ingresosBrutos: null,
       fechaInicioActividades: null,
+      esMipyme: false,
+      fcemUmbralMonto: null,
       ...defaultReminderFields,
     }
   }
@@ -125,12 +131,19 @@ export class EmpresaService {
             ? null
             : input.ingresosBrutos.trim(),
       fechaInicioActividades: fechaInicio,
+      esMipyme: input.esMipyme ?? false,
     }
+
+    const fcemUmbralMonto =
+      input.fcemUmbralMonto === undefined ? null : input.fcemUmbralMonto
 
     const row = await this.prisma.paramEmpresa.upsert({
       where: { tenantId },
-      create: { tenantId, ...data },
-      update: data,
+      create: { tenantId, ...data, fcemUmbralMonto },
+      update: {
+        ...data,
+        ...(input.fcemUmbralMonto !== undefined ? { fcemUmbralMonto: input.fcemUmbralMonto } : {}),
+      },
     })
 
     return rowToDto(row)

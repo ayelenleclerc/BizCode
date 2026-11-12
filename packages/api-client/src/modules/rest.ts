@@ -2032,6 +2032,92 @@ export const arcaAPI = {
 }
 
 /**
+ * @en FCEM MiPyME client (#239). Live WSFECM Not evidenced — homologación mock only.
+ * @es Cliente FCEM MiPyME (#239). WSFECM live no evidenciado — solo mock de homologación.
+ * @pt-BR Cliente FCEM MiPyME (#239). WSFECM live não evidenciado — apenas mock de homologação.
+ */
+export type FcemStatusDto = {
+  facturaId: number
+  fcemEstado:
+    | 'pendiente_aceptacion'
+    | 'aceptada'
+    | 'rechazada_por_receptor'
+    | 'aceptada_tacita'
+    | null
+  fcemTipoCbte: number | null
+  fcemPlazoPagoDias: number | null
+  fcemRejectReason: string | null
+  fcemEmittedAt: string | null
+  fcemResolvedAt: string | null
+  cae: string | null
+  caeVto: string | null
+  detection: {
+    required: boolean
+    reasons: string[]
+    umbralAplicado: number
+    fcemTipoCbte: number | null
+  }
+}
+
+export const fcemAPI = {
+  getStatus: async (facturaId: number): Promise<FcemStatusDto> => {
+    try {
+      const response = await api.get<{ success: boolean; data: FcemStatusDto }>(
+        `/fcem/facturas/${facturaId}`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  emitir: async (facturaId: number): Promise<FcemStatusDto> => {
+    try {
+      const response = await api.post<{ success: boolean; data: FcemStatusDto }>(
+        `/fcem/facturas/${facturaId}/emitir`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  aceptar: async (facturaId: number): Promise<FcemStatusDto> => {
+    try {
+      const response = await api.post<{ success: boolean; data: FcemStatusDto }>(
+        `/fcem/facturas/${facturaId}/aceptar`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  rechazar: async (facturaId: number, reason?: string): Promise<FcemStatusDto> => {
+    try {
+      const response = await api.post<{ success: boolean; data: FcemStatusDto }>(
+        `/fcem/facturas/${facturaId}/rechazar`,
+        reason ? { reason } : {},
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+
+  aceptarTacita: async (facturaId: number): Promise<FcemStatusDto> => {
+    try {
+      const response = await api.post<{ success: boolean; data: FcemStatusDto }>(
+        `/fcem/facturas/${facturaId}/aceptar-tacita`,
+      )
+      return response.data.data
+    } catch (error) {
+      return handleError(error as AxiosError<ApiErrorPayload>)
+    }
+  },
+}
+
+/**
  * @en Multi-organism fiscal e-invoicing types (#378, ADR-0018). Homologación mocks include
  *   `arca_wsfe`, `uruguay_dgi`, `chile_sii`, `mexico_sat_pac`, `brazil_sefaz_nfe`.
  * @es Tipos de facturación electrónica multi-organismo (#378, ADR-0018). Los mocks de homologación
@@ -3876,21 +3962,7 @@ export const empresaAPI = {
       return handleError(error as AxiosError<ApiErrorPayload>)
     }
   },
-  update: async (body: {
-    nombre: string
-    cuit: string
-    domicilio?: string | null
-    puntoVenta: number
-    tipoFactura: string
-    logoUrl?: string | null
-    recordatorioDiasGracia?: number
-    timezone?: string
-    recordatorioHoraInicio?: number
-    recordatorioHoraFin?: number
-    condicionIva?: string
-    ingresosBrutos?: string | null
-    fechaInicioActividades?: string | null
-  }) => {
+  update: async (body: import('@bizcode/types').EmpresaInput) => {
     try {
       const response = await api.put<{ success: boolean; data: import('@bizcode/types').EmpresaConfig }>('/empresa', body)
       return response.data.data
