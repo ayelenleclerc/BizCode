@@ -321,4 +321,25 @@ describe('Pedidos API', () => {
     const res = await request(app).post('/api/pedidos/1/pack')
     expect(res.status).toBe(403)
   })
+
+  it('returns 403 on ship without orders.dispatch (#450)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).post('/api/pedidos/1/ship')
+    expect(res.status).toBe(403)
+  })
+
+  it('returns 403 on deliver without orders.deliver.confirm (#450)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'logistics_planner'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).post('/api/pedidos/1/deliver')
+    expect(res.status).toBe(403)
+  })
+
+  it('returns 403 on collect without sales.create or reports.financial.read (#450)', async () => {
+    process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
+    const app = createApp(buildPrismaMock())
+    const res = await request(app).post('/api/pedidos/1/collect')
+    expect(res.status).toBe(403)
+  })
 })
