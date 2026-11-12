@@ -10,9 +10,10 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **RBAC HTTP logística de pedidos (#450 residual):** `tests/api/pedidos.test.ts` afirma 403 em `ship` (`warehouse_op` / sem `orders.dispatch`), `deliver` (`logistics_planner` / sem `orders.deliver.confirm`) e `collect` (`warehouse_op` / sem perms de cobrança); pack 403 já coberto.
 - **Transições API mock FCEM (#239 residual):** `tests/api/fcem.test.ts` cobre `POST .../aceptar`, `.../rechazar`, `.../aceptar-tacita` (asserts OpenAPI) e `422 FCEM_NOT_PENDING`; contrato mock ADR-0028. AFIP / WSFECM live permanecem Not evidenced — #239 permanece OPEN.
 - **Anulação de fatura restaura estoque (#450 GAP-P1-stock-void):** `FacturaService.void` espelha create — `applyStockDepositoDelta(+qty)` ou incremento de `Articulo.stock`; omite restore se `Pedido.origen` for meli/tiendanube/woocommerce; OpenAPI + ADR-0012; matriz piloto EN/ES/PT marca Coberto.
-- **Cobertura HTTP logística de pedidos (#450 GAP-P1-pedido-http):** `tests/api/pedidos.test.ts` cobre `POST .../pack|ship|deliver|collect` (asserts OpenAPI), 409 por transição ilegal e RBAC em pack; matriz piloto EN/ES/PT marca a linha Coberto e remove GAP-P1-pedido-http.
+- **Cobertura HTTP logística de pedidos (#450 GAP-P1-pedido-http):** `tests/api/pedidos.test.ts` cobre `POST .../pack|ship|deliver|collect` (asserts OpenAPI), 409 por transição ilegal e RBAC 403 em pack/ship/deliver/collect; matriz piloto EN/ES/PT marca a linha Coberto e remove GAP-P1-pedido-http.
 - **Refresh de evidência do piloto (#450):** registro de execução EN/ES/PT alinhado; revalidação das suites API `pedidos` / `facturas-void` / `fcem` em `docs/450-evidence-refresh` — #194/#197/#239 permanecem OPEN.
 - **Preparação drill staging SLA/DR (#197 residual):** matriz/readiness EN/ES/PT; `pnpm run dr:staging:check` fail-closed; registro de monitor vazio — #197 permanece OPEN.
 - **Página de status pública (#197 residual):** UI first-party `/status` lê `GET /api/health` (ok/degraded/unavailable); [uptime-monitor-register.md](../evidence/uptime-monitor-register.md) vazio; SLA/DR EN/ES/PT atualizados. 99.9% permanece aspiracional; drill staging pendente — #197 permanece OPEN.

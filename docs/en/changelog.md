@@ -10,9 +10,10 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Pedido logistics RBAC HTTP (#450 residual):** `tests/api/pedidos.test.ts` asserts 403 on `ship` (`warehouse_op` / no `orders.dispatch`), `deliver` (`logistics_planner` / no `orders.deliver.confirm`), and `collect` (`warehouse_op` / no cobro perms); pack 403 already covered.
 - **FCEM mock API transitions (#239 residual):** `tests/api/fcem.test.ts` covers `POST .../aceptar`, `.../rechazar`, `.../aceptar-tacita` (OpenAPI asserts) and `422 FCEM_NOT_PENDING`; ADR-0028 mock contract. Live AFIP / WSFECM remain Not evidenced — #239 stays open.
 - **Invoice void restores stock (#450 GAP-P1-stock-void):** `FacturaService.void` mirrors create — `applyStockDepositoDelta(+qty)` or `Articulo.stock` increment; skips restore when linked `Pedido.origen` is meli/tiendanube/woocommerce; OpenAPI + ADR-0012 updated; pilot matrix EN/ES/PT marks the row Covered.
-- **Pedido HTTP logistics coverage (#450 GAP-P1-pedido-http):** `tests/api/pedidos.test.ts` covers `POST .../pack|ship|deliver|collect` (OpenAPI asserts), illegal transition 409, and RBAC on pack; pilot matrix EN/ES/PT marks the row Covered and drops GAP-P1-pedido-http.
+- **Pedido HTTP logistics coverage (#450 GAP-P1-pedido-http):** `tests/api/pedidos.test.ts` covers `POST .../pack|ship|deliver|collect` (OpenAPI asserts), illegal transition 409, and RBAC 403 on pack/ship/deliver/collect; pilot matrix EN/ES/PT marks the row Covered and drops GAP-P1-pedido-http.
 - **Pilot evidence refresh (#450):** execution register EN/ES/PT aligned; revalidated `pedidos` / `facturas-void` / `fcem` API suites on `docs/450-evidence-refresh` — #194/#197/#239 remain OPEN.
 - **SLA/DR staging readiness (#197 residual):** pilot matrix + readiness EN/ES/PT reconcile `/status` as in-repo evidence and FCEM MVP in `develop`; `pnpm run dr:staging:check` fail-closed without `STAGING_DEPLOY_*`; empty [uptime-monitor-register.md](../evidence/uptime-monitor-register.md) unchanged — #197 stays open.
 - **Public status page (#197 residual):** first-party `/status` UI reads `GET /api/health` (ok/degraded/unavailable); empty [uptime-monitor-register.md](../evidence/uptime-monitor-register.md); SLA/DR EN/ES/PT updated. 99.9% uptime remains aspirational; staging DR drill still pending — #197 stays open.
