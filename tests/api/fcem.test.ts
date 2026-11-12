@@ -116,4 +116,142 @@ describe('FCEM API (#239)', () => {
     const res = await request(app).post('/api/fcem/facturas/9/emitir').expect(422)
     expect(res.body.error).toBe('FCEM_NOT_REQUIRED')
   })
+
+  it('POST aceptar resolves pendiente_aceptacion to aceptada', async () => {
+    const pendiente = {
+      id: 9,
+      total: FCEM_DEFAULT_UMBRAL_ARS,
+      tipo: 'A',
+      estadoCae: 'issued',
+      cae: '12345678901234',
+      caeVto: new Date('2026-12-01T00:00:00.000Z'),
+      fcemEstado: 'pendiente_aceptacion',
+      fcemTipoCbte: 201,
+      fcemPlazoPagoDias: 45,
+      fcemRejectReason: null,
+      fcemEmittedAt: new Date('2026-11-12T12:00:00.000Z'),
+      fcemResolvedAt: null,
+      cliente: { condIva: 'RI', creditDays: 45 },
+    }
+    const app = createApp(
+      buildPrismaMock({
+        factura: {
+          findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(pendiente),
+          update: vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({
+            ...pendiente,
+            ...data,
+          })),
+        },
+      }),
+    )
+    const res = await request(app).post('/api/fcem/facturas/9/aceptar').expect(200)
+    expect(res.body.data.fcemEstado).toBe('aceptada')
+    await assertMatchesOpenApi('/api/fcem/facturas/{facturaId}/aceptar', 'post', '200', res.body)
+  })
+
+  it('POST rechazar resolves pendiente_aceptacion to rechazada_por_receptor', async () => {
+    const pendiente = {
+      id: 9,
+      total: FCEM_DEFAULT_UMBRAL_ARS,
+      tipo: 'A',
+      estadoCae: 'issued',
+      cae: '12345678901234',
+      caeVto: new Date('2026-12-01T00:00:00.000Z'),
+      fcemEstado: 'pendiente_aceptacion',
+      fcemTipoCbte: 201,
+      fcemPlazoPagoDias: 45,
+      fcemRejectReason: null,
+      fcemEmittedAt: new Date('2026-11-12T12:00:00.000Z'),
+      fcemResolvedAt: null,
+      cliente: { condIva: 'RI', creditDays: 45 },
+    }
+    const app = createApp(
+      buildPrismaMock({
+        factura: {
+          findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(pendiente),
+          update: vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({
+            ...pendiente,
+            ...data,
+          })),
+        },
+      }),
+    )
+    const res = await request(app)
+      .post('/api/fcem/facturas/9/rechazar')
+      .send({ reason: 'Discrepancia en montos' })
+      .expect(200)
+    expect(res.body.data.fcemEstado).toBe('rechazada_por_receptor')
+    expect(res.body.data.fcemRejectReason).toBe('Discrepancia en montos')
+    await assertMatchesOpenApi('/api/fcem/facturas/{facturaId}/rechazar', 'post', '200', res.body)
+  })
+
+  it('POST aceptar-tacita resolves pendiente_aceptacion to aceptada_tacita', async () => {
+    const pendiente = {
+      id: 9,
+      total: FCEM_DEFAULT_UMBRAL_ARS,
+      tipo: 'A',
+      estadoCae: 'issued',
+      cae: '12345678901234',
+      caeVto: new Date('2026-12-01T00:00:00.000Z'),
+      fcemEstado: 'pendiente_aceptacion',
+      fcemTipoCbte: 201,
+      fcemPlazoPagoDias: 45,
+      fcemRejectReason: null,
+      fcemEmittedAt: new Date('2026-11-12T12:00:00.000Z'),
+      fcemResolvedAt: null,
+      cliente: { condIva: 'RI', creditDays: 45 },
+    }
+    const app = createApp(
+      buildPrismaMock({
+        factura: {
+          findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(pendiente),
+          update: vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({
+            ...pendiente,
+            ...data,
+          })),
+        },
+      }),
+    )
+    const res = await request(app).post('/api/fcem/facturas/9/aceptar-tacita').expect(200)
+    expect(res.body.data.fcemEstado).toBe('aceptada_tacita')
+    await assertMatchesOpenApi(
+      '/api/fcem/facturas/{facturaId}/aceptar-tacita',
+      'post',
+      '200',
+      res.body,
+    )
+  })
+
+  it('POST aceptar returns 422 when FCEM is not pendiente_aceptacion', async () => {
+    const alreadyAccepted = {
+      id: 9,
+      total: FCEM_DEFAULT_UMBRAL_ARS,
+      tipo: 'A',
+      estadoCae: 'issued',
+      cae: '12345678901234',
+      caeVto: new Date('2026-12-01T00:00:00.000Z'),
+      fcemEstado: 'aceptada',
+      fcemTipoCbte: 201,
+      fcemPlazoPagoDias: 45,
+      fcemRejectReason: null,
+      fcemEmittedAt: new Date('2026-11-12T12:00:00.000Z'),
+      fcemResolvedAt: new Date('2026-11-13T12:00:00.000Z'),
+      cliente: { condIva: 'RI', creditDays: 45 },
+    }
+    const app = createApp(
+      buildPrismaMock({
+        factura: {
+          findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(alreadyAccepted),
+          update: vi.fn(),
+        },
+      }),
+    )
+    const res = await request(app).post('/api/fcem/facturas/9/aceptar').expect(422)
+    expect(res.body.error).toBe('FCEM_NOT_PENDING')
+    await assertMatchesOpenApi('/api/fcem/facturas/{facturaId}/aceptar', 'post', '422', res.body)
+  })
 })

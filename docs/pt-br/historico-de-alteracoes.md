@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Transições API mock FCEM (#239 residual):** `tests/api/fcem.test.ts` cobre `POST .../aceptar`, `.../rechazar`, `.../aceptar-tacita` (asserts OpenAPI) e `422 FCEM_NOT_PENDING`; contrato mock ADR-0028. AFIP / WSFECM live permanecem Not evidenced — #239 permanece OPEN.
 - **Anulação de fatura restaura estoque (#450 GAP-P1-stock-void):** `FacturaService.void` espelha create — `applyStockDepositoDelta(+qty)` ou incremento de `Articulo.stock`; omite restore se `Pedido.origen` for meli/tiendanube/woocommerce; OpenAPI + ADR-0012; matriz piloto EN/ES/PT marca Coberto.
 - **Cobertura HTTP logística de pedidos (#450 GAP-P1-pedido-http):** `tests/api/pedidos.test.ts` cobre `POST .../pack|ship|deliver|collect` (asserts OpenAPI), 409 por transição ilegal e RBAC em pack; matriz piloto EN/ES/PT marca a linha Coberto e remove GAP-P1-pedido-http. Residual P1: GAP-P1-stock-void.
 - **Preparação drill staging SLA/DR (#197 residual):** matriz/readiness EN/ES/PT; `pnpm run dr:staging:check` fail-closed; registro de monitor vazio — #197 permanece OPEN.
