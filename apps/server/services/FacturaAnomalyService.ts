@@ -147,6 +147,7 @@ export class FacturaAnomalyService {
     const dayEnd = new Date(fecha)
     dayEnd.setHours(23, 59, 59, 999)
 
+    const configDelegate = this.prisma.configAnomaliaFactura
     const [cliente, priorCount, priorRows, duplicate, config] = await Promise.all([
       this.prisma.cliente.findFirst({
         where: { id: input.clienteId, tenantId: input.tenantId },
@@ -171,7 +172,14 @@ export class FacturaAnomalyService {
         },
         select: { id: true },
       }),
-      this.prisma.configAnomaliaFactura.findUnique({ where: { tenantId: input.tenantId } }),
+      /**
+       * @en Missing delegate (partial Prisma mocks) → MVP defaults.
+       * @es Sin delegate (mocks parciales de Prisma) → defaults MVP.
+       * @pt-BR Sem delegate (mocks parciais de Prisma) → defaults MVP.
+       */
+      configDelegate
+        ? configDelegate.findUnique({ where: { tenantId: input.tenantId } })
+        : Promise.resolve(null),
     ])
 
     const creditLimit =
