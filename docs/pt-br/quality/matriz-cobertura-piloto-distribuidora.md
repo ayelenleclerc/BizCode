@@ -70,4 +70,4 @@ A integridade de **saldos/estoque** é afirmada em integração PostgreSQL — n
 |---|---|---|
 | Segurança antes de dados reais | [#194](https://github.com/ayelenleclerc/BizCode/issues/194) | CI automatizado presente; relatório externo **vazio** — ver [prontidao-seguranca-precomercial.md](prontidao-seguranca-precomercial.md) |
 | SLA / DR operável | [#197](https://github.com/ayelenleclerc/BizCode/issues/197) | Drill local #449 evidenciado; `/status` first-party **no repositório**; residual = monitor externo live + drill staging (`pnpm run dr:staging:check` fail-closed sem `STAGING_DEPLOY_*`) |
-| FCEM MiPyME (Lei 27440) | [#239](https://github.com/ayelenleclerc/BizCode/issues/239) | **MVP mock em `develop`** ([ADR-0028](../adr/ADR-0028-fcem-mipyme-mock.md), PR #468); residual AFIP live mantém #239 aberta |
+| FCEM MiPyME (Lei 27440) | [#239](https://github.com/ayelenleclerc/BizCode/issues/239) | **MVP mock em `develop`** ([ADR-0028](../adr/ADR-0028-fcem-mipyme-mock.md), PR #468); API emit/aceitar/rejeitar/tácita em `tests/api/fcem.test.ts`; residual AFIP live mantém #239 aberta |
