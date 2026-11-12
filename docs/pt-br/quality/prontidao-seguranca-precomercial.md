@@ -13,7 +13,7 @@ Este documento **não** contrata vendor, não inventa achados nem fecha #194. O 
 | Inventário CI vs AC da issue | Contratar opções A/B/C |
 | Gaps explícitos (token Snyk, registro vazio; status da triagem ZAP) | Relatório externo simulado |
 | Go/no-go para uso de **dados reais** | Fechar #194 ou afirmar pronto comercial |
-| Links para testes de penetração + matriz piloto | Implementar FCEM / status page / DR staging |
+| Links para testes de penetração + matriz piloto | FCEM MVP mock em `develop` (residual live); `/status` no repo; DR staging + monitor externo pendentes |
 
 ## Critérios de aceitação vs evidência no repositório
 

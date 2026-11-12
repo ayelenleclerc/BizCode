@@ -27,7 +27,7 @@ BizCode provides multi-tenant business software (API + web UI) as configured for
 | Claim | Status |
 |-------|--------|
 | Local `backup:postgres:drill` + SEC-015 row | **Evidenced** (#449) |
-| Staging / remote DR drill | **Not evidenced** — keeps #197 open |
+| Staging / remote DR drill | **Not evidenced** — keeps #197 open; precondition `pnpm run dr:staging:check` fail-closed without `STAGING_DEPLOY_*` |
 | First-party status page (`/status`) | **Evidenced in repo** (`apps/web/src/pages/status/`) — not a live contractual monitor |
 | External uptime monitor + deployed status URL | **Not evidenced** — 99.9% uptime remains **aspirational**; register empty |
 | Emergency contacts filled | **Template only** in [disaster-recovery.md](disaster-recovery.md) |

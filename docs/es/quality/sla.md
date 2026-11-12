@@ -27,7 +27,7 @@ Software multi-tenant BizCode (API + UI web) según suscripción. Quedan fuera f
 | Afirmación | Estado |
 |------------|--------|
 | Drill local `backup:postgres:drill` + fila SEC-015 | **Evidenciado** (#449) |
-| Drill DR staging / remoto | **No evidenciado** — #197 sigue abierto |
+| Drill DR staging / remoto | **No evidenciado** — #197 sigue abierto; precondición `pnpm run dr:staging:check` fail-closed sin `STAGING_DEPLOY_*` |
 | Status page first-party (`/status`) | **Evidenciado en repo** (`apps/web/src/pages/status/`) — no es monitor contractual live |
 | Monitor externo + URL de status desplegada | **No evidenciado** — 99.9% sigue **aspiracional**; registro vacío |
 | Contactos de emergencia completos | Solo plantilla en [recuperacion-ante-desastres.md](recuperacion-ante-desastres.md) |

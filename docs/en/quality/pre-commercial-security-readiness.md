@@ -13,7 +13,7 @@ This document does **not** hire a vendor, invent findings, or close #194. An emp
 | Inventory CI controls vs issue AC | Contracting Option A/B/C vendors |
 | Explicit gaps (Snyk token, empty register; ZAP triage status) | Simulated external report / fake findings |
 | Go/no-go for **real data** use | Closing #194 or claiming commercial launch ready |
-| Cross-links to penetration-testing + pilot matrix | FCEM MVP mock shipped (live residual); status page partial; staging DR pending |
+| Cross-links to penetration-testing + pilot matrix | FCEM MVP mock in `develop` (live residual); `/status` in repo; staging DR + external monitor pending |
 
 ## Acceptance criteria vs repo evidence
 

@@ -4,6 +4,14 @@
 
 **Evidence status:** Empty — no external monitor archived yet.
 
+## How operators complete this register
+
+1. Deploy or confirm a reachable `GET https://<host>/api/health` (and preferably `https://<host>/status`).
+2. Create an external monitor (e.g. UptimeRobot / Better Stack) against the health URL; note interval and alert contacts.
+3. Replace the pending placeholders in the summary table below with real values (no fictional hosts).
+4. Append a dated row under **Entries**.
+5. Re-run staging DR when `STAGING_DEPLOY_*` exist (`pnpm run dr:staging:check`); keep [#197](https://github.com/ayelenleclerc/BizCode/issues/197) open until both this register and a timed staging drill are evidenced.
+
 | Field | Value |
 |-------|--------|
 | Monitor vendor | _(pending — e.g. UptimeRobot, Better Stack)_ |
@@ -26,3 +34,4 @@
 - [SLA](../en/quality/sla.md)
 - [Disaster recovery](../en/quality/disaster-recovery.md)
 - First-party UI: `apps/web/src/pages/status/`
+- Staging drill precondition: `pnpm run dr:staging:check`

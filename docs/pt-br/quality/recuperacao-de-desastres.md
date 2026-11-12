@@ -84,16 +84,18 @@ Scripts #150. **Sem** failover de réplica documentado.
 | Item | Evidência | Fecha o AC #197? |
 |------|-----------|----------------|
 | Drill de integridade local (`pnpm run backup:postgres:drill`) | Linha SEC-015 2026-11-07; [backup-e-restauracao.md](backup-e-restauracao.md) | **Não** |
-| Drill DR staging / remoto | Host pendente (`STAGING_DEPLOY_*`) | **Obrigatório** — aberto |
-| Status page first-party (`/status`) | No repo (`apps/web/src/pages/status/`) | **Parcial** — UI evidenciada; URL live + monitor externo pendentes |
+| Drill DR staging / remoto | Host pendente (`STAGING_DEPLOY_*`); pré-condição `pnpm run dr:staging:check` | **Obrigatório** — aberto |
+| Status page first-party (`/status`) | No repo (`apps/web/src/pages/status/`) | **Evidenciado no repo** — URL pública implantada + monitor externo pendentes |
 | Monitor externo de uptime | [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md) | **Obrigatório** — registro vazio |
 | Contatos de emergência | Modelo | **Não** — preencher ops |
 
 ## Drill semestral staging — AC pendente
 
+**Pré-condição:** `pnpm run dr:staging:check` só sai 0 quando `STAGING_DEPLOY_HOST`, `STAGING_DEPLOY_USER`, `STAGING_DEPLOY_SSH_KEY` e `STAGING_DEPLOY_PATH` estão definidos (mesmo fail-closed do staging.yml). Sem elas sai ≠0 e imprime o checklist — **não** afirma drill concluído.
+
 Checklist cronometrado (não marcar completo sem evidência de relógio de parede):
 
-1. Confirmar host staging com `STAGING_DEPLOY_*` ([entornos-implantacao.md](entornos-implantacao.md)).
+1. Confirmar host staging com `STAGING_DEPLOY_*` ([entornos-implantacao.md](entornos-implantacao.md)); executar `pnpm run dr:staging:check`.
 2. Registrar hora de início (UTC); snapshot/backup.
 3. Simular falha (parar app/DB só no staging).
 4. Restaurar do backup; redesploy; verificar `/api/health` e `/status`.
@@ -101,7 +103,7 @@ Checklist cronometrado (não marcar completo sem evidência de relógio de pared
 6. Acrescentar linha SEC-015 com RTO medido.
 7. **#197 permanece OPEN** até este drill **e** uma entrada live em [uptime-monitor-register.md](../../evidence/uptime-monitor-register.md).
 
-Smoke Docker local / drill #449 em SEC-015 **não** fecha esse AC.
+Smoke Docker local / drill #449 em SEC-015 **não** fecha esse AC. [`docker-compose.staging.yml`](../../../docker-compose.staging.yml) é **prática local** — **não** é o AC staging remoto.
 
 ## Relacionado
 
@@ -122,3 +124,4 @@ Smoke Docker local / drill #449 em SEC-015 **não** fecha esse AC.
 | 0.1 | 2026-08-25 | BizCode | Runbooks DR iniciais #197 |
 | 0.2 | 2026-11-08 | BizCode | Gaps explícitos #449 vs staging/status para #197 |
 | 0.3 | 2026-11-11 | BizCode | `/status` first-party + checklist drill staging cronometrado; registro de monitor vazio |
+| 0.4 | 2026-11-12 | BizCode | `dr:staging:check` fail-closed; `/status` evidenciado no repo; compose.staging = prática local |
