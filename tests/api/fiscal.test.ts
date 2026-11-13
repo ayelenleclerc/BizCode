@@ -129,6 +129,7 @@ describe('Fiscal multi-organism API (#378)', () => {
 
     expect(res.body.success).toBe(false)
     expect(res.body.error).toBe('RUT_REQUIRED')
+    await assertMatchesOpenApi('/api/fiscal/providers/config', 'put', '400', res.body)
   })
 
   it('PUT /api/fiscal/providers/config upserts chile_sii mock RUT', async () => {
@@ -166,13 +167,15 @@ describe('Fiscal multi-organism API (#378)', () => {
 
   it('POST /api/fiscal/documents/:facturaId/authorize rejects an invalid facturaId', async () => {
     const app = createApp(buildPrismaMock())
-    await request(app).post('/api/fiscal/documents/not-a-number/authorize').expect(400)
+    const res = await request(app).post('/api/fiscal/documents/not-a-number/authorize').expect(400)
+    await assertMatchesOpenApi('/api/fiscal/documents/{facturaId}/authorize', 'post', '400', res.body)
   })
 
   it('requires settings.fiscal.manage permission for provider config endpoints', async () => {
     process.env.BIZCODE_TEST_ROLE = 'driver'
     const app = createApp(buildPrismaMock())
-    await request(app).get('/api/fiscal/providers/config').expect(403)
+    const res = await request(app).get('/api/fiscal/providers/config').expect(403)
+    await assertMatchesOpenApi('/api/fiscal/providers/config', 'get', '403', res.body)
     process.env.BIZCODE_TEST_ROLE = 'owner'
   })
 })
