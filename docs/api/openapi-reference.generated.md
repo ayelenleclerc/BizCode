@@ -40991,6 +40991,273 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 }
 ```
 
+### PARAMETERS /api/anomalias
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/anomalias`
+
+### List detected billing anomalies (#200 residual)
+
+- **Method:** `GET`
+- **Path:** `/api/anomalias`
+- **Tags:** anomalias
+
+Requires `audit.read`. Tenant-scoped rows from `AnomaliaDetectada`.
+
+#### Responses
+
+##### Status: 200 Paginated anomaly list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`confirmada` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`severidad` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`detalle`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+- **`limit` (required)**
+
+  `integer`
+
+- **`offset` (required)**
+
+  `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "tipo": "",
+      "severidad": "",
+      "facturaId": 1,
+      "clienteId": 1,
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      },
+      "confirmada": true,
+      "createdAt": ""
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
 ### PARAMETERS /api/anomalias/config
 
 - **Method:** `PARAMETERS`
@@ -206021,6 +206288,162 @@ Originating invoice header (selected columns)
 ```json
 {
   "diasAlertaVencimiento": 1
+}
+```
+
+### AnomaliaDetectada
+
+- **Type:**`object`
+
+* **`confirmada` (required)**
+
+  `boolean`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`severidad` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipo` (required)**
+
+  `string`
+
+* **`clienteId`**
+
+  `integer`
+
+* **`detalle`**
+
+  `object`
+
+* **`facturaId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "tipo": "",
+  "severidad": "",
+  "facturaId": 1,
+  "clienteId": 1,
+  "descripcion": "",
+  "detalle": {
+    "additionalProperty": "anything"
+  },
+  "confirmada": true,
+  "createdAt": ""
+}
+```
+
+### AnomaliaDetectadaListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`confirmada` (required)**
+
+    `boolean`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`severidad` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipo` (required)**
+
+    `string`
+
+  - **`clienteId`**
+
+    `integer`
+
+  - **`detalle`**
+
+    `object`
+
+  - **`facturaId`**
+
+    `integer`
+
+* **`limit` (required)**
+
+  `integer`
+
+* **`offset` (required)**
+
+  `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+* **`total` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "tipo": "",
+      "severidad": "",
+      "facturaId": 1,
+      "clienteId": 1,
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      },
+      "confirmada": true,
+      "createdAt": ""
+    }
+  ],
+  "total": 1,
+  "limit": 1,
+  "offset": 1
 }
 ```
 

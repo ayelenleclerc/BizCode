@@ -1,5 +1,7 @@
 import type { AxiosError, AxiosInstance } from 'axios'
 import type {
+  AnomaliaDetectadaListFilters,
+  AnomaliaDetectadaRow,
   ApiErrorPayload,
   ConfigAnomaliaFacturaRow,
   ConfigAnomaliaFacturaUpsertInput,
@@ -7,13 +9,40 @@ import type {
 import { api } from '../default-client'
 import { handleError } from '../errors'
 
+export type AnomaliaDetectadaListResult = {
+  data: AnomaliaDetectadaRow[]
+  total: number
+  limit: number
+  offset: number
+}
+
 /**
- * @en Billing anomaly threshold config client (#200 residual).
- * @es Cliente de umbrales de anomalía de facturación (#200 residual).
- * @pt-BR Cliente de limiares de anomalia de faturamento (#200 residual).
+ * @en Billing anomaly config + list client (#200).
+ * @es Cliente de config + listado de anomalías de facturación (#200).
+ * @pt-BR Cliente de config + listagem de anomalias de faturamento (#200).
  */
 export function createAnomaliasAPI(http: AxiosInstance) {
   return {
+    list: async (params?: AnomaliaDetectadaListFilters): Promise<AnomaliaDetectadaListResult> => {
+      try {
+        const response = await http.get<{
+          success: boolean
+          data: AnomaliaDetectadaRow[]
+          total: number
+          limit: number
+          offset: number
+        }>('/anomalias', { params })
+        return {
+          data: response.data.data,
+          total: response.data.total,
+          limit: response.data.limit,
+          offset: response.data.offset,
+        }
+      } catch (error) {
+        return handleError(error as AxiosError<ApiErrorPayload>)
+      }
+    },
+
     getConfig: async (): Promise<ConfigAnomaliaFacturaRow> => {
       try {
         const response = await http.get<{ success: boolean; data: ConfigAnomaliaFacturaRow }>(

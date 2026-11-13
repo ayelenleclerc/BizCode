@@ -49,6 +49,7 @@
     "billing": "SaaS subscription",
     "seguridad": "Security",
     "auditLog": "Audit log",
+    "anomalias": "Billing anomalies",
     "superadmin": "SuperAdmin"
   },
   "language": {

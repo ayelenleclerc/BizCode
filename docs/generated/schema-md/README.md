@@ -16,6 +16,10 @@
 
 * [AlertaProveedorConfigInput](./alertaproveedorconfiginput.md) – `-`
 
+* [AnomaliaDetectada](./anomaliadetectada.md) – `-`
+
+* [AnomaliaDetectadaListEnvelope](./anomaliadetectadalistenvelope.md) – `-`
+
 * [ApiErrorEnvelope](./apierrorenvelope.md) – `-`
 
 * [ApiSuccessConfiguredEnvelope](./apisuccessconfiguredenvelope.md) – `-`
@@ -1574,6 +1578,8 @@
 
 ### Objects
 
+* [Untitled object in AnomaliaDetectada](./anomaliadetectada-properties-detalle.md) – `undefined#/properties/detalle`
+
 * [Untitled object in ApiSuccessConfiguredEnvelope](./apisuccessconfiguredenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled object in ArcaCaeEnvelope](./arcacaeenvelope-properties-data.md) – `undefined#/properties/data`
@@ -1953,6 +1959,8 @@
 ### Arrays
 
 * [Untitled array in AgingAr](./agingar-properties-buckets.md) – `undefined#/properties/buckets`
+
+* [Untitled array in AnomaliaDetectadaListEnvelope](./anomaliadetectadalistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in ApiErrorEnvelope](./apierrorenvelope-properties-warnings.md "Optional structured warnings (e") – `undefined#/properties/warnings`
 

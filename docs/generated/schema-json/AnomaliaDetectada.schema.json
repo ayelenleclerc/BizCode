@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "confirmada": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "detalle": {
+      "additionalProperties": true,
+      "nullable": true,
+      "type": "object"
+    },
+    "facturaId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "severidad": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipo": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "tipo",
+    "severidad",
+    "descripcion",
+    "confirmada",
+    "createdAt"
+  ],
+  "title": "AnomaliaDetectada",
+  "type": "object"
+}

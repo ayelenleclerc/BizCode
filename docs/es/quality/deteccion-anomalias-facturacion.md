@@ -13,10 +13,11 @@
 | Math | [`facturaAnomalyMath.ts`](../../../apps/server/services/facturaAnomalyMath.ts) |
 | Servicio | [`FacturaAnomalyService.ts`](../../../apps/server/services/FacturaAnomalyService.ts) desde `FacturaService.create` |
 | Umbrales por tenant | Prisma `ConfigAnomaliaFactura`; `GET/PUT /api/anomalias/config` (`settings.business.manage`); sección en Empresa |
+| Listado API / panel Admin | `GET /api/anomalias` (`audit.read`); página Admin `/admin/anomalias` |
 | REST | `POST /api/facturas` — body opcional `confirmAnomalies`; respuesta puede incluir `warnings[]`; `422 DUPLICATE_INVOICE_CONFIRM_REQUIRED` |
-| UI | Banner en `NuevaFacturaForm` + confirmar/cancelar duplicado; umbrales en configuración Empresa |
-| Auditoría | `factura_anomaly_detected` (además de `factura_create`); `anomalia_config_update`; visible en Audit Log de Admin |
-| Fixture AC | Tests en `tests/server/facturaAnomalyMath.test.ts`, `tests/api/factura-anomaly.test.ts`, `tests/api/anomalia-config.test.ts` |
+| UI | Banner en `NuevaFacturaForm` + confirmar/cancelar duplicado; umbrales en Empresa; listado Admin de anomalías |
+| Auditoría | `factura_anomaly_detected` (además de `factura_create`); `anomalia_config_update`; también en Audit Log |
+| Fixture AC | Tests en `tests/server/facturaAnomalyMath.test.ts`, `tests/api/factura-anomaly.test.ts`, `tests/api/anomalia-config.test.ts`, `tests/api/anomalia-list.test.ts` |
 
 ## Reglas (Fase 1)
 
@@ -29,17 +30,17 @@
 
 - `sales.create` en `POST /api/facturas`.
 - `settings.business.manage` en `GET/PUT /api/anomalias/config`.
+- `audit.read` en `GET /api/anomalias` y panel Admin de anomalías.
 
 ## Fuera de alcance / residual
 
 - Isolation Forest / ML Fase 2
 - Pico de ventas por vendedor (sin `vendedorId` en `Factura`)
 - Cobro fuera de horario comercial enforceable
-- Panel dedicado (usar Audit Log + `AnomaliaDetectada`)
 - FP &lt;5% en flota real
-- Gates de aprobación de manager
+- Gates de aprobación de manager para disposición de anomalías
 
 ## Relacionado
 
-- OpenAPI: `confirmAnomalies`, `warnings`, `FacturaAnomalyWarning`, `ConfigAnomaliaFactura*`
+- OpenAPI: `confirmAnomalies`, `warnings`, `FacturaAnomalyWarning`, `ConfigAnomaliaFactura*`, `AnomaliaDetectada*`
 - Defaults en `facturaAnomalyMath.ts`; overrides por tenant vía `ConfigAnomaliaFactura`

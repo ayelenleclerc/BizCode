@@ -1,0 +1,38 @@
+{
+  "title": "Billing anomalies",
+  "description": "Detected invoice anomalies for your organization (#200).",
+  "forbidden": "You do not have permission to view billing anomalies.",
+  "filters": {
+    "tipo": "Type",
+    "tipoPlaceholder": "e.g. descuento_excesivo",
+    "confirmada": "Confirmed",
+    "confirmadaAny": "Any",
+    "confirmadaYes": "Yes",
+    "confirmadaNo": "No",
+    "clienteId": "Customer ID",
+    "facturaId": "Invoice ID",
+    "apply": "Apply filters",
+    "clear": "Clear"
+  },
+  "table": {
+    "caption": "Detected anomalies",
+    "createdAt": "When",
+    "tipo": "Type",
+    "severidad": "Severity",
+    "clienteId": "Customer",
+    "facturaId": "Invoice",
+    "confirmada": "Confirmed",
+    "descripcion": "Description",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "empty": "No anomalies match the current filters.",
+  "error": "Could not load anomalies.",
+  "loading": "Loading anomalies…",
+  "refresh": "Refresh",
+  "pagination": {
+    "summary": "Showing {{from}}–{{to}} of {{total}}",
+    "prev": "Previous page",
+    "next": "Next page"
+  }
+}
