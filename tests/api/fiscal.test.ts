@@ -1,13 +1,13 @@
 /**
- * @en Multi-organism fiscal e-invoicing API tests (#378/#210/#207/#208): provider config,
+ * @en Multi-organism fiscal e-invoicing API tests (#378/#210/#207/#208/#211): provider config,
  *   capabilities, validation, and document authorization. Homologación mocks: `arca_wsfe`,
- *   `mexico_sat_pac`, `uruguay_dgi`, `chile_sii`. Live AFIP/DGI/SII/PAC remain Not evidenced.
- * @es Tests API de facturación electrónica multi-organismo (#378/#210/#207/#208): config,
+ *   `mexico_sat_pac`, `uruguay_dgi`, `chile_sii`, `brazil_sefaz_nfe`. Live AFIP/DGI/SII/PAC/SEFAZ remain Not evidenced.
+ * @es Tests API de facturación electrónica multi-organismo (#378/#210/#207/#208/#211): config,
  *   capacidades, validación y autorización. Mocks de homologación: `arca_wsfe`, `mexico_sat_pac`,
- *   `uruguay_dgi`, `chile_sii`. AFIP/DGI/SII/PAC live siguen sin evidenciarse.
- * @pt-BR Testes da API fiscal multi-organismo (#378/#210/#207/#208): config, capacidades,
+ *   `uruguay_dgi`, `chile_sii`, `brazil_sefaz_nfe`. AFIP/DGI/SII/PAC/SEFAZ live siguen sin evidenciarse.
+ * @pt-BR Testes da API fiscal multi-organismo (#378/#210/#207/#208/#211): config, capacidades,
  *   validação e autorização. Mocks de homologação: `arca_wsfe`, `mexico_sat_pac`, `uruguay_dgi`,
- *   `chile_sii`. AFIP/DGI/SII/PAC live permanecem não evidenciados.
+ *   `chile_sii`, `brazil_sefaz_nfe`. AFIP/DGI/SII/PAC/SEFAZ live permanecem não evidenciados.
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -74,7 +74,7 @@ describe('Fiscal multi-organism API (#378)', () => {
     process.env.BIZCODE_TEST_ROLE = 'owner'
   })
 
-  it('GET /api/fiscal/providers/capabilities lists all four providers as implemented mocks', async () => {
+  it('GET /api/fiscal/providers/capabilities lists all five providers as implemented mocks', async () => {
     const app = createApp(buildPrismaMock())
     const res = await request(app).get('/api/fiscal/providers/capabilities').expect(200)
 
@@ -86,6 +86,7 @@ describe('Fiscal multi-organism API (#378)', () => {
     expect(byProvider.get('uruguay_dgi')?.implemented).toBe(true)
     expect(byProvider.get('mexico_sat_pac')?.implemented).toBe(true)
     expect(byProvider.get('chile_sii')?.implemented).toBe(true)
+    expect(byProvider.get('brazil_sefaz_nfe')?.implemented).toBe(true)
     await assertMatchesOpenApi('/api/fiscal/providers/capabilities', 'get', '200', res.body)
   })
 
