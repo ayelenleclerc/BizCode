@@ -13,10 +13,11 @@ Does **not** claim Isolation Forest, a Python microservice, or measured false-po
 | Math | [`facturaAnomalyMath.ts`](../../../apps/server/services/facturaAnomalyMath.ts) |
 | Service | [`FacturaAnomalyService.ts`](../../../apps/server/services/FacturaAnomalyService.ts) hooked from `FacturaService.create` |
 | Tenant thresholds | Prisma `ConfigAnomaliaFactura`; `GET/PUT /api/anomalias/config` (`settings.business.manage`); Empresa UI section |
+| List API / Admin panel | `GET /api/anomalias` (`audit.read`); Admin page `/admin/anomalias` |
 | REST | `POST /api/facturas` — optional body `confirmAnomalies`; response may include `warnings[]`; `422 DUPLICATE_INVOICE_CONFIRM_REQUIRED` |
-| UI | `NuevaFacturaForm` banner + confirm/cancel for duplicates; thresholds on Empresa settings |
-| Audit | `factura_anomaly_detected` (plus existing `factura_create`); `anomalia_config_update`; rows visible in Admin Audit Log |
-| AC fixture | Unit tests in `tests/server/facturaAnomalyMath.test.ts`; API tests in `tests/api/factura-anomaly.test.ts`, `tests/api/anomalia-config.test.ts` |
+| UI | `NuevaFacturaForm` banner + confirm/cancel for duplicates; thresholds on Empresa settings; Admin anomalies list |
+| Audit | `factura_anomaly_detected` (plus existing `factura_create`); `anomalia_config_update`; rows also in Admin Audit Log |
+| AC fixture | Unit tests in `tests/server/facturaAnomalyMath.test.ts`; API tests in `tests/api/factura-anomaly.test.ts`, `tests/api/anomalia-config.test.ts`, `tests/api/anomalia-list.test.ts` |
 
 ## Rules (Fase 1)
 
@@ -28,17 +29,18 @@ Does **not** claim Isolation Forest, a Python microservice, or measured false-po
 ## Permissions
 
 - Unchanged: `sales.create` on `POST /api/facturas`.
+- `settings.business.manage` on `GET/PUT /api/anomalias/config`.
+- `audit.read` on `GET /api/anomalias` and Admin anomalies panel.
 
 ## Out of scope / residual
 
 - Isolation Forest / ML Fase 2
 - Peak sales by seller (`Factura` has no `vendedorId`)
 - Collection outside business hours (no enforceable commercial-hours policy for cobros)
-- Dedicated anomaly panel (use Audit Log + `AnomaliaDetectada`)
 - FP &lt;5% measured on real production fleet
-- Isolation Forest / manager approval gates
+- Manager approval gates for anomaly disposition
 
 ## Related
 
-- OpenAPI: `FacturaInput.confirmAnomalies`, `FacturaEnvelope.warnings`, `FacturaAnomalyWarning`, `FacturaDuplicateConfirmErrorEnvelope`, `ConfigAnomaliaFactura*`
+- OpenAPI: `FacturaInput.confirmAnomalies`, `FacturaEnvelope.warnings`, `FacturaAnomalyWarning`, `FacturaDuplicateConfirmErrorEnvelope`, `ConfigAnomaliaFactura*`, `AnomaliaDetectada*`
 - Defaults in `facturaAnomalyMath.ts`; per-tenant overrides via `ConfigAnomaliaFactura`

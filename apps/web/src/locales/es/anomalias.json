@@ -1,0 +1,38 @@
+{
+  "title": "Anomalías de facturación",
+  "description": "Anomalías de factura detectadas en tu organización (#200).",
+  "forbidden": "No tenés permiso para ver anomalías de facturación.",
+  "filters": {
+    "tipo": "Tipo",
+    "tipoPlaceholder": "p. ej. descuento_excesivo",
+    "confirmada": "Confirmada",
+    "confirmadaAny": "Cualquiera",
+    "confirmadaYes": "Sí",
+    "confirmadaNo": "No",
+    "clienteId": "ID cliente",
+    "facturaId": "ID factura",
+    "apply": "Aplicar filtros",
+    "clear": "Limpiar"
+  },
+  "table": {
+    "caption": "Anomalías detectadas",
+    "createdAt": "Cuándo",
+    "tipo": "Tipo",
+    "severidad": "Severidad",
+    "clienteId": "Cliente",
+    "facturaId": "Factura",
+    "confirmada": "Confirmada",
+    "descripcion": "Descripción",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "empty": "No hay anomalías con los filtros actuales.",
+  "error": "No se pudieron cargar las anomalías.",
+  "loading": "Cargando anomalías…",
+  "refresh": "Actualizar",
+  "pagination": {
+    "summary": "Mostrando {{from}}–{{to}} de {{total}}",
+    "prev": "Página anterior",
+    "next": "Página siguiente"
+  }
+}

@@ -5,7 +5,12 @@
  */
 
 import type { Prisma, PrismaClient } from '@prisma/client'
-import type { ConfigAnomaliaFacturaRow, ConfigAnomaliaFacturaUpsertInput } from '@bizcode/types'
+import type {
+  AnomaliaDetectadaListFilters,
+  AnomaliaDetectadaRow,
+  ConfigAnomaliaFacturaRow,
+  ConfigAnomaliaFacturaUpsertInput,
+} from '@bizcode/types'
 import { facturaFechaToPrismaDate } from '../routes/restDomainShared'
 import type { ServiceResult } from './serviceResults'
 import {
@@ -225,4 +230,52 @@ export class FacturaAnomalyService {
     }))
     await this.prisma.anomaliaDetectada.createMany({ data })
   }
+
+  /**
+   * @en List persisted anomalies for the tenant (panel / audit UI).
+   * @es Lista anomalías persistidas del tenant (panel / UI auditoría).
+   * @pt-BR Lista anomalias persistidas do tenant (painel / UI auditoria).
+   */
+  async list(
+    tenantId: number,
+    filters: AnomaliaDetectadaListFilters,
+    take: number,
+    skip: number,
+  ): Promise<{ rows: AnomaliaDetectadaRow[]; total: number }> {
+    const where: Prisma.AnomaliaDetectadaWhereInput = {
+      tenantId,
+      ...(filters.tipo ? { tipo: filters.tipo } : {}),
+      ...(filters.confirmada != null ? { confirmada: filters.confirmada } : {}),
+      ...(filters.clienteId != null ? { clienteId: filters.clienteId } : {}),
+      ...(filters.facturaId != null ? { facturaId: filters.facturaId } : {}),
+    }
+    const [total, rows] = await Promise.all([
+      this.prisma.anomaliaDetectada.count({ where }),
+      this.prisma.anomaliaDetectada.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take,
+        skip,
+      }),
+    ])
+    return {
+      total,
+      rows: rows.map((r) => ({
+        id: r.id,
+        tenantId: r.tenantId,
+        tipo: r.tipo,
+        severidad: r.severidad,
+        facturaId: r.facturaId,
+        clienteId: r.clienteId,
+        descripcion: r.descripcion,
+        detalle:
+          r.detalle != null && typeof r.detalle === 'object' && !Array.isArray(r.detalle)
+            ? (r.detalle as Record<string, unknown>)
+            : null,
+        confirmada: r.confirmada,
+        createdAt: r.createdAt.toISOString(),
+      })),
+    }
+  }
+
 }

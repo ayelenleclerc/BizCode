@@ -266,6 +266,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     roles: ['owner', 'manager', 'finance', 'auditor'],
     moduleKey: 'admin.audit_log',
   },
+  {
+    key: 'anomalias',
+    path: '/admin/anomalias',
+    icon: '⚠️',
+    roles: ['owner', 'manager', 'finance', 'auditor'],
+    moduleKey: 'admin.audit_log',
+  },
   { key: 'chat', path: '/chat', icon: '💬', roles: null, moduleKey: 'comms.chat' },
   {
     key: 'configuracion',
@@ -315,6 +322,7 @@ export const ROUTE_MODULE_GUARDS: ReadonlyArray<{ path: string; moduleKey: Modul
   { path: 'finanzas/contracargos-mp', moduleKey: 'finance.collections' },
   { path: 'finanzas/conciliacion-bancaria', moduleKey: 'finance.bank_reconcile' },
   { path: 'admin/audit-log', moduleKey: 'admin.audit_log' },
+  { path: 'admin/anomalias', moduleKey: 'admin.audit_log' },
   { path: 'compras', moduleKey: 'logistics.purchases' },
   { path: 'catalogo/reposicion', moduleKey: 'logistics.purchases' },
   { path: 'recuentos', moduleKey: 'inventory.count' },

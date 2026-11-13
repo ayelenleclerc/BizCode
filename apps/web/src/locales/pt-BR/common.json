@@ -49,6 +49,7 @@
     "billing": "Assinatura SaaS",
     "seguridad": "Segurança",
     "auditLog": "Registro de auditoria",
+    "anomalias": "Anomalias de faturamento",
     "superadmin": "SuperAdmin"
   },
   "language": {

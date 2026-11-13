@@ -16,6 +16,7 @@ import recuentosEs from '@/locales/es/recuentos.json'
 import repartosEs from '@/locales/es/repartos.json'
 import podEs from '@/locales/es/pod.json'
 import auditEs from '@/locales/es/audit.json'
+import anomaliasEs from '@/locales/es/anomalias.json'
 import cobrosEs from '@/locales/es/cobros.json'
 import pedidosEs from '@/locales/es/pedidos.json'
 import contratosEs from '@/locales/es/contratos.json'
@@ -62,6 +63,7 @@ import recuentosEn from '@/locales/en/recuentos.json'
 import repartosEn from '@/locales/en/repartos.json'
 import podEn from '@/locales/en/pod.json'
 import auditEn from '@/locales/en/audit.json'
+import anomaliasEn from '@/locales/en/anomalias.json'
 import cobrosEn from '@/locales/en/cobros.json'
 import pedidosEn from '@/locales/en/pedidos.json'
 import contratosEn from '@/locales/en/contratos.json'
@@ -108,6 +110,7 @@ import recuentosPt from '@/locales/pt-BR/recuentos.json'
 import repartosPt from '@/locales/pt-BR/repartos.json'
 import podPt from '@/locales/pt-BR/pod.json'
 import auditPt from '@/locales/pt-BR/audit.json'
+import anomaliasPt from '@/locales/pt-BR/anomalias.json'
 import cobrosPt from '@/locales/pt-BR/cobros.json'
 import pedidosPt from '@/locales/pt-BR/pedidos.json'
 import contratosPt from '@/locales/pt-BR/contratos.json'
@@ -152,7 +155,7 @@ i18n
     lng: savedLang,
     fallbackLng: 'es',
     defaultNS: 'common',
-    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'reposicion', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'fidelizacion', 'lotes', 'farmacia', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones', 'tiposCambio', 'formulasProduccion', 'ordenesProduccion', 'privacidad', 'status', 'saas', 'visitas'],
+    ns: ['common', 'clientes', 'articulos', 'proveedores', 'compras', 'reposicion', 'recuentos', 'repartos', 'pod', 'picking', 'seguimiento', 'logisticaReportes', 'facturacion', 'pedidos', 'contratos', 'ordenesTrabajo', 'garantias', 'fidelizacion', 'lotes', 'farmacia', 'caja', 'cobros', 'finanzas', 'reportes', 'dashboardAnalytics', 'logistica', 'zonasEntrega', 'empresa', 'portal', 'chat', 'audit', 'anomalias', 'listasPrecios', 'categoriasArticulo', 'variantes', 'depositos', 'transferenciasDeposito', 'comisiones', 'importaciones', 'tiposCambio', 'formulasProduccion', 'ordenesProduccion', 'privacidad', 'status', 'saas', 'visitas'],
     resources: {
       es: {
         common: commonEs,
@@ -176,6 +179,7 @@ i18n
         zonasEntrega: zonasEntregaEs,
         chat: chatEs,
         audit: auditEs,
+        anomalias: anomaliasEs,
         cobros: cobrosEs,
         finanzas: finanzasEs,
         reportes: reportesEs,
@@ -223,6 +227,7 @@ i18n
         zonasEntrega: zonasEntregaEn,
         chat: chatEn,
         audit: auditEn,
+        anomalias: anomaliasEn,
         cobros: cobrosEn,
         finanzas: finanzasEn,
         reportes: reportesEn,
@@ -270,6 +275,7 @@ i18n
         zonasEntrega: zonasEntregaPt,
         chat: chatPt,
         audit: auditPt,
+        anomalias: anomaliasPt,
         cobros: cobrosPt,
         finanzas: finanzasPt,
         reportes: reportesPt,

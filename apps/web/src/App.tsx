@@ -64,6 +64,7 @@ import PortalMisDatosPage from './pages/portal/PortalMisDatosPage'
 import PortalFidelizacionPage from './pages/portal/PortalFidelizacionPage'
 import ChatPage from './pages/chat'
 import AuditLogPage from './pages/admin/audit-log'
+import AnomaliasPage from './pages/admin/anomalias'
 import SuperAdminRoute from './components/SuperAdminRoute'
 import SuperadminHomePage from './pages/superadmin'
 import TenantDetailPage from './pages/superadmin/TenantDetailPage'
@@ -471,6 +472,14 @@ function AppRoutes() {
             element={
               <ModuleRoute moduleKey="admin.audit_log">
                 <AuditLogPage />
+              </ModuleRoute>
+            }
+          />
+          <Route
+            path="admin/anomalias"
+            element={
+              <ModuleRoute moduleKey="admin.audit_log">
+                <AnomaliasPage />
               </ModuleRoute>
             }
           />

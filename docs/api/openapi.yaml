@@ -4194,6 +4194,48 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/anomalias:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [anomalias]
+      summary: List detected billing anomalies (#200 residual)
+      description: Requires `audit.read`. Tenant-scoped rows from `AnomaliaDetectada`.
+      parameters:
+        - $ref: '#/components/parameters/ListLimit'
+        - $ref: '#/components/parameters/ListOffset'
+        - name: tipo
+          in: query
+          schema:
+            type: string
+        - name: confirmada
+          in: query
+          schema:
+            type: boolean
+        - name: clienteId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: facturaId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Paginated anomaly list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnomaliaDetectadaListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /api/anomalias/config:
     parameters:
       - $ref: '#/components/parameters/BizcodeChannelHeader'
@@ -27377,6 +27419,55 @@ components:
           type: integer
           minimum: 1
           maximum: 365
+
+    AnomaliaDetectada:
+      type: object
+      required:
+        [id, tenantId, tipo, severidad, descripcion, confirmada, createdAt]
+      properties:
+        id:
+          type: integer
+        tenantId:
+          type: integer
+        tipo:
+          type: string
+        severidad:
+          type: string
+        facturaId:
+          type: integer
+          nullable: true
+        clienteId:
+          type: integer
+          nullable: true
+        descripcion:
+          type: string
+        detalle:
+          type: object
+          additionalProperties: true
+          nullable: true
+        confirmada:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    AnomaliaDetectadaListEnvelope:
+      type: object
+      required: [success, data, total, limit, offset]
+      properties:
+        success:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnomaliaDetectada'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
 
     ConfigAnomaliaFactura:
       type: object
