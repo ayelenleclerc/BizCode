@@ -17,7 +17,7 @@
 | REST | `POST /api/facturas` — body opcional `confirmAnomalies`; respuesta puede incluir `warnings[]`; `422 DUPLICATE_INVOICE_CONFIRM_REQUIRED` |
 | UI | Banner en `NuevaFacturaForm` + confirmar/cancelar duplicado; umbrales en Empresa; listado Admin de anomalías |
 | Auditoría | `factura_anomaly_detected` (además de `factura_create`); `anomalia_config_update`; también en Audit Log |
-| Fixture AC | Tests en `tests/server/facturaAnomalyMath.test.ts`, `tests/api/factura-anomaly.test.ts`, `tests/api/anomalia-config.test.ts`, `tests/api/anomalia-list.test.ts` |
+| Fixture AC | Tests en `tests/server/facturaAnomalyMath.test.ts`, `tests/api/factura-anomaly.test.ts` (incl. OpenAPI Ajv para `POST /api/facturas` 422/200+warnings), `tests/api/anomalia-config.test.ts`, `tests/api/anomalia-list.test.ts` |
 
 ## Reglas (Fase 1)
 

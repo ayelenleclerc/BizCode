@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Asserts OpenAPI de anomalias na fatura (#200 residual):** `tests/api/factura-anomaly.test.ts` valida `POST /api/facturas` 422 (`DUPLICATE_INVOICE_CONFIRM_REQUIRED`) e 200 com `warnings[]` via Ajv vs OpenAPI (ADR-0003); #200 permanece OPEN (ML / FP / gates manager).
 - **Asserts OpenAPI de anomalias (#200 residual):** `tests/api/anomalia-list.test.ts` + `anomalia-config.test.ts` validam `/api/anomalias` e `/api/anomalias/config` com Ajv vs OpenAPI (ADR-0003); #200 permanece OPEN (ML / FP / gates manager).
 - **Notificação a owners ao rejeitar FCEM (#239 residual):** `POST /api/fcem/facturas/:id/rechazar` notifica owners in-app (`fcem_rejected`); #239 permanece OPEN (AFIP live / catálogo / ConsultaObligado).
 - **Painel de listagem de anomalias de faturamento (#200 residual):** `GET /api/anomalias` (`audit.read`) + Admin `/admin/anomalias` com filtros/paginação; OpenAPI + docs EN/ES/PT — #200 permanece OPEN (ML / FP / gates manager).

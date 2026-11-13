@@ -3,6 +3,7 @@ import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
 import { createCcTxLayer } from '../helpers/movimientoClienteCcPrismaMock'
+import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const CLIENTE_BASE = {
   id: 1,
@@ -80,17 +81,21 @@ describe('POST /api/facturas — anomaly detection (#200)', () => {
     expect(res.body.error).toBe('DUPLICATE_INVOICE_CONFIRM_REQUIRED')
     expect(res.body.warnings?.some((w: { tipo: string }) => w.tipo === 'factura_duplicada')).toBe(true)
     expect(vi.mocked(prisma.factura.create)).not.toHaveBeenCalled()
+    await assertMatchesOpenApi('/api/facturas', 'post', '422', res.body)
   })
 
   it('creates invoice with soft descuento_excesivo warning and persists anomaly', async () => {
     const facturaCreate = vi.fn().mockResolvedValue({
       id: 99,
       ...FACTURA_BODY,
+      fecha: new Date('2026-08-26T12:00:00.000Z').toISOString(),
       estado: 'A',
       clienteId: 1,
       items: [{ id: 1, facturaId: 99, articuloId: 1, cantidad: 1, precio: 1000, dscto: 40, subtotal: 600 }],
       cliente: CLIENTE_BASE,
       total: 600,
+      neto1: 495.87,
+      iva1: 104.13,
     })
     const createMany = vi.fn().mockResolvedValue({ count: 1 })
     const auditCreate = vi.fn().mockResolvedValue({ id: 1 })
@@ -156,5 +161,6 @@ describe('POST /api/facturas — anomaly detection (#200)', () => {
     expect(auditCreate.mock.calls.some((c) => c[0]?.data?.action === 'factura_anomaly_detected')).toBe(
       true,
     )
+    await assertMatchesOpenApi('/api/facturas', 'post', '200', res.body)
   })
 })

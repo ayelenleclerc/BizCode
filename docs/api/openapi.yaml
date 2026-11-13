@@ -4336,8 +4336,12 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/ApiErrorEnvelope'
                   - $ref: '#/components/schemas/FacturaDuplicateConfirmErrorEnvelope'
+                  - allOf:
+                      - $ref: '#/components/schemas/ApiErrorEnvelope'
+                      - type: object
+                        not:
+                          required: [warnings]
 
   /api/arca/config:
     get:

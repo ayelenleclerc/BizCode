@@ -43092,6 +43092,38 @@ Requires `settings.business.manage`.
 
   `boolean`
 
+- **`warnings` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**All of:**
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
 - **`warnings`**
 
   `array` — Optional structured warnings (e.g. billing anomalies
@@ -43114,42 +43146,14 @@ Requires `settings.business.manage`.
 
     `object`
 
-* **`error` (required)**
-
-  `string`
-
-* **`success` (required)**
-
-  `boolean`
-
-* **`warnings` (required)**
-
-  `array`
-
-  **Items:**
-
-  - **`descripcion` (required)**
-
-    `string`
-
-  - **`severidad` (required)**
-
-    `string`, possible values: `"warning", "critical"`
-
-  - **`tipo` (required)**
-
-    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
-
-  - **`detalle`**
-
-    `object`
+**Not:**
 
 **Example:**
 
 ```json
 {
   "success": false,
-  "error": "",
+  "error": "DUPLICATE_INVOICE_CONFIRM_REQUIRED",
   "warnings": [
     {
       "tipo": "factura_duplicada",
