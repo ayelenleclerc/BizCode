@@ -194,7 +194,8 @@
       "contract_adjustment_due": "Contract price adjustment applied",
       "shipment_delivered": "Shipment delivered",
       "reparto_sync_conflict": "Delivery route sync conflict",
-      "atencion_bot_escalation": "WhatsApp care bot escalation"
+      "atencion_bot_escalation": "WhatsApp care bot escalation",
+      "fcem_rejected": "FCEM rejected by buyer"
     }
   },
   "notifChannels": {

@@ -15,8 +15,9 @@ Issue #239 requires Factura de Crédito Electrónica MiPyME (FCEM, Ley 27440) fo
 2. Persist FCEM state on `Factura` (`fcemEstado`, `fcemTipoCbte`, `fcemPlazoPagoDias`, reject/timestamps) and MiPyME knobs on `ParamEmpresa` (`esMipyme`, `fcemUmbralMonto`).
 3. Pure detection in `@bizcode/types` (`evaluateFcemRequirement`) with configurable threshold default `FCEM_DEFAULT_UMBRAL_ARS` (not an auto-updated AFIP table).
 4. Homologación mock `arcaWsfecmMock` + `FcemService` + `/api/fcem/facturas/*` for emit / accept / reject / tacit accept.
-5. Do **not** implement live WSFECM SOAP/REST, AFIP certificates beyond existing ARCA mock, or automatic tacit-acceptance calendar jobs in this ADR.
-6. Keep #239 **OPEN** for residual live AFIP / catalog / ConsultaObligado work.
+5. On successful mock reject, notify tenant owners in-app (`fcem_rejected` via `notifyTenantOwners`); notification failure must not fail the HTTP reject.
+6. Do **not** implement live WSFECM SOAP/REST, AFIP certificates beyond existing ARCA mock, or automatic tacit-acceptance calendar jobs in this ADR.
+7. Keep #239 **OPEN** for residual live AFIP / catalog / ConsultaObligado work.
 
 ## Consequences
 

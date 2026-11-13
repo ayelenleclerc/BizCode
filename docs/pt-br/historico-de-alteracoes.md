@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Notificação a owners ao rejeitar FCEM (#239 residual):** `POST /api/fcem/facturas/:id/rechazar` notifica owners in-app (`fcem_rejected`); #239 permanece OPEN (AFIP live / catálogo / ConsultaObligado).
 - **Painel de listagem de anomalias de faturamento (#200 residual):** `GET /api/anomalias` (`audit.read`) + Admin `/admin/anomalias` com filtros/paginação; OpenAPI + docs EN/ES/PT — #200 permanece OPEN (ML / FP / gates manager).
 - **Limiares de anomalia de faturamento por tenant (#200 residual):** Prisma `ConfigAnomaliaFactura` + `GET/PUT /api/anomalias/config` (`settings.business.manage`); math/serviço respeitam overrides (defaults MVP); UI Empresa + OpenAPI + docs EN/ES/PT — #200 permanece OPEN (ML / FP / gates manager).
 - **Reconciliação drift docs ZAP /status (#194/#197 residual):** CI/CD EN/ES/PT deixam de afirmar ZAP `-I`; ISO A.5.30 + RSK R-11 distinguem `/status` in-repo de monitor externo + drill staging — #194/#197 permanecem OPEN (registers vazios; ops pendente).
