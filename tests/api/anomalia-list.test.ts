@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
+import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const NOW = new Date('2026-11-12T12:00:00.000Z')
 
@@ -33,6 +34,7 @@ describe('GET /api/anomalias (#200 residual panel)', () => {
     const res = await request(createApp(prisma)).get('/api/anomalias')
     expect(res.status).toBe(403)
     expect(String(res.body.error)).toContain('audit.read')
+    await assertMatchesOpenApi('/api/anomalias', 'get', '403', res.body)
   })
 
   it('lists paginated anomalies for auditor', async () => {
@@ -51,6 +53,7 @@ describe('GET /api/anomalias (#200 residual panel)', () => {
     expect(count).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ tenantId: 1 }) }),
     )
+    await assertMatchesOpenApi('/api/anomalias', 'get', '200', res.body)
   })
 
   it('applies tipo, confirmada, clienteId and facturaId filters', async () => {
@@ -59,7 +62,7 @@ describe('GET /api/anomalias (#200 residual panel)', () => {
     const prisma = {
       anomaliaDetectada: { count, findMany },
     } as unknown as PrismaClient
-    await request(createApp(prisma))
+    const res = await request(createApp(prisma))
       .get('/api/anomalias')
       .query({
         tipo: 'descuento_excesivo',
@@ -92,5 +95,6 @@ describe('GET /api/anomalias (#200 residual panel)', () => {
         skip: 0,
       }),
     )
+    await assertMatchesOpenApi('/api/anomalias', 'get', '200', res.body)
   })
 })

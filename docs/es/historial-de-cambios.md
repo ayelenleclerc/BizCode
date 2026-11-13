@@ -10,6 +10,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Asserts OpenAPI de anomalías (#200 residual):** `tests/api/anomalia-list.test.ts` + `anomalia-config.test.ts` validan `/api/anomalias` y `/api/anomalias/config` con Ajv vs OpenAPI (ADR-0003); #200 sigue OPEN (ML / FP / gates manager).
 - **Notificación a owners al rechazar FCEM (#239 residual):** `POST /api/fcem/facturas/:id/rechazar` notifica in-app a owners (`fcem_rejected`); #239 permanece OPEN (AFIP live / catálogo / ConsultaObligado).
 - **Panel listado de anomalías de facturación (#200 residual):** `GET /api/anomalias` (`audit.read`) + Admin `/admin/anomalias` con filtros/paginación; OpenAPI + docs EN/ES/PT — #200 sigue OPEN (ML / FP / gates manager).
 - **Umbrales de anomalía de facturación por tenant (#200 residual):** Prisma `ConfigAnomaliaFactura` + `GET/PUT /api/anomalias/config` (`settings.business.manage`); math/servicio respetan overrides (defaults MVP); UI Empresa + OpenAPI + docs EN/ES/PT — #200 sigue OPEN (ML / FP / gates manager).
