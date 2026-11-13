@@ -115,6 +115,7 @@ describe('FCEM API (#239)', () => {
     )
     const res = await request(app).post('/api/fcem/facturas/9/emitir').expect(422)
     expect(res.body.error).toBe('FCEM_NOT_REQUIRED')
+    await assertMatchesOpenApi('/api/fcem/facturas/{facturaId}/emitir', 'post', '422', res.body)
   })
 
   it('POST aceptar resolves pendiente_aceptacion to aceptada', async () => {
