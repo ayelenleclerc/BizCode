@@ -3,6 +3,7 @@ import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
 import { createCcTxLayer } from '../helpers/movimientoClienteCcPrismaMock'
+import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const NOW = new Date('2026-11-12T12:00:00.000Z')
 
@@ -51,6 +52,7 @@ describe('GET/PUT /api/anomalias/config (#200 residual)', () => {
     } as unknown as PrismaClient
     const res = await request(createApp(prisma)).get('/api/anomalias/config')
     expect(res.status).toBe(403)
+    await assertMatchesOpenApi('/api/anomalias/config', 'get', '403', res.body)
   })
 
   it('GET lazy-creates config with MVP defaults', async () => {
@@ -65,6 +67,7 @@ describe('GET/PUT /api/anomalias/config (#200 residual)', () => {
     expect(res.body.success).toBe(true)
     expect(res.body.data.discountThresholdPct).toBe(40)
     expect(create).toHaveBeenCalled()
+    await assertMatchesOpenApi('/api/anomalias/config', 'get', '200', res.body)
   })
 
   it('PUT upserts thresholds and audits', async () => {
@@ -91,6 +94,7 @@ describe('GET/PUT /api/anomalias/config (#200 residual)', () => {
     expect(auditCreate.mock.calls.some((c) => c[0]?.data?.action === 'anomalia_config_update')).toBe(
       true,
     )
+    await assertMatchesOpenApi('/api/anomalias/config', 'put', '200', res.body)
   })
 
   it('POST /api/facturas respects tenant discountThresholdPct=40 (no soft warning at 35%)', async () => {
