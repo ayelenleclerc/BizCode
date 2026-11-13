@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Assert OpenAPI emitir FCEM 422 (#239 residual):** `tests/api/fcem.test.ts` valida `POST /api/fcem/facturas/{facturaId}/emitir` 422 `FCEM_NOT_REQUIRED` com Ajv vs OpenAPI (ADR-0003); #239 permanece OPEN (AFIP live / catálogo / ConsultaObligado).
 - **Assert capabilities Brasil (#211 residual):** `tests/api/fiscal.test.ts` espera `brazil_sefaz_nfe.implemented` entre cinco mocks de homologação; #211 permanece OPEN (SEFAZ live / DANFE / Simples-ICMS / cancelamento).
 - **Assert OpenAPI 422 otimizar repartos (#199 residual):** `tests/api/repartos.test.ts` valida `POST /api/repartos/{id}/optimizar` 422 `REPARTO_ROUTE_INSUFFICIENT_COORDS` com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC frota).
 - **Asserts OpenAPI de anomalias na fatura (#200 residual):** `tests/api/factura-anomaly.test.ts` valida `POST /api/facturas` 422 (`DUPLICATE_INVOICE_CONFIRM_REQUIRED`) e 200 com `warnings[]` via Ajv vs OpenAPI (ADR-0003); #200 permanece OPEN (ML / FP / gates manager).
