@@ -17,7 +17,7 @@ Does **not** claim Isolation Forest, a Python microservice, or measured false-po
 | REST | `POST /api/facturas` — optional body `confirmAnomalies`; response may include `warnings[]`; `422 DUPLICATE_INVOICE_CONFIRM_REQUIRED` |
 | UI | `NuevaFacturaForm` banner + confirm/cancel for duplicates; thresholds on Empresa settings; Admin anomalies list |
 | Audit | `factura_anomaly_detected` (plus existing `factura_create`); `anomalia_config_update`; rows also in Admin Audit Log |
-| AC fixture | Unit tests in `tests/server/facturaAnomalyMath.test.ts`; API tests in `tests/api/factura-anomaly.test.ts`, `tests/api/anomalia-config.test.ts`, `tests/api/anomalia-list.test.ts` |
+| AC fixture | Unit tests in `tests/server/facturaAnomalyMath.test.ts`; API tests in `tests/api/factura-anomaly.test.ts` (incl. OpenAPI Ajv for `POST /api/facturas` 422/200+warnings), `tests/api/anomalia-config.test.ts`, `tests/api/anomalia-list.test.ts` |
 
 ## Rules (Fase 1)
 
