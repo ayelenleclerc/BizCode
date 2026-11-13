@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Brazil fiscal capabilities assert (#211 residual):** `tests/api/fiscal.test.ts` expects `brazil_sefaz_nfe.implemented` among five homologación mocks; #211 stays OPEN (live SEFAZ / DANFE / Simples-ICMS / cancel).
 - **Reparto optimize 422 OpenAPI assert (#199 residual):** `tests/api/repartos.test.ts` validates `POST /api/repartos/{id}/optimizar` 422 `REPARTO_ROUTE_INSUFFICIENT_COORDS` with Ajv vs OpenAPI (ADR-0003); #199 stays OPEN (geocoder / external solvers / fleet AC).
 - **Factura anomaly OpenAPI asserts (#200 residual):** `tests/api/factura-anomaly.test.ts` validates `POST /api/facturas` 422 (`DUPLICATE_INVOICE_CONFIRM_REQUIRED`) and 200 with `warnings[]` via Ajv vs OpenAPI (ADR-0003); #200 stays OPEN (ML / FP / manager gates).
 - **Anomaly API OpenAPI asserts (#200 residual):** `tests/api/anomalia-list.test.ts` + `anomalia-config.test.ts` validate `/api/anomalias` and `/api/anomalias/config` responses with Ajv vs OpenAPI (ADR-0003); #200 stays OPEN (ML / FP / manager gates).
