@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Assert OpenAPI exportação despachante 422 (#206 residual):** `tests/api/exportacion.test.ts` valida `POST /api/pedidos/{id}/notificar-despachante` 422 (sem email) com Ajv vs OpenAPI (ADR-0003); #206 permanece OPEN (filing aduaneiro / AC de exportação ricos).
 - **Assert OpenAPI reposição 403 (#198 residual):** `tests/api/reposicion-forecast.test.ts` valida `GET /api/catalogo/reposicion` 403 com Ajv vs OpenAPI (ADR-0003); #198 permanece OPEN (ML / forecast rico).
 - **Asserts OpenAPI fiscal 400/403 (#208 residual):** `tests/api/fiscal.test.ts` valida `PUT .../config` 400 `RUT_REQUIRED`, authorize id inválido 400 e GET config 403 com Ajv vs OpenAPI (ADR-0003); #208 permanece OPEN (SII live).
 - **Assert OpenAPI emitir FCEM 422 (#239 residual):** `tests/api/fcem.test.ts` valida `POST /api/fcem/facturas/{facturaId}/emitir` 422 `FCEM_NOT_REQUIRED` com Ajv vs OpenAPI (ADR-0003); #239 permanece OPEN (AFIP live / catálogo / ConsultaObligado).
