@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Reparto optimize 422 OpenAPI assert (#199 residual):** `tests/api/repartos.test.ts` validates `POST /api/repartos/{id}/optimizar` 422 `REPARTO_ROUTE_INSUFFICIENT_COORDS` with Ajv vs OpenAPI (ADR-0003); #199 stays OPEN (geocoder / external solvers / fleet AC).
 - **Factura anomaly OpenAPI asserts (#200 residual):** `tests/api/factura-anomaly.test.ts` validates `POST /api/facturas` 422 (`DUPLICATE_INVOICE_CONFIRM_REQUIRED`) and 200 with `warnings[]` via Ajv vs OpenAPI (ADR-0003); #200 stays OPEN (ML / FP / manager gates).
 - **Anomaly API OpenAPI asserts (#200 residual):** `tests/api/anomalia-list.test.ts` + `anomalia-config.test.ts` validate `/api/anomalias` and `/api/anomalias/config` responses with Ajv vs OpenAPI (ADR-0003); #200 stays OPEN (ML / FP / manager gates).
 - **FCEM reject owner notification (#239 residual):** `POST /api/fcem/facturas/:id/rechazar` notifies tenant owners in-app (`fcem_rejected`); #239 stays OPEN (live AFIP / catalog / ConsultaObligado).
