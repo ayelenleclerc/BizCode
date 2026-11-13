@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
+import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const repartoRow = {
   id: 1,
@@ -588,5 +589,6 @@ describe('API /api/repartos POD', () => {
     const app = createApp(prisma)
     const res = await request(app).post('/api/repartos/1/optimizar').send({ apply: false }).expect(422)
     expect(res.body.error).toBe('REPARTO_ROUTE_INSUFFICIENT_COORDS')
+    await assertMatchesOpenApi('/api/repartos/{id}/optimizar', 'post', '422', res.body)
   })
 })
