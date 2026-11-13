@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Asserts OpenAPI fiscal 400/403 (#208 residual):** `tests/api/fiscal.test.ts` valida `PUT .../config` 400 `RUT_REQUIRED`, authorize id inválido 400 e GET config 403 com Ajv vs OpenAPI (ADR-0003); #208 permanece OPEN (SII live).
 - **Assert OpenAPI emitir FCEM 422 (#239 residual):** `tests/api/fcem.test.ts` valida `POST /api/fcem/facturas/{facturaId}/emitir` 422 `FCEM_NOT_REQUIRED` com Ajv vs OpenAPI (ADR-0003); #239 permanece OPEN (AFIP live / catálogo / ConsultaObligado).
 - **Assert capabilities Brasil (#211 residual):** `tests/api/fiscal.test.ts` espera `brazil_sefaz_nfe.implemented` entre cinco mocks de homologação; #211 permanece OPEN (SEFAZ live / DANFE / Simples-ICMS / cancelamento).
 - **Assert OpenAPI 422 otimizar repartos (#199 residual):** `tests/api/repartos.test.ts` valida `POST /api/repartos/{id}/optimizar` 422 `REPARTO_ROUTE_INSUFFICIENT_COORDS` com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC frota).

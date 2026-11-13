@@ -62,10 +62,10 @@ describe('ContracargosMpPage (#179)', () => {
     })
   })
 
-  it('renders pending chargeback queue', async () => {
+  it('renders pending chargeback row', async () => {
     render(<ContracargosMpPage />)
     expect(await screen.findByTestId('contracargos-mp-page')).toBeInTheDocument()
-    expect(screen.getByTestId('contracargos-mp-row-1')).toBeInTheDocument()
+    expect(await screen.findByTestId('contracargos-mp-row-1')).toBeInTheDocument()
   })
 
   it('marks chargeback as resolved', async () => {
