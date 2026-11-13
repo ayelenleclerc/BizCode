@@ -391,6 +391,19 @@
     "save": "Salvar alertas",
     "saved": "Configuração salva"
   },
+  "anomaliaFactura": {
+    "title": "Limiares de anomalias de faturamento",
+    "hint": "Alertas estatísticos / heurísticos de fatura (#200). Os defaults coincidem com as constantes MVP até você salvar.",
+    "loading": "Carregando limiares…",
+    "forbidden": "É necessário permissão de configuração de negócio para ver ou editar limiares de anomalia.",
+    "minHistory": "Histórico mínimo de faturas antes do Z-score",
+    "zScoreThreshold": "Limiar absoluto de Z-score",
+    "discountThresholdPct": "Limiar de desconto excessivo (%)",
+    "newCustomerCreditFraction": "Fração do limite de crédito (cliente novo, 0–1)",
+    "save": "Salvar limiares",
+    "saving": "Salvando…",
+    "saved": "Limiares salvos"
+  },
   "retenciones": {
     "title": "Retenções e percepções",
     "hint": "Regimes configuráveis por tenant. O cálculo automático em pagamentos e faturas virá em #229. A condição IVA de clientes/fornecedores usa o cadastro existente (Padrão AFIP #192 pendente).",

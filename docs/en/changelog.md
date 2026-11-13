@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Billing anomaly tenant thresholds (#200 residual):** Prisma `ConfigAnomaliaFactura` + `GET/PUT /api/anomalias/config` (`settings.business.manage`); math/service honor per-tenant overrides (MVP defaults unchanged); Empresa UI + OpenAPI + docs EN/ES/PT — #200 stays OPEN (ML / FP / dedicated panel).
 - **Docs drift reconcile ZAP /status (#194/#197 residual):** CI/CD EN/ES/PT no longer claim ZAP `-I`; ISO A.5.30 + RSK R-11 distinguish in-repo `/status` from external uptime monitor + staging drill — #194/#197 stay OPEN (empty registers; ops pending).
 - **Pilot evidence register post-RBAC (#450):** matrix EN/ES/PT Evidence + execution register record `vitest` `tests/api/pedidos.test.ts` PASS (13/13) after #474 (RBAC 403 ship/deliver/collect) — #194/#197/#239 remain OPEN.
 - **Pedido logistics RBAC HTTP (#450 residual):** `tests/api/pedidos.test.ts` asserts 403 on `ship` (`warehouse_op` / no `orders.dispatch`), `deliver` (`logistics_planner` / no `orders.deliver.confirm`), and `collect` (`warehouse_op` / no cobro perms); pack 403 already covered.

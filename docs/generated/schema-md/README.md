@@ -232,6 +232,12 @@
 
 * [ConciliarManualBody](./conciliarmanualbody.md) – `-`
 
+* [ConfigAnomaliaFactura](./configanomaliafactura.md) – `-`
+
+* [ConfigAnomaliaFacturaEnvelope](./configanomaliafacturaenvelope.md) – `-`
+
+* [ConfigAnomaliaFacturaUpsertInput](./configanomaliafacturaupsertinput.md) – `-`
+
 * [ConfigComision](./configcomision.md) – `-`
 
 * [ConfigComisionCreateInput](./configcomisioncreateinput.md) – `-`

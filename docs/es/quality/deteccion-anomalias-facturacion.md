@@ -12,21 +12,23 @@
 | Persistencia | Prisma `AnomaliaDetectada` (migración `20260826120000_anomalia_detectada_200`) |
 | Math | [`facturaAnomalyMath.ts`](../../../apps/server/services/facturaAnomalyMath.ts) |
 | Servicio | [`FacturaAnomalyService.ts`](../../../apps/server/services/FacturaAnomalyService.ts) desde `FacturaService.create` |
+| Umbrales por tenant | Prisma `ConfigAnomaliaFactura`; `GET/PUT /api/anomalias/config` (`settings.business.manage`); sección en Empresa |
 | REST | `POST /api/facturas` — body opcional `confirmAnomalies`; respuesta puede incluir `warnings[]`; `422 DUPLICATE_INVOICE_CONFIRM_REQUIRED` |
-| UI | Banner en `NuevaFacturaForm` + confirmar/cancelar duplicado |
-| Auditoría | `factura_anomaly_detected` (además de `factura_create`); visible en Audit Log de Admin |
-| Fixture AC | Tests en `tests/server/facturaAnomalyMath.test.ts` y `tests/api/factura-anomaly.test.ts` |
+| UI | Banner en `NuevaFacturaForm` + confirmar/cancelar duplicado; umbrales en configuración Empresa |
+| Auditoría | `factura_anomaly_detected` (además de `factura_create`); `anomalia_config_update`; visible en Audit Log de Admin |
+| Fixture AC | Tests en `tests/server/facturaAnomalyMath.test.ts`, `tests/api/factura-anomaly.test.ts`, `tests/api/anomalia-config.test.ts` |
 
 ## Reglas (Fase 1)
 
 1. **`factura_duplicada`** — mismo `clienteId` + mismo `total` + misma fecha calendario + `estado='A'`. Bloqueo suave sin `confirmAnomalies: true` → `422` + `warnings`. Con confirm → crea y persiste `confirmada=true`.
-2. **`monto_inusual`** — cliente con **&gt; 20** facturas activas; alerta si `|Z| &gt; 3`. Soft warning.
-3. **`descuento_excesivo`** — promedio ponderado de `dscto` de líneas &gt; **30%**. Soft warning.
-4. **`cliente_nuevo_compra_grande`** — ≤ 1 factura previa activa y `total &gt; 50%` de `creditLimit` no nulo. Soft warning.
+2. **`monto_inusual`** — cliente con **&gt; `minHistory`** (default 20) facturas activas; alerta si `|Z| &gt; zScoreThreshold` (default 3). Soft warning.
+3. **`descuento_excesivo`** — promedio ponderado de `dscto` de líneas &gt; `discountThresholdPct` (default 30). Soft warning.
+4. **`cliente_nuevo_compra_grande`** — ≤ 1 factura previa activa y `total &gt; newCustomerCreditFraction` (default 0.5) de `creditLimit` no nulo. Soft warning.
 
 ## Permisos
 
-- Sin cambio: `sales.create` en `POST /api/facturas`.
+- `sales.create` en `POST /api/facturas`.
+- `settings.business.manage` en `GET/PUT /api/anomalias/config`.
 
 ## Fuera de alcance / residual
 
@@ -35,9 +37,9 @@
 - Cobro fuera de horario comercial enforceable
 - Panel dedicado (usar Audit Log + `AnomaliaDetectada`)
 - FP &lt;5% en flota real
-- Umbral de descuento configurable por tenant
+- Gates de aprobación de manager
 
 ## Relacionado
 
-- OpenAPI: `confirmAnomalies`, `warnings`, `FacturaAnomalyWarning`
-- Constantes en `facturaAnomalyMath.ts`
+- OpenAPI: `confirmAnomalies`, `warnings`, `FacturaAnomalyWarning`, `ConfigAnomaliaFactura*`
+- Defaults en `facturaAnomalyMath.ts`; overrides por tenant vía `ConfigAnomaliaFactura`

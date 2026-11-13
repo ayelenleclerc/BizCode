@@ -76,6 +76,30 @@ describe('facturaAnomalyMath (#200)', () => {
     expect(w.some((x) => x.tipo === 'descuento_excesivo')).toBe(true)
   })
 
+  it('respects tenant discountThresholdPct override', () => {
+    const lines = [{ cantidad: 1, precio: 100, dscto: 25 }]
+    const withDefault = evaluateFacturaAnomalies({
+      total: 75,
+      priorInvoiceCount: 0,
+      priorTotals: [],
+      hasDuplicateSameDay: false,
+      creditLimit: null,
+      lines,
+    })
+    expect(withDefault.some((x) => x.tipo === 'descuento_excesivo')).toBe(false)
+
+    const withLower = evaluateFacturaAnomalies({
+      total: 75,
+      priorInvoiceCount: 0,
+      priorTotals: [],
+      hasDuplicateSameDay: false,
+      creditLimit: null,
+      lines,
+      thresholds: { discountThresholdPct: 20 },
+    })
+    expect(withLower.some((x) => x.tipo === 'descuento_excesivo')).toBe(true)
+  })
+
   it('flags cliente_nuevo_compra_grande against credit limit', () => {
     const w = evaluateFacturaAnomalies({
       total: 6000,

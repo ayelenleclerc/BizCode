@@ -3874,6 +3874,13 @@ export const configFefoUpsertBodySchema = z.object({
   diasAlertaVencimiento: z.number().int().min(1).max(365),
 })
 
+export const configAnomaliaFacturaUpsertBodySchema = z.object({
+  minHistory: z.number().int().min(1).max(1000),
+  zScoreThreshold: z.number().min(0.1).max(20),
+  discountThresholdPct: z.number().min(0).max(100),
+  newCustomerCreditFraction: z.number().min(0.01).max(1),
+})
+
 export const loteCreateBodySchema = z.object({
   articuloId: z.number().int().min(1),
   depositoId: z.number().int().min(1),

@@ -40991,6 +40991,557 @@ Requires all items to have `cantFisica`. For each line with non-zero variance, u
 }
 ```
 
+### PARAMETERS /api/anomalias/config
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/anomalias/config`
+
+### Get billing anomaly thresholds (#200 residual)
+
+- **Method:** `GET`
+- **Path:** `/api/anomalias/config`
+- **Tags:** anomalias
+
+Requires `settings.business.manage`. Lazy-creates row with MVP defaults when missing.
+
+#### Responses
+
+##### Status: 200 Anomaly threshold config
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`discountThresholdPct` (required)**
+
+    `number`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`minHistory` (required)**
+
+    `integer`
+
+  - **`newCustomerCreditFraction` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`zScoreThreshold` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "minHistory": 1,
+    "zScoreThreshold": 0.1,
+    "discountThresholdPct": 0,
+    "newCustomerCreditFraction": 0.01,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Upsert billing anomaly thresholds (#200 residual)
+
+- **Method:** `PUT`
+- **Path:** `/api/anomalias/config`
+- **Tags:** anomalias
+
+Requires `settings.business.manage`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`discountThresholdPct` (required)**
+
+  `number`
+
+- **`minHistory` (required)**
+
+  `integer`
+
+- **`newCustomerCreditFraction` (required)**
+
+  `number`
+
+- **`zScoreThreshold` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "minHistory": 1,
+  "zScoreThreshold": 0.1,
+  "discountThresholdPct": 0,
+  "newCustomerCreditFraction": 0.01
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated config
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`discountThresholdPct` (required)**
+
+    `number`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`minHistory` (required)**
+
+    `integer`
+
+  - **`newCustomerCreditFraction` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`zScoreThreshold` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "minHistory": 1,
+    "zScoreThreshold": 0.1,
+    "discountThresholdPct": 0,
+    "newCustomerCreditFraction": 0.01,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
 ### PARAMETERS /api/facturas
 
 - **Method:** `PARAMETERS`
@@ -205470,6 +206021,150 @@ Originating invoice header (selected columns)
 ```json
 {
   "diasAlertaVencimiento": 1
+}
+```
+
+### ConfigAnomaliaFactura
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`discountThresholdPct` (required)**
+
+  `number`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`minHistory` (required)**
+
+  `integer`
+
+* **`newCustomerCreditFraction` (required)**
+
+  `number`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`zScoreThreshold` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "minHistory": 1,
+  "zScoreThreshold": 0.1,
+  "discountThresholdPct": 0,
+  "newCustomerCreditFraction": 0.01,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### ConfigAnomaliaFacturaUpsertInput
+
+- **Type:**`object`
+
+* **`discountThresholdPct` (required)**
+
+  `number`
+
+* **`minHistory` (required)**
+
+  `integer`
+
+* **`newCustomerCreditFraction` (required)**
+
+  `number`
+
+* **`zScoreThreshold` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "minHistory": 1,
+  "zScoreThreshold": 0.1,
+  "discountThresholdPct": 0,
+  "newCustomerCreditFraction": 0.01
+}
+```
+
+### ConfigAnomaliaFacturaEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`discountThresholdPct` (required)**
+
+    `number`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`minHistory` (required)**
+
+    `integer`
+
+  - **`newCustomerCreditFraction` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`zScoreThreshold` (required)**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "minHistory": 1,
+    "zScoreThreshold": 0.1,
+    "discountThresholdPct": 0,
+    "newCustomerCreditFraction": 0.01,
+    "createdAt": "",
+    "updatedAt": ""
+  }
 }
 ```
 

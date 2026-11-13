@@ -391,6 +391,19 @@
     "save": "Save alerts",
     "saved": "Settings saved"
   },
+  "anomaliaFactura": {
+    "title": "Billing anomaly thresholds",
+    "hint": "Statistical / heuristic invoice alerts (#200). Defaults match the MVP constants until you save.",
+    "loading": "Loading thresholds…",
+    "forbidden": "You need business settings permission to view or edit anomaly thresholds.",
+    "minHistory": "Minimum invoice history before Z-score",
+    "zScoreThreshold": "Absolute Z-score threshold",
+    "discountThresholdPct": "Excessive discount threshold (%)",
+    "newCustomerCreditFraction": "New-customer credit limit fraction (0–1)",
+    "save": "Save anomaly thresholds",
+    "saving": "Saving…",
+    "saved": "Thresholds saved"
+  },
   "retenciones": {
     "title": "Withholdings and perceptions",
     "hint": "Tenant-configurable regimes. Automatic calculation on payments and invoices will ship in #229. Customer/supplier VAT condition uses the existing master (AFIP registry #192 pending).",

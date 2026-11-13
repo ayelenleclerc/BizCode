@@ -12,17 +12,18 @@ Does **not** claim Isolation Forest, a Python microservice, or measured false-po
 | Persistence | Prisma `AnomaliaDetectada` (migration `20260826120000_anomalia_detectada_200`) |
 | Math | [`facturaAnomalyMath.ts`](../../../apps/server/services/facturaAnomalyMath.ts) |
 | Service | [`FacturaAnomalyService.ts`](../../../apps/server/services/FacturaAnomalyService.ts) hooked from `FacturaService.create` |
+| Tenant thresholds | Prisma `ConfigAnomaliaFactura`; `GET/PUT /api/anomalias/config` (`settings.business.manage`); Empresa UI section |
 | REST | `POST /api/facturas` — optional body `confirmAnomalies`; response may include `warnings[]`; `422 DUPLICATE_INVOICE_CONFIRM_REQUIRED` |
-| UI | `NuevaFacturaForm` banner + confirm/cancel for duplicates |
-| Audit | `factura_anomaly_detected` (plus existing `factura_create`); rows visible in Admin Audit Log |
-| AC fixture | Unit tests in `tests/server/facturaAnomalyMath.test.ts`; API tests in `tests/api/factura-anomaly.test.ts` |
+| UI | `NuevaFacturaForm` banner + confirm/cancel for duplicates; thresholds on Empresa settings |
+| Audit | `factura_anomaly_detected` (plus existing `factura_create`); `anomalia_config_update`; rows visible in Admin Audit Log |
+| AC fixture | Unit tests in `tests/server/facturaAnomalyMath.test.ts`; API tests in `tests/api/factura-anomaly.test.ts`, `tests/api/anomalia-config.test.ts` |
 
 ## Rules (Fase 1)
 
 1. **`factura_duplicada`** — same `clienteId` + same `total` + same calendar date + `estado='A'`. Soft block: without `confirmAnomalies: true` → `422` + `warnings` (no persist). With confirm → create, persist with `confirmada=true`.
-2. **`monto_inusual`** — customer has **&gt; 20** active invoices; alert if `|Z| &gt; 3` vs mean/stddev of prior totals. Soft warning on successful create.
-3. **`descuento_excesivo`** — weighted average line `dscto` % &gt; **30** (`ANOMALY_DISCOUNT_THRESHOLD_PCT`). Soft warning.
-4. **`cliente_nuevo_compra_grande`** — ≤ 1 prior active invoice and `total &gt; 50%` of non-null `creditLimit`. Soft warning.
+2. **`monto_inusual`** — customer has **&gt; `minHistory`** (default 20) active invoices; alert if `|Z| &gt; zScoreThreshold` (default 3). Soft warning on successful create.
+3. **`descuento_excesivo`** — weighted average line `dscto` % &gt; `discountThresholdPct` (default 30). Soft warning.
+4. **`cliente_nuevo_compra_grande`** — ≤ 1 prior active invoice and `total &gt; newCustomerCreditFraction` (default 0.5) of non-null `creditLimit`. Soft warning.
 
 ## Permissions
 
@@ -35,9 +36,9 @@ Does **not** claim Isolation Forest, a Python microservice, or measured false-po
 - Collection outside business hours (no enforceable commercial-hours policy for cobros)
 - Dedicated anomaly panel (use Audit Log + `AnomaliaDetectada`)
 - FP &lt;5% measured on real production fleet
-- Tenant-configurable discount threshold (fixed constant in MVP)
+- Isolation Forest / manager approval gates
 
 ## Related
 
-- OpenAPI: `FacturaInput.confirmAnomalies`, `FacturaEnvelope.warnings`, `FacturaAnomalyWarning`, `FacturaDuplicateConfirmErrorEnvelope`
-- Constants documented in `facturaAnomalyMath.ts`
+- OpenAPI: `FacturaInput.confirmAnomalies`, `FacturaEnvelope.warnings`, `FacturaAnomalyWarning`, `FacturaDuplicateConfirmErrorEnvelope`, `ConfigAnomaliaFactura*`
+- Defaults in `facturaAnomalyMath.ts`; per-tenant overrides via `ConfigAnomaliaFactura`
