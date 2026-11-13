@@ -1,20 +1,20 @@
 # EcommerceConnectorStatus Schema
 
 ```txt
-undefined
+undefined#/properties/data/items
 ```
 
 
 
-| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                         |
-| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :----------------------------------------------------------------------------------------------------------------- |
-| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [EcommerceConnectorStatus.schema.json](../schema-json/EcommerceConnectorStatus.schema.json "open original schema") |
+| Abstract            | Extensible | Status         | Identifiable | Custom Properties | Additional Properties | Access Restrictions | Defined In                                                                                                                 |
+| :------------------ | :--------- | :------------- | :----------- | :---------------- | :-------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------------------- |
+| Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [EcommerceConnectorsEnvelope.schema.json\*](../schema-json/EcommerceConnectorsEnvelope.schema.json "open original schema") |
 
-## EcommerceConnectorStatus Type
+## items Type
 
 `object` ([EcommerceConnectorStatus](ecommerceconnectorstatus.md))
 
-# EcommerceConnectorStatus Properties
+# items Properties
 
 | Property                        | Type      | Required | Nullable       | Defined by                                                                                                             |
 | :------------------------------ | :-------- | :------- | :------------- | :--------------------------------------------------------------------------------------------------------------------- |
