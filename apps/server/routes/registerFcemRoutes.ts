@@ -11,6 +11,8 @@ import { requireModule } from '../middleware/requireModule'
 import { fiscalMutationHttpRateLimiter } from '../middleware/routeRateLimit'
 import { validateBody } from '../middleware/validateBody'
 import { FcemService } from '../fiscal/ar/FcemService'
+import { notifyTenantOwners } from '../notifications'
+import { logger } from '../logger'
 import type { RestRouteContext } from './restRouteTypes'
 import { errorMessage, getTenantId } from './restDomainShared'
 
@@ -129,6 +131,27 @@ export function registerFcemRoutes(app: Application, ctx: RestRouteContext): voi
           fcemEstado: result.data.fcemEstado,
           reason: result.data.fcemRejectReason,
         })
+        const tenantId = getTenantId(req)
+        try {
+          await notifyTenantOwners(prisma, tenantId, 'fcem_rejected', {
+            facturaId,
+            ...(result.data.fcemRejectReason
+              ? { detail: result.data.fcemRejectReason }
+              : {}),
+          })
+        } catch (notifyErr: unknown) {
+          logger.warn(
+            {
+              err:
+                notifyErr instanceof Error
+                  ? { name: notifyErr.name, message: notifyErr.message }
+                  : String(notifyErr),
+              tenantId,
+              facturaId,
+            },
+            '[fcem] owner notify on reject failed',
+          )
+        }
         res.json({ success: true, data: result.data })
       } catch (err: unknown) {
         res.status(500).json({ success: false, error: errorMessage(err) })

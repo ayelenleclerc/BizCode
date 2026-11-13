@@ -15,8 +15,9 @@ El issue #239 requiere Factura de Crédito Electrónica MiPyME (FCEM, Ley 27440)
 2. Persistir estado FCEM en `Factura` y knobs MiPyME en `ParamEmpresa`.
 3. Detección pura en `@bizcode/types` (`evaluateFcemRequirement`) con umbral por defecto configurable (sin tabla AFIP auto-actualizada).
 4. Mock de homologación `arcaWsfecmMock` + `FcemService` + `/api/fcem/facturas/*`.
-5. No implementar WSFECM live ni jobs de aceptación tácita por calendario en este ADR.
-6. Mantener #239 **OPEN** para residual live AFIP / catálogo / ConsultaObligado.
+5. Tras rechazo mock exitoso, notificar in-app a owners del tenant (`fcem_rejected` vía `notifyTenantOwners`); un fallo de notificación no debe fallar el HTTP de rechazo.
+6. No implementar WSFECM live ni jobs de aceptación tácita por calendario en este ADR.
+7. Mantener #239 **OPEN** para residual live AFIP / catálogo / ConsultaObligado.
 
 ## Consecuencias
 

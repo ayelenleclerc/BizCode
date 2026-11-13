@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **FCEM reject owner notification (#239 residual):** `POST /api/fcem/facturas/:id/rechazar` notifies tenant owners in-app (`fcem_rejected`); #239 stays OPEN (live AFIP / catalog / ConsultaObligado).
 - **Billing anomaly list panel (#200 residual):** `GET /api/anomalias` (`audit.read`) + Admin `/admin/anomalias` with filters/pagination; OpenAPI + docs EN/ES/PT — #200 stays OPEN (ML / FP / manager gates).
 - **Billing anomaly tenant thresholds (#200 residual):** Prisma `ConfigAnomaliaFactura` + `GET/PUT /api/anomalias/config` (`settings.business.manage`); math/service honor per-tenant overrides (MVP defaults unchanged); Empresa UI + OpenAPI + docs EN/ES/PT — #200 stays OPEN (ML / FP / manager gates).
 - **Docs drift reconcile ZAP /status (#194/#197 residual):** CI/CD EN/ES/PT no longer claim ZAP `-I`; ISO A.5.30 + RSK R-11 distinguish in-repo `/status` from external uptime monitor + staging drill — #194/#197 stay OPEN (empty registers; ops pending).

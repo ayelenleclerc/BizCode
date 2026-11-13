@@ -166,6 +166,8 @@ describe('FCEM API (#239)', () => {
       fcemResolvedAt: null,
       cliente: { condIva: 'RI', creditDays: 45 },
     }
+    const notificationCreateMany = vi.fn().mockResolvedValue({ count: 1 })
+    const appUserFindMany = vi.fn().mockResolvedValue([{ id: 42 }])
     const app = createApp(
       buildPrismaMock({
         factura: {
@@ -176,6 +178,11 @@ describe('FCEM API (#239)', () => {
             ...data,
           })),
         },
+        appUser: {
+          count: vi.fn().mockResolvedValue(1),
+          findMany: appUserFindMany,
+        },
+        notification: { createMany: notificationCreateMany },
       }),
     )
     const res = await request(app)
@@ -184,6 +191,23 @@ describe('FCEM API (#239)', () => {
       .expect(200)
     expect(res.body.data.fcemEstado).toBe('rechazada_por_receptor')
     expect(res.body.data.fcemRejectReason).toBe('Discrepancia en montos')
+    expect(appUserFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ role: 'owner', active: true }),
+      }),
+    )
+    expect(notificationCreateMany).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          userId: 42,
+          type: 'fcem_rejected',
+          payload: expect.objectContaining({
+            facturaId: 9,
+            detail: 'Discrepancia en montos',
+          }),
+        }),
+      ],
+    })
     await assertMatchesOpenApi('/api/fcem/facturas/{facturaId}/rechazar', 'post', '200', res.body)
   })
 

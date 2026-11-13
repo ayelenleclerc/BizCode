@@ -194,7 +194,8 @@
       "contract_adjustment_due": "Reajuste de preço do contrato aplicado",
       "shipment_delivered": "Envio entregue",
       "reparto_sync_conflict": "Conflito de sincronização de rota",
-      "atencion_bot_escalation": "Escalonamento do bot de atendimento WhatsApp"
+      "atencion_bot_escalation": "Escalonamento do bot de atendimento WhatsApp",
+      "fcem_rejected": "FCEM rejeitada pelo receptor"
     }
   },
   "notifChannels": {

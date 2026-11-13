@@ -368,6 +368,15 @@ function buildMessage(type: NotificationType, payload: NotificationPayload): Mes
         text: `Un cliente solicitó atención humana vía WhatsApp.${preview}${detail}`,
       }
     }
+    case 'fcem_rejected': {
+      const facturaRef =
+        payload.facturaRef ?? (payload.facturaId != null ? `#${payload.facturaId}` : '')
+      const detail = payload.detail ? `\nMotivo: ${payload.detail}` : ''
+      return {
+        subject: `[BizCode] FCEM rechazada por el receptor${facturaRef ? ` — ${facturaRef}` : ''}`,
+        text: `El receptor rechazó la Factura de Crédito Electrónica MiPyME${facturaRef ? ` ${facturaRef}` : ''}.${detail}`,
+      }
+    }
   }
 }
 
