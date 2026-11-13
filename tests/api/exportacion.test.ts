@@ -10,6 +10,7 @@ import type { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
 import * as channels from '../../apps/server/channels'
+import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const EXPORT_MODULES =
   'core.auth,core.catalog,core.clients,core.invoicing,core.orders,catalog.multicurrency,vertical.export'
@@ -123,6 +124,7 @@ describe('export vertical REST endpoints (#206)', () => {
         .send({})
         .expect(422)
       expect(res.body.error).toContain('despachanteEmail is required')
+      await assertMatchesOpenApi('/api/pedidos/{id}/notificar-despachante', 'post', '422', res.body)
     })
 
     it('returns 422 for a malformed broker email', async () => {
