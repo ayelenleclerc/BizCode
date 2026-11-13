@@ -154,6 +154,7 @@ describe('reposicion forecast API (#198)', () => {
   it('returns 403 without products.read', async () => {
     setupAuth('driver')
     const app = createApp(buildPrismaMock())
-    await request(app).get('/api/catalogo/reposicion').expect(403)
+    const res = await request(app).get('/api/catalogo/reposicion').expect(403)
+    await assertMatchesOpenApi('/api/catalogo/reposicion', 'get', '403', res.body)
   })
 })
