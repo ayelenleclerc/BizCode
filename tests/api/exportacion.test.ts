@@ -59,6 +59,7 @@ describe('export vertical REST endpoints (#206)', () => {
       const app = createApp(prisma)
       const res = await request(app).get('/api/exportacion/incoterms').expect(403)
       expect(res.body).toMatchObject({ error: 'module_not_enabled', module: 'vertical.export' })
+      await assertMatchesOpenApi('/api/exportacion/incoterms', 'get', '403', res.body)
     })
 
     it('gates the broker notification too', async () => {
