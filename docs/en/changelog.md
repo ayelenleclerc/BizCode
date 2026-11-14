@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Farmacia libro-psicotropicos 422 OpenAPI assert (#204 residual):** `tests/api/farmacia.test.ts` validates `POST /api/farmacia/libro-psicotropicos` 422 `ARTICLE_NOT_PSYCHOTROPIC` with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT / SEDRONAR live).
 - **Exportacion despachante 422 OpenAPI assert (#206 residual):** `tests/api/exportacion.test.ts` validates `POST /api/pedidos/{id}/notificar-despachante` 422 (missing email) with Ajv vs OpenAPI (ADR-0003); #206 stays OPEN (customs filing / richer export AC).
 - **Reposicion 403 OpenAPI assert (#198 residual):** `tests/api/reposicion-forecast.test.ts` validates `GET /api/catalogo/reposicion` 403 with Ajv vs OpenAPI (ADR-0003); #198 stays OPEN (ML / richer forecast).
 - **Fiscal 400/403 OpenAPI asserts (#208 residual):** `tests/api/fiscal.test.ts` validates `PUT .../config` 400 `RUT_REQUIRED`, authorize invalid id 400, and GET config 403 with Ajv vs OpenAPI (ADR-0003); #208 stays OPEN (live SII).
