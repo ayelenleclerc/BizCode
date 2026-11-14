@@ -129,10 +129,11 @@ describe('export vertical REST endpoints (#206)', () => {
 
     it('returns 422 for a malformed broker email', async () => {
       const app = createApp(prisma)
-      await request(app)
+      const res = await request(app)
         .post('/api/pedidos/12/notificar-despachante')
         .send({ despachanteEmail: 'not-an-email' })
         .expect(422)
+      await assertMatchesOpenApi('/api/pedidos/{id}/notificar-despachante', 'post', '422', res.body)
     })
 
     it('returns 404 when the order does not belong to the tenant', async () => {

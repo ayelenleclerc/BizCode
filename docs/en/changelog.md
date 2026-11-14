@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Exportacion despachante malformed-email 422 OpenAPI assert (#206 residual):** `tests/api/exportacion.test.ts` validates `POST /api/pedidos/{id}/notificar-despachante` 422 (malformed email) with Ajv vs OpenAPI (ADR-0003); #206 stays OPEN (customs filing / richer export AC).
 - **Reparto optimize 403 OpenAPI assert (#199 residual):** `tests/api/repartos.test.ts` validates `POST /api/repartos/{id}/optimizar` 403 with Ajv vs OpenAPI (ADR-0003); #199 stays OPEN (geocoder / external solvers / fleet AC).
 - **Farmacia libro-psicotropicos 422 OpenAPI assert (#204 residual):** `tests/api/farmacia.test.ts` validates `POST /api/farmacia/libro-psicotropicos` 422 `ARTICLE_NOT_PSYCHOTROPIC` with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT / SEDRONAR live).
 - **Exportacion despachante 422 OpenAPI assert (#206 residual):** `tests/api/exportacion.test.ts` validates `POST /api/pedidos/{id}/notificar-despachante` 422 (missing email) with Ajv vs OpenAPI (ADR-0003); #206 stays OPEN (customs filing / richer export AC).
