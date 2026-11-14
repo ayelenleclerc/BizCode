@@ -9,6 +9,7 @@ import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
+import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const PHARMACY_MODULES = 'core.auth,core.catalog,core.clients,core.invoicing,inventory.stock,inventory.fefo,inventory.lots,vertical.pharmacy'
 
@@ -204,6 +205,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
         .send({ articuloId: 5, tipo: 'ingreso', cantidad: 3 })
         .expect(422)
       expect(res.body).toMatchObject({ error: 'ARTICLE_NOT_PSYCHOTROPIC' })
+      await assertMatchesOpenApi('/api/farmacia/libro-psicotropicos', 'post', '422', res.body)
     })
 
     it('rejects an unknown tipo with 400', async () => {
