@@ -470,7 +470,8 @@ describe('API /api/repartos POD', () => {
   it('POST /api/repartos/:id/optimizar returns 403 without orders.dispatch', async () => {
     process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
     const app = createApp(buildPrismaMock())
-    await request(app).post('/api/repartos/1/optimizar').send({ apply: false }).expect(403)
+    const res = await request(app).post('/api/repartos/1/optimizar').send({ apply: false }).expect(403)
+    await assertMatchesOpenApi('/api/repartos/{id}/optimizar', 'post', '403', res.body)
   })
 
   it('POST /api/repartos/:id/optimizar preview returns distances for logistics_planner', async () => {
