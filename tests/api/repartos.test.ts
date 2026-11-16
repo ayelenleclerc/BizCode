@@ -174,7 +174,8 @@ describe('API /api/repartos', () => {
     process.env.BIZCODE_TEST_ROLE = 'driver'
     process.env.BIZCODE_TEST_USER_ID = '9'
     const app = createApp(buildPrismaMock())
-    await request(app).get('/api/repartos/1').expect(403)
+    const res = await request(app).get('/api/repartos/1').expect(403)
+    await assertMatchesOpenApi('/api/repartos/{id}', 'get', '403', res.body)
   })
 
   it('POST /api/repartos returns 403 without orders.dispatch', async () => {
