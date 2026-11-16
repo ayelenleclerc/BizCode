@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Assert OpenAPI POST repartos 403 (#199 residual):** `tests/api/repartos.test.ts` valida `POST /api/repartos` 403 (sem `orders.dispatch`) com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC de frota).
 - **Assert OpenAPI repartos por id 403 (#199 residual):** `tests/api/repartos.test.ts` valida `GET /api/repartos/{id}` 403 (driver em rota de outro motorista) com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC de frota).
 - **Assert OpenAPI mi-reparto 403 (#199 residual):** `tests/api/repartos.test.ts` valida `GET /api/repartos/mi-reparto` 403 com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC de frota).
 - **Assert OpenAPI listagem repartos 403 (#199 residual):** `tests/api/repartos.test.ts` valida `GET /api/repartos` 403 com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC de frota).
