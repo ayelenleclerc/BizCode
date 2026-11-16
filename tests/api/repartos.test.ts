@@ -117,7 +117,8 @@ describe('API /api/repartos', () => {
     process.env.BIZCODE_TEST_AUTH_BYPASS = 'true'
     process.env.BIZCODE_TEST_ROLE = 'billing'
     const app = createApp(buildPrismaMock())
-    await request(app).get('/api/repartos').expect(403)
+    const res = await request(app).get('/api/repartos').expect(403)
+    await assertMatchesOpenApi('/api/repartos', 'get', '403', res.body)
   })
 
   it('GET /api/repartos returns 200 for logistics_planner', async () => {
