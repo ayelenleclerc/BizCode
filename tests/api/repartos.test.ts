@@ -132,7 +132,8 @@ describe('API /api/repartos', () => {
   it('GET /api/repartos/mi-reparto returns 403 without orders.deliver.confirm', async () => {
     process.env.BIZCODE_TEST_ROLE = 'billing'
     const app = createApp(buildPrismaMock())
-    await request(app).get('/api/repartos/mi-reparto').expect(403)
+    const res = await request(app).get('/api/repartos/mi-reparto').expect(403)
+    await assertMatchesOpenApi('/api/repartos/mi-reparto', 'get', '403', res.body)
   })
 
   it('GET /api/repartos/mi-reparto returns 404 when the driver has no route', async () => {
