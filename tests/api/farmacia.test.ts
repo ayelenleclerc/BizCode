@@ -146,10 +146,11 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
 
     it('rejects a body without numeroReceta', async () => {
       const app = createApp(prisma)
-      await request(app)
+      const res = await request(app)
         .post('/api/farmacia/recetas')
         .send({ ...validRecetaBody, numeroReceta: '' })
         .expect(400)
+      await assertMatchesOpenApi('/api/farmacia/recetas', 'post', '400', res.body)
     })
 
     it('returns 409 when the prescription number already exists', async () => {
