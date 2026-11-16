@@ -244,10 +244,11 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
 
     it('rejects an oversized DataMatrix payload with 400', async () => {
       const app = createApp(prisma)
-      await request(app)
+      const res = await request(app)
         .put('/api/farmacia/lotes/8/serial')
         .send({ codigoDatamatrix: 'x'.repeat(201) })
         .expect(400)
+      await assertMatchesOpenApi('/api/farmacia/lotes/{id}/serial', 'put', '400', res.body)
     })
   })
 })

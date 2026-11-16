@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Assert OpenAPI farmácia lotes serial 400 (#204 residual):** `tests/api/farmacia.test.ts` valida `PUT /api/farmacia/lotes/{id}/serial` 400 (DataMatrix oversized) com Ajv vs OpenAPI (ADR-0003); #204 permanece OPEN (ANMAT / SEDRONAR live).
 - **Assert OpenAPI farmácia livro-psicotrópicos tipo 400 (#204 residual):** `tests/api/farmacia.test.ts` valida `POST /api/farmacia/libro-psicotropicos` 400 (tipo desconhecido) com Ajv vs OpenAPI (ADR-0003); #204 permanece OPEN (ANMAT / SEDRONAR live).
 - **Assert OpenAPI farmácia POST receitas 400 (#204 residual):** `tests/api/farmacia.test.ts` valida `POST /api/farmacia/recetas` 400 (sem numeroReceta) com Ajv vs OpenAPI (ADR-0003); #204 permanece OPEN (ANMAT / SEDRONAR live).
 - **Assert OpenAPI farmácia receitas 400 (#204 residual):** `tests/api/farmacia.test.ts` valida `GET /api/farmacia/recetas` 400 (filtro de data malformado) com Ajv vs OpenAPI (ADR-0003); #204 permanece OPEN (ANMAT / SEDRONAR live).
