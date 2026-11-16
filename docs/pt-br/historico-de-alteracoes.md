@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Assert OpenAPI listagem repartos 403 (#199 residual):** `tests/api/repartos.test.ts` valida `GET /api/repartos` 403 com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC de frota).
 - **Assert OpenAPI exportação despachante 403 (#206 residual):** `tests/api/exportacion.test.ts` valida `POST /api/pedidos/{id}/notificar-despachante` 403 (module gate) com Ajv vs OpenAPI (ADR-0003); #206 permanece OPEN (filing aduaneiro / AC de exportação ricos).
 - **Assert OpenAPI farmácia lotes serial 400 (#204 residual):** `tests/api/farmacia.test.ts` valida `PUT /api/farmacia/lotes/{id}/serial` 400 (DataMatrix oversized) com Ajv vs OpenAPI (ADR-0003); #204 permanece OPEN (ANMAT / SEDRONAR live).
 - **Assert OpenAPI farmácia livro-psicotrópicos tipo 400 (#204 residual):** `tests/api/farmacia.test.ts` valida `POST /api/farmacia/libro-psicotropicos` 400 (tipo desconhecido) com Ajv vs OpenAPI (ADR-0003); #204 permanece OPEN (ANMAT / SEDRONAR live).
