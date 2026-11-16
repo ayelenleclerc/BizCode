@@ -181,10 +181,11 @@ describe('API /api/repartos', () => {
   it('POST /api/repartos returns 403 without orders.dispatch', async () => {
     process.env.BIZCODE_TEST_ROLE = 'warehouse_op'
     const app = createApp(buildPrismaMock())
-    await request(app)
+    const res = await request(app)
       .post('/api/repartos')
       .send({ fecha: '2026-05-20', choferId: 2, ordenEntregaIds: [5] })
       .expect(403)
+    await assertMatchesOpenApi('/api/repartos', 'post', '403', res.body)
   })
 
   it('POST /api/repartos creates route with logistics_planner', async () => {
