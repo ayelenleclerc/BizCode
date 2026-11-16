@@ -65,7 +65,8 @@ describe('export vertical REST endpoints (#206)', () => {
     it('gates the broker notification too', async () => {
       process.env.BIZCODE_TEST_MODULES = 'core.auth,core.catalog,core.clients,core.invoicing'
       const app = createApp(prisma)
-      await request(app).post('/api/pedidos/12/notificar-despachante').send({}).expect(403)
+      const res = await request(app).post('/api/pedidos/12/notificar-despachante').send({}).expect(403)
+      await assertMatchesOpenApi('/api/pedidos/{id}/notificar-despachante', 'post', '403', res.body)
     })
   })
 
