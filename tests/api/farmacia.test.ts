@@ -213,10 +213,11 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
 
     it('rejects an unknown tipo with 400', async () => {
       const app = createApp(prisma)
-      await request(app)
+      const res = await request(app)
         .post('/api/farmacia/libro-psicotropicos')
         .send({ articuloId: 5, tipo: 'venta', cantidad: 3 })
         .expect(400)
+      await assertMatchesOpenApi('/api/farmacia/libro-psicotropicos', 'post', '400', res.body)
     })
   })
 
