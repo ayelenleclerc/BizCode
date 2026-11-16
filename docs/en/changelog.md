@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Farmacia recetas 400 OpenAPI assert (#204 residual):** `tests/api/farmacia.test.ts` validates `GET /api/farmacia/recetas` 400 (malformed date filter) with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT / SEDRONAR live).
 - **Farmacia recetas 403 OpenAPI assert (#204 residual):** `tests/api/farmacia.test.ts` validates `GET /api/farmacia/recetas` 403 `module_not_enabled` with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT / SEDRONAR live).
 - **Exportacion incoterms 403 OpenAPI assert (#206 residual):** `tests/api/exportacion.test.ts` validates `GET /api/exportacion/incoterms` 403 `module_not_enabled` with Ajv vs OpenAPI (ADR-0003); #206 stays OPEN (customs filing / richer export AC).
 - **Exportacion despachante malformed-email 422 OpenAPI assert (#206 residual):** `tests/api/exportacion.test.ts` validates `POST /api/pedidos/{id}/notificar-despachante` 422 (malformed email) with Ajv vs OpenAPI (ADR-0003); #206 stays OPEN (customs filing / richer export AC).

@@ -112,7 +112,8 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
 
     it('rejects a malformed date filter with 400', async () => {
       const app = createApp(prisma)
-      await request(app).get('/api/farmacia/recetas?desde=28-08-2026').expect(400)
+      const res = await request(app).get('/api/farmacia/recetas?desde=28-08-2026').expect(400)
+      await assertMatchesOpenApi('/api/farmacia/recetas', 'get', '400', res.body)
     })
   })
 
