@@ -93,6 +93,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
       const app = createApp(prisma)
       const res = await request(app).get('/api/farmacia/recetas').expect(403)
       expect(res.body).toMatchObject({ error: 'module_not_enabled', module: 'vertical.pharmacy' })
+      await assertMatchesOpenApi('/api/farmacia/recetas', 'get', '403', res.body)
     })
   })
 
