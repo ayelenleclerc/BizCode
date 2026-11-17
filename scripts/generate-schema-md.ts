@@ -19,6 +19,7 @@ const LEAF_SCHEMAS_LAST = [
   'LogisticaZonaRow',
   'LogisticaKpis',
   'LogisticaReturnReasonRow',
+  'EcommerceConnectorStatus',
 ] as const
 
 function runJsonSchema2Md(inputDir: string, noReadme: boolean): void {
