@@ -279,4 +279,34 @@ describe('FCEM API (#239)', () => {
     expect(res.body.error).toBe('FCEM_NOT_PENDING')
     await assertMatchesOpenApi('/api/fcem/facturas/{facturaId}/aceptar', 'post', '422', res.body)
   })
+
+  it('POST rechazar returns 422 when FCEM is not pendiente_aceptacion', async () => {
+    const alreadyAccepted = {
+      id: 9,
+      total: FCEM_DEFAULT_UMBRAL_ARS,
+      tipo: 'A',
+      estadoCae: 'issued',
+      cae: '12345678901234',
+      caeVto: new Date('2026-12-01T00:00:00.000Z'),
+      fcemEstado: 'aceptada',
+      fcemTipoCbte: 201,
+      fcemPlazoPagoDias: 45,
+      fcemRejectReason: null,
+      fcemEmittedAt: new Date('2026-11-12T12:00:00.000Z'),
+      fcemResolvedAt: new Date('2026-11-13T12:00:00.000Z'),
+      cliente: { condIva: 'RI', creditDays: 45 },
+    }
+    const app = createApp(
+      buildPrismaMock({
+        factura: {
+          findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(alreadyAccepted),
+          update: vi.fn(),
+        },
+      }),
+    )
+    const res = await request(app).post('/api/fcem/facturas/9/rechazar').send({}).expect(422)
+    expect(res.body.error).toBe('FCEM_NOT_PENDING')
+    await assertMatchesOpenApi('/api/fcem/facturas/{facturaId}/rechazar', 'post', '422', res.body)
+  })
 })
