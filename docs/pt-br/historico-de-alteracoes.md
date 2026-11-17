@@ -8,6 +8,10 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- **MVP farmácia planos / prepagas (#252):** ABM de planos + % cobertura, venda com copago/crédito automático, apresentação mensal CSV, CC e rejeições parciais em `vertical.pharmacy` (migração Prisma `20261117120000_obras_sociales_252`, `ObraSocialService`, `/api/farmacia/obras-sociales*`, abas UI). Residual: sem PAMI/Farmalink live nem formatos proprietários OSDE/Swiss; #252 permanece OPEN.
+
 ### Alterado
 
 - **Assert OpenAPI POD GET 403 (#199 residual):** `tests/api/repartos.test.ts` valida `GET /api/repartos/{id}/items/{itemId}/pod` 403 (driver) com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC de frota).

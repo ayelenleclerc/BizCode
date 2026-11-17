@@ -122,6 +122,7 @@ model Cliente {
   movimientosPuntos   MovimientoPuntos[]
   atencionBotSessions AtencionBotSession[]
   recetasDispensacion RecetaDispensacion[]
+  ventasConOS         VentaConOS[]
 
   @@unique([tenantId, codigo])
   @@index([tenantId])
@@ -385,6 +386,7 @@ model Articulo {
   tiendanubePublicacion   TiendanubePublicacion?
   wooCommercePublicacion  WooCommercePublicacion?
   librosPsicotropicos     LibroPsicotropicoMovimiento[]
+  ventaOSItems            VentaOSItem[]
   formulasComoProducto    FormulaProduccion[]           @relation("FormulaProducto")
   formulasComoInsumo      FormulaInsumo[]               @relation("FormulaInsumoArticulo")
   ordenesProduccion       OrdenProduccion[]             @relation("OrdenProduccionProducto")
@@ -950,6 +952,7 @@ model Factura {
 
   items                            FacturaItem[]
   recetasDispensacion              RecetaDispensacion[]
+  ventasConOS                      VentaConOS[]
   ordenesEntrega                   OrdenEntrega[]
   ordenesTrabajo                   OrdenTrabajo[]
   garantias                        Garantia[]
@@ -2043,6 +2046,12 @@ model Tenant {
   atencionBotSessions              AtencionBotSession[]
   recetasDispensacion              RecetaDispensacion[]
   librosPsicotropicos              LibroPsicotropicoMovimiento[]
+  obrasSociales                    ObraSocial[]
+  coberturasOS                     CoberturaOS[]
+  ventasConOS                      VentaConOS[]
+  ventaOSItems                     VentaOSItem[]
+  presentacionesOS                 PresentacionOS[]
+  presentacionOSRechazos           PresentacionOSRechazo[]
 }
 
 /// @en Short-lived WhatsApp customer-care bot session (#201); TTL enforced in service (~30 min).
@@ -3715,6 +3724,156 @@ model LibroPsicotropicoMovimiento {
   @@index([tenantId, createdAt])
   @@index([tenantId, articuloId, createdAt])
   @@index([tenantId, tipo])
+}
+
+/// @en Health insurer / prepaid plan catalog for pharmacy sales (#252); local ABM, no PAMI/Farmalink live.
+/// @es Catálogo de obra social / prepaga para ventas de farmacia (#252); ABM local, sin PAMI/Farmalink live.
+/// @pt-BR Catálogo de plano de saúde / prepaga para vendas de farmácia (#252); ABM local, sem PAMI/Farmalink live.
+model ObraSocial {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  nombre    String   @db.VarChar(120)
+  codigo    String   @db.VarChar(40)
+  activa    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  coberturas     CoberturaOS[]
+  ventas         VentaConOS[]
+  presentaciones PresentacionOS[]
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId])
+  @@index([tenantId, activa])
+}
+
+/// @en Default coverage percent by product type for an insurer (#252).
+/// @es Porcentaje de cobertura por tipo de producto para una OS (#252).
+/// @pt-BR Percentual de cobertura por tipo de produto para um plano (#252).
+model CoberturaOS {
+  id           Int        @id @default(autoincrement())
+  tenantId     Int
+  tenant       Tenant     @relation(fields: [tenantId], references: [id])
+  obraSocialId Int
+  obraSocial   ObraSocial @relation(fields: [obraSocialId], references: [id], onDelete: Cascade)
+  /// generico | marca | cronico | oncologico
+  tipoProducto String     @db.VarChar(20)
+  /// @en Percent covered by the insurer (0–100).
+  /// @es Porcentaje cubierto por la OS (0–100).
+  /// @pt-BR Percentual coberto pelo plano (0–100).
+  cobertura    Decimal    @db.Decimal(5, 2)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([obraSocialId, tipoProducto])
+  @@index([tenantId])
+  @@index([tenantId, obraSocialId])
+}
+
+/// @en Pharmacy sale with patient copay and insurer credit (#252); not live COFA/OSDE filing.
+/// @es Venta de farmacia con copago del paciente y crédito OS (#252); no es presentación live COFA/OSDE.
+/// @pt-BR Venda de farmácia com copago do paciente e crédito do plano (#252); não é apresentação live COFA/OSDE.
+model VentaConOS {
+  id             Int             @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant          @relation(fields: [tenantId], references: [id])
+  facturaId      Int?
+  factura        Factura?        @relation(fields: [facturaId], references: [id], onDelete: SetNull)
+  clienteId      Int
+  cliente        Cliente         @relation(fields: [clienteId], references: [id], onDelete: Restrict)
+  obraSocialId   Int
+  obraSocial     ObraSocial      @relation(fields: [obraSocialId], references: [id], onDelete: Restrict)
+  nroAfiliado    String          @db.VarChar(40)
+  nroReceta      String?         @db.VarChar(40)
+  totalVenta     Decimal         @db.Decimal(14, 2)
+  copagoPaciente Decimal         @db.Decimal(14, 2)
+  creditoOS      Decimal         @db.Decimal(14, 2)
+  /// pendiente_cobro_os | presentado | cobrado | rechazado_os
+  estado         String          @db.VarChar(30)
+  presentacionId Int?
+  presentacion   PresentacionOS? @relation(fields: [presentacionId], references: [id], onDelete: SetNull)
+  fecha          DateTime        @default(now())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  items    VentaOSItem[]
+  rechazos PresentacionOSRechazo[]
+
+  @@index([tenantId])
+  @@index([tenantId, obraSocialId, estado])
+  @@index([tenantId, presentacionId])
+  @@index([tenantId, fecha])
+  @@index([tenantId, clienteId])
+  @@index([tenantId, facturaId])
+}
+
+model VentaOSItem {
+  id             Int        @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant     @relation(fields: [tenantId], references: [id])
+  ventaConOSId   Int
+  ventaConOS     VentaConOS @relation(fields: [ventaConOSId], references: [id], onDelete: Cascade)
+  articuloId     Int?
+  articulo       Articulo?  @relation(fields: [articuloId], references: [id], onDelete: SetNull)
+  descripcion    String     @db.VarChar(200)
+  /// generico | marca | cronico | oncologico
+  tipoProducto   String     @db.VarChar(20)
+  cantidad       Decimal    @db.Decimal(14, 4)
+  precioUnitario Decimal    @db.Decimal(14, 2)
+  subtotal       Decimal    @db.Decimal(14, 2)
+  coberturaPct   Decimal    @db.Decimal(5, 2)
+  creditoOS      Decimal    @db.Decimal(14, 2)
+  copago         Decimal    @db.Decimal(14, 2)
+
+  @@index([tenantId])
+  @@index([tenantId, ventaConOSId])
+}
+
+/// @en Monthly insurer presentation batch (#252); CSV/PDF export is internal, not proprietary OS formats.
+/// @es Lote mensual de presentación a la OS (#252); exportación CSV/PDF interna, no formatos propietarios.
+/// @pt-BR Lote mensal de apresentação ao plano (#252); exportação CSV/PDF interna, não formatos proprietários.
+model PresentacionOS {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int
+  tenant         Tenant    @relation(fields: [tenantId], references: [id])
+  obraSocialId   Int
+  obraSocial     ObraSocial @relation(fields: [obraSocialId], references: [id], onDelete: Restrict)
+  /// YYYY-MM
+  periodo        String    @db.VarChar(7)
+  totalCredito   Decimal   @db.Decimal(14, 2)
+  /// generada | presentada | cobrada | con_rechazos
+  estado         String    @db.VarChar(20)
+  archivoCsvName String?   @db.VarChar(200)
+  fechaPago      DateTime?
+  importeCobrado Decimal?  @db.Decimal(14, 2)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  ventas   VentaConOS[]
+  rechazos PresentacionOSRechazo[]
+
+  @@unique([tenantId, obraSocialId, periodo])
+  @@index([tenantId])
+  @@index([tenantId, obraSocialId])
+}
+
+model PresentacionOSRechazo {
+  id               Int            @id @default(autoincrement())
+  tenantId         Int
+  tenant           Tenant         @relation(fields: [tenantId], references: [id])
+  presentacionId   Int
+  presentacion     PresentacionOS @relation(fields: [presentacionId], references: [id], onDelete: Cascade)
+  ventaConOSId     Int
+  ventaConOS       VentaConOS     @relation(fields: [ventaConOSId], references: [id], onDelete: Restrict)
+  ventaOSItemId    Int?
+  importeRechazado Decimal        @db.Decimal(14, 2)
+  motivo           String?        @db.VarChar(300)
+  createdAt        DateTime       @default(now())
+
+  @@index([tenantId])
+  @@index([tenantId, presentacionId])
+  @@index([tenantId, ventaConOSId])
 }
 
 /// @en Current loyalty points balance per customer (#250).

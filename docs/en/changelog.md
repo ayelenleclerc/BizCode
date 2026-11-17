@@ -8,6 +8,10 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Pharmacy obras sociales / prepaid MVP (#252):** ABM insurers + coverage %, OS sale with automatic copay/credit, monthly presentation CSV, CC summary and partial rejections on `vertical.pharmacy` (Prisma migration `20261117120000_obras_sociales_252`, `ObraSocialService`, `/api/farmacia/obras-sociales*`, UI tabs). Residual: no PAMI/Farmalink live and no proprietary OSDE/Swiss formats; #252 stays OPEN.
+
 ### Changed
 
 - **Repartos POD GET 403 OpenAPI assert (#199 residual):** `tests/api/repartos.test.ts` validates `GET /api/repartos/{id}/items/{itemId}/pod` 403 (driver) with Ajv vs OpenAPI (ADR-0003); #199 stays OPEN (geocoder / external solvers / fleet AC).

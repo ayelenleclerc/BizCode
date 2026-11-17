@@ -1,11 +1,66 @@
 {
   "title": "Pharmacy",
   "loadError": "Could not load pharmacy data",
-  "complianceNotice": "Local record only. This module does not submit to the ANMAT National Traceability System and the psychotropic book is not the official SEDRONAR filing format.",
+  "complianceNotice": "Local record only. This module does not submit to ANMAT SNT; the psychotropic book is not the official SEDRONAR filing format; insurer presentations are internal CSV/PDF (no PAMI/Farmalink or proprietary OSDE/Swiss formats).",
   "tabs": {
     "recetas": "Prescriptions",
     "libro": "Psychotropic book",
-    "serial": "Lot serial"
+    "serial": "Lot serial",
+    "os": "Insurers",
+    "ventasOs": "Insurer sales",
+    "presentaciones": "Presentations",
+    "cc": "Insurer ledger"
+  },
+  "os": {
+    "title": "Insurers and prepaid plans",
+    "hint": "Local ABM only. No PAMI/Farmalink live integration and no proprietary OSDE/Swiss formats.",
+    "nombre": "Name",
+    "codigo": "Code",
+    "tipoProducto": "Product type",
+    "cobertura": "Coverage %",
+    "tipos": {
+      "generico": "Generic",
+      "marca": "Brand",
+      "cronico": "Chronic",
+      "oncologico": "Oncology"
+    },
+    "save": "Register insurer",
+    "saveOk": "Insurer registered",
+    "saveError": "Could not register the insurer",
+    "empty": "No insurers registered yet",
+    "sinCoberturas": "No coverage rows"
+  },
+  "ventasOs": {
+    "title": "Sales with insurer credit",
+    "clienteId": "Customer ID",
+    "obraSocialId": "Insurer ID",
+    "nroAfiliado": "Member number",
+    "descripcion": "Item description",
+    "precioUnitario": "Unit price",
+    "copago": "Copay",
+    "credito": "Insurer credit",
+    "save": "Register insurer sale",
+    "saveOk": "Insurer sale registered",
+    "saveError": "Could not register the insurer sale",
+    "empty": "No insurer sales yet"
+  },
+  "presentaciones": {
+    "title": "Monthly presentations",
+    "hint": "Internal CSV batch; not a proprietary COFA/OSDE/Swiss filing format.",
+    "obraSocialId": "Insurer ID",
+    "periodo": "Period (YYYY-MM)",
+    "total": "Credit total",
+    "save": "Generate presentation",
+    "saveOk": "Presentation generated",
+    "saveError": "Could not generate the presentation",
+    "empty": "No presentations yet"
+  },
+  "cc": {
+    "title": "Current account by insurer",
+    "saldo": "Open balance",
+    "cobrado": "Collected",
+    "rechazado": "Rejected",
+    "empty": "No current-account movements"
   },
   "recetas": {
     "title": "Dispensing prescriptions",
