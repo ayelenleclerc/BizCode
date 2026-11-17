@@ -306,10 +306,11 @@ describe('API /api/repartos POD', () => {
   it('PUT item pod returns 403 without orders.deliver.confirm', async () => {
     process.env.BIZCODE_TEST_ROLE = 'billing'
     const app = createApp(buildPrismaMock())
-    await request(app)
+    const res = await request(app)
       .put('/api/repartos/1/items/10')
       .send({ outcome: 'delivered', receptorNombre: 'A', firmaBase64: TEST_FIRMA })
       .expect(403)
+    await assertMatchesOpenApi('/api/repartos/{id}/items/{itemId}', 'put', '403', res.body)
   })
 
   it('PUT item pod returns 200 for driver on own route', async () => {
