@@ -10,6 +10,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Assert OpenAPI POD GET 403 (#199 residual):** `tests/api/repartos.test.ts` valida `GET /api/repartos/{id}/items/{itemId}/pod` 403 (driver) con Ajv vs OpenAPI (ADR-0003); #199 sigue OPEN (geocoder / solvers externos / AC de flota).
 - **Assert OpenAPI POD PUT 403 (#199 residual):** `tests/api/repartos.test.ts` valida `PUT /api/repartos/{id}/items/{itemId}` 403 (sin `orders.deliver.confirm`) con Ajv vs OpenAPI (ADR-0003); #199 sigue OPEN (geocoder / solvers externos / AC de flota).
 - **Assert OpenAPI repartos activos 403 (#199 residual):** `tests/api/repartos.test.ts` valida `GET /api/repartos/activos` 403 (driver) con Ajv vs OpenAPI (ADR-0003); #199 sigue OPEN (geocoder / solvers externos / AC de flota).
 - **Assert OpenAPI POST repartos 403 (#199 residual):** `tests/api/repartos.test.ts` valida `POST /api/repartos` 403 (sin `orders.dispatch`) con Ajv vs OpenAPI (ADR-0003); #199 sigue OPEN (geocoder / solvers externos / AC de flota).

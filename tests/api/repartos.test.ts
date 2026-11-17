@@ -382,7 +382,8 @@ describe('API /api/repartos POD', () => {
   it('GET pod returns 403 for driver', async () => {
     process.env.BIZCODE_TEST_ROLE = 'driver'
     const app = createApp(buildPrismaMock())
-    await request(app).get('/api/repartos/1/items/10/pod').expect(403)
+    const res = await request(app).get('/api/repartos/1/items/10/pod').expect(403)
+    await assertMatchesOpenApi('/api/repartos/{id}/items/{itemId}/pod', 'get', '403', res.body)
   })
 
   it('GET pod returns 200 for logistics_planner', async () => {
