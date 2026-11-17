@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "cobertura": {
+      "type": "number"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "obraSocialId": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipoProducto": {
+      "$ref": "./OsTipoProducto.schema.json"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "obraSocialId",
+    "tipoProducto",
+    "cobertura",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "CoberturaOS",
+  "type": "object"
+}

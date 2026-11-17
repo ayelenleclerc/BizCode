@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "codigo": {
+      "type": "string"
+    },
+    "creditoCobrado": {
+      "type": "number"
+    },
+    "creditoPendiente": {
+      "type": "number"
+    },
+    "creditoPresentado": {
+      "type": "number"
+    },
+    "creditoRechazado": {
+      "type": "number"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "obraSocialId": {
+      "type": "integer"
+    },
+    "saldoAbierto": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "obraSocialId",
+    "nombre",
+    "codigo",
+    "creditoPendiente",
+    "creditoPresentado",
+    "creditoCobrado",
+    "creditoRechazado",
+    "saldoAbierto"
+  ],
+  "title": "ObraSocialCuentaCorriente",
+  "type": "object"
+}

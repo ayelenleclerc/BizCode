@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activa": {
+      "type": "boolean"
+    },
+    "coberturas": {
+      "items": {
+        "$ref": "./CoberturaOSUpsertInput.schema.json"
+      },
+      "type": "array"
+    },
+    "codigo": {
+      "maxLength": 40,
+      "minLength": 1,
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 120,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "nombre",
+    "codigo"
+  ],
+  "title": "ObraSocialCreateInput",
+  "type": "object"
+}

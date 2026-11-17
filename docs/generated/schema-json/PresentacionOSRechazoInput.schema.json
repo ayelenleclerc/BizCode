@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "importeRechazado": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "motivo": {
+      "maxLength": 300,
+      "nullable": true,
+      "type": "string"
+    },
+    "ventaConOSId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "ventaOSItemId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "ventaConOSId",
+    "importeRechazado"
+  ],
+  "title": "PresentacionOSRechazoInput",
+  "type": "object"
+}

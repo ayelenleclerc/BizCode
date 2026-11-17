@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "archivoCsvName": {
+      "nullable": true,
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "estado": {
+      "$ref": "./PresentacionOsEstado.schema.json"
+    },
+    "fechaPago": {
+      "format": "date-time",
+      "nullable": true,
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "importeCobrado": {
+      "nullable": true,
+      "type": "number"
+    },
+    "obraSocialId": {
+      "type": "integer"
+    },
+    "periodo": {
+      "type": "string"
+    },
+    "rechazos": {
+      "items": {
+        "$ref": "./PresentacionOSRechazo.schema.json"
+      },
+      "type": "array"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "totalCredito": {
+      "type": "number"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "ventasCount": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "obraSocialId",
+    "periodo",
+    "totalCredito",
+    "estado",
+    "archivoCsvName",
+    "fechaPago",
+    "importeCobrado",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "PresentacionOS",
+  "type": "object"
+}

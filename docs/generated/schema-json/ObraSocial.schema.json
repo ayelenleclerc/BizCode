@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activa": {
+      "type": "boolean"
+    },
+    "coberturas": {
+      "items": {
+        "$ref": "./CoberturaOS.schema.json"
+      },
+      "type": "array"
+    },
+    "codigo": {
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "updatedAt": {
+      "format": "date-time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "nombre",
+    "codigo",
+    "activa",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "ObraSocial",
+  "type": "object"
+}

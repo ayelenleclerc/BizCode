@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "articuloId": {
+      "nullable": true,
+      "type": "integer"
+    },
+    "cantidad": {
+      "type": "number"
+    },
+    "coberturaPct": {
+      "type": "number"
+    },
+    "copago": {
+      "type": "number"
+    },
+    "creditoOS": {
+      "type": "number"
+    },
+    "descripcion": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "precioUnitario": {
+      "type": "number"
+    },
+    "subtotal": {
+      "type": "number"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "tipoProducto": {
+      "$ref": "./OsTipoProducto.schema.json"
+    },
+    "ventaConOSId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "ventaConOSId",
+    "articuloId",
+    "descripcion",
+    "tipoProducto",
+    "cantidad",
+    "precioUnitario",
+    "subtotal",
+    "coberturaPct",
+    "creditoOS",
+    "copago"
+  ],
+  "title": "VentaOSItem",
+  "type": "object"
+}

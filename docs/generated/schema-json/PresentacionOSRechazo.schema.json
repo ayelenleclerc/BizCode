@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "importeRechazado": {
+      "type": "number"
+    },
+    "motivo": {
+      "nullable": true,
+      "type": "string"
+    },
+    "presentacionId": {
+      "type": "integer"
+    },
+    "tenantId": {
+      "type": "integer"
+    },
+    "ventaConOSId": {
+      "type": "integer"
+    },
+    "ventaOSItemId": {
+      "nullable": true,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "tenantId",
+    "presentacionId",
+    "ventaConOSId",
+    "ventaOSItemId",
+    "importeRechazado",
+    "motivo",
+    "createdAt"
+  ],
+  "title": "PresentacionOSRechazo",
+  "type": "object"
+}
