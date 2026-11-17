@@ -3956,6 +3956,85 @@ export const loteSerialUpdateBodySchema = z.object({
   codigoDatamatrix: z.string().trim().max(200).nullable().optional(),
 })
 
+/**
+ * @en Pharmacy insurer / prepaid schemas (#252).
+ * @es Schemas de obras sociales / prepagas (#252).
+ * @pt-BR Schemas de planos / prepagas (#252).
+ */
+const osTipoProducto = z.enum(['generico', 'marca', 'cronico', 'oncologico'])
+
+export const obraSocialCreateBodySchema = z.object({
+  nombre: z.string().trim().min(1).max(120),
+  codigo: z.string().trim().min(1).max(40),
+  activa: z.boolean().optional(),
+  coberturas: z
+    .array(
+      z.object({
+        tipoProducto: osTipoProducto,
+        cobertura: z.number().finite().min(0).max(100),
+      }),
+    )
+    .max(20)
+    .optional(),
+})
+
+export const obraSocialUpdateBodySchema = z.object({
+  nombre: z.string().trim().min(1).max(120).optional(),
+  codigo: z.string().trim().min(1).max(40).optional(),
+  activa: z.boolean().optional(),
+})
+
+export const coberturaOsUpsertBodySchema = z.object({
+  tipoProducto: osTipoProducto,
+  cobertura: z.number().finite().min(0).max(100),
+})
+
+export const ventaConOsCreateBodySchema = z.object({
+  clienteId: z.number().int().min(1),
+  obraSocialId: z.number().int().min(1),
+  nroAfiliado: z.string().trim().min(1).max(40),
+  nroReceta: z.string().trim().max(40).nullable().optional(),
+  facturaId: z.number().int().min(1).nullable().optional(),
+  items: z
+    .array(
+      z.object({
+        articuloId: z.number().int().min(1).nullable().optional(),
+        descripcion: z.string().trim().min(1).max(200),
+        tipoProducto: osTipoProducto,
+        cantidad: z.number().finite().positive(),
+        precioUnitario: z.number().finite().min(0),
+      }),
+    )
+    .min(1)
+    .max(100),
+})
+
+export const ventaConOsListQuerySchema = z.object({
+  obraSocialId: z.coerce.number().int().min(1).optional(),
+  estado: z.enum(['pendiente_cobro_os', 'presentado', 'cobrado', 'rechazado_os']).optional(),
+})
+
+export const presentacionOsCreateBodySchema = z.object({
+  obraSocialId: z.number().int().min(1),
+  periodo: z.string().trim().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'must be YYYY-MM'),
+})
+
+export const presentacionOsCobroBodySchema = z.object({
+  importeCobrado: z.number().finite().min(0),
+  fechaPago: z.string().trim().optional(),
+})
+
+export const presentacionOsRechazoBodySchema = z.object({
+  ventaConOSId: z.number().int().min(1),
+  ventaOSItemId: z.number().int().min(1).nullable().optional(),
+  importeRechazado: z.number().finite().positive(),
+  motivo: z.string().trim().max(300).nullable().optional(),
+})
+
+export const presentacionOsListQuerySchema = z.object({
+  obraSocialId: z.coerce.number().int().min(1).optional(),
+})
+
 export const visitaCreateBodySchema = z
   .object({
     vendedorId: z.number(),

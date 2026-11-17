@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clienteId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "facturaId": {
+      "minimum": 1,
+      "nullable": true,
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "properties": {
+          "articuloId": {
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "cantidad": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "descripcion": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "precioUnitario": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "tipoProducto": {
+            "$ref": "./OsTipoProducto.schema.json"
+          }
+        },
+        "required": [
+          "descripcion",
+          "tipoProducto",
+          "cantidad",
+          "precioUnitario"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "nroAfiliado": {
+      "maxLength": 40,
+      "minLength": 1,
+      "type": "string"
+    },
+    "nroReceta": {
+      "maxLength": 40,
+      "nullable": true,
+      "type": "string"
+    },
+    "obraSocialId": {
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "clienteId",
+    "obraSocialId",
+    "nroAfiliado",
+    "items"
+  ],
+  "title": "VentaConOSCreateInput",
+  "type": "object"
+}

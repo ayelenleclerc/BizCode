@@ -176,6 +176,12 @@
 
 * [ClientePuntosEnvelope](./clientepuntosenvelope.md) – `-`
 
+* [CoberturaOS](./coberturaos.md) – `-`
+
+* [CoberturaOSEnvelope](./coberturaosenvelope.md) – `-`
+
+* [CoberturaOSUpsertInput](./coberturaosupsertinput.md) – `-`
+
 * [CobranzaRecordatorioEnvelope](./cobranzarecordatorioenvelope.md) – `-`
 
 * [CobranzaRecordatorioInput](./cobranzarecordatorioinput.md) – `-`
@@ -804,6 +810,20 @@
 
 * [NotificationReadAllEnvelope](./notificationreadallenvelope.md) – `-`
 
+* [ObraSocial](./obrasocial.md) – `-`
+
+* [ObraSocialCreateInput](./obrasocialcreateinput.md) – `-`
+
+* [ObraSocialCuentaCorriente](./obrasocialcuentacorriente.md) – `-`
+
+* [ObraSocialCuentaCorrienteListEnvelope](./obrasocialcuentacorrientelistenvelope.md) – `-`
+
+* [ObraSocialEnvelope](./obrasocialenvelope.md) – `-`
+
+* [ObraSocialListEnvelope](./obrasociallistenvelope.md) – `-`
+
+* [ObraSocialUpdateInput](./obrasocialupdateinput.md) – `-`
+
 * [OrdenCompra](./ordencompra.md) – `-`
 
 * [OrdenCompraCreateInput](./ordencompracreateinput.md) – `-`
@@ -875,6 +895,8 @@
 * [OrdenTrabajoTransitionInput](./ordentrabajotransitioninput.md) – `-`
 
 * [OrdenTrabajoUpdateInput](./ordentrabajoupdateinput.md) – `-`
+
+* [OsTipoProducto](./ostipoproducto.md) – `-`
 
 * [PadronA4Consulta](./padrona4consulta.md) – `-`
 
@@ -991,6 +1013,22 @@
 * [PrecioEscalonado](./precioescalonado.md) – `-`
 
 * [PresentacionFila](./presentacionfila.md) – `-`
+
+* [PresentacionOS](./presentacionos.md) – `-`
+
+* [PresentacionOSCobroInput](./presentacionoscobroinput.md) – `-`
+
+* [PresentacionOSCreateInput](./presentacionoscreateinput.md) – `-`
+
+* [PresentacionOSEnvelope](./presentacionosenvelope.md) – `-`
+
+* [PresentacionOSListEnvelope](./presentacionoslistenvelope.md) – `-`
+
+* [PresentacionOSRechazo](./presentacionosrechazo.md) – `-`
+
+* [PresentacionOSRechazoInput](./presentacionosrechazoinput.md) – `-`
+
+* [PresentacionOsEstado](./presentacionosestado.md) – `-`
 
 * [PresentacionPreview](./presentacionpreview.md) – `-`
 
@@ -1520,6 +1558,18 @@
 
 * [VendedorZonaListEnvelope](./vendedorzonalistenvelope.md) – `-`
 
+* [VentaConOS](./ventaconos.md) – `-`
+
+* [VentaConOSCreateInput](./ventaconoscreateinput.md) – `-`
+
+* [VentaConOSEnvelope](./ventaconosenvelope.md) – `-`
+
+* [VentaConOSListEnvelope](./ventaconoslistenvelope.md) – `-`
+
+* [VentaOSItem](./ventaositem.md) – `-`
+
+* [VentaOsEstado](./ventaosestado.md) – `-`
+
 * [Visita](./visita.md) – `-`
 
 * [VisitaCreateInput](./visitacreateinput.md) – `-`
@@ -1944,6 +1994,8 @@
 
 * [Untitled object in VendedorZonaListEnvelope](./vendedorzonalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
+* [Untitled object in VentaConOSCreateInput](./ventaconoscreateinput-properties-items-items.md) – `undefined#/properties/items/items`
+
 * [Untitled object in VisitaListEnvelope](./visitalistenvelope-allof-0.md) – `undefined#/allOf/0`
 
 * [Untitled object in WooCommerceDisconnectEnvelope](./woocommercedisconnectenvelope-properties-data.md) – `undefined#/properties/data`
@@ -2214,6 +2266,14 @@
 
 * [Untitled array in NotificationListEnvelope](./notificationlistenvelope-properties-data.md) – `undefined#/properties/data`
 
+* [Untitled array in ObraSocial](./obrasocial-properties-coberturas.md) – `undefined#/properties/coberturas`
+
+* [Untitled array in ObraSocialCreateInput](./obrasocialcreateinput-properties-coberturas.md) – `undefined#/properties/coberturas`
+
+* [Untitled array in ObraSocialCuentaCorrienteListEnvelope](./obrasocialcuentacorrientelistenvelope-properties-data.md) – `undefined#/properties/data`
+
+* [Untitled array in ObraSocialListEnvelope](./obrasociallistenvelope-properties-data.md) – `undefined#/properties/data`
+
 * [Untitled array in OrdenCompra](./ordencompra-properties-items.md) – `undefined#/properties/items`
 
 * [Untitled array in OrdenCompraCreateInput](./ordencompracreateinput-properties-items.md) – `undefined#/properties/items`
@@ -2277,6 +2337,10 @@
 * [Untitled array in PortalFacturaListEnvelope](./portalfacturalistenvelope-properties-data-properties-facturas.md) – `undefined#/properties/data/properties/facturas`
 
 * [Untitled array in PortalPedidoListEnvelope](./portalpedidolistenvelope-properties-data-properties-pedidos.md) – `undefined#/properties/data/properties/pedidos`
+
+* [Untitled array in PresentacionOS](./presentacionos-properties-rechazos.md) – `undefined#/properties/rechazos`
+
+* [Untitled array in PresentacionOSListEnvelope](./presentacionoslistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in PresentacionPreview](./presentacionpreview-properties-filas.md) – `undefined#/properties/filas`
 
@@ -2459,6 +2523,12 @@
 * [Untitled array in TurnoCajaListEnvelope](./turnocajalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 
 * [Untitled array in VendedorZonaListEnvelope](./vendedorzonalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
+
+* [Untitled array in VentaConOS](./ventaconos-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in VentaConOSCreateInput](./ventaconoscreateinput-properties-items.md) – `undefined#/properties/items`
+
+* [Untitled array in VentaConOSListEnvelope](./ventaconoslistenvelope-properties-data.md) – `undefined#/properties/data`
 
 * [Untitled array in VisitaListEnvelope](./visitalistenvelope-allof-0-properties-data.md) – `undefined#/allOf/0/properties/data`
 

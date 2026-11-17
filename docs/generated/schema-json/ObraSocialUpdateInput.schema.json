@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activa": {
+      "type": "boolean"
+    },
+    "codigo": {
+      "maxLength": 40,
+      "minLength": 1,
+      "type": "string"
+    },
+    "nombre": {
+      "maxLength": 120,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "title": "ObraSocialUpdateInput",
+  "type": "object"
+}

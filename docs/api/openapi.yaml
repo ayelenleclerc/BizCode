@@ -132,9 +132,11 @@ tags:
     description: Audit event history (read-only)
   - name: farmacia
     description: >-
-      Pharmacy vertical MVP (#204, module `vertical.pharmacy`) — prescriptions, internal
-      psychotropic movement book and lot unit serial capture. The book is an internal audit
-      trail: it is not the official SEDRONAR filing format, and no ANMAT SNT web service is called.
+      Pharmacy vertical (#204/#252, module `vertical.pharmacy`) — prescriptions, internal
+      psychotropic movement book, lot unit serial capture, and insurer/prepaid (obra social)
+      ABM, copay sales, monthly presentation CSV, current account and partial rejections.
+      The psychotropic book is an internal audit trail (not official SEDRONAR). Presentation
+      CSV/PDF is internal (not PAMI/Farmalink or proprietary OSDE/Swiss formats). No ANMAT SNT call.
   - name: exportacion
     description: >-
       Export vertical MVP (#206, module `vertical.export`) — operation currency with an explicit
@@ -7893,6 +7895,448 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/obras-sociales:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [farmacia]
+      summary: List insurers / prepaid plans (#252)
+      description: Requires module `vertical.pharmacy` and `products.read`.
+      responses:
+        '200':
+          description: Insurer list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObraSocialListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [farmacia]
+      summary: Create insurer / prepaid plan (#252)
+      description: Requires module `vertical.pharmacy` and `inventory.adjust`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObraSocialCreateInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObraSocialEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate codigo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/obras-sociales/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [farmacia]
+      summary: Get insurer by id (#252)
+      responses:
+        '200':
+          description: Insurer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObraSocialEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    patch:
+      tags: [farmacia]
+      summary: Update insurer (#252)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObraSocialUpdateInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObraSocialEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Duplicate codigo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/obras-sociales/{id}/coberturas:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    put:
+      tags: [farmacia]
+      summary: Upsert coverage percent by product type (#252)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoberturaOSUpsertInput'
+      responses:
+        '200':
+          description: Upserted coverage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoberturaOSEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/ventas-os:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [farmacia]
+      summary: List pharmacy sales with insurer credit (#252)
+      parameters:
+        - name: obraSocialId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: estado
+          in: query
+          schema:
+            $ref: '#/components/schemas/VentaOsEstado'
+      responses:
+        '200':
+          description: Sales list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VentaConOSListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [farmacia]
+      summary: Create sale with automatic copay / insurer credit (#252)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VentaConOSCreateInput'
+      responses:
+        '201':
+          description: Created sale
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VentaConOSEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/presentaciones-os:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [farmacia]
+      summary: List monthly insurer presentations (#252)
+      parameters:
+        - name: obraSocialId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Presentations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionOSListEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags: [farmacia]
+      summary: Generate monthly presentation from pending OS sales (#252)
+      description: >-
+        Groups `pendiente_cobro_os` sales for the period into an internal CSV presentation.
+        Not a proprietary COFA/OSDE/Swiss filing format.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentacionOSCreateInput'
+      responses:
+        '201':
+          description: Presentation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionOSEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Duplicate period
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '422':
+          description: No pending sales
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/presentaciones-os/{id}/export:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    get:
+      tags: [farmacia]
+      summary: Download internal presentation CSV (#252)
+      responses:
+        '200':
+          description: CSV body
+          content:
+            text/csv:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/presentaciones-os/{id}/marcar-presentada:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [farmacia]
+      summary: Mark presentation as submitted (#252)
+      responses:
+        '200':
+          description: Updated presentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionOSEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/presentaciones-os/{id}/cobro:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [farmacia]
+      summary: Register insurer payment against a presentation (#252)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentacionOSCobroInput'
+      responses:
+        '200':
+          description: Updated presentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionOSEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/presentaciones-os/{id}/rechazos:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+    post:
+      tags: [farmacia]
+      summary: Register a partial rejection on a presentation (#252)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresentacionOSRechazoInput'
+      responses:
+        '201':
+          description: Presentation with new rejection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresentacionOSEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          description: Invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorEnvelope'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/farmacia/obras-sociales-cc:
+    parameters:
+      - $ref: '#/components/parameters/BizcodeChannelHeader'
+    get:
+      tags: [farmacia]
+      summary: Insurer current-account summary (#252)
+      description: Credits pending vs presented vs collected vs rejected per obra social.
+      responses:
+        '200':
+          description: CC rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObraSocialCuentaCorrienteListEnvelope'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -28001,6 +28445,271 @@ components:
             codigoDatamatrix:
               type: string
               nullable: true
+
+    OsTipoProducto:
+      type: string
+      enum: [generico, marca, cronico, oncologico]
+
+    VentaOsEstado:
+      type: string
+      enum: [pendiente_cobro_os, presentado, cobrado, rechazado_os]
+
+    PresentacionOsEstado:
+      type: string
+      enum: [generada, presentada, cobrada, con_rechazos]
+
+    CoberturaOS:
+      type: object
+      required: [id, tenantId, obraSocialId, tipoProducto, cobertura, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        tenantId: { type: integer }
+        obraSocialId: { type: integer }
+        tipoProducto: { $ref: '#/components/schemas/OsTipoProducto' }
+        cobertura: { type: number }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    ObraSocial:
+      type: object
+      required: [id, tenantId, nombre, codigo, activa, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        tenantId: { type: integer }
+        nombre: { type: string }
+        codigo: { type: string }
+        activa: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        coberturas:
+          type: array
+          items: { $ref: '#/components/schemas/CoberturaOS' }
+
+    ObraSocialCreateInput:
+      type: object
+      required: [nombre, codigo]
+      properties:
+        nombre: { type: string, minLength: 1, maxLength: 120 }
+        codigo: { type: string, minLength: 1, maxLength: 40 }
+        activa: { type: boolean }
+        coberturas:
+          type: array
+          items: { $ref: '#/components/schemas/CoberturaOSUpsertInput' }
+
+    ObraSocialUpdateInput:
+      type: object
+      properties:
+        nombre: { type: string, minLength: 1, maxLength: 120 }
+        codigo: { type: string, minLength: 1, maxLength: 40 }
+        activa: { type: boolean }
+
+    CoberturaOSUpsertInput:
+      type: object
+      required: [tipoProducto, cobertura]
+      properties:
+        tipoProducto: { $ref: '#/components/schemas/OsTipoProducto' }
+        cobertura: { type: number, minimum: 0, maximum: 100 }
+
+    ObraSocialEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data: { $ref: '#/components/schemas/ObraSocial' }
+
+    ObraSocialListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/ObraSocial' }
+
+    CoberturaOSEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data: { $ref: '#/components/schemas/CoberturaOS' }
+
+    VentaOSItem:
+      type: object
+      required:
+        [id, tenantId, ventaConOSId, articuloId, descripcion, tipoProducto, cantidad, precioUnitario, subtotal, coberturaPct, creditoOS, copago]
+      properties:
+        id: { type: integer }
+        tenantId: { type: integer }
+        ventaConOSId: { type: integer }
+        articuloId: { type: integer, nullable: true }
+        descripcion: { type: string }
+        tipoProducto: { $ref: '#/components/schemas/OsTipoProducto' }
+        cantidad: { type: number }
+        precioUnitario: { type: number }
+        subtotal: { type: number }
+        coberturaPct: { type: number }
+        creditoOS: { type: number }
+        copago: { type: number }
+
+    VentaConOS:
+      type: object
+      required:
+        [id, tenantId, facturaId, clienteId, obraSocialId, nroAfiliado, nroReceta, totalVenta, copagoPaciente, creditoOS, estado, presentacionId, fecha, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        tenantId: { type: integer }
+        facturaId: { type: integer, nullable: true }
+        clienteId: { type: integer }
+        obraSocialId: { type: integer }
+        nroAfiliado: { type: string }
+        nroReceta: { type: string, nullable: true }
+        totalVenta: { type: number }
+        copagoPaciente: { type: number }
+        creditoOS: { type: number }
+        estado: { $ref: '#/components/schemas/VentaOsEstado' }
+        presentacionId: { type: integer, nullable: true }
+        fecha: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/VentaOSItem' }
+
+    VentaConOSCreateInput:
+      type: object
+      required: [clienteId, obraSocialId, nroAfiliado, items]
+      properties:
+        clienteId: { type: integer, minimum: 1 }
+        obraSocialId: { type: integer, minimum: 1 }
+        nroAfiliado: { type: string, minLength: 1, maxLength: 40 }
+        nroReceta: { type: string, maxLength: 40, nullable: true }
+        facturaId: { type: integer, minimum: 1, nullable: true }
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [descripcion, tipoProducto, cantidad, precioUnitario]
+            properties:
+              articuloId: { type: integer, minimum: 1, nullable: true }
+              descripcion: { type: string, minLength: 1, maxLength: 200 }
+              tipoProducto: { $ref: '#/components/schemas/OsTipoProducto' }
+              cantidad: { type: number, exclusiveMinimum: 0 }
+              precioUnitario: { type: number, minimum: 0 }
+
+    VentaConOSEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data: { $ref: '#/components/schemas/VentaConOS' }
+
+    VentaConOSListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/VentaConOS' }
+
+    PresentacionOSRechazo:
+      type: object
+      required: [id, tenantId, presentacionId, ventaConOSId, ventaOSItemId, importeRechazado, motivo, createdAt]
+      properties:
+        id: { type: integer }
+        tenantId: { type: integer }
+        presentacionId: { type: integer }
+        ventaConOSId: { type: integer }
+        ventaOSItemId: { type: integer, nullable: true }
+        importeRechazado: { type: number }
+        motivo: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    PresentacionOS:
+      type: object
+      required:
+        [id, tenantId, obraSocialId, periodo, totalCredito, estado, archivoCsvName, fechaPago, importeCobrado, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        tenantId: { type: integer }
+        obraSocialId: { type: integer }
+        periodo: { type: string }
+        totalCredito: { type: number }
+        estado: { $ref: '#/components/schemas/PresentacionOsEstado' }
+        archivoCsvName: { type: string, nullable: true }
+        fechaPago: { type: string, format: date-time, nullable: true }
+        importeCobrado: { type: number, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        ventasCount: { type: integer }
+        rechazos:
+          type: array
+          items: { $ref: '#/components/schemas/PresentacionOSRechazo' }
+
+    PresentacionOSCreateInput:
+      type: object
+      required: [obraSocialId, periodo]
+      properties:
+        obraSocialId: { type: integer, minimum: 1 }
+        periodo:
+          type: string
+          pattern: '^\d{4}-(0[1-9]|1[0-2])$'
+
+    PresentacionOSCobroInput:
+      type: object
+      required: [importeCobrado]
+      properties:
+        importeCobrado: { type: number, minimum: 0 }
+        fechaPago: { type: string }
+
+    PresentacionOSRechazoInput:
+      type: object
+      required: [ventaConOSId, importeRechazado]
+      properties:
+        ventaConOSId: { type: integer, minimum: 1 }
+        ventaOSItemId: { type: integer, minimum: 1, nullable: true }
+        importeRechazado: { type: number, exclusiveMinimum: 0 }
+        motivo: { type: string, maxLength: 300, nullable: true }
+
+    PresentacionOSEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data: { $ref: '#/components/schemas/PresentacionOS' }
+
+    PresentacionOSListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/PresentacionOS' }
+
+    ObraSocialCuentaCorriente:
+      type: object
+      required:
+        [obraSocialId, nombre, codigo, creditoPendiente, creditoPresentado, creditoCobrado, creditoRechazado, saldoAbierto]
+      properties:
+        obraSocialId: { type: integer }
+        nombre: { type: string }
+        codigo: { type: string }
+        creditoPendiente: { type: number }
+        creditoPresentado: { type: number }
+        creditoCobrado: { type: number }
+        creditoRechazado: { type: number }
+        saldoAbierto: { type: number }
+
+    ObraSocialCuentaCorrienteListEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data:
+          type: array
+          items: { $ref: '#/components/schemas/ObraSocialCuentaCorriente' }
 
     Incoterm:
       type: string

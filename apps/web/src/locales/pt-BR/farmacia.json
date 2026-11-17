@@ -1,11 +1,66 @@
 {
   "title": "Farmácia",
   "loadError": "Não foi possível carregar os dados da farmácia",
-  "complianceNotice": "Somente registro local. Este módulo não envia informações ao Sistema Nacional de Rastreabilidade da ANMAT e o livro de psicotrópicos não é o formato oficial de declaração ao SEDRONAR.",
+  "complianceNotice": "Somente registro local. Este módulo não envia ao SNT da ANMAT; o livro de psicotrópicos não é o formato oficial SEDRONAR; as apresentações a planos são CSV/PDF internos (sem PAMI/Farmalink nem formatos proprietários OSDE/Swiss).",
   "tabs": {
     "recetas": "Receitas",
     "libro": "Livro de psicotrópicos",
-    "serial": "Serial do lote"
+    "serial": "Serial do lote",
+    "os": "Planos de saúde",
+    "ventasOs": "Vendas com plano",
+    "presentaciones": "Apresentações",
+    "cc": "Conta corrente do plano"
+  },
+  "os": {
+    "title": "Planos de saúde e prepagas",
+    "hint": "ABM local. Sem integração live PAMI/Farmalink e sem formatos proprietários OSDE/Swiss.",
+    "nombre": "Nome",
+    "codigo": "Código",
+    "tipoProducto": "Tipo de produto",
+    "cobertura": "Cobertura %",
+    "tipos": {
+      "generico": "Genérico",
+      "marca": "Marca",
+      "cronico": "Crônico",
+      "oncologico": "Oncológico"
+    },
+    "save": "Registrar plano",
+    "saveOk": "Plano registrado",
+    "saveError": "Não foi possível registrar o plano",
+    "empty": "Ainda não há planos registrados",
+    "sinCoberturas": "Sem coberturas"
+  },
+  "ventasOs": {
+    "title": "Vendas com crédito do plano",
+    "clienteId": "ID do cliente",
+    "obraSocialId": "ID do plano",
+    "nroAfiliado": "Número do afiliado",
+    "descripcion": "Descrição do item",
+    "precioUnitario": "Preço unitário",
+    "copago": "Copago",
+    "credito": "Crédito do plano",
+    "save": "Registrar venda com plano",
+    "saveOk": "Venda registrada",
+    "saveError": "Não foi possível registrar a venda",
+    "empty": "Ainda não há vendas com plano"
+  },
+  "presentaciones": {
+    "title": "Apresentações mensais",
+    "hint": "Lote CSV interno; não é formato proprietário COFA/OSDE/Swiss.",
+    "obraSocialId": "ID do plano",
+    "periodo": "Período (YYYY-MM)",
+    "total": "Total de crédito",
+    "save": "Gerar apresentação",
+    "saveOk": "Apresentação gerada",
+    "saveError": "Não foi possível gerar a apresentação",
+    "empty": "Ainda não há apresentações"
+  },
+  "cc": {
+    "title": "Conta corrente por plano",
+    "saldo": "Saldo aberto",
+    "cobrado": "Cobrado",
+    "rechazado": "Rejeitado",
+    "empty": "Sem movimentos de conta corrente"
   },
   "recetas": {
     "title": "Receitas de dispensação",

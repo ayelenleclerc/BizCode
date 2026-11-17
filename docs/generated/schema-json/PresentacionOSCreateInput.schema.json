@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "obraSocialId": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "periodo": {
+      "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "obraSocialId",
+    "periodo"
+  ],
+  "title": "PresentacionOSCreateInput",
+  "type": "object"
+}

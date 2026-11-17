@@ -8,6 +8,10 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Pharmacy obras sociales / prepaid MVP (#252):** ABM insurers + coverage %, OS sale with automatic copay/credit, monthly presentation CSV, CC summary and partial rejections on `vertical.pharmacy` (Prisma migration `20261117120000_obras_sociales_252`, `ObraSocialService`, `/api/farmacia/obras-sociales*`, UI tabs). Residual: no PAMI/Farmalink live and no proprietary OSDE/Swiss formats; #252 stays OPEN.
+
 ### Changed
 
 - **Twilio WhatsApp webhook 403 OpenAPI assert (#201 residual):** `tests/api/twilio-whatsapp-webhook.test.ts` validates `POST /api/webhooks/twilio/whatsapp` 403 (invalid Twilio signature) with Ajv vs OpenAPI (ADR-0003); #201 stays OPEN (OpenAI / Meta Cloud / WA per tenant).

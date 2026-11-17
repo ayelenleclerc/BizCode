@@ -1,11 +1,66 @@
 {
   "title": "Farmacia",
   "loadError": "No se pudieron cargar los datos de farmacia",
-  "complianceNotice": "Registro local únicamente. Este módulo no envía información al Sistema Nacional de Trazabilidad de ANMAT y el libro de psicotrópicos no es el formato oficial de presentación ante SEDRONAR.",
+  "complianceNotice": "Registro local únicamente. Este módulo no envía información al SNT de ANMAT; el libro de psicotrópicos no es el formato oficial SEDRONAR; las presentaciones a obras sociales son CSV/PDF internos (sin PAMI/Farmalink ni formatos propietarios OSDE/Swiss).",
   "tabs": {
     "recetas": "Recetas",
     "libro": "Libro de psicotrópicos",
-    "serial": "Serial de lote"
+    "serial": "Serial de lote",
+    "os": "Obras sociales",
+    "ventasOs": "Ventas OS",
+    "presentaciones": "Presentaciones",
+    "cc": "Cuenta corriente OS"
+  },
+  "os": {
+    "title": "Obras sociales y prepagas",
+    "hint": "ABM local. No integra PAMI/Farmalink ni formatos propietarios OSDE/Swiss.",
+    "nombre": "Nombre",
+    "codigo": "Código",
+    "tipoProducto": "Tipo de producto",
+    "cobertura": "Cobertura %",
+    "tipos": {
+      "generico": "Genérico",
+      "marca": "Marca",
+      "cronico": "Crónico",
+      "oncologico": "Oncológico"
+    },
+    "save": "Registrar obra social",
+    "saveOk": "Obra social registrada",
+    "saveError": "No se pudo registrar la obra social",
+    "empty": "Todavía no hay obras sociales",
+    "sinCoberturas": "Sin coberturas"
+  },
+  "ventasOs": {
+    "title": "Ventas con obra social",
+    "clienteId": "ID de cliente",
+    "obraSocialId": "ID de obra social",
+    "nroAfiliado": "Número de afiliado",
+    "descripcion": "Descripción del ítem",
+    "precioUnitario": "Precio unitario",
+    "copago": "Copago",
+    "credito": "Crédito OS",
+    "save": "Registrar venta OS",
+    "saveOk": "Venta OS registrada",
+    "saveError": "No se pudo registrar la venta OS",
+    "empty": "Todavía no hay ventas con OS"
+  },
+  "presentaciones": {
+    "title": "Presentaciones mensuales",
+    "hint": "Planilla CSV interna; no es formato propietario COFA/OSDE/Swiss.",
+    "obraSocialId": "ID de obra social",
+    "periodo": "Período (YYYY-MM)",
+    "total": "Total crédito",
+    "save": "Generar presentación",
+    "saveOk": "Presentación generada",
+    "saveError": "No se pudo generar la presentación",
+    "empty": "Todavía no hay presentaciones"
+  },
+  "cc": {
+    "title": "Cuenta corriente por obra social",
+    "saldo": "Saldo abierto",
+    "cobrado": "Cobrado",
+    "rechazado": "Rechazado",
+    "empty": "Sin movimientos de cuenta corriente"
   },
   "recetas": {
     "title": "Recetas de dispensación",

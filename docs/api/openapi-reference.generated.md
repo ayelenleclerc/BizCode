@@ -79261,6 +79261,5513 @@ Requires module `vertical.pharmacy` and `inventory.adjust`. Values are stored ve
 }
 ```
 
+### PARAMETERS /api/farmacia/obras-sociales
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/obras-sociales`
+
+### List insurers / prepaid plans (#252)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/obras-sociales`
+- **Tags:** farmacia
+
+Requires module `vertical.pharmacy` and `products.read`.
+
+#### Responses
+
+##### Status: 200 Insurer list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`coberturas`**
+
+    `array`
+
+    **Items:**
+
+    - **`cobertura` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`obraSocialId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "nombre": "",
+      "codigo": "",
+      "activa": true,
+      "createdAt": "",
+      "updatedAt": "",
+      "coberturas": [
+        {
+          "id": 1,
+          "tenantId": 1,
+          "obraSocialId": 1,
+          "tipoProducto": "generico",
+          "cobertura": 1,
+          "createdAt": "",
+          "updatedAt": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Create insurer / prepaid plan (#252)
+
+- **Method:** `POST`
+- **Path:** `/api/farmacia/obras-sociales`
+- **Tags:** farmacia
+
+Requires module `vertical.pharmacy` and `inventory.adjust`.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`codigo` (required)**
+
+  `string`
+
+- **`nombre` (required)**
+
+  `string`
+
+- **`activa`**
+
+  `boolean`
+
+- **`coberturas`**
+
+  `array`
+
+  **Items:**
+
+  - **`cobertura` (required)**
+
+    `number`
+
+  - **`tipoProducto` (required)**
+
+    `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "activa": true,
+  "coberturas": [
+    {
+      "tipoProducto": "generico",
+      "cobertura": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`coberturas`**
+
+    `array`
+
+    **Items:**
+
+    - **`cobertura` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`obraSocialId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "activa": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "coberturas": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "obraSocialId": 1,
+        "tipoProducto": "generico",
+        "cobertura": 1,
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 409 Duplicate codigo
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/obras-sociales/{id}
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/obras-sociales/{id}`
+
+### Get insurer by id (#252)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/obras-sociales/{id}`
+- **Tags:** farmacia
+
+#### Responses
+
+##### Status: 200 Insurer
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`coberturas`**
+
+    `array`
+
+    **Items:**
+
+    - **`cobertura` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`obraSocialId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "activa": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "coberturas": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "obraSocialId": 1,
+        "tipoProducto": "generico",
+        "cobertura": 1,
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Update insurer (#252)
+
+- **Method:** `PATCH`
+- **Path:** `/api/farmacia/obras-sociales/{id}`
+- **Tags:** farmacia
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`activa`**
+
+  `boolean`
+
+- **`codigo`**
+
+  `string`
+
+- **`nombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "activa": true
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`coberturas`**
+
+    `array`
+
+    **Items:**
+
+    - **`cobertura` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`obraSocialId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "activa": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "coberturas": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "obraSocialId": 1,
+        "tipoProducto": "generico",
+        "cobertura": 1,
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 409 Duplicate codigo
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/obras-sociales/{id}/coberturas
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/obras-sociales/{id}/coberturas`
+
+### Upsert coverage percent by product type (#252)
+
+- **Method:** `PUT`
+- **Path:** `/api/farmacia/obras-sociales/{id}/coberturas`
+- **Tags:** farmacia
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`cobertura` (required)**
+
+  `number`
+
+- **`tipoProducto` (required)**
+
+  `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+**Example:**
+
+```json
+{
+  "tipoProducto": "generico",
+  "cobertura": 0
+}
+```
+
+#### Responses
+
+##### Status: 200 Upserted coverage
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`cobertura` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipoProducto` (required)**
+
+    `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "obraSocialId": 1,
+    "tipoProducto": "generico",
+    "cobertura": 1,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/ventas-os
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/ventas-os`
+
+### List pharmacy sales with insurer credit (#252)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/ventas-os`
+- **Tags:** farmacia
+
+#### Responses
+
+##### Status: 200 Sales list
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`copagoPaciente` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`creditoOS` (required)**
+
+    `number`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente_cobro_os", "presentado", "cobrado", "rechazado_os"`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroAfiliado` (required)**
+
+    `string`
+
+  - **`nroReceta` (required)**
+
+    `string`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`presentacionId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalVenta` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`coberturaPct` (required)**
+
+      `number`
+
+    - **`copago` (required)**
+
+      `number`
+
+    - **`creditoOS` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`precioUnitario` (required)**
+
+      `number`
+
+    - **`subtotal` (required)**
+
+      `number`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "obraSocialId": 1,
+      "nroAfiliado": "",
+      "nroReceta": "",
+      "totalVenta": 1,
+      "copagoPaciente": 1,
+      "creditoOS": 1,
+      "estado": "pendiente_cobro_os",
+      "presentacionId": 1,
+      "fecha": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "items": [
+        {
+          "id": 1,
+          "tenantId": 1,
+          "ventaConOSId": 1,
+          "articuloId": 1,
+          "descripcion": "",
+          "tipoProducto": "generico",
+          "cantidad": 1,
+          "precioUnitario": 1,
+          "subtotal": 1,
+          "coberturaPct": 1,
+          "creditoOS": 1,
+          "copago": 1
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Create sale with automatic copay / insurer credit (#252)
+
+- **Method:** `POST`
+- **Path:** `/api/farmacia/ventas-os`
+- **Tags:** farmacia
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`clienteId` (required)**
+
+  `integer`
+
+- **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnitario` (required)**
+
+    `number`
+
+  - **`tipoProducto` (required)**
+
+    `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+  - **`articuloId`**
+
+    `integer`
+
+- **`nroAfiliado` (required)**
+
+  `string`
+
+- **`obraSocialId` (required)**
+
+  `integer`
+
+- **`facturaId`**
+
+  `integer`
+
+- **`nroReceta`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "obraSocialId": 1,
+  "nroAfiliado": "",
+  "nroReceta": "",
+  "facturaId": 1,
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "tipoProducto": "generico",
+      "cantidad": 1,
+      "precioUnitario": 0
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 201 Created sale
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`copagoPaciente` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`creditoOS` (required)**
+
+    `number`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente_cobro_os", "presentado", "cobrado", "rechazado_os"`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroAfiliado` (required)**
+
+    `string`
+
+  - **`nroReceta` (required)**
+
+    `string`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`presentacionId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalVenta` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`coberturaPct` (required)**
+
+      `number`
+
+    - **`copago` (required)**
+
+      `number`
+
+    - **`creditoOS` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`precioUnitario` (required)**
+
+      `number`
+
+    - **`subtotal` (required)**
+
+      `number`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "obraSocialId": 1,
+    "nroAfiliado": "",
+    "nroReceta": "",
+    "totalVenta": 1,
+    "copagoPaciente": 1,
+    "creditoOS": 1,
+    "estado": "pendiente_cobro_os",
+    "presentacionId": 1,
+    "fecha": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "items": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "ventaConOSId": 1,
+        "articuloId": 1,
+        "descripcion": "",
+        "tipoProducto": "generico",
+        "cantidad": 1,
+        "precioUnitario": 1,
+        "subtotal": 1,
+        "coberturaPct": 1,
+        "creditoOS": 1,
+        "copago": 1
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/presentaciones-os
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/presentaciones-os`
+
+### List monthly insurer presentations (#252)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/presentaciones-os`
+- **Tags:** farmacia
+
+#### Responses
+
+##### Status: 200 Presentations
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`archivoCsvName` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"generada", "presentada", "cobrada", "con_rechazos"`
+
+  - **`fechaPago` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importeCobrado` (required)**
+
+    `number`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalCredito` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rechazos`**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importeRechazado` (required)**
+
+      `number`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`presentacionId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+    - **`ventaOSItemId` (required)**
+
+      `integer`
+
+  - **`ventasCount`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "obraSocialId": 1,
+      "periodo": "",
+      "totalCredito": 1,
+      "estado": "generada",
+      "archivoCsvName": "",
+      "fechaPago": "",
+      "importeCobrado": 1,
+      "createdAt": "",
+      "updatedAt": "",
+      "ventasCount": 1,
+      "rechazos": [
+        {
+          "id": 1,
+          "tenantId": 1,
+          "presentacionId": 1,
+          "ventaConOSId": 1,
+          "ventaOSItemId": 1,
+          "importeRechazado": 1,
+          "motivo": "",
+          "createdAt": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### Generate monthly presentation from pending OS sales (#252)
+
+- **Method:** `POST`
+- **Path:** `/api/farmacia/presentaciones-os`
+- **Tags:** farmacia
+
+Groups `pendiente_cobro_os` sales for the period into an internal CSV presentation. Not a proprietary COFA/OSDE/Swiss filing format.
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`obraSocialId` (required)**
+
+  `integer`
+
+- **`periodo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "obraSocialId": 1,
+  "periodo": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Presentation created
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`archivoCsvName` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"generada", "presentada", "cobrada", "con_rechazos"`
+
+  - **`fechaPago` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importeCobrado` (required)**
+
+    `number`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalCredito` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rechazos`**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importeRechazado` (required)**
+
+      `number`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`presentacionId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+    - **`ventaOSItemId` (required)**
+
+      `integer`
+
+  - **`ventasCount`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "obraSocialId": 1,
+    "periodo": "",
+    "totalCredito": 1,
+    "estado": "generada",
+    "archivoCsvName": "",
+    "fechaPago": "",
+    "importeCobrado": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "ventasCount": 1,
+    "rechazos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "presentacionId": 1,
+        "ventaConOSId": 1,
+        "ventaOSItemId": 1,
+        "importeRechazado": 1,
+        "motivo": "",
+        "createdAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 409 Duplicate period
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 No pending sales
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/presentaciones-os/{id}/export
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/presentaciones-os/{id}/export`
+
+### Download internal presentation CSV (#252)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/presentaciones-os/{id}/export`
+- **Tags:** farmacia
+
+#### Responses
+
+##### Status: 200 CSV body
+
+###### Content-Type: text/csv
+
+`string`
+
+**Example:**
+
+```json
+true
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/presentaciones-os/{id}/marcar-presentada
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/presentaciones-os/{id}/marcar-presentada`
+
+### Mark presentation as submitted (#252)
+
+- **Method:** `POST`
+- **Path:** `/api/farmacia/presentaciones-os/{id}/marcar-presentada`
+- **Tags:** farmacia
+
+#### Responses
+
+##### Status: 200 Updated presentation
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`archivoCsvName` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"generada", "presentada", "cobrada", "con_rechazos"`
+
+  - **`fechaPago` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importeCobrado` (required)**
+
+    `number`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalCredito` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rechazos`**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importeRechazado` (required)**
+
+      `number`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`presentacionId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+    - **`ventaOSItemId` (required)**
+
+      `integer`
+
+  - **`ventasCount`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "obraSocialId": 1,
+    "periodo": "",
+    "totalCredito": 1,
+    "estado": "generada",
+    "archivoCsvName": "",
+    "fechaPago": "",
+    "importeCobrado": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "ventasCount": 1,
+    "rechazos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "presentacionId": 1,
+        "ventaConOSId": 1,
+        "ventaOSItemId": 1,
+        "importeRechazado": 1,
+        "motivo": "",
+        "createdAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/presentaciones-os/{id}/cobro
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/presentaciones-os/{id}/cobro`
+
+### Register insurer payment against a presentation (#252)
+
+- **Method:** `POST`
+- **Path:** `/api/farmacia/presentaciones-os/{id}/cobro`
+- **Tags:** farmacia
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`importeCobrado` (required)**
+
+  `number`
+
+- **`fechaPago`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "importeCobrado": 0,
+  "fechaPago": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 Updated presentation
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`archivoCsvName` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"generada", "presentada", "cobrada", "con_rechazos"`
+
+  - **`fechaPago` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importeCobrado` (required)**
+
+    `number`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalCredito` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rechazos`**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importeRechazado` (required)**
+
+      `number`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`presentacionId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+    - **`ventaOSItemId` (required)**
+
+      `integer`
+
+  - **`ventasCount`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "obraSocialId": 1,
+    "periodo": "",
+    "totalCredito": 1,
+    "estado": "generada",
+    "archivoCsvName": "",
+    "fechaPago": "",
+    "importeCobrado": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "ventasCount": 1,
+    "rechazos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "presentacionId": 1,
+        "ventaConOSId": 1,
+        "ventaOSItemId": 1,
+        "importeRechazado": 1,
+        "motivo": "",
+        "createdAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/presentaciones-os/{id}/rechazos
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/presentaciones-os/{id}/rechazos`
+
+### Register a partial rejection on a presentation (#252)
+
+- **Method:** `POST`
+- **Path:** `/api/farmacia/presentaciones-os/{id}/rechazos`
+- **Tags:** farmacia
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`importeRechazado` (required)**
+
+  `number`
+
+- **`ventaConOSId` (required)**
+
+  `integer`
+
+- **`motivo`**
+
+  `string`
+
+- **`ventaOSItemId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "ventaConOSId": 1,
+  "ventaOSItemId": 1,
+  "importeRechazado": 1,
+  "motivo": ""
+}
+```
+
+#### Responses
+
+##### Status: 201 Presentation with new rejection
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object`
+
+  - **`archivoCsvName` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"generada", "presentada", "cobrada", "con_rechazos"`
+
+  - **`fechaPago` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importeCobrado` (required)**
+
+    `number`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalCredito` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rechazos`**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importeRechazado` (required)**
+
+      `number`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`presentacionId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+    - **`ventaOSItemId` (required)**
+
+      `integer`
+
+  - **`ventasCount`**
+
+    `integer`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "obraSocialId": 1,
+    "periodo": "",
+    "totalCredito": 1,
+    "estado": "generada",
+    "archivoCsvName": "",
+    "fechaPago": "",
+    "importeCobrado": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "ventasCount": 1,
+    "rechazos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "presentacionId": 1,
+        "ventaConOSId": 1,
+        "ventaOSItemId": 1,
+        "importeRechazado": 1,
+        "motivo": "",
+        "createdAt": ""
+      }
+    ]
+  }
+}
+```
+
+##### Status: 400 Request payload is invalid
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 404 Resource not found
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 422 Invalid state
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+### PARAMETERS /api/farmacia/obras-sociales-cc
+
+- **Method:** `PARAMETERS`
+- **Path:** `/api/farmacia/obras-sociales-cc`
+
+### Insurer current-account summary (#252)
+
+- **Method:** `GET`
+- **Path:** `/api/farmacia/obras-sociales-cc`
+- **Tags:** farmacia
+
+Credits pending vs presented vs collected vs rejected per obra social.
+
+#### Responses
+
+##### Status: 200 CC rows
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`creditoCobrado` (required)**
+
+    `number`
+
+  - **`creditoPendiente` (required)**
+
+    `number`
+
+  - **`creditoPresentado` (required)**
+
+    `number`
+
+  - **`creditoRechazado` (required)**
+
+    `number`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`saldoAbierto` (required)**
+
+    `number`
+
+- **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "obraSocialId": 1,
+      "nombre": "",
+      "codigo": "",
+      "creditoPendiente": 1,
+      "creditoPresentado": 1,
+      "creditoCobrado": 1,
+      "creditoRechazado": 1,
+      "saldoAbierto": 1
+    }
+  ]
+}
+```
+
+##### Status: 401 Authentication required or invalid credentials
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 403 Authenticated but missing permission
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
+##### Status: 500 Internal server error
+
+###### Content-Type: application/json
+
+- **`error` (required)**
+
+  `string`
+
+- **`success` (required)**
+
+  `boolean`
+
+- **`warnings`**
+
+  `array` — Optional structured warnings (e.g. billing anomalies
+
+  **Items:**
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`severidad` (required)**
+
+    `string`, possible values: `"warning", "critical"`
+
+  - **`tipo` (required)**
+
+    `string`, possible values: `"factura_duplicada", "monto_inusual", "descuento_excesivo", "cliente_nuevo_compra_grande"`
+
+  - **`detalle`**
+
+    `object`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "error": "",
+  "warnings": [
+    {
+      "tipo": "factura_duplicada",
+      "severidad": "warning",
+      "descripcion": "",
+      "detalle": {
+        "additionalProperty": "anything"
+      }
+    }
+  ]
+}
+```
+
 ### PARAMETERS /api/exportacion/incoterms
 
 - **Method:** `PARAMETERS`
@@ -208075,6 +213582,1785 @@ Operator-entered unit serial / DataMatrix payload; stored verbatim (#204).
     "serialUnidad": "",
     "codigoDatamatrix": ""
   }
+}
+```
+
+### OsTipoProducto
+
+- **Type:**`string`
+
+**Example:**
+
+### VentaOsEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### PresentacionOsEstado
+
+- **Type:**`string`
+
+**Example:**
+
+### CoberturaOS
+
+- **Type:**`object`
+
+* **`cobertura` (required)**
+
+  `number`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`obraSocialId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipoProducto` (required)**
+
+  `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "obraSocialId": 1,
+  "tipoProducto": "generico",
+  "cobertura": 1,
+  "createdAt": "",
+  "updatedAt": ""
+}
+```
+
+### ObraSocial
+
+- **Type:**`object`
+
+* **`activa` (required)**
+
+  `boolean`
+
+* **`codigo` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`coberturas`**
+
+  `array`
+
+  **Items:**
+
+  - **`cobertura` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipoProducto` (required)**
+
+    `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "nombre": "",
+  "codigo": "",
+  "activa": true,
+  "createdAt": "",
+  "updatedAt": "",
+  "coberturas": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "obraSocialId": 1,
+      "tipoProducto": "generico",
+      "cobertura": 1,
+      "createdAt": "",
+      "updatedAt": ""
+    }
+  ]
+}
+```
+
+### ObraSocialCreateInput
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `string`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`activa`**
+
+  `boolean`
+
+* **`coberturas`**
+
+  `array`
+
+  **Items:**
+
+  - **`cobertura` (required)**
+
+    `number`
+
+  - **`tipoProducto` (required)**
+
+    `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "activa": true,
+  "coberturas": [
+    {
+      "tipoProducto": "generico",
+      "cobertura": 0
+    }
+  ]
+}
+```
+
+### ObraSocialUpdateInput
+
+- **Type:**`object`
+
+* **`activa`**
+
+  `boolean`
+
+* **`codigo`**
+
+  `string`
+
+* **`nombre`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "nombre": "",
+  "codigo": "",
+  "activa": true
+}
+```
+
+### CoberturaOSUpsertInput
+
+- **Type:**`object`
+
+* **`cobertura` (required)**
+
+  `number`
+
+* **`tipoProducto` (required)**
+
+  `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+**Example:**
+
+```json
+{
+  "tipoProducto": "generico",
+  "cobertura": 0
+}
+```
+
+### ObraSocialEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`coberturas`**
+
+    `array`
+
+    **Items:**
+
+    - **`cobertura` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`obraSocialId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "nombre": "",
+    "codigo": "",
+    "activa": true,
+    "createdAt": "",
+    "updatedAt": "",
+    "coberturas": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "obraSocialId": 1,
+        "tipoProducto": "generico",
+        "cobertura": 1,
+        "createdAt": "",
+        "updatedAt": ""
+      }
+    ]
+  }
+}
+```
+
+### ObraSocialListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`activa` (required)**
+
+    `boolean`
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`coberturas`**
+
+    `array`
+
+    **Items:**
+
+    - **`cobertura` (required)**
+
+      `number`
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`obraSocialId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`updatedAt` (required)**
+
+      `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "nombre": "",
+      "codigo": "",
+      "activa": true,
+      "createdAt": "",
+      "updatedAt": "",
+      "coberturas": [
+        {
+          "id": 1,
+          "tenantId": 1,
+          "obraSocialId": 1,
+          "tipoProducto": "generico",
+          "cobertura": 1,
+          "createdAt": "",
+          "updatedAt": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+### CoberturaOSEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`cobertura` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipoProducto` (required)**
+
+    `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "obraSocialId": 1,
+    "tipoProducto": "generico",
+    "cobertura": 1,
+    "createdAt": "",
+    "updatedAt": ""
+  }
+}
+```
+
+### VentaOSItem
+
+- **Type:**`object`
+
+* **`articuloId` (required)**
+
+  `integer`
+
+* **`cantidad` (required)**
+
+  `number`
+
+* **`coberturaPct` (required)**
+
+  `number`
+
+* **`copago` (required)**
+
+  `number`
+
+* **`creditoOS` (required)**
+
+  `number`
+
+* **`descripcion` (required)**
+
+  `string`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`precioUnitario` (required)**
+
+  `number`
+
+* **`subtotal` (required)**
+
+  `number`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`tipoProducto` (required)**
+
+  `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+* **`ventaConOSId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "ventaConOSId": 1,
+  "articuloId": 1,
+  "descripcion": "",
+  "tipoProducto": "generico",
+  "cantidad": 1,
+  "precioUnitario": 1,
+  "subtotal": 1,
+  "coberturaPct": 1,
+  "creditoOS": 1,
+  "copago": 1
+}
+```
+
+### VentaConOS
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`copagoPaciente` (required)**
+
+  `number`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`creditoOS` (required)**
+
+  `number`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"pendiente_cobro_os", "presentado", "cobrado", "rechazado_os"`
+
+* **`facturaId` (required)**
+
+  `integer`
+
+* **`fecha` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`nroAfiliado` (required)**
+
+  `string`
+
+* **`nroReceta` (required)**
+
+  `string`
+
+* **`obraSocialId` (required)**
+
+  `integer`
+
+* **`presentacionId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`totalVenta` (required)**
+
+  `number`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`items`**
+
+  `array`
+
+  **Items:**
+
+  - **`articuloId` (required)**
+
+    `integer`
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`coberturaPct` (required)**
+
+    `number`
+
+  - **`copago` (required)**
+
+    `number`
+
+  - **`creditoOS` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`precioUnitario` (required)**
+
+    `number`
+
+  - **`subtotal` (required)**
+
+    `number`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`tipoProducto` (required)**
+
+    `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+  - **`ventaConOSId` (required)**
+
+    `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "facturaId": 1,
+  "clienteId": 1,
+  "obraSocialId": 1,
+  "nroAfiliado": "",
+  "nroReceta": "",
+  "totalVenta": 1,
+  "copagoPaciente": 1,
+  "creditoOS": 1,
+  "estado": "pendiente_cobro_os",
+  "presentacionId": 1,
+  "fecha": "",
+  "createdAt": "",
+  "updatedAt": "",
+  "items": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "ventaConOSId": 1,
+      "articuloId": 1,
+      "descripcion": "",
+      "tipoProducto": "generico",
+      "cantidad": 1,
+      "precioUnitario": 1,
+      "subtotal": 1,
+      "coberturaPct": 1,
+      "creditoOS": 1,
+      "copago": 1
+    }
+  ]
+}
+```
+
+### VentaConOSCreateInput
+
+- **Type:**`object`
+
+* **`clienteId` (required)**
+
+  `integer`
+
+* **`items` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`cantidad` (required)**
+
+    `number`
+
+  - **`descripcion` (required)**
+
+    `string`
+
+  - **`precioUnitario` (required)**
+
+    `number`
+
+  - **`tipoProducto` (required)**
+
+    `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+  - **`articuloId`**
+
+    `integer`
+
+* **`nroAfiliado` (required)**
+
+  `string`
+
+* **`obraSocialId` (required)**
+
+  `integer`
+
+* **`facturaId`**
+
+  `integer`
+
+* **`nroReceta`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "clienteId": 1,
+  "obraSocialId": 1,
+  "nroAfiliado": "",
+  "nroReceta": "",
+  "facturaId": 1,
+  "items": [
+    {
+      "articuloId": 1,
+      "descripcion": "",
+      "tipoProducto": "generico",
+      "cantidad": 1,
+      "precioUnitario": 0
+    }
+  ]
+}
+```
+
+### VentaConOSEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`copagoPaciente` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`creditoOS` (required)**
+
+    `number`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente_cobro_os", "presentado", "cobrado", "rechazado_os"`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroAfiliado` (required)**
+
+    `string`
+
+  - **`nroReceta` (required)**
+
+    `string`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`presentacionId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalVenta` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`coberturaPct` (required)**
+
+      `number`
+
+    - **`copago` (required)**
+
+      `number`
+
+    - **`creditoOS` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`precioUnitario` (required)**
+
+      `number`
+
+    - **`subtotal` (required)**
+
+      `number`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "facturaId": 1,
+    "clienteId": 1,
+    "obraSocialId": 1,
+    "nroAfiliado": "",
+    "nroReceta": "",
+    "totalVenta": 1,
+    "copagoPaciente": 1,
+    "creditoOS": 1,
+    "estado": "pendiente_cobro_os",
+    "presentacionId": 1,
+    "fecha": "",
+    "createdAt": "",
+    "updatedAt": "",
+    "items": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "ventaConOSId": 1,
+        "articuloId": 1,
+        "descripcion": "",
+        "tipoProducto": "generico",
+        "cantidad": 1,
+        "precioUnitario": 1,
+        "subtotal": 1,
+        "coberturaPct": 1,
+        "creditoOS": 1,
+        "copago": 1
+      }
+    ]
+  }
+}
+```
+
+### VentaConOSListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`clienteId` (required)**
+
+    `integer`
+
+  - **`copagoPaciente` (required)**
+
+    `number`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`creditoOS` (required)**
+
+    `number`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"pendiente_cobro_os", "presentado", "cobrado", "rechazado_os"`
+
+  - **`facturaId` (required)**
+
+    `integer`
+
+  - **`fecha` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`nroAfiliado` (required)**
+
+    `string`
+
+  - **`nroReceta` (required)**
+
+    `string`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`presentacionId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalVenta` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`items`**
+
+    `array`
+
+    **Items:**
+
+    - **`articuloId` (required)**
+
+      `integer`
+
+    - **`cantidad` (required)**
+
+      `number`
+
+    - **`coberturaPct` (required)**
+
+      `number`
+
+    - **`copago` (required)**
+
+      `number`
+
+    - **`creditoOS` (required)**
+
+      `number`
+
+    - **`descripcion` (required)**
+
+      `string`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`precioUnitario` (required)**
+
+      `number`
+
+    - **`subtotal` (required)**
+
+      `number`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`tipoProducto` (required)**
+
+      `string`, possible values: `"generico", "marca", "cronico", "oncologico"`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "facturaId": 1,
+      "clienteId": 1,
+      "obraSocialId": 1,
+      "nroAfiliado": "",
+      "nroReceta": "",
+      "totalVenta": 1,
+      "copagoPaciente": 1,
+      "creditoOS": 1,
+      "estado": "pendiente_cobro_os",
+      "presentacionId": 1,
+      "fecha": "",
+      "createdAt": "",
+      "updatedAt": "",
+      "items": [
+        {
+          "id": 1,
+          "tenantId": 1,
+          "ventaConOSId": 1,
+          "articuloId": 1,
+          "descripcion": "",
+          "tipoProducto": "generico",
+          "cantidad": 1,
+          "precioUnitario": 1,
+          "subtotal": 1,
+          "coberturaPct": 1,
+          "creditoOS": 1,
+          "copago": 1
+        }
+      ]
+    }
+  ]
+}
+```
+
+### PresentacionOSRechazo
+
+- **Type:**`object`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importeRechazado` (required)**
+
+  `number`
+
+* **`motivo` (required)**
+
+  `string`
+
+* **`presentacionId` (required)**
+
+  `integer`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`ventaConOSId` (required)**
+
+  `integer`
+
+* **`ventaOSItemId` (required)**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "presentacionId": 1,
+  "ventaConOSId": 1,
+  "ventaOSItemId": 1,
+  "importeRechazado": 1,
+  "motivo": "",
+  "createdAt": ""
+}
+```
+
+### PresentacionOS
+
+- **Type:**`object`
+
+* **`archivoCsvName` (required)**
+
+  `string`
+
+* **`createdAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`estado` (required)**
+
+  `string`, possible values: `"generada", "presentada", "cobrada", "con_rechazos"`
+
+* **`fechaPago` (required)**
+
+  `string`, format: `date-time`
+
+* **`id` (required)**
+
+  `integer`
+
+* **`importeCobrado` (required)**
+
+  `number`
+
+* **`obraSocialId` (required)**
+
+  `integer`
+
+* **`periodo` (required)**
+
+  `string`
+
+* **`tenantId` (required)**
+
+  `integer`
+
+* **`totalCredito` (required)**
+
+  `number`
+
+* **`updatedAt` (required)**
+
+  `string`, format: `date-time`
+
+* **`rechazos`**
+
+  `array`
+
+  **Items:**
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importeRechazado` (required)**
+
+    `number`
+
+  - **`motivo` (required)**
+
+    `string`
+
+  - **`presentacionId` (required)**
+
+    `integer`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`ventaConOSId` (required)**
+
+    `integer`
+
+  - **`ventaOSItemId` (required)**
+
+    `integer`
+
+* **`ventasCount`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "id": 1,
+  "tenantId": 1,
+  "obraSocialId": 1,
+  "periodo": "",
+  "totalCredito": 1,
+  "estado": "generada",
+  "archivoCsvName": "",
+  "fechaPago": "",
+  "importeCobrado": 1,
+  "createdAt": "",
+  "updatedAt": "",
+  "ventasCount": 1,
+  "rechazos": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "presentacionId": 1,
+      "ventaConOSId": 1,
+      "ventaOSItemId": 1,
+      "importeRechazado": 1,
+      "motivo": "",
+      "createdAt": ""
+    }
+  ]
+}
+```
+
+### PresentacionOSCreateInput
+
+- **Type:**`object`
+
+* **`obraSocialId` (required)**
+
+  `integer`
+
+* **`periodo` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "obraSocialId": 1,
+  "periodo": ""
+}
+```
+
+### PresentacionOSCobroInput
+
+- **Type:**`object`
+
+* **`importeCobrado` (required)**
+
+  `number`
+
+* **`fechaPago`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "importeCobrado": 0,
+  "fechaPago": ""
+}
+```
+
+### PresentacionOSRechazoInput
+
+- **Type:**`object`
+
+* **`importeRechazado` (required)**
+
+  `number`
+
+* **`ventaConOSId` (required)**
+
+  `integer`
+
+* **`motivo`**
+
+  `string`
+
+* **`ventaOSItemId`**
+
+  `integer`
+
+**Example:**
+
+```json
+{
+  "ventaConOSId": 1,
+  "ventaOSItemId": 1,
+  "importeRechazado": 1,
+  "motivo": ""
+}
+```
+
+### PresentacionOSEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `object`
+
+  - **`archivoCsvName` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"generada", "presentada", "cobrada", "con_rechazos"`
+
+  - **`fechaPago` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importeCobrado` (required)**
+
+    `number`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalCredito` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rechazos`**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importeRechazado` (required)**
+
+      `number`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`presentacionId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+    - **`ventaOSItemId` (required)**
+
+      `integer`
+
+  - **`ventasCount`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "tenantId": 1,
+    "obraSocialId": 1,
+    "periodo": "",
+    "totalCredito": 1,
+    "estado": "generada",
+    "archivoCsvName": "",
+    "fechaPago": "",
+    "importeCobrado": 1,
+    "createdAt": "",
+    "updatedAt": "",
+    "ventasCount": 1,
+    "rechazos": [
+      {
+        "id": 1,
+        "tenantId": 1,
+        "presentacionId": 1,
+        "ventaConOSId": 1,
+        "ventaOSItemId": 1,
+        "importeRechazado": 1,
+        "motivo": "",
+        "createdAt": ""
+      }
+    ]
+  }
+}
+```
+
+### PresentacionOSListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`archivoCsvName` (required)**
+
+    `string`
+
+  - **`createdAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`estado` (required)**
+
+    `string`, possible values: `"generada", "presentada", "cobrada", "con_rechazos"`
+
+  - **`fechaPago` (required)**
+
+    `string`, format: `date-time`
+
+  - **`id` (required)**
+
+    `integer`
+
+  - **`importeCobrado` (required)**
+
+    `number`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`periodo` (required)**
+
+    `string`
+
+  - **`tenantId` (required)**
+
+    `integer`
+
+  - **`totalCredito` (required)**
+
+    `number`
+
+  - **`updatedAt` (required)**
+
+    `string`, format: `date-time`
+
+  - **`rechazos`**
+
+    `array`
+
+    **Items:**
+
+    - **`createdAt` (required)**
+
+      `string`, format: `date-time`
+
+    - **`id` (required)**
+
+      `integer`
+
+    - **`importeRechazado` (required)**
+
+      `number`
+
+    - **`motivo` (required)**
+
+      `string`
+
+    - **`presentacionId` (required)**
+
+      `integer`
+
+    - **`tenantId` (required)**
+
+      `integer`
+
+    - **`ventaConOSId` (required)**
+
+      `integer`
+
+    - **`ventaOSItemId` (required)**
+
+      `integer`
+
+  - **`ventasCount`**
+
+    `integer`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "tenantId": 1,
+      "obraSocialId": 1,
+      "periodo": "",
+      "totalCredito": 1,
+      "estado": "generada",
+      "archivoCsvName": "",
+      "fechaPago": "",
+      "importeCobrado": 1,
+      "createdAt": "",
+      "updatedAt": "",
+      "ventasCount": 1,
+      "rechazos": [
+        {
+          "id": 1,
+          "tenantId": 1,
+          "presentacionId": 1,
+          "ventaConOSId": 1,
+          "ventaOSItemId": 1,
+          "importeRechazado": 1,
+          "motivo": "",
+          "createdAt": ""
+        }
+      ]
+    }
+  ]
+}
+```
+
+### ObraSocialCuentaCorriente
+
+- **Type:**`object`
+
+* **`codigo` (required)**
+
+  `string`
+
+* **`creditoCobrado` (required)**
+
+  `number`
+
+* **`creditoPendiente` (required)**
+
+  `number`
+
+* **`creditoPresentado` (required)**
+
+  `number`
+
+* **`creditoRechazado` (required)**
+
+  `number`
+
+* **`nombre` (required)**
+
+  `string`
+
+* **`obraSocialId` (required)**
+
+  `integer`
+
+* **`saldoAbierto` (required)**
+
+  `number`
+
+**Example:**
+
+```json
+{
+  "obraSocialId": 1,
+  "nombre": "",
+  "codigo": "",
+  "creditoPendiente": 1,
+  "creditoPresentado": 1,
+  "creditoCobrado": 1,
+  "creditoRechazado": 1,
+  "saldoAbierto": 1
+}
+```
+
+### ObraSocialCuentaCorrienteListEnvelope
+
+- **Type:**`object`
+
+* **`data` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`codigo` (required)**
+
+    `string`
+
+  - **`creditoCobrado` (required)**
+
+    `number`
+
+  - **`creditoPendiente` (required)**
+
+    `number`
+
+  - **`creditoPresentado` (required)**
+
+    `number`
+
+  - **`creditoRechazado` (required)**
+
+    `number`
+
+  - **`nombre` (required)**
+
+    `string`
+
+  - **`obraSocialId` (required)**
+
+    `integer`
+
+  - **`saldoAbierto` (required)**
+
+    `number`
+
+* **`success` (required)**
+
+  `boolean`
+
+**Example:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "obraSocialId": 1,
+      "nombre": "",
+      "codigo": "",
+      "creditoPendiente": 1,
+      "creditoPresentado": 1,
+      "creditoCobrado": 1,
+      "creditoRechazado": 1,
+      "saldoAbierto": 1
+    }
+  ]
 }
 ```
 

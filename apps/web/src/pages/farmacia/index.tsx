@@ -9,8 +9,9 @@ import type {
 import { CanAccess } from '@/components/CanAccess'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import AsyncWrapper from '@/components/shared/AsyncWrapper'
+import { ObrasSocialesPanels, type OsTab } from './ObrasSocialesPanels'
 
-type Tab = 'recetas' | 'libro' | 'serial'
+type Tab = 'recetas' | 'libro' | 'serial' | OsTab
 
 const LIBRO_TIPOS: readonly LibroPsicotropicoTipo[] = ['ingreso', 'egreso', 'ajuste']
 
@@ -38,9 +39,9 @@ function optionalInt(raw: string): number | null {
 }
 
 /**
- * @en Pharmacy vertical console (#204): prescriptions, internal psychotropic book and lot serials.
- * @es Consola del vertical farmacia (#204): recetas, libro interno de psicotrópicos y seriales de lote.
- * @pt-BR Console do vertical farmácia (#204): receitas, livro interno de psicotrópicos e seriais de lote.
+ * @en Pharmacy vertical console (#204/#252): prescriptions, psychotropic book, serials and obras sociales.
+ * @es Consola del vertical farmacia (#204/#252): recetas, libro psicotrópicos, seriales y obras sociales.
+ * @pt-BR Console do vertical farmácia (#204/#252): receitas, livro psicotrópicos, seriais e planos.
  */
 export default function FarmaciaPage() {
   const { t } = useTranslation('farmacia')
@@ -217,6 +218,46 @@ export default function FarmaciaPage() {
             onClick={() => setTab('serial')}
           >
             {t('tabs.serial')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'os'}
+            className={`px-3 py-1.5 rounded border ${tab === 'os' ? 'bg-slate-200 dark:bg-slate-700' : ''}`}
+            data-testid="farmacia-tab-os"
+            onClick={() => setTab('os')}
+          >
+            {t('tabs.os')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'ventasOs'}
+            className={`px-3 py-1.5 rounded border ${tab === 'ventasOs' ? 'bg-slate-200 dark:bg-slate-700' : ''}`}
+            data-testid="farmacia-tab-ventas-os"
+            onClick={() => setTab('ventasOs')}
+          >
+            {t('tabs.ventasOs')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'presentaciones'}
+            className={`px-3 py-1.5 rounded border ${tab === 'presentaciones' ? 'bg-slate-200 dark:bg-slate-700' : ''}`}
+            data-testid="farmacia-tab-presentaciones"
+            onClick={() => setTab('presentaciones')}
+          >
+            {t('tabs.presentaciones')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'cc'}
+            className={`px-3 py-1.5 rounded border ${tab === 'cc' ? 'bg-slate-200 dark:bg-slate-700' : ''}`}
+            data-testid="farmacia-tab-os-cc"
+            onClick={() => setTab('cc')}
+          >
+            {t('tabs.cc')}
           </button>
         </div>
 
@@ -649,6 +690,10 @@ export default function FarmaciaPage() {
             </section>
           ) : null}
         </AsyncWrapper>
+
+        {tab === 'os' || tab === 'ventasOs' || tab === 'presentaciones' || tab === 'cc' ? (
+          <ObrasSocialesPanels tab={tab} />
+        ) : null}
       </div>
     </ErrorBoundary>
   )
