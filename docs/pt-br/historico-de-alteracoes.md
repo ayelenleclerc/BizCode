@@ -10,6 +10,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Assert OpenAPI webhook Twilio WhatsApp 403 (#201 residual):** `tests/api/twilio-whatsapp-webhook.test.ts` valida `POST /api/webhooks/twilio/whatsapp` 403 (assinatura Twilio inválida) com Ajv vs OpenAPI (ADR-0003); #201 permanece OPEN (OpenAI / Meta Cloud / WA por tenant).
 - **Assert OpenAPI POD GET 403 (#199 residual):** `tests/api/repartos.test.ts` valida `GET /api/repartos/{id}/items/{itemId}/pod` 403 (driver) com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC de frota).
 - **Assert OpenAPI POD PUT 403 (#199 residual):** `tests/api/repartos.test.ts` valida `PUT /api/repartos/{id}/items/{itemId}` 403 (sem `orders.deliver.confirm`) com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC de frota).
 - **Assert OpenAPI repartos ativos 403 (#199 residual):** `tests/api/repartos.test.ts` valida `GET /api/repartos/activos` 403 (driver) com Ajv vs OpenAPI (ADR-0003); #199 permanece OPEN (geocoder / solvers externos / AC de frota).

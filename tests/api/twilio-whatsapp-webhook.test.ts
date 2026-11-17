@@ -8,6 +8,7 @@ import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../../apps/server/createApp'
+import { assertMatchesOpenApi } from './validate-openapi-response'
 
 const validateRequestMock = vi.hoisted(() => vi.fn(() => true))
 const handleInboundMock = vi.hoisted(() =>
@@ -88,6 +89,7 @@ describe('POST /api/webhooks/twilio/whatsapp (#201)', () => {
       .type('form')
       .send({ From: 'whatsapp:+5491155551234', Body: 'saldo' })
     expect(res.status).toBe(403)
+    await assertMatchesOpenApi('/api/webhooks/twilio/whatsapp', 'post', '403', res.body)
     expect(handleInboundMock).not.toHaveBeenCalled()
   })
 
