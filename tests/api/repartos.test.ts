@@ -202,7 +202,8 @@ describe('API /api/repartos', () => {
   it('GET /api/repartos/activos returns 403 for driver', async () => {
     process.env.BIZCODE_TEST_ROLE = 'driver'
     const app = createApp(buildPrismaMock())
-    await request(app).get('/api/repartos/activos').expect(403)
+    const res = await request(app).get('/api/repartos/activos').expect(403)
+    await assertMatchesOpenApi('/api/repartos/activos', 'get', '403', res.body)
   })
 
   it('GET /api/repartos/activos returns 200 for logistics_planner', async () => {
