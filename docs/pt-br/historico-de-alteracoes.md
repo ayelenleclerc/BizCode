@@ -14,6 +14,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Assert OpenAPI presentaciones-os 422 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST /api/farmacia/presentaciones-os` 422 `no_pending_sales_for_period` com Ajv vs OpenAPI (ADR-0003); #252 permanece OPEN.
 - **Asserts OpenAPI FCEM mutações 404 (#239 residual):** `tests/api/fcem.test.ts` valida `POST .../emitir|aceptar|rechazar|aceptar-tacita` 404 com Ajv vs OpenAPI (ADR-0003); #239 permanece OPEN (AFIP live residual).
 - **Assert OpenAPI FCEM GET 404 (#239 residual):** `tests/api/fcem.test.ts` valida `GET /api/fcem/facturas/{facturaId}` 404 com Ajv vs OpenAPI (ADR-0003); #239 permanece OPEN (AFIP live residual).
 - **Asserts OpenAPI farmácia 404 (#204 residual):** `tests/api/farmacia.test.ts` valida `GET /api/farmacia/recetas/{id}` 404 e `PUT /api/farmacia/lotes/{id}/serial` 404 com Ajv vs OpenAPI (ADR-0003); #204 permanece OPEN (residual ANMAT live).

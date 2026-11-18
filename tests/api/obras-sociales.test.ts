@@ -228,6 +228,17 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'post', '201', res.body)
   })
 
+  it('POST /api/farmacia/presentaciones-os returns 422 when no pending sales', async () => {
+    vi.mocked(prisma.ventaConOS.findMany).mockResolvedValueOnce([])
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os')
+      .send({ obraSocialId: 1, periodo: '2026-05' })
+      .expect(422)
+    expect(res.body.error).toBe('no_pending_sales_for_period')
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'post', '422', res.body)
+  })
+
   it('GET /api/farmacia/obras-sociales-cc returns CC summary', async () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/farmacia/obras-sociales-cc').expect(200)
