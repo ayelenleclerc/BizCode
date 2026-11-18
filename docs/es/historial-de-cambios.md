@@ -14,6 +14,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Ignore pnpm audit picomatch ReDoS (GHSA-fc5q-39xc-vjpf):** aún sin release parchado en npm (`<=4.0.7`); advisory ignorada para Quality Gate. Ruta solo de desarrollo vía `@semantic-release/*` → `picomatch`.
 - **Assert OpenAPI aceptar-tacita FCEM 422 (#239 residual):** `tests/api/fcem.test.ts` valida `POST /api/fcem/facturas/{facturaId}/aceptar-tacita` 422 `FCEM_NOT_PENDING` con Ajv vs OpenAPI (ADR-0003); #239 sigue OPEN (AFIP live / catálogo / ConsultaObligado).
 - **Assert OpenAPI rechazar FCEM 422 (#239 residual):** `tests/api/fcem.test.ts` valida `POST /api/fcem/facturas/{facturaId}/rechazar` 422 `FCEM_NOT_PENDING` con Ajv vs OpenAPI (ADR-0003); #239 sigue OPEN (AFIP live / catálogo / ConsultaObligado).
 - **Assert OpenAPI webhook Twilio WhatsApp 403 (#201 residual):** `tests/api/twilio-whatsapp-webhook.test.ts` valida `POST /api/webhooks/twilio/whatsapp` 403 (firma Twilio inválida) con Ajv vs OpenAPI (ADR-0003); #201 sigue OPEN (OpenAI / Meta Cloud / WA por tenant).
