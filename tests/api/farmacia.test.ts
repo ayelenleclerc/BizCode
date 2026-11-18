@@ -174,6 +174,24 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
       expect(res.body.data[0]).toMatchObject({ id: 2, tipo: 'ingreso', cantidad: 3 })
     })
 
+    it('rejects a malformed date filter with 400', async () => {
+      const app = createApp(prisma)
+      const res = await request(app)
+        .get('/api/farmacia/libro-psicotropicos?desde=28-08-2026')
+        .expect(400)
+      expect(res.body.error).toBe('Invalid query parameters')
+      await assertMatchesOpenApi('/api/farmacia/libro-psicotropicos', 'get', '400', res.body)
+    })
+
+    it('rejects a malformed date filter on export with 400', async () => {
+      const app = createApp(prisma)
+      const res = await request(app)
+        .get('/api/farmacia/libro-psicotropicos/export?desde=28-08-2026')
+        .expect(400)
+      expect(res.body.error).toBe('Invalid query parameters')
+      await assertMatchesOpenApi('/api/farmacia/libro-psicotropicos/export', 'get', '400', res.body)
+    })
+
     it('exports the book as CSV', async () => {
       vi.mocked(prisma.libroPsicotropicoMovimiento.findMany).mockResolvedValueOnce([
         libroRow,
