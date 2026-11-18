@@ -234,4 +234,106 @@ describe('obras sociales REST endpoints (#252)', () => {
     expect(res.body.data[0].obraSocialId).toBe(1)
     await assertMatchesOpenApi('/api/farmacia/obras-sociales-cc', 'get', '200', res.body)
   })
+
+  it('POST /api/farmacia/presentaciones-os/{id}/cobro returns 400 on invalid body', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/cobro')
+      .send({})
+      .expect(400)
+    expect(res.body.success).toBe(false)
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os/{id}/cobro', 'post', '400', res.body)
+  })
+
+  it('POST /api/farmacia/presentaciones-os/{id}/cobro returns 404 when missing', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/cobro')
+      .send({ importeCobrado: 1000 })
+      .expect(404)
+    expect(res.body.error).toBe('presentacion_not_found')
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os/{id}/cobro', 'post', '404', res.body)
+  })
+
+  it('POST /api/farmacia/presentaciones-os/{id}/cobro returns 422 when already cobrada', async () => {
+    vi.mocked(prisma.presentacionOS.findFirst).mockResolvedValueOnce({
+      id: 9,
+      tenantId: 1,
+      obraSocialId: 1,
+      periodo: '2026-05',
+      totalCredito: new Prisma.Decimal(7000),
+      estado: 'cobrada',
+      archivoCsvName: 'presentacion-os-1-2026-05.csv',
+      fechaPago: new Date('2026-06-15T00:00:00.000Z'),
+      importeCobrado: new Prisma.Decimal(7000),
+      createdAt: new Date('2026-06-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-06-15T00:00:00.000Z'),
+      rechazos: [],
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/cobro')
+      .send({ importeCobrado: 1000 })
+      .expect(422)
+    expect(res.body.error).toBe('presentacion_already_cobrada')
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os/{id}/cobro', 'post', '422', res.body)
+  })
+
+  it('POST /api/farmacia/presentaciones-os/{id}/rechazos returns 400 on invalid body', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/rechazos')
+      .send({})
+      .expect(400)
+    expect(res.body.success).toBe(false)
+    await assertMatchesOpenApi(
+      '/api/farmacia/presentaciones-os/{id}/rechazos',
+      'post',
+      '400',
+      res.body,
+    )
+  })
+
+  it('POST /api/farmacia/presentaciones-os/{id}/rechazos returns 404 when missing', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/rechazos')
+      .send({ ventaConOSId: 5, importeRechazado: 1000 })
+      .expect(404)
+    expect(res.body.error).toBe('presentacion_not_found')
+    await assertMatchesOpenApi(
+      '/api/farmacia/presentaciones-os/{id}/rechazos',
+      'post',
+      '404',
+      res.body,
+    )
+  })
+
+  it('POST /api/farmacia/presentaciones-os/{id}/rechazos returns 422 when already cobrada', async () => {
+    vi.mocked(prisma.presentacionOS.findFirst).mockResolvedValueOnce({
+      id: 9,
+      tenantId: 1,
+      obraSocialId: 1,
+      periodo: '2026-05',
+      totalCredito: new Prisma.Decimal(7000),
+      estado: 'cobrada',
+      archivoCsvName: 'presentacion-os-1-2026-05.csv',
+      fechaPago: new Date('2026-06-15T00:00:00.000Z'),
+      importeCobrado: new Prisma.Decimal(7000),
+      createdAt: new Date('2026-06-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-06-15T00:00:00.000Z'),
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/rechazos')
+      .send({ ventaConOSId: 5, importeRechazado: 1000 })
+      .expect(422)
+    expect(res.body.error).toBe('presentacion_already_cobrada')
+    await assertMatchesOpenApi(
+      '/api/farmacia/presentaciones-os/{id}/rechazos',
+      'post',
+      '422',
+      res.body,
+    )
+  })
 })

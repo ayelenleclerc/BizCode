@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Pharmacy OS cobro/rechazo OpenAPI error asserts (#252 residual):** `tests/api/obras-sociales.test.ts` validates `POST .../cobro` and `POST .../rechazos` 400/404/422 with Ajv vs OpenAPI (ADR-0003). #252 stays OPEN (no PAMI/Farmalink live).
 - **Pharmacy OS cuenta corriente uses importeRechazado (#252 residual):** `cuentaCorriente` prefers `PresentacionOSRechazo.importeRechazado` for `creditoRechazado` and falls back to full `creditoOS` only when a `rechazado_os` venta has no rechazo row (avoids double count). #252 stays OPEN (no PAMI/Farmalink live).
 - **Pharmacy OS cobro respects partial rejections (#252 residual):** `registerCobro` marks only ventas with an explicit rechazo as `rechazado_os`; other eligible lines become `cobrado`. #252 stays OPEN (no PAMI/Farmalink live).
 - **pnpm audit ignore picomatch ReDoS (GHSA-fc5q-39xc-vjpf):** no patched release on npm yet (`<=4.0.7`); advisory ignored for CI Quality Gate. Dev-only path via `@semantic-release/*` → `picomatch`.
