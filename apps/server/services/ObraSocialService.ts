@@ -670,11 +670,12 @@ export class ObraSocialService {
     })
     const ventas = await this.prisma.ventaConOS.findMany({
       where: { tenantId },
-      select: { obraSocialId: true, estado: true, creditoOS: true },
+      select: { id: true, obraSocialId: true, estado: true, creditoOS: true },
     })
     const rechazos = await this.prisma.presentacionOSRechazo.findMany({
       where: { tenantId },
       select: {
+        ventaConOSId: true,
         importeRechazado: true,
         ventaConOS: { select: { obraSocialId: true } },
       },
@@ -694,6 +695,15 @@ export class ObraSocialService {
       })
     }
 
+    /** @en Ventas with explicit PresentacionOSRechazo rows; prefer importeRechazado over full creditoOS. @es Ventas con rechazo explícito; preferir importeRechazado. @pt-BR Vendas com rejeição explícita; preferir importeRechazado. */
+    const ventasWithExplicitRechazo = new Set<number>()
+    for (const r of rechazos) {
+      const row = byOs.get(r.ventaConOS.obraSocialId)
+      if (!row) continue
+      row.creditoRechazado += Number(r.importeRechazado)
+      ventasWithExplicitRechazo.add(r.ventaConOSId)
+    }
+
     for (const v of ventas) {
       const row = byOs.get(v.obraSocialId)
       if (!row) continue
@@ -701,14 +711,9 @@ export class ObraSocialService {
       if (v.estado === 'pendiente_cobro_os') row.creditoPendiente += credit
       else if (v.estado === 'presentado') row.creditoPresentado += credit
       else if (v.estado === 'cobrado') row.creditoCobrado += credit
-      else if (v.estado === 'rechazado_os') row.creditoRechazado += credit
-    }
-
-    for (const r of rechazos) {
-      const row = byOs.get(r.ventaConOS.obraSocialId)
-      if (!row) continue
-      // Prefer explicit rechazo amounts when present; ventas already counted rejected credits above.
-      void r
+      else if (v.estado === 'rechazado_os' && !ventasWithExplicitRechazo.has(v.id)) {
+        row.creditoRechazado += credit
+      }
     }
 
     for (const row of byOs.values()) {

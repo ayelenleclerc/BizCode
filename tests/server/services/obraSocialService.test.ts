@@ -437,8 +437,8 @@ describe('ObraSocialService (#252)', () => {
       obraSocial: { findMany: vi.fn().mockResolvedValue([osRow()]) },
       ventaConOS: {
         findMany: vi.fn().mockResolvedValue([
-          { obraSocialId: 1, estado: 'pendiente_cobro_os', creditoOS: new Prisma.Decimal(7000) },
-          { obraSocialId: 1, estado: 'cobrado', creditoOS: new Prisma.Decimal(2000) },
+          { id: 1, obraSocialId: 1, estado: 'pendiente_cobro_os', creditoOS: new Prisma.Decimal(7000) },
+          { id: 2, obraSocialId: 1, estado: 'cobrado', creditoOS: new Prisma.Decimal(2000) },
         ]),
       },
       presentacionOSRechazo: { findMany: vi.fn().mockResolvedValue([]) },
@@ -450,6 +450,35 @@ describe('ObraSocialService (#252)', () => {
     expect(result.data[0].creditoPendiente).toBe(7000)
     expect(result.data[0].creditoCobrado).toBe(2000)
     expect(result.data[0].saldoAbierto).toBe(7000)
+  })
+
+  it('cuenta corriente prefers importeRechazado over full creditoOS for rejected ventas', async () => {
+    const prisma = {
+      obraSocial: { findMany: vi.fn().mockResolvedValue([osRow()]) },
+      ventaConOS: {
+        findMany: vi.fn().mockResolvedValue([
+          { id: 5, obraSocialId: 1, estado: 'rechazado_os', creditoOS: new Prisma.Decimal(7000) },
+          { id: 6, obraSocialId: 1, estado: 'rechazado_os', creditoOS: new Prisma.Decimal(3000) },
+          { id: 7, obraSocialId: 1, estado: 'cobrado', creditoOS: new Prisma.Decimal(2000) },
+        ]),
+      },
+      presentacionOSRechazo: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            ventaConOSId: 5,
+            importeRechazado: new Prisma.Decimal(1000),
+            ventaConOS: { obraSocialId: 1 },
+          },
+        ]),
+      },
+    }
+    const svc = new ObraSocialService(prisma as never)
+    const result = await svc.cuentaCorriente(7)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    // venta 5: explicit rechazo 1000 (not full 7000); venta 6: no rechazo row → full 3000
+    expect(result.data[0].creditoRechazado).toBe(4000)
+    expect(result.data[0].creditoCobrado).toBe(2000)
   })
 
   it('lists presentaciones', async () => {
