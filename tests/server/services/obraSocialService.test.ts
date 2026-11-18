@@ -278,6 +278,7 @@ describe('ObraSocialService (#252)', () => {
   })
 
   it('registers cobro without rechazos as cobrada', async () => {
+    const ventaUpdateMany = vi.fn().mockResolvedValue({ count: 1 })
     const prisma = {
       presentacionOS: {
         findFirst: vi.fn().mockResolvedValue(presentacionRow({ estado: 'presentada' })),
@@ -292,7 +293,7 @@ describe('ObraSocialService (#252)', () => {
                 presentacionRow({ estado: 'cobrada', importeCobrado: new Prisma.Decimal(7000) }),
               ),
           },
-          ventaConOS: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+          ventaConOS: { updateMany: ventaUpdateMany },
         }),
       ),
     }
@@ -301,6 +302,90 @@ describe('ObraSocialService (#252)', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.data.estado).toBe('cobrada')
+    expect(ventaUpdateMany).toHaveBeenCalledTimes(1)
+    expect(ventaUpdateMany).toHaveBeenCalledWith({
+      where: {
+        tenantId: 7,
+        presentacionId: 9,
+        estado: { in: ['presentado', 'pendiente_cobro_os'] },
+      },
+      data: { estado: 'cobrado' },
+    })
+  })
+
+  it('registers cobro with partial rechazos without rejecting all ventas', async () => {
+    const ventaUpdateMany = vi.fn().mockResolvedValue({ count: 1 })
+    const prisma = {
+      presentacionOS: {
+        findFirst: vi.fn().mockResolvedValue(
+          presentacionRow({
+            estado: 'con_rechazos',
+            rechazos: [
+              {
+                id: 1,
+                tenantId: 7,
+                presentacionId: 9,
+                ventaConOSId: 5,
+                ventaOSItemId: null,
+                importeRechazado: new Prisma.Decimal(1000),
+                motivo: 'item',
+                createdAt: now,
+              },
+            ],
+          }),
+        ),
+      },
+      $transaction: vi.fn(async (fn: (tx: Record<string, unknown>) => Promise<unknown>) =>
+        fn({
+          presentacionOS: {
+            update: vi.fn().mockResolvedValue(presentacionRow({ estado: 'con_rechazos' })),
+            findFirstOrThrow: vi.fn().mockResolvedValue(
+              presentacionRow({
+                estado: 'con_rechazos',
+                importeCobrado: new Prisma.Decimal(6000),
+                rechazos: [
+                  {
+                    id: 1,
+                    tenantId: 7,
+                    presentacionId: 9,
+                    ventaConOSId: 5,
+                    ventaOSItemId: null,
+                    importeRechazado: new Prisma.Decimal(1000),
+                    motivo: 'item',
+                    createdAt: now,
+                  },
+                ],
+              }),
+            ),
+          },
+          ventaConOS: { updateMany: ventaUpdateMany },
+        }),
+      ),
+    }
+    const svc = new ObraSocialService(prisma as never)
+    const result = await svc.registerCobro(7, 9, { importeCobrado: 6000 })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.data.estado).toBe('con_rechazos')
+    expect(ventaUpdateMany).toHaveBeenCalledTimes(2)
+    expect(ventaUpdateMany).toHaveBeenNthCalledWith(1, {
+      where: {
+        tenantId: 7,
+        presentacionId: 9,
+        id: { in: [5] },
+        estado: { in: ['presentado', 'pendiente_cobro_os', 'rechazado_os'] },
+      },
+      data: { estado: 'rechazado_os' },
+    })
+    expect(ventaUpdateMany).toHaveBeenNthCalledWith(2, {
+      where: {
+        tenantId: 7,
+        presentacionId: 9,
+        estado: { in: ['presentado', 'pendiente_cobro_os'] },
+        id: { notIn: [5] },
+      },
+      data: { estado: 'cobrado' },
+    })
   })
 
   it('registers rechazo and sets con_rechazos', async () => {

@@ -554,6 +554,14 @@ export class ObraSocialService {
     }
 
     const hasRechazos = existing.rechazos.length > 0
+    /**
+     * @en Only ventas with an explicit rechazo stay rejected; other eligible lines become cobrado.
+     * @es Solo las ventas con rechazo explícito quedan rechazadas; el resto elegible pasa a cobrado.
+     * @pt-BR Só vendas com rejeição explícita ficam rejeitadas; as demais elegíveis passam a cobrado.
+     */
+    const rejectedVentaIds = [
+      ...new Set(existing.rechazos.map((r) => r.ventaConOSId).filter((id) => Number.isInteger(id) && id > 0)),
+    ]
     const updated = await this.prisma.$transaction(async (tx) => {
       const presentacion = await tx.presentacionOS.update({
         where: { id: presentacionId },
@@ -563,13 +571,25 @@ export class ObraSocialService {
           fechaPago,
         },
       })
+      if (rejectedVentaIds.length > 0) {
+        await tx.ventaConOS.updateMany({
+          where: {
+            tenantId,
+            presentacionId,
+            id: { in: rejectedVentaIds },
+            estado: { in: ['presentado', 'pendiente_cobro_os', 'rechazado_os'] },
+          },
+          data: { estado: 'rechazado_os' },
+        })
+      }
       await tx.ventaConOS.updateMany({
         where: {
           tenantId,
           presentacionId,
           estado: { in: ['presentado', 'pendiente_cobro_os'] },
+          ...(rejectedVentaIds.length > 0 ? { id: { notIn: rejectedVentaIds } } : {}),
         },
-        data: { estado: hasRechazos ? 'rechazado_os' : 'cobrado' },
+        data: { estado: 'cobrado' },
       })
       return tx.presentacionOS.findFirstOrThrow({
         where: { id: presentacion.id },

@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Pharmacy OS cobro respects partial rejections (#252 residual):** `registerCobro` marks only ventas with an explicit rechazo as `rechazado_os`; other eligible lines become `cobrado`. #252 stays OPEN (no PAMI/Farmalink live).
 - **pnpm audit ignore picomatch ReDoS (GHSA-fc5q-39xc-vjpf):** no patched release on npm yet (`<=4.0.7`); advisory ignored for CI Quality Gate. Dev-only path via `@semantic-release/*` → `picomatch`.
 - **FCEM aceptar-tacita 422 OpenAPI assert (#239 residual):** `tests/api/fcem.test.ts` validates `POST /api/fcem/facturas/{facturaId}/aceptar-tacita` 422 `FCEM_NOT_PENDING` with Ajv vs OpenAPI (ADR-0003); #239 stays OPEN (live AFIP / catalog / ConsultaObligado).
 - **FCEM rechazar 422 OpenAPI assert (#239 residual):** `tests/api/fcem.test.ts` validates `POST /api/fcem/facturas/{facturaId}/rechazar` 422 `FCEM_NOT_PENDING` with Ajv vs OpenAPI (ADR-0003); #239 stays OPEN (live AFIP / catalog / ConsultaObligado).
