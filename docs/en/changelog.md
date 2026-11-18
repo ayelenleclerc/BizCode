@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Pharmacy libro psicotropicos GET 400 OpenAPI asserts (#204 residual):** `tests/api/farmacia.test.ts` validates `GET /api/farmacia/libro-psicotropicos` and `.../export` 400 with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT live residual).
 - **Pharmacy OS list query 400 OpenAPI asserts (#252 residual):** `tests/api/obras-sociales.test.ts` validates `GET /api/farmacia/ventas-os` and `GET /api/farmacia/presentaciones-os` 400 with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN.
 - **Pharmacy OS marcar-presentada OpenAPI error asserts (#252 residual):** `tests/api/obras-sociales.test.ts` validates `POST .../marcar-presentada` 404/422 with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN.
 - **Pharmacy OS presentaciones-os 422 OpenAPI assert (#252 residual):** `tests/api/obras-sociales.test.ts` validates `POST /api/farmacia/presentaciones-os` 422 `no_pending_sales_for_period` with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN.
