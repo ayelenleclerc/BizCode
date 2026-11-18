@@ -287,6 +287,20 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/obras-sociales-cc', 'get', '200', res.body)
   })
 
+  it('GET /api/farmacia/ventas-os returns 400 on invalid query', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/farmacia/ventas-os?obraSocialId=0').expect(400)
+    expect(res.body.error).toBe('Invalid query parameters')
+    await assertMatchesOpenApi('/api/farmacia/ventas-os', 'get', '400', res.body)
+  })
+
+  it('GET /api/farmacia/presentaciones-os returns 400 on invalid query', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/farmacia/presentaciones-os?obraSocialId=0').expect(400)
+    expect(res.body.error).toBe('Invalid query parameters')
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'get', '400', res.body)
+  })
+
   it('POST /api/farmacia/presentaciones-os/{id}/cobro returns 400 on invalid body', async () => {
     const app = createApp(prisma)
     const res = await request(app)
