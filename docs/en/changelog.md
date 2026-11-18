@@ -14,6 +14,9 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Pharmacy libro psicotropicos GET 400 OpenAPI asserts (#204 residual):** `tests/api/farmacia.test.ts` validates `GET /api/farmacia/libro-psicotropicos` and `.../export` 400 with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT live residual).
+- **Pharmacy OS list query 400 OpenAPI asserts (#252 residual):** `tests/api/obras-sociales.test.ts` validates `GET /api/farmacia/ventas-os` and `GET /api/farmacia/presentaciones-os` 400 with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN.
+- **Pharmacy OS marcar-presentada OpenAPI error asserts (#252 residual):** `tests/api/obras-sociales.test.ts` validates `POST .../marcar-presentada` 404/422 with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN.
 - **Pharmacy OS presentaciones-os 422 OpenAPI assert (#252 residual):** `tests/api/obras-sociales.test.ts` validates `POST /api/farmacia/presentaciones-os` 422 `no_pending_sales_for_period` with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN.
 - **FCEM mutation 404 OpenAPI asserts (#239 residual):** `tests/api/fcem.test.ts` validates `POST .../emitir|aceptar|rechazar|aceptar-tacita` 404 with Ajv vs OpenAPI (ADR-0003); #239 stays OPEN (live AFIP residual).
 - **FCEM GET factura 404 OpenAPI assert (#239 residual):** `tests/api/fcem.test.ts` validates `GET /api/fcem/facturas/{facturaId}` 404 with Ajv vs OpenAPI (ADR-0003); #239 stays OPEN (live AFIP residual).
