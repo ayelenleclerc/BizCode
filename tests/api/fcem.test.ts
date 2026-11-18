@@ -94,6 +94,21 @@ describe('FCEM API (#239)', () => {
     await assertMatchesOpenApi('/api/fcem/facturas/{facturaId}', 'get', '200', res.body)
   })
 
+  it('GET /api/fcem/facturas/:id returns 404 when factura is missing', async () => {
+    const app = createApp(
+      buildPrismaMock({
+        factura: {
+          findMany: vi.fn().mockResolvedValue([]),
+          findFirst: vi.fn().mockResolvedValue(null),
+          update: vi.fn(),
+        },
+      }),
+    )
+    const res = await request(app).get('/api/fcem/facturas/9').expect(404)
+    expect(res.body.error).toBe('Factura not found')
+    await assertMatchesOpenApi('/api/fcem/facturas/{facturaId}', 'get', '404', res.body)
+  })
+
   it('POST emitir issues mock CAE and sets pendiente_aceptacion', async () => {
     const app = createApp(buildPrismaMock())
     const res = await request(app).post('/api/fcem/facturas/9/emitir').expect(200)

@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **FCEM GET factura 404 OpenAPI assert (#239 residual):** `tests/api/fcem.test.ts` validates `GET /api/fcem/facturas/{facturaId}` 404 with Ajv vs OpenAPI (ADR-0003); #239 stays OPEN (live AFIP residual).
 - **Pharmacy recetas/lotes 404 OpenAPI asserts (#204 residual):** `tests/api/farmacia.test.ts` validates `GET /api/farmacia/recetas/{id}` 404 and `PUT /api/farmacia/lotes/{id}/serial` 404 with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT live residual).
 - **Changelog ZAP `-I` drift fix (#194 residual docs):** Unreleased Added no longer claims the ZAP job still uses `-I` (aligned with Changed triage + `.github/workflows/zap.yml`). #194 stays OPEN (empty external register).
 - **Pharmacy OS cobro/rechazo OpenAPI error asserts (#252 residual):** `tests/api/obras-sociales.test.ts` validates `POST .../cobro` and `POST .../rechazos` 400/404/422 with Ajv vs OpenAPI (ADR-0003). #252 stays OPEN (no PAMI/Farmalink live).
