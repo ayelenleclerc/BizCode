@@ -14,6 +14,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Asserts OpenAPI cobro/rechazo OS (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST .../cobro` y `POST .../rechazos` 400/404/422 con Ajv vs OpenAPI (ADR-0003). #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Cuenta corriente OS usa importeRechazado (#252 residual):** `cuentaCorriente` prioriza `PresentacionOSRechazo.importeRechazado` en `creditoRechazado` y solo suma el `creditoOS` completo si una venta `rechazado_os` no tiene fila de rechazo (sin doble conteo). #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Cobro OS respeta rechazos parciales (#252 residual):** `registerCobro` deja `rechazado_os` solo en ventas con rechazo explícito; el resto elegible pasa a `cobrado`. #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Ignore pnpm audit picomatch ReDoS (GHSA-fc5q-39xc-vjpf):** aún sin release parchado en npm (`<=4.0.7`); advisory ignorada para Quality Gate. Ruta solo de desarrollo vía `@semantic-release/*` → `picomatch`.
