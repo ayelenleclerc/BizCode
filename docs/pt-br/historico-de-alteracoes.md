@@ -14,6 +14,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Asserts OpenAPI farmácia 404 (#204 residual):** `tests/api/farmacia.test.ts` valida `GET /api/farmacia/recetas/{id}` 404 e `PUT /api/farmacia/lotes/{id}/serial` 404 com Ajv vs OpenAPI (ADR-0003); #204 permanece OPEN (residual ANMAT live).
 - **Correção drift changelog ZAP `-I` (#194 residual docs):** Added Unreleased deixa de afirmar que o job ZAP usa `-I` (alinhado com Alterado + `.github/workflows/zap.yml`). #194 permanece OPEN (register externo vazio).
 - **Asserts OpenAPI cobrança/rejeição OS (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST .../cobro` e `POST .../rechazos` 400/404/422 com Ajv vs OpenAPI (ADR-0003). #252 permanece OPEN (sem PAMI/Farmalink live).
 - **Conta corrente OS usa importeRechazado (#252 residual):** `cuentaCorriente` prioriza `PresentacionOSRechazo.importeRechazado` em `creditoRechazado` e só soma o `creditoOS` completo se uma venda `rechazado_os` não tiver linha de rejeição (sem contagem dupla). #252 permanece OPEN (sem PAMI/Farmalink live).

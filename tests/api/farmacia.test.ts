@@ -122,6 +122,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
       const app = createApp(prisma)
       const res = await request(app).get('/api/farmacia/recetas/99').expect(404)
       expect(res.body).toMatchObject({ success: false, error: 'Receta not found' })
+      await assertMatchesOpenApi('/api/farmacia/recetas/{id}', 'get', '404', res.body)
     })
 
     it('returns the prescription when found', async () => {
@@ -239,7 +240,11 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
     it('returns 404 when the lot is not from this tenant', async () => {
       vi.mocked(prisma.lote.findFirst).mockResolvedValueOnce(null as never)
       const app = createApp(prisma)
-      await request(app).put('/api/farmacia/lotes/8/serial').send({ serialUnidad: 'AB-1' }).expect(404)
+      const res = await request(app)
+        .put('/api/farmacia/lotes/8/serial')
+        .send({ serialUnidad: 'AB-1' })
+        .expect(404)
+      await assertMatchesOpenApi('/api/farmacia/lotes/{id}/serial', 'put', '404', res.body)
     })
 
     it('rejects an oversized DataMatrix payload with 400', async () => {
