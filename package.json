@@ -271,7 +271,8 @@
         "CVE-2023-54404"
       ],
       "ignoreGhsas": [
-        "GHSA-g2v6-rqmx-r4w6"
+        "GHSA-g2v6-rqmx-r4w6",
+        "GHSA-fc5q-39xc-vjpf"
       ]
     }
   }
