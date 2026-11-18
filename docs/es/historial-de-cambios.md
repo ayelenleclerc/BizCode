@@ -14,6 +14,13 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Asserts OpenAPI libro psicotrópicos GET 400 (#204 residual):** `tests/api/farmacia.test.ts` valida `GET /api/farmacia/libro-psicotropicos` y `.../export` 400 con Ajv vs OpenAPI (ADR-0003); #204 sigue OPEN (residual ANMAT live).
+- **Asserts OpenAPI listados OS 400 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `GET /api/farmacia/ventas-os` y `GET /api/farmacia/presentaciones-os` 400 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN.
+- **Asserts OpenAPI marcar-presentada (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST .../marcar-presentada` 404/422 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN.
+- **Assert OpenAPI presentaciones-os 422 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST /api/farmacia/presentaciones-os` 422 `no_pending_sales_for_period` con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN.
+- **Asserts OpenAPI FCEM mutaciones 404 (#239 residual):** `tests/api/fcem.test.ts` valida `POST .../emitir|aceptar|rechazar|aceptar-tacita` 404 con Ajv vs OpenAPI (ADR-0003); #239 sigue OPEN (AFIP live residual).
+- **Assert OpenAPI FCEM GET 404 (#239 residual):** `tests/api/fcem.test.ts` valida `GET /api/fcem/facturas/{facturaId}` 404 con Ajv vs OpenAPI (ADR-0003); #239 sigue OPEN (AFIP live residual).
+- **Asserts OpenAPI farmacia 404 (#204 residual):** `tests/api/farmacia.test.ts` valida `GET /api/farmacia/recetas/{id}` 404 y `PUT /api/farmacia/lotes/{id}/serial` 404 con Ajv vs OpenAPI (ADR-0003); #204 sigue OPEN (residual ANMAT live).
 - **Fix drift changelog ZAP `-I` (#194 residual docs):** Added Unreleased ya no afirma que el job ZAP use `-I` (alineado con Cambiado + `.github/workflows/zap.yml`). #194 sigue OPEN (register externo vacío).
 - **Asserts OpenAPI cobro/rechazo OS (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST .../cobro` y `POST .../rechazos` 400/404/422 con Ajv vs OpenAPI (ADR-0003). #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Cuenta corriente OS usa importeRechazado (#252 residual):** `cuentaCorriente` prioriza `PresentacionOSRechazo.importeRechazado` en `creditoRechazado` y solo suma el `creditoOS` completo si una venta `rechazado_os` no tiene fila de rechazo (sin doble conteo). #252 sigue OPEN (sin PAMI/Farmalink live).
