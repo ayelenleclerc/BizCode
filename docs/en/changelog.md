@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **FCEM aceptar-tacita 422 OpenAPI assert (#239 residual):** `tests/api/fcem.test.ts` validates `POST /api/fcem/facturas/{facturaId}/aceptar-tacita` 422 `FCEM_NOT_PENDING` with Ajv vs OpenAPI (ADR-0003); #239 stays OPEN (live AFIP / catalog / ConsultaObligado).
 - **FCEM rechazar 422 OpenAPI assert (#239 residual):** `tests/api/fcem.test.ts` validates `POST /api/fcem/facturas/{facturaId}/rechazar` 422 `FCEM_NOT_PENDING` with Ajv vs OpenAPI (ADR-0003); #239 stays OPEN (live AFIP / catalog / ConsultaObligado).
 - **Twilio WhatsApp webhook 403 OpenAPI assert (#201 residual):** `tests/api/twilio-whatsapp-webhook.test.ts` validates `POST /api/webhooks/twilio/whatsapp` 403 (invalid Twilio signature) with Ajv vs OpenAPI (ADR-0003); #201 stays OPEN (OpenAI / Meta Cloud / WA per tenant).
 - **Repartos POD GET 403 OpenAPI assert (#199 residual):** `tests/api/repartos.test.ts` validates `GET /api/repartos/{id}/items/{itemId}/pod` 403 (driver) with Ajv vs OpenAPI (ADR-0003); #199 stays OPEN (geocoder / external solvers / fleet AC).
