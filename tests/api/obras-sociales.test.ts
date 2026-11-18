@@ -239,6 +239,47 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'post', '422', res.body)
   })
 
+  it('POST /api/farmacia/presentaciones-os/{id}/marcar-presentada returns 404 when missing', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/marcar-presentada')
+      .expect(404)
+    expect(res.body.error).toBe('presentacion_not_found')
+    await assertMatchesOpenApi(
+      '/api/farmacia/presentaciones-os/{id}/marcar-presentada',
+      'post',
+      '404',
+      res.body,
+    )
+  })
+
+  it('POST /api/farmacia/presentaciones-os/{id}/marcar-presentada returns 422 when invalid state', async () => {
+    vi.mocked(prisma.presentacionOS.findFirst).mockResolvedValueOnce({
+      id: 9,
+      tenantId: 1,
+      obraSocialId: 1,
+      periodo: '2026-05',
+      totalCredito: new Prisma.Decimal(7000),
+      estado: 'cobrada',
+      archivoCsvName: 'presentacion-os-1-2026-05.csv',
+      fechaPago: new Date('2026-06-15T00:00:00.000Z'),
+      importeCobrado: new Prisma.Decimal(7000),
+      createdAt: new Date('2026-06-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-06-15T00:00:00.000Z'),
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/marcar-presentada')
+      .expect(422)
+    expect(res.body.error).toBe('presentacion_invalid_state')
+    await assertMatchesOpenApi(
+      '/api/farmacia/presentaciones-os/{id}/marcar-presentada',
+      'post',
+      '422',
+      res.body,
+    )
+  })
+
   it('GET /api/farmacia/obras-sociales-cc returns CC summary', async () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/farmacia/obras-sociales-cc').expect(200)
