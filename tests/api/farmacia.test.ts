@@ -122,6 +122,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
       const app = createApp(prisma)
       const res = await request(app).get('/api/farmacia/recetas/99').expect(404)
       expect(res.body).toMatchObject({ success: false, error: 'Receta not found' })
+      await assertMatchesOpenApi('/api/farmacia/recetas/{id}', 'get', '404', res.body)
     })
 
     it('returns the prescription when found', async () => {
@@ -171,6 +172,24 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
       const app = createApp(prisma)
       const res = await request(app).get('/api/farmacia/libro-psicotropicos').expect(200)
       expect(res.body.data[0]).toMatchObject({ id: 2, tipo: 'ingreso', cantidad: 3 })
+    })
+
+    it('rejects a malformed date filter with 400', async () => {
+      const app = createApp(prisma)
+      const res = await request(app)
+        .get('/api/farmacia/libro-psicotropicos?desde=28-08-2026')
+        .expect(400)
+      expect(res.body.error).toBe('Invalid query parameters')
+      await assertMatchesOpenApi('/api/farmacia/libro-psicotropicos', 'get', '400', res.body)
+    })
+
+    it('rejects a malformed date filter on export with 400', async () => {
+      const app = createApp(prisma)
+      const res = await request(app)
+        .get('/api/farmacia/libro-psicotropicos/export?desde=28-08-2026')
+        .expect(400)
+      expect(res.body.error).toBe('Invalid query parameters')
+      await assertMatchesOpenApi('/api/farmacia/libro-psicotropicos/export', 'get', '400', res.body)
     })
 
     it('exports the book as CSV', async () => {
@@ -239,7 +258,11 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
     it('returns 404 when the lot is not from this tenant', async () => {
       vi.mocked(prisma.lote.findFirst).mockResolvedValueOnce(null as never)
       const app = createApp(prisma)
-      await request(app).put('/api/farmacia/lotes/8/serial').send({ serialUnidad: 'AB-1' }).expect(404)
+      const res = await request(app)
+        .put('/api/farmacia/lotes/8/serial')
+        .send({ serialUnidad: 'AB-1' })
+        .expect(404)
+      await assertMatchesOpenApi('/api/farmacia/lotes/{id}/serial', 'put', '404', res.body)
     })
 
     it('rejects an oversized DataMatrix payload with 400', async () => {
