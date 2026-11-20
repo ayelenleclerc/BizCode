@@ -217,6 +217,36 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/ventas-os', 'post', '201', res.body)
   })
 
+  it('POST /api/farmacia/ventas-os returns 400 on invalid body', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/farmacia/ventas-os').send({}).expect(400)
+    expect(res.body.success).toBe(false)
+    await assertMatchesOpenApi('/api/farmacia/ventas-os', 'post', '400', res.body)
+  })
+
+  it('POST /api/farmacia/ventas-os returns 404 when obra social is missing', async () => {
+    vi.mocked(prisma.obraSocial.findFirst).mockResolvedValueOnce(null)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/ventas-os')
+      .send({
+        clienteId: 4,
+        obraSocialId: 1,
+        nroAfiliado: 'AF-1',
+        items: [
+          {
+            descripcion: 'Ibuprofeno',
+            tipoProducto: 'generico',
+            cantidad: 1,
+            precioUnitario: 10000,
+          },
+        ],
+      })
+      .expect(404)
+    expect(res.body.error).toBe('obra_social_not_found')
+    await assertMatchesOpenApi('/api/farmacia/ventas-os', 'post', '404', res.body)
+  })
+
   it('POST /api/farmacia/presentaciones-os generates period batch', async () => {
     const app = createApp(prisma)
     const res = await request(app)
