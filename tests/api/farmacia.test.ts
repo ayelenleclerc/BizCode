@@ -161,6 +161,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
       const app = createApp(prisma)
       const res = await request(app).post('/api/farmacia/recetas').send(validRecetaBody).expect(409)
       expect(res.body).toMatchObject({ error: 'RECETA_ALREADY_EXISTS' })
+      await assertMatchesOpenApi('/api/farmacia/recetas', 'post', '409', res.body)
     })
   })
 
