@@ -269,6 +269,37 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'post', '422', res.body)
   })
 
+  it('POST /api/farmacia/presentaciones-os returns 400 on invalid body', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).post('/api/farmacia/presentaciones-os').send({}).expect(400)
+    expect(res.body.success).toBe(false)
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'post', '400', res.body)
+  })
+
+  it('POST /api/farmacia/presentaciones-os returns 404 when obra social is missing', async () => {
+    vi.mocked(prisma.obraSocial.findFirst).mockResolvedValueOnce(null)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os')
+      .send({ obraSocialId: 1, periodo: '2026-05' })
+      .expect(404)
+    expect(res.body.error).toBe('obra_social_not_found')
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'post', '404', res.body)
+  })
+
+  it('POST /api/farmacia/presentaciones-os returns 409 when period is duplicate', async () => {
+    vi.mocked(prisma.$transaction).mockRejectedValueOnce(
+      Object.assign(new Error('unique'), { code: 'P2002' }),
+    )
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os')
+      .send({ obraSocialId: 1, periodo: '2026-05' })
+      .expect(409)
+    expect(res.body.error).toBe('presentacion_periodo_duplicate')
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'post', '409', res.body)
+  })
+
   it('POST /api/farmacia/presentaciones-os/{id}/marcar-presentada returns 404 when missing', async () => {
     const app = createApp(prisma)
     const res = await request(app)
