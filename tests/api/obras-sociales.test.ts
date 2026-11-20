@@ -220,6 +220,37 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/obras-sociales/{id}', 'patch', '404', res.body)
   })
 
+  it('PUT /api/farmacia/obras-sociales/{id}/coberturas returns 400 on invalid body', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .put('/api/farmacia/obras-sociales/1/coberturas')
+      .send({})
+      .expect(400)
+    expect(res.body.success).toBe(false)
+    await assertMatchesOpenApi(
+      '/api/farmacia/obras-sociales/{id}/coberturas',
+      'put',
+      '400',
+      res.body,
+    )
+  })
+
+  it('PUT /api/farmacia/obras-sociales/{id}/coberturas returns 404 when missing', async () => {
+    vi.mocked(prisma.obraSocial.findFirst).mockResolvedValueOnce(null)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .put('/api/farmacia/obras-sociales/99/coberturas')
+      .send({ tipoProducto: 'generico', cobertura: 70 })
+      .expect(404)
+    expect(res.body.error).toBe('obra_social_not_found')
+    await assertMatchesOpenApi(
+      '/api/farmacia/obras-sociales/{id}/coberturas',
+      'put',
+      '404',
+      res.body,
+    )
+  })
+
   it('POST /api/farmacia/ventas-os computes copay', async () => {
     const app = createApp(prisma)
     const res = await request(app)
