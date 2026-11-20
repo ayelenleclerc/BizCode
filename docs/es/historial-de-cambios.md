@@ -14,6 +14,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Asserts OpenAPI presentaciones-os POST 400/404/409 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST /api/farmacia/presentaciones-os` 400/404/409 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Asserts OpenAPI ventas-os POST 400/404 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST /api/farmacia/ventas-os` 400/404 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Asserts OpenAPI libro psicotrópicos GET 400 (#204 residual):** `tests/api/farmacia.test.ts` valida `GET /api/farmacia/libro-psicotropicos` y `.../export` 400 con Ajv vs OpenAPI (ADR-0003); #204 sigue OPEN (residual ANMAT live).
 - **Asserts OpenAPI listados OS 400 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `GET /api/farmacia/ventas-os` y `GET /api/farmacia/presentaciones-os` 400 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN.
