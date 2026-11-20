@@ -201,6 +201,23 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/obras-sociales', 'post', '400', res.body)
   })
 
+  it('POST /api/farmacia/obras-sociales returns 409 when codigo is duplicate', async () => {
+    vi.mocked(prisma.obraSocial.create).mockRejectedValueOnce(
+      Object.assign(new Error('unique'), { code: 'P2002' }),
+    )
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/obras-sociales')
+      .send({
+        nombre: 'IOMA',
+        codigo: 'IOMA',
+        coberturas: [{ tipoProducto: 'generico', cobertura: 70 }],
+      })
+      .expect(409)
+    expect(res.body.error).toBe('obra_social_codigo_duplicate')
+    await assertMatchesOpenApi('/api/farmacia/obras-sociales', 'post', '409', res.body)
+  })
+
   it('GET /api/farmacia/obras-sociales/{id} returns 404 when missing', async () => {
     vi.mocked(prisma.obraSocial.findFirst).mockResolvedValueOnce(null)
     const app = createApp(prisma)
@@ -218,6 +235,19 @@ describe('obras sociales REST endpoints (#252)', () => {
       .expect(404)
     expect(res.body.error).toBe('obra_social_not_found')
     await assertMatchesOpenApi('/api/farmacia/obras-sociales/{id}', 'patch', '404', res.body)
+  })
+
+  it('PATCH /api/farmacia/obras-sociales/{id} returns 409 when codigo is duplicate', async () => {
+    vi.mocked(prisma.obraSocial.update).mockRejectedValueOnce(
+      Object.assign(new Error('unique'), { code: 'P2002' }),
+    )
+    const app = createApp(prisma)
+    const res = await request(app)
+      .patch('/api/farmacia/obras-sociales/1')
+      .send({ codigo: 'DUP' })
+      .expect(409)
+    expect(res.body.error).toBe('obra_social_codigo_duplicate')
+    await assertMatchesOpenApi('/api/farmacia/obras-sociales/{id}', 'patch', '409', res.body)
   })
 
   it('PUT /api/farmacia/obras-sociales/{id}/coberturas returns 400 on invalid body', async () => {
