@@ -300,6 +300,18 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'post', '409', res.body)
   })
 
+  it('GET /api/farmacia/presentaciones-os/{id}/export returns 404 when missing', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/farmacia/presentaciones-os/9/export').expect(404)
+    expect(res.body.error).toBe('presentacion_not_found')
+    await assertMatchesOpenApi(
+      '/api/farmacia/presentaciones-os/{id}/export',
+      'get',
+      '404',
+      res.body,
+    )
+  })
+
   it('POST /api/farmacia/presentaciones-os/{id}/marcar-presentada returns 404 when missing', async () => {
     const app = createApp(prisma)
     const res = await request(app)

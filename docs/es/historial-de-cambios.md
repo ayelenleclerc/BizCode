@@ -14,6 +14,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Assert OpenAPI presentaciones-os export 404 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `GET /api/farmacia/presentaciones-os/{id}/export` 404 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Assert OpenAPI recetas POST 409 (#204 residual):** `tests/api/farmacia.test.ts` valida `POST /api/farmacia/recetas` 409 con Ajv vs OpenAPI (ADR-0003); #204 sigue OPEN (residual ANMAT live).
 - **Asserts OpenAPI presentaciones-os POST 400/404/409 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST /api/farmacia/presentaciones-os` 400/404/409 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Asserts OpenAPI ventas-os POST 400/404 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST /api/farmacia/ventas-os` 400/404 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN (sin PAMI/Farmalink live).
