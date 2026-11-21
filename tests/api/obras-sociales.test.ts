@@ -233,6 +233,16 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/obras-sociales/{id}', 'get', '404', res.body)
   })
 
+  it('PATCH /api/farmacia/obras-sociales/{id} updates insurer', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .patch('/api/farmacia/obras-sociales/1')
+      .send({ nombre: 'IOMA Actualizada' })
+      .expect(200)
+    expect(res.body.data.codigo).toBe('IOMA')
+    await assertMatchesOpenApi('/api/farmacia/obras-sociales/{id}', 'patch', '200', res.body)
+  })
+
   it('PATCH /api/farmacia/obras-sociales/{id} returns 400 on invalid body', async () => {
     const app = createApp(prisma)
     const res = await request(app)
@@ -265,6 +275,22 @@ describe('obras sociales REST endpoints (#252)', () => {
       .expect(409)
     expect(res.body.error).toBe('obra_social_codigo_duplicate')
     await assertMatchesOpenApi('/api/farmacia/obras-sociales/{id}', 'patch', '409', res.body)
+  })
+
+  it('PUT /api/farmacia/obras-sociales/{id}/coberturas upserts coverage', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .put('/api/farmacia/obras-sociales/1/coberturas')
+      .send({ tipoProducto: 'generico', cobertura: 70 })
+      .expect(200)
+    expect(res.body.data.tipoProducto).toBe('generico')
+    expect(res.body.data.cobertura).toBe(70)
+    await assertMatchesOpenApi(
+      '/api/farmacia/obras-sociales/{id}/coberturas',
+      'put',
+      '200',
+      res.body,
+    )
   })
 
   it('PUT /api/farmacia/obras-sociales/{id}/coberturas returns 400 on invalid body', async () => {
