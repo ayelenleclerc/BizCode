@@ -218,12 +218,29 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/obras-sociales', 'post', '409', res.body)
   })
 
+  it('GET /api/farmacia/obras-sociales/{id} returns insurer', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/farmacia/obras-sociales/1').expect(200)
+    expect(res.body.data.codigo).toBe('IOMA')
+    await assertMatchesOpenApi('/api/farmacia/obras-sociales/{id}', 'get', '200', res.body)
+  })
+
   it('GET /api/farmacia/obras-sociales/{id} returns 404 when missing', async () => {
     vi.mocked(prisma.obraSocial.findFirst).mockResolvedValueOnce(null)
     const app = createApp(prisma)
     const res = await request(app).get('/api/farmacia/obras-sociales/99').expect(404)
     expect(res.body.error).toBe('obra_social_not_found')
     await assertMatchesOpenApi('/api/farmacia/obras-sociales/{id}', 'get', '404', res.body)
+  })
+
+  it('PATCH /api/farmacia/obras-sociales/{id} returns 400 on invalid body', async () => {
+    const app = createApp(prisma)
+    const res = await request(app)
+      .patch('/api/farmacia/obras-sociales/1')
+      .send({ nombre: '' })
+      .expect(400)
+    expect(res.body.success).toBe(false)
+    await assertMatchesOpenApi('/api/farmacia/obras-sociales/{id}', 'patch', '400', res.body)
   })
 
   it('PATCH /api/farmacia/obras-sociales/{id} returns 404 when missing', async () => {
