@@ -442,6 +442,41 @@ describe('obras sociales REST endpoints (#252)', () => {
     )
   })
 
+  it('POST /api/farmacia/presentaciones-os/{id}/marcar-presentada marks as presentada', async () => {
+    const generada = {
+      id: 9,
+      tenantId: 1,
+      obraSocialId: 1,
+      periodo: '2026-05',
+      totalCredito: new Prisma.Decimal(7000),
+      estado: 'generada',
+      archivoCsvName: 'presentacion-os-1-2026-05.csv',
+      fechaPago: null,
+      importeCobrado: null,
+      createdAt: new Date('2026-06-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T00:00:00.000Z'),
+    }
+    vi.mocked(prisma.presentacionOS.findFirst).mockResolvedValueOnce(generada as never)
+    vi.mocked(prisma.presentacionOS.update).mockResolvedValueOnce({
+      ...generada,
+      estado: 'presentada',
+      obraSocial: { id: 1, nombre: 'IOMA', codigo: 'IOMA' },
+      rechazos: [],
+      _count: { ventas: 1 },
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/marcar-presentada')
+      .expect(200)
+    expect(res.body.data.estado).toBe('presentada')
+    await assertMatchesOpenApi(
+      '/api/farmacia/presentaciones-os/{id}/marcar-presentada',
+      'post',
+      '200',
+      res.body,
+    )
+  })
+
   it('POST /api/farmacia/presentaciones-os/{id}/marcar-presentada returns 404 when missing', async () => {
     const app = createApp(prisma)
     const res = await request(app)
@@ -534,6 +569,46 @@ describe('obras sociales REST endpoints (#252)', () => {
     const res = await request(app).get('/api/farmacia/presentaciones-os?obraSocialId=0').expect(400)
     expect(res.body.error).toBe('Invalid query parameters')
     await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'get', '400', res.body)
+  })
+
+  it('POST /api/farmacia/presentaciones-os/{id}/cobro registers payment', async () => {
+    vi.mocked(prisma.presentacionOS.findFirst).mockResolvedValueOnce({
+      id: 9,
+      tenantId: 1,
+      obraSocialId: 1,
+      periodo: '2026-05',
+      totalCredito: new Prisma.Decimal(7000),
+      estado: 'presentada',
+      archivoCsvName: 'presentacion-os-1-2026-05.csv',
+      fechaPago: null,
+      importeCobrado: null,
+      createdAt: new Date('2026-06-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T00:00:00.000Z'),
+      rechazos: [],
+    } as never)
+    vi.mocked(prisma.$transaction).mockResolvedValueOnce({
+      id: 9,
+      tenantId: 1,
+      obraSocialId: 1,
+      periodo: '2026-05',
+      totalCredito: new Prisma.Decimal(7000),
+      estado: 'cobrada',
+      archivoCsvName: 'presentacion-os-1-2026-05.csv',
+      fechaPago: new Date('2026-06-15T00:00:00.000Z'),
+      importeCobrado: new Prisma.Decimal(7000),
+      createdAt: new Date('2026-06-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-06-15T00:00:00.000Z'),
+      obraSocial: { id: 1, nombre: 'IOMA', codigo: 'IOMA' },
+      rechazos: [],
+      _count: { ventas: 1 },
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/cobro')
+      .send({ importeCobrado: 7000, fechaPago: '2026-06-15T00:00:00.000Z' })
+      .expect(200)
+    expect(res.body.data.estado).toBe('cobrada')
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os/{id}/cobro', 'post', '200', res.body)
   })
 
   it('POST /api/farmacia/presentaciones-os/{id}/cobro returns 400 on invalid body', async () => {
