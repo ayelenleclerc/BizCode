@@ -655,6 +655,67 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/presentaciones-os/{id}/cobro', 'post', '422', res.body)
   })
 
+  it('POST /api/farmacia/presentaciones-os/{id}/rechazos registers rejection', async () => {
+    vi.mocked(prisma.presentacionOS.findFirst).mockResolvedValueOnce({
+      id: 9,
+      tenantId: 1,
+      obraSocialId: 1,
+      periodo: '2026-05',
+      totalCredito: new Prisma.Decimal(7000),
+      estado: 'presentada',
+      archivoCsvName: 'presentacion-os-1-2026-05.csv',
+      fechaPago: null,
+      importeCobrado: null,
+      createdAt: new Date('2026-06-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T00:00:00.000Z'),
+    } as never)
+    vi.mocked(prisma.ventaConOS.findFirst).mockResolvedValueOnce({
+      ...ventaRow,
+      presentacionId: 9,
+      estado: 'presentado',
+    } as never)
+    vi.mocked(prisma.$transaction).mockResolvedValueOnce({
+      id: 9,
+      tenantId: 1,
+      obraSocialId: 1,
+      periodo: '2026-05',
+      totalCredito: new Prisma.Decimal(7000),
+      estado: 'con_rechazos',
+      archivoCsvName: 'presentacion-os-1-2026-05.csv',
+      fechaPago: null,
+      importeCobrado: null,
+      createdAt: new Date('2026-06-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-06-10T00:00:00.000Z'),
+      obraSocial: { id: 1, nombre: 'IOMA', codigo: 'IOMA' },
+      rechazos: [
+        {
+          id: 1,
+          tenantId: 1,
+          presentacionId: 9,
+          ventaConOSId: 5,
+          ventaOSItemId: null,
+          importeRechazado: new Prisma.Decimal(1000),
+          motivo: 'Item rechazado',
+          createdAt: new Date('2026-06-10T00:00:00.000Z'),
+        },
+      ],
+      _count: { ventas: 1 },
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app)
+      .post('/api/farmacia/presentaciones-os/9/rechazos')
+      .send({ ventaConOSId: 5, importeRechazado: 1000, motivo: 'Item rechazado' })
+      .expect(201)
+    expect(res.body.data.estado).toBe('con_rechazos')
+    expect(res.body.data.rechazos).toHaveLength(1)
+    await assertMatchesOpenApi(
+      '/api/farmacia/presentaciones-os/{id}/rechazos',
+      'post',
+      '201',
+      res.body,
+    )
+  })
+
   it('POST /api/farmacia/presentaciones-os/{id}/rechazos returns 400 on invalid body', async () => {
     const app = createApp(prisma)
     const res = await request(app)
