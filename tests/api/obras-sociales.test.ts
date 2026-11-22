@@ -490,11 +490,43 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/obras-sociales-cc', 'get', '200', res.body)
   })
 
+  it('GET /api/farmacia/ventas-os returns sales list', async () => {
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/farmacia/ventas-os').expect(200)
+    expect(res.body.data[0].id).toBe(5)
+    await assertMatchesOpenApi('/api/farmacia/ventas-os', 'get', '200', res.body)
+  })
+
   it('GET /api/farmacia/ventas-os returns 400 on invalid query', async () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/farmacia/ventas-os?obraSocialId=0').expect(400)
     expect(res.body.error).toBe('Invalid query parameters')
     await assertMatchesOpenApi('/api/farmacia/ventas-os', 'get', '400', res.body)
+  })
+
+  it('GET /api/farmacia/presentaciones-os returns presentations list', async () => {
+    vi.mocked(prisma.presentacionOS.findMany).mockResolvedValueOnce([
+      {
+        id: 9,
+        tenantId: 1,
+        obraSocialId: 1,
+        periodo: '2026-05',
+        totalCredito: new Prisma.Decimal(7000),
+        estado: 'generada',
+        archivoCsvName: 'presentacion-os-1-2026-05.csv',
+        fechaPago: null,
+        importeCobrado: null,
+        createdAt: new Date('2026-06-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-06-01T00:00:00.000Z'),
+        obraSocial: { id: 1, nombre: 'IOMA', codigo: 'IOMA' },
+        rechazos: [],
+        _count: { ventas: 1 },
+      },
+    ] as never)
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/farmacia/presentaciones-os').expect(200)
+    expect(res.body.data[0].periodo).toBe('2026-05')
+    await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'get', '200', res.body)
   })
 
   it('GET /api/farmacia/presentaciones-os returns 400 on invalid query', async () => {

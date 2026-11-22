@@ -14,6 +14,7 @@ Versionado: [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Asserts OpenAPI GET ventas-os / presentaciones-os 200 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `GET /api/farmacia/ventas-os` y `GET /api/farmacia/presentaciones-os` 200 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Asserts OpenAPI PATCH obras-sociales 200 + coberturas PUT 200 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `PATCH /api/farmacia/obras-sociales/{id}` 200 y `PUT .../{id}/coberturas` 200 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Asserts OpenAPI GET obras-sociales/{id} 200 + PATCH 400 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `GET /api/farmacia/obras-sociales/{id}` 200 y `PATCH .../{id}` 400 con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN (sin PAMI/Farmalink live).
 - **Asserts OpenAPI ABM obras-sociales 409 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST|PATCH /api/farmacia/obras-sociales` 409 `obra_social_codigo_duplicate` con Ajv vs OpenAPI (ADR-0003); #252 sigue OPEN (sin PAMI/Farmalink live).
