@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Pharmacy OS presentaciones-os export 200 OpenAPI assert (#252 residual):** `tests/api/obras-sociales.test.ts` validates `GET /api/farmacia/presentaciones-os/{id}/export` 200 `text/csv` with Ajv vs OpenAPI (ADR-0003); `assertMatchesOpenApi` accepts optional `contentType` for non-JSON responses; #252 stays OPEN (no PAMI/Farmalink live).
 - **Pharmacy OS presentaciones-os rechazos 201 OpenAPI assert (#252 residual):** `tests/api/obras-sociales.test.ts` validates `POST /api/farmacia/presentaciones-os/{id}/rechazos` 201 with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN (no PAMI/Farmalink live).
 - **Pharmacy OS marcar-presentada / cobro 200 OpenAPI asserts (#252 residual):** `tests/api/obras-sociales.test.ts` validates `POST /api/farmacia/presentaciones-os/{id}/marcar-presentada` 200 and `POST .../{id}/cobro` 200 with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN (no PAMI/Farmalink live).
 - **Pharmacy OS ventas-os / presentaciones-os GET 200 OpenAPI asserts (#252 residual):** `tests/api/obras-sociales.test.ts` validates `GET /api/farmacia/ventas-os` and `GET /api/farmacia/presentaciones-os` 200 with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN (no PAMI/Farmalink live).

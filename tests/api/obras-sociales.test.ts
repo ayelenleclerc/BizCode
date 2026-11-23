@@ -430,6 +430,33 @@ describe('obras sociales REST endpoints (#252)', () => {
     await assertMatchesOpenApi('/api/farmacia/presentaciones-os', 'post', '409', res.body)
   })
 
+  it('GET /api/farmacia/presentaciones-os/{id}/export returns CSV', async () => {
+    vi.mocked(prisma.presentacionOS.findFirst).mockResolvedValueOnce({
+      id: 9,
+      tenantId: 1,
+      obraSocialId: 1,
+      periodo: '2026-05',
+      totalCredito: new Prisma.Decimal(7000),
+      estado: 'generada',
+      archivoCsvName: 'presentacion-os-1-2026-05.csv',
+      fechaPago: null,
+      importeCobrado: null,
+      createdAt: new Date('2026-06-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-06-01T00:00:00.000Z'),
+    } as never)
+    const app = createApp(prisma)
+    const res = await request(app).get('/api/farmacia/presentaciones-os/9/export').expect(200)
+    expect(res.headers['content-type']).toContain('text/csv')
+    expect(res.text.split('\n')[0]).toContain('ventaId')
+    await assertMatchesOpenApi(
+      '/api/farmacia/presentaciones-os/{id}/export',
+      'get',
+      '200',
+      res.text,
+      { contentType: 'text/csv' },
+    )
+  })
+
   it('GET /api/farmacia/presentaciones-os/{id}/export returns 404 when missing', async () => {
     const app = createApp(prisma)
     const res = await request(app).get('/api/farmacia/presentaciones-os/9/export').expect(404)
