@@ -176,6 +176,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
       const app = createApp(prisma)
       const res = await request(app).get('/api/farmacia/libro-psicotropicos').expect(200)
       expect(res.body.data[0]).toMatchObject({ id: 2, tipo: 'ingreso', cantidad: 3 })
+      await assertMatchesOpenApi('/api/farmacia/libro-psicotropicos', 'get', '200', res.body)
     })
 
     it('rejects a malformed date filter with 400', async () => {
@@ -208,6 +209,13 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
       expect(res.headers['content-disposition']).toContain('libro-psicotropicos.csv')
       expect(res.text.split('\n')[0]).toContain('"fecha","tipo"')
       expect(res.text).toContain('Clonazepam 2mg')
+      await assertMatchesOpenApi(
+        '/api/farmacia/libro-psicotropicos/export',
+        'get',
+        '200',
+        res.text,
+        { contentType: 'text/csv' },
+      )
     })
 
     it('creates an entry for a psychotropic article', async () => {
@@ -218,6 +226,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
         .send({ articuloId: 5, tipo: 'ingreso', cantidad: 3, referencia: 'compra:9' })
         .expect(201)
       expect(res.body.data).toMatchObject({ id: 2, referencia: 'compra:9' })
+      await assertMatchesOpenApi('/api/farmacia/libro-psicotropicos', 'post', '201', res.body)
     })
 
     it('returns 422 when the article is not flagged as psychotropic', async () => {
