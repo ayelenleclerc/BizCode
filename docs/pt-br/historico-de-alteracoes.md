@@ -14,6 +14,7 @@ Versionamento: [Semantic Versioning](https://semver.org/).
 
 ### Alterado
 
+- **Asserts OpenAPI farmácia receitas/serial happy-path (#204 residual):** `tests/api/farmacia.test.ts` valida `GET /api/farmacia/recetas` 200, `GET /api/farmacia/recetas/{id}` 200, `POST /api/farmacia/recetas` 201 e `PUT /api/farmacia/lotes/{id}/serial` 200 com Ajv vs OpenAPI (ADR-0003); #204 permanece OPEN (residual ANMAT live).
 - **Assert OpenAPI apresentações-os export 200 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `GET /api/farmacia/presentaciones-os/{id}/export` 200 `text/csv` com Ajv vs OpenAPI (ADR-0003); `assertMatchesOpenApi` aceita `contentType` opcional para respostas não JSON; #252 permanece OPEN (sem PAMI/Farmalink live).
 - **Assert OpenAPI apresentações-os rejeições 201 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST /api/farmacia/presentaciones-os/{id}/rechazos` 201 com Ajv vs OpenAPI (ADR-0003); #252 permanece OPEN (sem PAMI/Farmalink live).
 - **Asserts OpenAPI marcar-presentada / cobrança 200 (#252 residual):** `tests/api/obras-sociales.test.ts` valida `POST /api/farmacia/presentaciones-os/{id}/marcar-presentada` 200 e `POST .../{id}/cobro` 200 com Ajv vs OpenAPI (ADR-0003); #252 permanece OPEN (sem PAMI/Farmalink live).

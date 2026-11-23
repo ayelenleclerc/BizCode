@@ -108,6 +108,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
         numeroReceta: 'R-1',
         fechaReceta: '2026-08-28',
       })
+      await assertMatchesOpenApi('/api/farmacia/recetas', 'get', '200', res.body)
     })
 
     it('rejects a malformed date filter with 400', async () => {
@@ -130,6 +131,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
       const app = createApp(prisma)
       const res = await request(app).get('/api/farmacia/recetas/1').expect(200)
       expect(res.body.data).toMatchObject({ id: 1, matricula: 'MN 1' })
+      await assertMatchesOpenApi('/api/farmacia/recetas/{id}', 'get', '200', res.body)
     })
   })
 
@@ -143,6 +145,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
         .expect(201)
       expect(res.body.data).toMatchObject({ id: 1, numeroReceta: 'R-1' })
       expect(prisma.auditEvent.create).toHaveBeenCalled()
+      await assertMatchesOpenApi('/api/farmacia/recetas', 'post', '201', res.body)
     })
 
     it('rejects a body without numeroReceta', async () => {
@@ -254,6 +257,7 @@ describe('pharmacy vertical REST endpoints (#204)', () => {
           data: { serialUnidad: 'AB-1', codigoDatamatrix: null },
         }),
       )
+      await assertMatchesOpenApi('/api/farmacia/lotes/{id}/serial', 'put', '200', res.body)
     })
 
     it('returns 404 when the lot is not from this tenant', async () => {
