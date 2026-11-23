@@ -32,14 +32,26 @@ async function loadDereferenced() {
   return dereferenced
 }
 
+export type AssertMatchesOpenApiOptions = {
+  /**
+   * @en Media type under the response `content` map (default: `application/json`, else `text/csv` if present).
+   * @es Media type bajo el mapa `content` de la respuesta (por defecto: `application/json`, si no `text/csv` si existe).
+   * @pt-BR Media type no mapa `content` da resposta (padrão: `application/json`, senão `text/csv` se existir).
+   */
+  contentType?: string
+}
+
 /**
- * Valida un cuerpo JSON contra el schema de respuesta OpenAPI 3.1 (ruta canónica con `{id}`).
+ * @en Validates a response body against the OpenAPI 3.1 response schema (canonical path with `{id}`).
+ * @es Valida un cuerpo de respuesta contra el schema OpenAPI 3.1 (ruta canónica con `{id}`).
+ * @pt-BR Valida um corpo de resposta contra o schema OpenAPI 3.1 (rota canônica com `{id}`).
  */
 export async function assertMatchesOpenApi(
   openApiPath: string,
   method: string,
   statusCode: string,
-  body: unknown
+  body: unknown,
+  options?: AssertMatchesOpenApiOptions,
 ): Promise<void> {
   const spec = await loadDereferenced()
   const paths = spec.paths as Record<string, Record<string, unknown>> | undefined
@@ -52,15 +64,25 @@ export async function assertMatchesOpenApi(
   const responses = op.responses as
     | Record<string, { content?: Record<string, { schema?: unknown }> }>
     | undefined
-  const content = responses?.[statusCode]?.content?.['application/json']?.schema
-  if (!content) {
+  const contentMap = responses?.[statusCode]?.content
+  const contentType =
+    options?.contentType ??
+    (contentMap?.['application/json'] ? 'application/json' : undefined) ??
+    (contentMap?.['text/csv'] ? 'text/csv' : undefined)
+  const content = contentType ? contentMap?.[contentType]?.schema : undefined
+  if (!content || !contentType) {
     throw new Error(`No hay schema de respuesta para ${method.toUpperCase()} ${openApiPath} ${statusCode}`)
   }
   const validate = ajv.compile(content as object)
+  const bodyForError: unknown = body
   const ok = validate(body)
   if (!ok) {
+    const bodyPreview =
+      typeof bodyForError === 'string'
+        ? bodyForError.slice(0, 500)
+        : JSON.stringify(bodyForError, null, 2)
     throw new Error(
-      `OpenAPI no coincide: ${ajv.errorsText(validate.errors)}\nbody: ${JSON.stringify(body, null, 2)}`
+      `OpenAPI no coincide (${contentType}): ${ajv.errorsText(validate.errors)}\nbody: ${bodyPreview}`,
     )
   }
 }
