@@ -10,10 +10,12 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **BizCode Local — distributor scope matrix (#536):** Traceable requirement → UI/API → service → test → status matrix for the Local/distributor program (#535); extends pilot #450; documents new-install `MAYORISTA_ALIMENTOS` profile without migrating existing tenant flags; module conservation for paused verticals; EN/ES/PT-BR + `DOCUMENT_LOCALE_MAP`.
 - **Pharmacy obras sociales / prepaid MVP (#252):** ABM insurers + coverage %, OS sale with automatic copay/credit, monthly presentation CSV, CC summary and partial rejections on `vertical.pharmacy` (Prisma migration `20261117120000_obras_sociales_252`, `ObraSocialService`, `/api/farmacia/obras-sociales*`, UI tabs). Residual: no PAMI/Farmalink live and no proprietary OSDE/Swiss formats; #252 stays OPEN.
 
 ### Changed
 
+- **README `pnpm` typo fix (#536):** Replaced stray `ppnpm` with `pnpm` in local-dev command examples (`dev:full`).
 - **Pharmacy libro psicotropicos happy-path OpenAPI asserts (#204 residual):** `tests/api/farmacia.test.ts` validates `GET /api/farmacia/libro-psicotropicos` 200, `POST /api/farmacia/libro-psicotropicos` 201 and `GET .../export` 200 `text/csv` with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT live residual).
 - **Pharmacy recetas/serial happy-path OpenAPI asserts (#204 residual):** `tests/api/farmacia.test.ts` validates `GET /api/farmacia/recetas` 200, `GET /api/farmacia/recetas/{id}` 200, `POST /api/farmacia/recetas` 201 and `PUT /api/farmacia/lotes/{id}/serial` 200 with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT live residual).
 - **Pharmacy OS presentaciones-os export 200 OpenAPI assert (#252 residual):** `tests/api/obras-sociales.test.ts` validates `GET /api/farmacia/presentaciones-os/{id}/export` 200 `text/csv` with Ajv vs OpenAPI (ADR-0003); `assertMatchesOpenApi` accepts optional `contentType` for non-JSON responses; #252 stays OPEN (no PAMI/Farmalink live).
