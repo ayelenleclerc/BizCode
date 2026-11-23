@@ -14,6 +14,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Pharmacy libro psicotropicos happy-path OpenAPI asserts (#204 residual):** `tests/api/farmacia.test.ts` validates `GET /api/farmacia/libro-psicotropicos` 200, `POST /api/farmacia/libro-psicotropicos` 201 and `GET .../export` 200 `text/csv` with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT live residual).
 - **Pharmacy recetas/serial happy-path OpenAPI asserts (#204 residual):** `tests/api/farmacia.test.ts` validates `GET /api/farmacia/recetas` 200, `GET /api/farmacia/recetas/{id}` 200, `POST /api/farmacia/recetas` 201 and `PUT /api/farmacia/lotes/{id}/serial` 200 with Ajv vs OpenAPI (ADR-0003); #204 stays OPEN (ANMAT live residual).
 - **Pharmacy OS presentaciones-os export 200 OpenAPI assert (#252 residual):** `tests/api/obras-sociales.test.ts` validates `GET /api/farmacia/presentaciones-os/{id}/export` 200 `text/csv` with Ajv vs OpenAPI (ADR-0003); `assertMatchesOpenApi` accepts optional `contentType` for non-JSON responses; #252 stays OPEN (no PAMI/Farmalink live).
 - **Pharmacy OS presentaciones-os rechazos 201 OpenAPI assert (#252 residual):** `tests/api/obras-sociales.test.ts` validates `POST /api/farmacia/presentaciones-os/{id}/rechazos` 201 with Ajv vs OpenAPI (ADR-0003); #252 stays OPEN (no PAMI/Farmalink live).
