@@ -2,7 +2,7 @@
 
 **Propósito:** Criterio de salida verificable para ejercitar BizCode con **datos ficticios** en el circuito del piloto. No afirma readiness comercial ni cierra #194 / #197 / #239.
 
-**Relacionado:** [estrategia-pruebas.md](estrategia-pruebas.md), [flujo-operativo-pedido-entrega-cobranza.md](flujo-operativo-pedido-entrega-cobranza.md) (#391), [backup-y-restauracion.md](backup-y-restauracion.md) (#449), [ciclo-ci-cd.md](ciclo-ci-cd.md) (#451).
+**Relacionado:** [estrategia-pruebas.md](estrategia-pruebas.md), [flujo-operativo-pedido-entrega-cobranza.md](flujo-operativo-pedido-entrega-cobranza.md) (#391), [backup-y-restauracion.md](backup-y-restauracion.md) (#449), [ciclo-ci-cd.md](ciclo-ci-cd.md) (#451), [matriz-alcance-local-distribuidora.md](matriz-alcance-local-distribuidora.md) (#536 — alcance Local/distribuidora; extiende esta matriz piloto).
 
 ## Leyenda de prioridad
 

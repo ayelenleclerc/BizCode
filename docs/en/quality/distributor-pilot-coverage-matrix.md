@@ -2,7 +2,7 @@
 
 **Purpose:** Verifiable exit criteria for exercising BizCode with **fictional data** on the distributor pilot circuit. Does not claim commercial readiness or close #194 / #197 / #239.
 
-**Related:** [testing-strategy.md](testing-strategy.md), [operational-flow-order-delivery-collection.md](operational-flow-order-delivery-collection.md) (#391), [backup-and-restore.md](backup-and-restore.md) (#449), [ci-cd.md](ci-cd.md) (#451).
+**Related:** [testing-strategy.md](testing-strategy.md), [operational-flow-order-delivery-collection.md](operational-flow-order-delivery-collection.md) (#391), [backup-and-restore.md](backup-and-restore.md) (#449), [ci-cd.md](ci-cd.md) (#451), [local-distributor-scope-matrix.md](local-distributor-scope-matrix.md) (#536 — Local/distributor program scope; extends this pilot matrix).
 
 ## Priority legend
 

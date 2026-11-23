@@ -2,7 +2,7 @@
 
 **Propósito:** Critério de saída verificável para exercitar o BizCode com **dados fictícios** no circuito do piloto. Não afirma readiness comercial nem fecha #194 / #197 / #239.
 
-**Relacionado:** [estrategia-testes.md](estrategia-testes.md), [fluxo-operacional-pedido-entrega-cobranca.md](flujo-operacional-pedido-entrega-cobranca.md) (#391), [backup-e-restauracao.md](backup-e-restauracao.md) (#449), [ciclo-ci-cd.md](ciclo-ci-cd.md) (#451).
+**Relacionado:** [estrategia-testes.md](estrategia-testes.md), [fluxo-operacional-pedido-entrega-cobranca.md](flujo-operacional-pedido-entrega-cobranca.md) (#391), [backup-e-restauracao.md](backup-e-restauracao.md) (#449), [ciclo-ci-cd.md](ciclo-ci-cd.md) (#451), [matriz-escopo-local-distribuidora.md](matriz-escopo-local-distribuidora.md) (#536 — escopo Local/distribuidora; estende esta matriz piloto).
 
 ## Legenda de prioridade
 

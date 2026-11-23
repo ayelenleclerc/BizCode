@@ -53,7 +53,7 @@ npx prisma migrate dev
 npx prisma db seed   # creates tenant `platform` + SuperAdmin `ayelen` — set `BIZCODE_SEED_SUPERADMIN_PASSWORD` in `.env` first (≥ 8 chars; see `.env.example`)
 
 # 5. Start the full-stack dev server (API + Vite)
-ppnpm run dev:full
+pnpm run dev:full
 ```
 
 **Login (after seed):** tenant slug `platform`, username `ayelen`, password is the value you set in `BIZCODE_SEED_SUPERADMIN_PASSWORD` (local `.env` only; never commit). Re-running the seed resets that user’s password hash to match the current env value. The `super_admin` role includes all ERP permissions plus platform permissions ([`src/lib/rbac.ts`](src/lib/rbac.ts)).
@@ -71,13 +71,13 @@ Use **one** path per environment; for day-to-day local setup, prefer **`npx pris
 
 Automated tests cover the seed logic via [`tests/scripts/seed-superadmin.test.ts`](tests/scripts/seed-superadmin.test.ts) (`runSuperAdminSeed`).
 
-**Troubleshooting (web login):** If login fails with a “cannot reach the server” style message (localized in the UI), start the API on port 3001 (`pnpm run server` or `ppnpm run dev:full`) and inspect the browser **Network** tab for `POST …/api/auth/login`.
+**Troubleshooting (web login):** If login fails with a “cannot reach the server” style message (localized in the UI), start the API on port 3001 (`pnpm run server` or `pnpm run dev:full`) and inspect the browser **Network** tab for `POST …/api/auth/login`.
 
 ### Available Scripts
 
 | Script | Purpose |
 |---|---|
-| `ppnpm run dev:full` | Start Express API + Vite dev server concurrently |
+| `pnpm run dev:full` | Start Express API + Vite dev server concurrently |
 | `pnpm run dev:vite` | Vite dev server only |
 | `pnpm run server` | Express API server only (port 3001) |
 | `pnpm run build:web` | Production Vite build |
