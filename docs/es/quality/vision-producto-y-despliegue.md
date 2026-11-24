@@ -17,7 +17,7 @@ Este documento fija la **dirección estratégica de producto y arquitectura** pa
 
 ## Escritorio multiusuario
 
-Los despliegues de escritorio pueden tener **varios usuarios** (p. ej. oficina/LAN). Usuario, rol y auditoría deben ser **conceptualmente compatibles** con un futuro SaaS (mismas entidades; distinto aislamiento y política de despliegue).
+Los despliegues de escritorio pueden tener **varios usuarios** (p. ej. oficina/LAN). Usuario, rol y auditoría deben ser **conceptualmente compatibles** con un futuro SaaS (mismas entidades; distinto aislamiento y política de despliegue). Topología Local de un establecimiento (host principal + puestos), opciones multisitio y modos de fallo: [topologia-despliegue-local.md](topologia-despliegue-local.md) (#537) / [ADR-0029](../adr/ADR-0029-local-deployment-topology.md).
 
 ## Módulos fiscales por país
 

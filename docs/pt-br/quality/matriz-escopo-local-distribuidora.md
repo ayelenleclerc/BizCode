@@ -2,7 +2,7 @@
 
 **Propósito:** Matriz rastreável requisito → UI/API → serviço/modelo → teste → status para o programa **BizCode Local / distribuidora** ([#535](https://github.com/ayelenleclerc/BizCode/issues/535)). Estende a matriz piloto [#450](matriz-cobertura-piloto-distribuidora.md); **não** substitui o registro de evidência dela.
 
-**Relacionado:** [matriz-cobertura-piloto-distribuidora.md](matriz-cobertura-piloto-distribuidora.md) (#450), [catalogo-modulos-e-feature-flags.md](catalogo-modulos-e-feature-flags.md), [visao-produto-e-implantacao.md](visao-produto-e-implantacao.md) (PROD-VISION-001 / ADR-0007), [fluxo-operacional-pedido-entrega-cobranca.md](fluxo-operacional-pedido-entrega-cobranca.md) (#391), [backup-e-restauracao.md](backup-e-restauracao.md).
+**Relacionado:** [matriz-cobertura-piloto-distribuidora.md](matriz-cobertura-piloto-distribuidora.md) (#450), [topologia-implantacao-local.md](topologia-implantacao-local.md) (#537 / ADR-0029), [catalogo-modulos-e-feature-flags.md](catalogo-modulos-e-feature-flags.md), [visao-produto-e-implantacao.md](visao-produto-e-implantacao.md) (PROD-VISION-001 / ADR-0007), [fluxo-operacional-pedido-entrega-cobranca.md](fluxo-operacional-pedido-entrega-cobranca.md) (#391), [backup-e-restauracao.md](backup-e-restauracao.md).
 
 **Baseline (Fase 1):** `develop` @ `104172d2` (pós-#560).
 
@@ -38,7 +38,7 @@
 | Padrón A4 | Fiscal AR | `PadronA4Service.ts` + `arcaPadronMock.ts` | Mock; SOAP live fora de escopo → [#545](https://github.com/ayelenleclerc/BizCode/issues/545) | simulado |
 | Runtime desktop local (Tauri) | Shell Tauri carrega web | `main.rs` só `ping`; sem sidecar | [#539](https://github.com/ayelenleclerc/BizCode/issues/539) | pendiente |
 | Segurança baseline Local | — | — | Docs → [#538](https://github.com/ayelenleclerc/BizCode/issues/538) | pendiente |
-| Topologia Local (Chris / multi-site) | — | — | Docs → [#537](https://github.com/ayelenleclerc/BizCode/issues/537) | pendiente |
+| Topologia Local (Chris / multi-site) | — | — | [topologia-implantacao-local.md](topologia-implantacao-local.md) / [ADR-0029](../adr/ADR-0029-local-deployment-topology.md); multi-site A/B **decisão da proprietária pendente** | verificado (doc); decisão piloto pendente |
 | Backups Local operáveis | Docs ops | `backup:postgres:drill` / SEC-007 | [backup-e-restauracao.md](backup-e-restauracao.md); Local → [#540](https://github.com/ayelenleclerc/BizCode/issues/540) | parcial |
 | Compras / custos / promos (escopo Local) | Módulos do preset | Serviços de domínio | Issues filhas sob #535 (P1+) | pendiente |
 

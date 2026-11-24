@@ -17,7 +17,7 @@ This document captures **strategic product and architecture direction** so contr
 
 ## Multi-user desktop
 
-Desktop deployments may have **multiple users** (e.g. office/LAN). User, role, and audit concepts should remain **conceptually compatible** with a future SaaS model (same entities; different isolation and deployment policies).
+Desktop deployments may have **multiple users** (e.g. office/LAN). User, role, and audit concepts should remain **conceptually compatible** with a future SaaS model (same entities; different isolation and deployment policies). Single-establishment Local topology (principal host + workstations), multi-site options, and channel failure modes: [local-deployment-topology.md](local-deployment-topology.md) (#537) / [ADR-0029](../adr/ADR-0029-local-deployment-topology.md).
 
 ## Fiscal modules by country
 
