@@ -75,9 +75,26 @@ const envSchema = z.object({
   HTTP_RATE_LIMIT_IMPORT_PER_HOUR: optionalPositiveInt,
   TRUST_PROXY: optionalNonEmptyString,
   WEBHOOK_IP_ALLOWLIST: optionalNonEmptyString,
+  /** Optional HTTP bind host (#538). See {@link resolveListenHost}. */
+  BIZCODE_LISTEN_HOST: optionalNonEmptyString,
 })
 
 export type AppConfig = z.infer<typeof envSchema>
+
+/**
+ * @en Resolves HTTP listen host (#538): explicit `BIZCODE_LISTEN_HOST`, else loopback outside production, else all interfaces (`undefined`).
+ * @es Resuelve el host de listen HTTP (#538): `BIZCODE_LISTEN_HOST` explícito, si no loopback fuera de production, si no todas las interfaces (`undefined`).
+ * @pt-BR Resolve o host de listen HTTP (#538): `BIZCODE_LISTEN_HOST` explícito, senão loopback fora de production, senão todas as interfaces (`undefined`).
+ */
+export function resolveListenHost(config: Pick<AppConfig, 'BIZCODE_LISTEN_HOST' | 'NODE_ENV'>): string | undefined {
+  if (config.BIZCODE_LISTEN_HOST) {
+    return config.BIZCODE_LISTEN_HOST
+  }
+  if (config.NODE_ENV === 'production') {
+    return undefined
+  }
+  return '127.0.0.1'
+}
 
 let cachedConfig: AppConfig | null = null
 

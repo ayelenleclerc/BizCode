@@ -4,7 +4,7 @@ import type { Server } from 'node:http'
 import { createApp } from './createApp'
 import { createTenantRlsPrisma } from './lib/tenantRls'
 import { logger } from './logger'
-import { initializeAppConfig } from './config/env'
+import { getAppConfig, initializeAppConfig, resolveListenHost } from './config/env'
 import { startSecurityMonitor, stopSecurityMonitor } from './security/securityMonitor'
 
 export const PORT = 3001
@@ -42,9 +42,15 @@ export function bindHttpServer(
   port: number,
   options?: BindHttpServerOptions,
 ): Server {
-  const server = app.listen(port, () => {
-    logger.info({ port }, 'API server listening')
-  })
+  // #538: explicit host when resolved; omit host for production all-interfaces default.
+  const host = resolveListenHost(getAppConfig())
+  const onListening = (): void => {
+    logger.info({ port, host: host ?? 'all-interfaces' }, 'API server listening')
+  }
+  const server =
+    host === undefined
+      ? app.listen(port, onListening)
+      : app.listen(port, host, onListening)
   if (options?.startSecurityMonitor !== false) {
     startSecurityMonitor(prisma)
   }

@@ -37,7 +37,7 @@
 | ARCA CAE (AFIP) | Fiscal AR modules | `apps/server/fiscal/ar/ArcaService.ts` + `arcaWsfeMock.ts` | Homologation mock only; live → [#544](https://github.com/ayelenleclerc/BizCode/issues/544) | simulado |
 | Padrón A4 | Fiscal AR | `PadronA4Service.ts` + `arcaPadronMock.ts` | Mock; live SOAP out of scope in code → [#545](https://github.com/ayelenleclerc/BizCode/issues/545) | simulado |
 | Local desktop runtime (Tauri) | Tauri shell loads web | `src-tauri/src/main.rs` (`ping` only); `tauri.conf.json` — no sidecar / no Express spawn | [#539](https://github.com/ayelenleclerc/BizCode/issues/539) | pendiente |
-| Local security baseline | — | — | Docs/work → [#538](https://github.com/ayelenleclerc/BizCode/issues/538) | pendiente |
+| Local security baseline | — | — | [local-security-hardening.md](local-security-hardening.md) (#538); updater/CSP → #539; pentest → #194 | verificado (doc); residuales #539/#194 |
 | Local topology (Chris / multi-site) | — | — | [local-deployment-topology.md](local-deployment-topology.md) / [ADR-0029](../adr/ADR-0029-local-deployment-topology.md); multi-site A/B **owner decision pending** | verificado (doc); decisión piloto pendiente |
 | Local backups operable | Ops docs | `backup:postgres:drill` / SEC-007 | [backup-and-restore.md](backup-and-restore.md); Local-specific → [#540](https://github.com/ayelenleclerc/BizCode/issues/540) | parcial |
 | Purchases / costs / promos (Local scope) | Purchases modules in preset | Domain services vary | Child issues under #535 (P1+) | pendiente |
