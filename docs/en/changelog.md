@@ -10,6 +10,7 @@ Versioning: [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **BizCode Local — security hardening (#538):** Threat matrix + secure-config manual EN/ES/PT for Local installs; `BIZCODE_LISTEN_HOST` with loopback default outside production; residual Tauri updater/CSP → #539; external pentest → #194 keep-OPEN; `DOCUMENT_LOCALE_MAP` row.
 - **BizCode Local — deployment topology (#537):** ADR-0029 + EN/ES/PT topology doc (single-site baseline, multi-site options A/B pending owner decision, remote-channel inventory, failure matrix); documents Tauri sidecar drift vs `src-tauri` ping-only; `DOCUMENT_LOCALE_MAP` row; architecture cross-links.
 - **BizCode Local — distributor scope matrix (#536):** Traceable requirement → UI/API → service → test → status matrix for the Local/distributor program (#535); extends pilot #450; documents new-install `MAYORISTA_ALIMENTOS` profile without migrating existing tenant flags; module conservation for paused verticals; EN/ES/PT-BR + `DOCUMENT_LOCALE_MAP`.
 - **Pharmacy obras sociales / prepaid MVP (#252):** ABM insurers + coverage %, OS sale with automatic copay/credit, monthly presentation CSV, CC summary and partial rejections on `vertical.pharmacy` (Prisma migration `20261117120000_obras_sociales_252`, `ObraSocialService`, `/api/farmacia/obras-sociales*`, UI tabs). Residual: no PAMI/Farmalink live and no proprietary OSDE/Swiss formats; #252 stays OPEN.

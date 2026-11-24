@@ -76,7 +76,7 @@ In-repo today, “sucursal” means a **warehouse type** inside one DB (`Deposit
 - Authorization remains **server-side** (`requirePermission`, tenant middleware, portal guards).
 - Isolation by **tenant** (ADR-0010); warehouse/branch scopes are arrays — fine-grained multi-site IAM may need follow-up.
 - Secrets: DB URL, session secrets, webhook credentials must stay on the principal host / secret store — not copied to every puesto.
-- Residual risk: exposing Local API to the internet without #538 controls.
+- Residual risk: exposing Local API to the internet without Local hardening — see [local-security-hardening.md](local-security-hardening.md) (#538).
 
 ## Explicit gaps (Not evidenced)
 

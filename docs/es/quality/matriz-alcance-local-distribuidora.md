@@ -37,7 +37,7 @@
 | ARCA CAE (AFIP) | Módulos fiscales AR | `ArcaService.ts` + `arcaWsfeMock.ts` | Solo mock homologación; live → [#544](https://github.com/ayelenleclerc/BizCode/issues/544) | simulado |
 | Padrón A4 | Fiscal AR | `PadronA4Service.ts` + `arcaPadronMock.ts` | Mock; SOAP live fuera de alcance → [#545](https://github.com/ayelenleclerc/BizCode/issues/545) | simulado |
 | Runtime escritorio local (Tauri) | Shell Tauri carga web | `main.rs` solo `ping`; sin sidecar / sin spawn Express | [#539](https://github.com/ayelenleclerc/BizCode/issues/539) | pendiente |
-| Seguridad baseline Local | — | — | Trabajo docs → [#538](https://github.com/ayelenleclerc/BizCode/issues/538) | pendiente |
+| Seguridad baseline Local | — | — | [endurecimiento-seguridad-local.md](endurecimiento-seguridad-local.md) (#538); updater/CSP → #539; pentest → #194 | verificado (doc); residuales #539/#194 |
 | Topología Local (Chris / multi-sitio) | — | — | [topologia-despliegue-local.md](topologia-despliegue-local.md) / [ADR-0029](../adr/ADR-0029-local-deployment-topology.md); multisitio A/B **decisión propietaria pendiente** | verificado (doc); decisión piloto pendiente |
 | Backups Local operables | Docs ops | `backup:postgres:drill` / SEC-007 | [backup-y-restauracion.md](backup-y-restauracion.md); específico Local → [#540](https://github.com/ayelenleclerc/BizCode/issues/540) | parcial |
 | Compras / costos / promos (alcance Local) | Módulos compras del preset | Servicios de dominio | Issues hijas bajo #535 (P1+) | pendiente |

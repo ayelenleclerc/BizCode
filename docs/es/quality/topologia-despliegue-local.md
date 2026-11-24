@@ -75,7 +75,7 @@ En el repo, “sucursal” como `Deposito.tipo` es almacén **dentro** de una DB
 
 - Autorización **server-side**; aislamiento por **tenant** (ADR-0010).
 - Secretos en el host principal / almacén de secretos — no en cada puesto.
-- Riesgo residual: exponer API Local a Internet sin controles de #538.
+- Riesgo residual: exponer API Local a Internet — ver [endurecimiento-seguridad-local.md](endurecimiento-seguridad-local.md) (#538).
 
 ## Brechas explícitas (Not evidenced)
 

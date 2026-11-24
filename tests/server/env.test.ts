@@ -1,5 +1,10 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { initializeAppConfig, loadAppConfig, resetAppConfigCache } from '../../apps/server/config/env'
+import {
+  initializeAppConfig,
+  loadAppConfig,
+  resetAppConfigCache,
+  resolveListenHost,
+} from '../../apps/server/config/env'
 
 const validEnv = {
   DATABASE_URL: 'postgresql://bizcode@localhost:5432/bizcode_test',
@@ -140,5 +145,22 @@ describe('server/config/env', () => {
       LOG_LEVEL: 'info',
     })
     expect(parsed.LOG_LEVEL).toBe('info')
+  })
+
+  it('accepts optional BIZCODE_LISTEN_HOST (#538)', () => {
+    const parsed = loadAppConfig({
+      ...validEnv,
+      BIZCODE_LISTEN_HOST: '0.0.0.0',
+    })
+    expect(parsed.BIZCODE_LISTEN_HOST).toBe('0.0.0.0')
+  })
+
+  it('resolveListenHost defaults to loopback outside production (#538)', () => {
+    expect(resolveListenHost({ NODE_ENV: 'development' })).toBe('127.0.0.1')
+    expect(resolveListenHost({ NODE_ENV: 'test' })).toBe('127.0.0.1')
+    expect(resolveListenHost({ NODE_ENV: 'production' })).toBeUndefined()
+    expect(resolveListenHost({ NODE_ENV: 'test', BIZCODE_LISTEN_HOST: '192.168.1.10' })).toBe(
+      '192.168.1.10',
+    )
   })
 })

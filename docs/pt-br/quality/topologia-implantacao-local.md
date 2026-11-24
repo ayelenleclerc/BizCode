@@ -73,7 +73,7 @@ No repositório, “sucursal” como `Deposito.tipo` é armazém **dentro** de u
 
 - Autorização server-side; isolamento por tenant (ADR-0010).
 - Segredos no host principal.
-- Risco residual: expor API Local sem #538.
+- Risco residual: expor API Local — ver [endurecimento-seguranca-local.md](endurecimento-seguranca-local.md) (#538).
 
 ## Lacunas (Not evidenced)
 
