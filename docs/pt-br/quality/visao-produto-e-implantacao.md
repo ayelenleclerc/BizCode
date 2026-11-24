@@ -17,7 +17,7 @@ Este documento registra a **direção estratégica de produto e arquitetura** pa
 
 ## Desktop multiusuário
 
-Implantações desktop podem ter **vários usuários** (p. ex. escritório/LAN). Usuário, papel e auditoria devem ser **conceptualmente compatíveis** com um futuro SaaS (mesmas entidades; isolamento e política de implantação distintos).
+Implantações desktop podem ter **vários usuários** (p. ex. escritório/LAN). Usuário, papel e auditoria devem ser **conceptualmente compatíveis** com um futuro SaaS (mesmas entidades; isolamento e política de implantação distintos). Topologia Local de um estabelecimento (host principal + postos), opções multi-site e modos de falha: [topologia-implantacao-local.md](topologia-implantacao-local.md) (#537) / [ADR-0029](../adr/ADR-0029-local-deployment-topology.md).
 
 ## Módulos fiscais por país
 

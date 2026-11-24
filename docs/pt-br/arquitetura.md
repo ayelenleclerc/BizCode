@@ -78,6 +78,6 @@ O **mesmo domínio de negócio** deve suportar **desktop** (este documento) e, q
 - **Superfície da API em módulos:** `server/createApp.ts` compõe middleware e routers; os handlers REST de domínio ficam em `server/routes/` e são registrados a partir de `server/registerRestDomainRoutes.ts`. `server.ts` expõe o bootstrap; `server/main.ts` é a entrada do `npm run server`.
 - **Sessão e exposição à rede:** há cookie de sessão, `resolveSession` e `requirePermission` nas rotas protegidas (ver `server/auth.ts` e [modelo-iam-sessoes-auditoria.md](quality/modelo-iam-sessoes-auditoria.md)). O layout desktop padrão ainda pressupõe sidecar local em loopback; SaaS hospedado exige transporte e hardening conforme [seguranca.md](seguranca.md).
 - **Build Tauri fora do CI:** ver [quality/ciclo-ci-cd.md](quality/ciclo-ci-cd.md).
-- **Sem modo offline:** o SPA exige o sidecar Express em execução.
+- **Sem modo offline:** o SPA exige a API Express alcançável. Os diagramas ainda mostram Express como sidecar Tauri; o `src-tauri` atual só expõe `ping` — a API sobe à parte até o empacotamento ([#539](https://github.com/ayelenleclerc/BizCode/issues/539)). Ver [topologia-implantacao-local.md](quality/topologia-implantacao-local.md) (#537) e [ADR-0029](adr/ADR-0029-local-deployment-topology.md).
 
 **Outros idiomas:** [English](../en/arquitetura.md) · [Español](../es/arquitetura.md)
